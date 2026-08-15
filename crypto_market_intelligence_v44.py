@@ -43,15 +43,15 @@ FEE = 0.002
 UPDATE_TIME = "06:00 UTC"
 
 ASSETS = {
-    'ETH': {'name': 'Ethereum', 'binance': 'ETHUSDT', 'coingecko': 'ethereum', 'deribit': 'ETH'},
-    'BTC': {'name': 'Bitcoin', 'binance': 'BTCUSDT', 'coingecko': 'bitcoin', 'deribit': 'BTC'},
-    'SOL': {'name': 'Solana', 'binance': 'SOLUSDT', 'coingecko': 'solana', 'deribit': 'SOL'},
-    'BNB': {'name': 'BNB', 'binance': 'BNBUSDT', 'coingecko': 'binancecoin', 'deribit': None},
-    'XRP': {'name': 'XRP', 'binance': 'XRPUSDT', 'coingecko': 'ripple', 'deribit': None},
-    'ADA': {'name': 'Cardano', 'binance': 'ADAUSDT', 'coingecko': 'cardano', 'deribit': None},
-    'DOGE': {'name': 'Dogecoin', 'binance': 'DOGEUSDT', 'coingecko': 'dogecoin', 'deribit': None},
-    'LINK': {'name': 'Chainlink', 'binance': 'LINKUSDT', 'coingecko': 'chainlink', 'deribit': None},
-    'AVAX': {'name': 'Avalanche', 'binance': 'AVAXUSDT', 'coingecko': 'avalanche-2', 'deribit': None},
+    'ETH': {'name': 'Ethereum', 'binance': 'ETHUSDT', 'yahoo': 'ETH-USD', 'coingecko': 'ethereum', 'deribit': 'ETH'},
+    'BTC': {'name': 'Bitcoin', 'binance': 'BTCUSDT', 'yahoo': 'BTC-USD', 'coingecko': 'bitcoin', 'deribit': 'BTC'},
+    'SOL': {'name': 'Solana', 'binance': 'SOLUSDT', 'yahoo': 'SOL-USD', 'coingecko': 'solana', 'deribit': 'SOL'},
+    'BNB': {'name': 'BNB', 'binance': 'BNBUSDT', 'yahoo': 'BNB-USD', 'coingecko': 'binancecoin', 'deribit': None},
+    'XRP': {'name': 'XRP', 'binance': 'XRPUSDT', 'yahoo': 'XRP-USD', 'coingecko': 'ripple', 'deribit': None},
+    'ADA': {'name': 'Cardano', 'binance': 'ADAUSDT', 'yahoo': 'ADA-USD', 'coingecko': 'cardano', 'deribit': None},
+    'DOGE': {'name': 'Dogecoin', 'binance': 'DOGEUSDT', 'yahoo': 'DOGE-USD', 'coingecko': 'dogecoin', 'deribit': None},
+    'LINK': {'name': 'Chainlink', 'binance': 'LINKUSDT', 'yahoo': 'LINK-USD', 'coingecko': 'chainlink', 'deribit': None},
+    'AVAX': {'name': 'Avalanche', 'binance': 'AVAXUSDT', 'yahoo': 'AVAX-USD', 'coingecko': 'avalanche-2', 'deribit': None},
 }
 
 ETHERSCAN_API_KEY = os.environ.get('ETHERSCAN_API_KEY', '')
@@ -123,6 +123,51 @@ def fetch_yahoo(ticker, period='2y'):
         return df
     except Exception as e:
         print(f"  ⚠️ Yahoo {ticker}: {e}")
+        return pd.DataFrame()
+
+def fetch_yahoo_ohlcv(ticker, period='2y'):
+    '''Fetch full OHLCV from Yahoo Finance as fallback when Binance fails.'''
+    try:
+        import yfinance as yf
+        data = yf.download(ticker, period=period, progress=False, auto_adjust=True)
+        if data.empty:
+            return pd.DataFrame()
+        df = data.reset_index()
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = [' '.join(col).strip() if col[1] else col[0] for col in df.columns.values]
+
+        # Map columns - Yahoo returns Open, High, Low, Close, Volume
+        col_map = {}
+        for c in df.columns:
+            cl = c.lower()
+            if 'date' in cl or c == df.columns[0]:
+                col_map['date'] = c
+            elif 'open' in cl and 'adj' not in cl:
+                col_map['open'] = c
+            elif 'high' in cl:
+                col_map['high'] = c
+            elif 'low' in cl:
+                col_map['low'] = c
+            elif 'close' in cl and 'adj' not in cl:
+                col_map['close'] = c
+            elif 'volume' in cl:
+                col_map['volume'] = c
+
+        needed = ['date', 'open', 'high', 'low', 'close', 'volume']
+        available = [col_map.get(k) for k in needed if col_map.get(k) in df.columns]
+        if len(available) < 4:
+            return pd.DataFrame()
+
+        df = df[available].copy()
+        rename = {v: k for k, v in col_map.items() if v in df.columns}
+        df = df.rename(columns=rename)
+        df['date'] = pd.to_datetime(df['date'])
+        for col in ['open', 'high', 'low', 'close', 'volume']:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+        return df[['date', 'open', 'high', 'low', 'close', 'volume']].dropna(subset=['close'])
+    except Exception as e:
+        print(f"  ⚠️ Yahoo OHLCV {ticker}: {e}")
         return pd.DataFrame()
 
 def fetch_fear_greed():
@@ -995,11 +1040,17 @@ def process_asset(code, config, fng_df, macro_data):
     print(f"{'='*60}")
 
     df = fetch_binance_klines(config['binance'])
+    source = 'Binance'
     if df.empty or len(df) < 100:
-        print(f"  ❌ No data for {code}")
+        print(f"  ⚠️ Binance failed, trying Yahoo Finance fallback...")
+        if config.get('yahoo'):
+            df = fetch_yahoo_ohlcv(config['yahoo'])
+            source = 'Yahoo'
+    if df.empty or len(df) < 100:
+        print(f"  ❌ No data for {code} from any source")
         return None
 
-    print(f"  Fetched {len(df)} days from Binance")
+    print(f"  Fetched {len(df)} days from {source}")
 
     df = add_features(df)
     df = add_pi_cycle(df)
@@ -1749,7 +1800,28 @@ def run_pipeline():
                 all_signals[code]['onchain'] = onchain
 
     if not all_signals:
-        print("\n❌ No assets processed successfully. Exiting.")
+        print("\n⚠️ No assets processed successfully. Generating fallback report...")
+        # Generate a minimal JSON so the dashboard doesn't break
+        dashboard_data = {
+            'version': '4.4',
+            'generated_at': datetime.now().isoformat(),
+            'update_schedule': UPDATE_TIME,
+            'disclaimer': "THIS IS A RESEARCH AND EDUCATIONAL TOOL ONLY. NOT FINANCIAL ADVICE.",
+            'fear_greed': {'value': 50, 'label': 'Neutral'},
+            'global_data': global_data,
+            'market_report': {
+                'date': datetime.now().strftime('%Y-%m-%d'),
+                'market_mood': 'UNKNOWN',
+                'mood_description': 'Data fetch failed. Binance API may be blocking this IP. Check API status.',
+                'bullish_assets': 0, 'bearish_assets': 0, 'neutral_assets': 0,
+                'avg_conviction': 0, 'regime_distribution': {},
+            },
+            'assets': {},
+        }
+        os.makedirs('docs', exist_ok=True)
+        with open(OUTPUT_PATH, 'w') as f:
+            json.dump(dashboard_data, f, indent=2, default=str)
+        print(f"\n💾 Fallback saved to {OUTPUT_PATH}")
         return
 
     print("\n[4/7] Computing cross-asset analytics...")
