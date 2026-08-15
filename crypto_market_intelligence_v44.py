@@ -1210,7 +1210,7 @@ def process_asset(code, config, fng_df, macro_data):
     }
 
     print(f"  ✅ {narrative['signal']} | Conviction: {narrative['conviction']}/1.0 | Regime: {latest['regime']}")
-    return asset_output, df[['date', 'close']].rename(columns={'close': code}), chart_data, df[['date', 'close']].rename(columns={'close': code})
+    return asset_output, df[['date', 'close']].rename(columns={'close': code}), chart_data
 
 
 
