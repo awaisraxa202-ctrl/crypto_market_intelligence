@@ -2,7 +2,7 @@ name: Market Cortex Hourly Update
 
 on:
   schedule:
-    # Every 2 hours (optimized for free tier)
+    # Every 2 hours
     - cron: '0 */2 * * *'
   workflow_dispatch:
 
@@ -21,23 +21,23 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      
+
       - name: Install dependencies
         run: |
           pip install pandas numpy requests yfinance
-      
-      - name: Run Market Intelligence Engine (Ultimate)
+
+      - name: Run Market Intelligence Engine (v5.0 Ultimate)
         run: python crypto_market_intelligence_v50_ultimate.py
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-      
+
       - name: Commit and push updated data
         run: |
           git config user.name "github-actions[bot]"
