@@ -3,11 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Market Cortex — Crypto Intelligence Terminal</title>
+  <title>Market Cortex v5.0 — Ultimate Edition</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
-    /* ─── ROOT ─── */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
       --bg: #08080c;
@@ -20,7 +19,6 @@
       --text-muted: rgba(238,239,242,0.25);
       --accent: #00e5ff;
       --accent-dim: rgba(0,229,255,0.05);
-      --accent-glow: rgba(0,229,255,0.1);
       --rose: #ff3864;
       --lime: #39ff14;
       --amber: #ffd700;
@@ -35,12 +33,10 @@
     body { font-family: var(--font-body); font-weight: 300; background: var(--bg); min-height: 100vh; overflow-x: hidden; }
     ::selection { background: var(--accent-dim); color: var(--accent); }
 
-    /* ─── WEBGL ─── */
     #webgl { position: fixed; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; display: block; }
     .grain { position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.02; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 256px 256px; }
     .vignette { position: fixed; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(ellipse at center, transparent 45%, rgba(8,8,12,0.5) 100%); }
 
-    /* ─── BOOT ─── */
     #boot {
       position: fixed; inset: 0; z-index: 10000; background: var(--bg);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -62,7 +58,6 @@
     .boot-track { width: 180px; height: 1px; background: rgba(255,255,255,0.05); position: relative; overflow: hidden; }
     .boot-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: linear-gradient(90deg, transparent, var(--accent), transparent); transition: width 0.5s var(--ease); }
 
-    /* ─── SYSTEM INFO OVERLAY (FULL PAGE) ─── */
     #system-overlay {
       position: fixed; inset: 0; z-index: 9999;
       background: var(--bg);
@@ -70,11 +65,7 @@
       padding: 40px 24px;
       transition: opacity 0.8s var(--ease), visibility 0.8s var(--ease);
     }
-    #system-overlay.dismissed {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
+    #system-overlay.dismissed { opacity: 0; visibility: hidden; pointer-events: none; }
     #system-overlay .inner {
       max-width: 820px; width: 100%;
       background: var(--bg-elevated);
@@ -89,104 +80,31 @@
       background: linear-gradient(135deg, var(--accent-dim), transparent 50%, var(--violet)20);
       opacity: 0.15; z-index: -1;
     }
-
-    .overlay-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 24px; flex-wrap: wrap; gap: 10px;
-    }
-    .overlay-header .brand {
-      font-family: var(--font-display); font-weight: 300;
-      font-size: 1.1rem; color: #fff;
-    }
-    .overlay-header .brand span {
-      color: var(--accent); font-style: italic;
-    }
-    .overlay-header .badge {
-      font-family: var(--font-mono); font-weight: 300;
-      font-size: 0.5rem; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--text-muted);
-      padding: 4px 12px; border: 1px solid var(--border-subtle);
-      border-radius: 100px;
-    }
-
-    .overlay-title {
-      font-family: var(--font-display); font-weight: 300;
-      font-size: 1.8rem; color: #fff; margin-bottom: 6px;
-      letter-spacing: -0.02em;
-    }
+    .overlay-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 10px; }
+    .overlay-header .brand { font-family: var(--font-display); font-weight: 300; font-size: 1.1rem; color: #fff; }
+    .overlay-header .brand span { color: var(--accent); font-style: italic; }
+    .overlay-header .badge { font-family: var(--font-mono); font-weight: 300; font-size: 0.5rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); padding: 4px 12px; border: 1px solid var(--border-subtle); border-radius: 100px; }
+    .overlay-title { font-family: var(--font-display); font-weight: 300; font-size: 1.8rem; color: #fff; margin-bottom: 6px; letter-spacing: -0.02em; }
     .overlay-title .accent { color: var(--accent); font-style: italic; }
-    .overlay-sub {
-      font-weight: 300; font-size: 0.85rem;
-      color: var(--text-secondary); line-height: 1.6;
-      margin-bottom: 24px;
-    }
-
-    .overlay-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 20px 32px; margin: 16px 0 24px;
-    }
+    .overlay-sub { font-weight: 300; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px; }
+    .overlay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 32px; margin: 16px 0 24px; }
     @media (max-width: 700px) { .overlay-grid { grid-template-columns: 1fr; } }
-
-    .overlay-col .col-label {
-      font-family: var(--font-mono); font-weight: 300;
-      font-size: 0.55rem; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--text-muted);
-      margin-bottom: 8px;
-    }
-    .overlay-col ul {
-      list-style: none; font-weight: 300; font-size: 0.75rem;
-      line-height: 2.2; color: var(--text-secondary);
-    }
+    .overlay-col .col-label { font-family: var(--font-mono); font-weight: 300; font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+    .overlay-col ul { list-style: none; font-weight: 300; font-size: 0.75rem; line-height: 2.2; color: var(--text-secondary); }
     .overlay-col ul li { display: flex; align-items: flex-start; gap: 8px; }
     .overlay-col ul li .icon { flex-shrink: 0; width: 16px; text-align: center; font-size: 0.65rem; }
     .overlay-col ul li .icon-check { color: var(--lime); }
     .overlay-col ul li .icon-cross { color: var(--rose); }
-
-    .overlay-warning {
-      padding: 12px 16px; background: rgba(255, 215, 0, 0.03);
-      border-radius: 6px; border-left: 2px solid var(--amber);
-      font-size: 0.7rem; color: var(--text-secondary); line-height: 1.6;
-      margin-bottom: 24px;
-    }
+    .overlay-warning { padding: 12px 16px; background: rgba(255, 215, 0, 0.03); border-radius: 6px; border-left: 2px solid var(--amber); font-size: 0.7rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px; }
     .overlay-warning strong { color: var(--amber); font-weight: 400; }
+    .overlay-actions { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; padding-top: 16px; border-top: 1px solid var(--border-subtle); }
+    .overlay-actions label { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-weight: 300; font-size: 0.6rem; color: var(--text-secondary); cursor: pointer; }
+    .overlay-actions label input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; background: transparent; border: 1px solid var(--border-subtle); border-radius: 3px; }
+    .btn-enter { padding: 8px 28px; background: transparent; border: 1px solid var(--accent); border-radius: 100px; color: var(--accent); font-family: var(--font-mono); font-weight: 300; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.3s var(--ease); }
+    .btn-enter:hover { background: var(--accent); color: var(--bg); }
+    .btn-enter:disabled { opacity: 0.25; cursor: not-allowed; border-color: var(--text-muted); color: var(--text-muted); }
+    .btn-enter:disabled:hover { background: transparent; color: var(--text-muted); }
 
-    .overlay-actions {
-      display: flex; align-items: center; gap: 20px;
-      flex-wrap: wrap; padding-top: 16px;
-      border-top: 1px solid var(--border-subtle);
-    }
-    .overlay-actions label {
-      display: flex; align-items: center; gap: 8px;
-      font-family: var(--font-mono); font-weight: 300;
-      font-size: 0.6rem; color: var(--text-secondary);
-      cursor: pointer;
-    }
-    .overlay-actions label input[type="checkbox"] {
-      width: 15px; height: 15px; accent-color: var(--accent);
-      cursor: pointer; background: transparent;
-      border: 1px solid var(--border-subtle);
-      border-radius: 3px;
-    }
-    .btn-enter {
-      padding: 8px 28px; background: transparent;
-      border: 1px solid var(--accent); border-radius: 100px;
-      color: var(--accent); font-family: var(--font-mono);
-      font-weight: 300; font-size: 0.6rem; letter-spacing: 0.1em;
-      text-transform: uppercase; cursor: pointer;
-      transition: all 0.3s var(--ease);
-    }
-    .btn-enter:hover {
-      background: var(--accent); color: var(--bg);
-    }
-    .btn-enter:disabled {
-      opacity: 0.25; cursor: not-allowed;
-      border-color: var(--text-muted); color: var(--text-muted);
-    }
-    .btn-enter:disabled:hover {
-      background: transparent; color: var(--text-muted);
-    }
-
-    /* ─── HUD ─── */
     #hud {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       height: 50px; display: flex; align-items: center; justify-content: space-between;
@@ -200,14 +118,15 @@
     @keyframes hudIn { to { transform: translateY(0); } }
     .hud-brand { font-family: var(--font-display); font-weight: 300; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: #fff; }
     .hud-brand span { color: var(--accent); font-weight: 300; font-style: italic; }
+    .hud-brand .version { font-size: 0.45rem; color: var(--text-muted); margin-left: 6px; }
     .hud-nav { display: flex; gap: 20px; }
     .hud-nav a { font-family: var(--font-mono); font-weight: 300; font-size: 0.5rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); text-decoration: none; padding: 4px 0; border-bottom: 1px solid transparent; transition: all 0.3s var(--ease); }
     .hud-nav a:hover { color: #fff; border-bottom-color: var(--accent); }
     .hud-meta { display: flex; align-items: center; gap: 14px; font-family: var(--font-mono); font-weight: 300; font-size: 0.5rem; color: var(--text-secondary); }
     .hud-pulse { width: 4px; height: 4px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 8px var(--lime); animation: pulseDot 1.6s infinite; }
     @keyframes pulseDot { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+    .hud-update-badge { font-size: 0.4rem; color: var(--text-muted); background: var(--bg-card); padding: 2px 8px; border-radius: 100px; border: 1px solid var(--border-subtle); }
 
-    /* ─── LAYOUT ─── */
     .app {
       position: relative; z-index: 10;
       max-width: 1280px; margin: 0 auto; padding: 68px 24px 40px;
@@ -215,15 +134,14 @@
     }
     .app.visible { opacity: 1; }
 
-    /* ─── INTRO ─── */
     .intro { padding: 32px 0 16px; display: flex; flex-direction: column; gap: 8px; }
     .intro-eyebrow { font-family: var(--font-mono); font-weight: 300; font-size: 0.5rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); opacity: 0; animation: fadeUp 0.6s 2.2s var(--ease) forwards; }
     .intro-title { font-family: var(--font-display); font-weight: 300; font-size: clamp(2.4rem, 6vw, 4.6rem); line-height: 1; letter-spacing: -0.03em; color: #fff; opacity: 0; animation: fadeUp 0.8s 2.4s var(--ease) forwards; }
     .intro-title .accent { color: var(--accent); font-weight: 300; font-style: italic; }
-    .intro-sub { font-weight: 300; font-size: clamp(0.8rem, 1vw, 0.95rem); line-height: 1.6; color: var(--text-secondary); max-width: 520px; opacity: 0; animation: fadeUp 0.6s 2.6s var(--ease) forwards; }
+    .intro-title .version { font-size: 0.4em; color: var(--text-muted); margin-left: 12px; font-style: normal; }
+    .intro-sub { font-weight: 300; font-size: clamp(0.8rem, 1vw, 0.95rem); line-height: 1.6; color: var(--text-secondary); max-width: 560px; opacity: 0; animation: fadeUp 0.6s 2.6s var(--ease) forwards; }
     @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
 
-    /* ─── DISCLAIMER ─── */
     .disclaimer-banner {
       display: flex; align-items: center; gap: 14px; padding: 10px 18px;
       background: rgba(255, 215, 0, 0.03); border: 1px solid rgba(255, 215, 0, 0.06);
@@ -234,7 +152,6 @@
     .disclaimer-banner a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.3s; }
     .disclaimer-banner a:hover { border-bottom-color: var(--accent); }
 
-    /* ─── SECTION HEADERS ─── */
     .section-header {
       display: flex; align-items: baseline; justify-content: space-between;
       flex-wrap: wrap; gap: 6px; margin: 32px 0 14px;
@@ -243,7 +160,6 @@
     .section-header h2 { font-family: var(--font-display); font-weight: 300; font-size: clamp(1rem, 1.6vw, 1.35rem); letter-spacing: -0.02em; color: #fff; }
     .section-header .desc { font-weight: 300; font-size: 0.7rem; color: var(--text-secondary); max-width: 340px; }
 
-    /* ─── CARDS ─── */
     .card-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
     .card-grid-2 { grid-template-columns: repeat(2, 1fr); }
     .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
@@ -273,16 +189,24 @@
     .card-value .amber { color: var(--amber); }
     .card-detail { font-weight: 300; font-size: 0.7rem; color: var(--text-secondary); margin-top: 2px; line-height: 1.5; }
 
-    /* ─── METRIC ROW ─── */
+    .risk-badge {
+      display: inline-block; padding: 2px 10px; border-radius: 100px;
+      font-family: var(--font-mono); font-weight: 300; font-size: 0.45rem;
+      letter-spacing: 0.04em; text-transform: uppercase;
+    }
+    .risk-badge.safe { background: rgba(57,255,20,0.08); color: var(--lime); border: 1px solid rgba(57,255,20,0.1); }
+    .risk-badge.warning { background: rgba(255,215,0,0.08); color: var(--amber); border: 1px solid rgba(255,215,0,0.1); }
+    .risk-badge.danger { background: rgba(255,56,100,0.08); color: var(--rose); border: 1px solid rgba(255,56,100,0.1); }
+    .risk-badge.info { background: rgba(0,229,255,0.08); color: var(--accent); border: 1px solid rgba(0,229,255,0.1); }
+
     .metric-row {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 6px 0; border-bottom: 1px solid var(--border-subtle);
+      padding: 5px 0; border-bottom: 1px solid var(--border-subtle);
     }
     .metric-row:last-child { border-bottom: none; }
-    .metric-label { font-family: var(--font-mono); font-weight: 300; font-size: 0.5rem; letter-spacing: 0.04em; color: var(--text-secondary); }
-    .metric-value { font-family: var(--font-mono); font-weight: 300; font-size: 0.75rem; color: #fff; }
+    .metric-label { font-family: var(--font-mono); font-weight: 300; font-size: 0.45rem; letter-spacing: 0.04em; color: var(--text-secondary); }
+    .metric-value { font-family: var(--font-mono); font-weight: 300; font-size: 0.7rem; color: #fff; }
 
-    /* ─── BADGES ─── */
     .badge {
       display: inline-block; padding: 2px 9px; border-radius: 100px;
       font-family: var(--font-mono); font-weight: 300; font-size: 0.45rem;
@@ -294,11 +218,9 @@
     .badge.short { background: rgba(255,56,100,0.04); color: var(--rose); border: 1px solid rgba(255,56,100,0.06); }
     .badge.strong-short { background: rgba(255,56,100,0.08); color: var(--rose); border: 1px solid rgba(255,56,100,0.1); }
 
-    /* ─── CONVICTION ─── */
     .conviction-track { height: 2px; background: rgba(255,255,255,0.03); border-radius: 2px; overflow: hidden; margin-top: 4px; }
     .conviction-fill { height: 100%; border-radius: 2px; transition: width 1s var(--ease); background: linear-gradient(90deg, var(--accent), var(--violet)); }
 
-    /* ─── ASSET NODES ─── */
     .asset-node {
       background: var(--bg-card); border: 1px solid var(--border-subtle);
       border-radius: var(--radius); overflow: hidden;
@@ -307,59 +229,71 @@
     .asset-node:hover { border-color: var(--border-active); transform: translateY(-2px); }
     .asset-node-header {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 16px; border-bottom: 1px solid var(--border-subtle);
+      padding: 10px 14px; border-bottom: 1px solid var(--border-subtle);
     }
     .asset-node-id { font-family: var(--font-display); font-weight: 300; font-size: 0.95rem; color: #fff; }
     .asset-node-name { font-weight: 300; font-size: 0.55rem; color: var(--text-secondary); margin-left: 4px; }
     .asset-node-price { font-family: var(--font-mono); font-weight: 300; font-size: 0.75rem; color: var(--text-secondary); }
-    .asset-node-body { padding: 12px 16px; }
-    .asset-node-expand { max-height: 0; overflow: hidden; transition: max-height 0.5s var(--ease), opacity 0.3s; opacity: 0; }
-    .asset-node.expanded .asset-node-expand { max-height: 1800px; opacity: 1; }
-    .asset-node-expand-inner { padding: 0 16px 16px; border-top: 1px solid var(--border-subtle); }
+    .asset-node-body { padding: 10px 14px; }
+    .asset-node-expand { max-height: 0; overflow: hidden; transition: max-height 0.6s var(--ease), opacity 0.3s; opacity: 0; }
+    .asset-node.expanded .asset-node-expand { max-height: 2800px; opacity: 1; }
+    .asset-node-expand-inner { padding: 0 14px 14px; border-top: 1px solid var(--border-subtle); }
 
     .pill-row { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
     .pill {
       display: inline-flex; align-items: center; gap: 3px;
       padding: 2px 7px; background: rgba(255,255,255,0.015);
       border: 1px solid var(--border-subtle); border-radius: 100px;
-      font-family: var(--font-mono); font-weight: 300; font-size: 0.45rem; color: var(--text-secondary);
+      font-family: var(--font-mono); font-weight: 300; font-size: 0.4rem; color: var(--text-secondary);
     }
     .pill .bull { color: var(--lime); }
     .pill .bear { color: var(--rose); }
     .pill .neut { color: var(--amber); }
 
-    /* ─── CHARTS ─── */
+    .trade-plan-box {
+      background: rgba(0,229,255,0.03); border: 1px solid var(--border-active);
+      border-radius: 6px; padding: 8px 10px; margin-top: 6px;
+    }
+    .trade-plan-box .row { display: flex; justify-content: space-between; font-size: 0.55rem; padding: 2px 0; }
+    .trade-plan-box .label { color: var(--text-muted); }
+    .trade-plan-box .value { color: #fff; font-family: var(--font-mono); }
+    .trade-plan-box .value.lime { color: var(--lime); }
+    .trade-plan-box .value.rose { color: var(--rose); }
+    .trade-plan-box .value.accent { color: var(--accent); }
+
+    .regime-change-banner {
+      background: rgba(255,215,0,0.06); border: 1px solid var(--amber);
+      border-radius: 4px; padding: 4px 8px; font-size: 0.45rem;
+      color: var(--amber); margin-top: 4px; font-family: var(--font-mono);
+    }
+
     .chart-wrap { position: relative; height: 160px; margin: 6px 0; }
     .chart-wrap canvas { max-height: 160px; }
 
-    /* ─── CORRELATION ─── */
     .corr-table {
       width: 100%; border-collapse: separate; border-spacing: 2px;
-      font-family: var(--font-mono); font-weight: 300; font-size: 0.55rem;
+      font-family: var(--font-mono); font-weight: 300; font-size: 0.5rem;
     }
     .corr-table th { padding: 4px; color: var(--text-secondary); font-weight: 300; text-align: center; }
     .corr-table td { padding: 4px; text-align: center; border-radius: 4px; transition: transform 0.15s; }
     .corr-table td:hover { transform: scale(1.05); position: relative; z-index: 2; }
 
-    /* ─── FUNDING ─── */
-    .funding-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 4px; }
+    .funding-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 4px; }
     .funding-cell {
-      padding: 5px; border-radius: 4px; text-align: center;
+      padding: 4px; border-radius: 4px; text-align: center;
       border: 1px solid var(--border-subtle); background: rgba(255,255,255,0.01);
-      font-family: var(--font-mono); font-weight: 300; font-size: 0.5rem;
+      font-family: var(--font-mono); font-weight: 300; font-size: 0.45rem;
     }
-    .funding-cell .asset { font-weight: 400; color: #fff; font-size: 0.6rem; }
-    .funding-cell .rate { font-size: 0.45rem; }
+    .funding-cell .asset { font-weight: 400; color: #fff; font-size: 0.55rem; }
+    .funding-cell .rate { font-size: 0.4rem; }
 
-    /* ─── LIQUIDATIONS ─── */
     .liq-item { margin-bottom: 6px; background: rgba(255,255,255,0.01); border-radius: 6px; padding: 5px 8px; }
-    .liq-item .row { display: flex; justify-content: space-between; font-size: 0.6rem; }
+    .liq-item .row { display: flex; justify-content: space-between; font-size: 0.55rem; }
     .liq-item .bars { display: flex; height: 2px; border-radius: 2px; overflow: hidden; margin: 2px 0; }
     .liq-item .bars .long { background: var(--rose); }
     .liq-item .bars .short { background: var(--lime); }
-    .liq-item .meta { display: flex; justify-content: space-between; font-size: 0.45rem; color: var(--text-muted); }
+    .liq-item .meta { display: flex; justify-content: space-between; font-size: 0.4rem; color: var(--text-muted); }
 
-    /* ─── REVEAL ─── */
     .reveal { opacity: 0; transform: translateY(20px); transition: all 0.7s var(--ease); }
     .reveal.visible { opacity: 1; transform: translateY(0); }
     .stagger-1 { transition-delay: 0.04s; }
@@ -367,7 +301,6 @@
     .stagger-3 { transition-delay: 0.12s; }
     .stagger-4 { transition-delay: 0.16s; }
 
-    /* ─── FOOTER ─── */
     footer {
       margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--border-subtle);
       display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
@@ -375,7 +308,6 @@
       color: var(--text-muted); letter-spacing: 0.04em;
     }
 
-    /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
       #system-overlay .inner { padding: 28px 20px; }
       .overlay-title { font-size: 1.4rem; }
@@ -399,12 +331,10 @@
 </head>
 <body>
 
-  <!-- ─── WEBGL ─── -->
   <canvas id="webgl"></canvas>
   <div class="grain"></div>
   <div class="vignette"></div>
 
-  <!-- ─── BOOT ─── -->
   <div id="boot">
     <div style="position:relative; width:72px; height:72px;">
       <div class="boot-ring"></div>
@@ -416,29 +346,30 @@
     <div class="boot-track"><div class="boot-fill" id="boot-fill"></div></div>
   </div>
 
-  <!-- ─── SYSTEM INFO OVERLAY (FULL PAGE) ─── -->
   <div id="system-overlay">
     <div class="inner">
       <div class="overlay-header">
-        <div class="brand">Market <span>Cortex</span></div>
+        <div class="brand">Market <span>Cortex</span> <span style="font-size:0.5rem;color:var(--text-muted);margin-left:8px;">v5.0</span></div>
         <div class="badge">Research &amp; Education</div>
       </div>
-
       <div class="overlay-title">Before You <span class="accent">Enter</span></div>
-      <div class="overlay-sub">This is a research-grade market intelligence terminal. Please take a moment to understand what it is — and what it is not.</div>
-
+      <div class="overlay-sub">This is a research-grade market intelligence terminal with advanced risk management, multi-timeframe analysis, and real-time alerts. Please take a moment to understand what it is — and what it is not.</div>
       <div class="overlay-grid">
         <div class="overlay-col">
           <div class="col-label">✓ What This System <span style="color:var(--lime);">Is</span></div>
           <ul>
-            <li><span class="icon icon-check">✓</span> A research-grade market intelligence terminal</li>
-            <li><span class="icon icon-check">✓</span> Real data from 11+ sources (Binance, Yahoo, CoinGecko, etc.)</li>
-            <li><span class="icon icon-check">✓</span> 30+ technical indicators calculated from scratch</li>
-            <li><span class="icon icon-check">✓</span> 10 strategy backtests with 0.2% fees + Kelly Criterion</li>
-            <li><span class="icon icon-check">✓</span> Monte Carlo simulation (1,000 runs)</li>
-            <li><span class="icon icon-check">✓</span> Plain-English narrative signals with conviction scores</li>
-            <li><span class="icon icon-check">✓</span> Historical pattern matching &amp; seasonality analysis</li>
-            <li><span class="icon icon-check">✓</span> Automated daily updates via GitHub Actions · $0 cost</li>
+            <li><span class="icon icon-check">✓</span> Research-grade market intelligence terminal</li>
+            <li><span class="icon icon-check">✓</span> Real data from 11+ sources (Binance, Yahoo, CoinGecko)</li>
+            <li><span class="icon icon-check">✓</span> 30+ technical indicators from scratch</li>
+            <li><span class="icon icon-check">✓</span> Dynamic position sizing (volatility-adjusted)</li>
+            <li><span class="icon icon-check">✓</span> Drawdown protection (10% DD → 50% size)</li>
+            <li><span class="icon icon-check">✓</span> Regime-based strategy switching</li>
+            <li><span class="icon icon-check">✓</span> Multi-timeframe analysis (1h/4h/1d)</li>
+            <li><span class="icon icon-check">✓</span> Volatility forecast &amp; price targets with probability</li>
+            <li><span class="icon icon-check">✓</span> Risk metrics (VaR, Sortino, Calmar, Kelly)</li>
+            <li><span class="icon icon-check">✓</span> Real-time alerts (Discord/Telegram)</li>
+            <li><span class="icon icon-check">✓</span> Portfolio simulator &amp; walk-forward validation</li>
+            <li><span class="icon icon-check">✓</span> Automated hourly updates · $0 cost</li>
           </ul>
         </div>
         <div class="overlay-col">
@@ -452,11 +383,9 @@
           </ul>
         </div>
       </div>
-
       <div class="overlay-warning">
         <strong>⚠️ IMPORTANT:</strong> Paper trade first for 3+ months. Never risk more than 1–2% of capital on any single trade idea. The creators are NOT responsible for any trading losses. Past performance does NOT predict future results.
       </div>
-
       <div class="overlay-actions">
         <label>
           <input type="checkbox" id="understand-check" />
@@ -467,32 +396,30 @@
     </div>
   </div>
 
-  <!-- ─── HUD ─── -->
   <nav id="hud">
-    <div class="hud-brand">Market <span>Cortex</span></div>
+    <div class="hud-brand">Market <span>Cortex</span> <span class="version">v5.0</span></div>
     <div class="hud-nav">
       <a href="#overview">Overview</a>
       <a href="#assets">Assets</a>
+      <a href="#portfolio">Portfolio</a>
       <a href="#analytics">Analytics</a>
     </div>
     <div class="hud-meta">
       <span id="hud-time">--:-- UTC</span>
       <span class="hud-pulse"></span>
       <span style="color:var(--lime);">LIVE</span>
+      <span class="hud-update-badge">⏱ Every 2h</span>
     </div>
   </nav>
 
-  <!-- ─── APP (DASHBOARD) ─── -->
   <div class="app" id="dashboard-app">
 
-    <!-- ─── INTRO ─── -->
     <section class="intro">
-      <div class="intro-eyebrow">Quantitative Market Intelligence · Research &amp; Education</div>
-      <h1 class="intro-title">Market <span class="accent">Cortex</span></h1>
-      <p class="intro-sub">Real-time analysis of 9 crypto assets across 30+ indicators, 10 strategy backtests, Monte Carlo simulation, and plain-English signals. A research-grade terminal for systematic market intelligence.</p>
+      <div class="intro-eyebrow">Quantitative Market Intelligence · v5.0 Ultimate · Risk Management</div>
+      <h1 class="intro-title">Market <span class="accent">Cortex</span> <span class="version">v5.0</span></h1>
+      <p class="intro-sub">Real-time analysis across 9 crypto assets with dynamic position sizing, drawdown protection, regime-based strategy switching, multi-timeframe confirmation, volatility forecasting, price targets with probability, and actionable trade plans.</p>
     </section>
 
-    <!-- ─── DISCLAIMER BANNER ─── -->
     <div class="disclaimer-banner">
       <span style="font-size:1rem;">⚠️</span>
       <span><strong>RESEARCH &amp; EDUCATIONAL TOOL ONLY</strong> — NOT financial advice. Past performance does <strong>NOT</strong> predict future results. <a href="#" onclick="alert('Full Disclaimer: This is a research and educational tool only. NOT financial advice. Past performance does NOT predict future results. You can lose money. The creators are NOT responsible for any trading losses. Paper trade first for 3+ months. Never risk more than 1–2% of capital on any single trade idea.'); return false;">Read full disclaimer →</a></span>
@@ -501,12 +428,12 @@
     <!-- ─── QUICK STATS ─── -->
     <div class="section-header" id="overview">
       <h2><span class="num">01</span>Market Pulse</h2>
-      <span class="desc">Mood · Fear &amp; Greed · Altcoin Season</span>
+      <span class="desc">Mood · Fear &amp; Greed · Risk Grade</span>
     </div>
     <div class="card-grid card-grid-3">
       <div class="card reveal stagger-1"><div class="card-glow"></div><div class="card-label">Market Mood</div><div class="card-value" id="market-mood">—</div><div class="card-detail" id="mood-detail">Loading...</div></div>
       <div class="card reveal stagger-2"><div class="card-glow"></div><div class="card-label">Fear &amp; Greed</div><div class="card-value" id="fng-value">—</div><div class="card-detail" id="fng-label">Loading...</div></div>
-      <div class="card reveal stagger-3"><div class="card-glow"></div><div class="card-label">Altcoin Season Index</div><div class="card-value" id="alt-index">—</div><div class="card-detail" id="alt-label">Loading...</div></div>
+      <div class="card reveal stagger-3"><div class="card-glow"></div><div class="card-label">Risk Grade</div><div class="card-value" id="risk-grade">—</div><div class="card-detail" id="risk-detail">Loading...</div></div>
     </div>
 
     <!-- ─── MACRO REGIME ─── -->
@@ -531,13 +458,29 @@
     <!-- ─── ASSET NODES ─── -->
     <div class="section-header" id="assets">
       <h2><span class="num">03</span>Asset Signal Nodes</h2>
-      <span class="desc">Expand each for full decomposition</span>
+      <span class="desc">Expand for trade plan · multi-TF · volatility forecast · price targets</span>
     </div>
     <div class="card-grid" id="asset-grid"></div>
 
+    <!-- ─── PORTFOLIO SIMULATOR ─── -->
+    <div class="section-header" id="portfolio">
+      <h2><span class="num">04</span>Portfolio Simulator</h2>
+      <span class="desc">Based on current signals</span>
+    </div>
+    <div class="card reveal">
+      <div class="card-glow"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;">
+        <div><div class="card-label">Starting Capital</div><div class="card-value">$10,000</div></div>
+        <div><div class="card-label">Final Value</div><div class="card-value" id="portfolio-final">—</div></div>
+        <div><div class="card-label">Total Return</div><div class="card-value" id="portfolio-return">—</div></div>
+        <div><div class="card-label">Risk Grade</div><div class="card-value" id="portfolio-risk">—</div></div>
+      </div>
+      <div style="height:120px;margin-top:12px;"><canvas id="portfolio-chart"></canvas></div>
+    </div>
+
     <!-- ─── ANALYTICS ─── -->
     <div class="section-header" id="analytics">
-      <h2><span class="num">04</span>Cross-Asset Analytics</h2>
+      <h2><span class="num">05</span>Cross-Asset Analytics</h2>
       <span class="desc">Correlation · Funding · Liquidations</span>
     </div>
     <div class="card-grid card-grid-2">
@@ -549,10 +492,9 @@
       <div class="card reveal"><div class="card-glow"></div><div class="card-label">Regime Distribution</div><div class="chart-wrap"><canvas id="regime-chart"></canvas></div></div>
     </div>
 
-    <!-- ─── FOOTER ─── -->
     <footer>
-      <span>© 2026 Market Cortex — Crypto Intelligence Terminal</span>
-      <span>Built with WebGL · Vercel-inspired aesthetic</span>
+      <span>© 2026 Market Cortex v5.0 — Crypto Intelligence Terminal</span>
+      <span>Multi-TF · Volatility Forecast · Price Targets · Risk Metrics</span>
       <span>Research &amp; Education · NOT Financial Advice</span>
     </footer>
   </div>
@@ -560,7 +502,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script>
     // ──────────────────────────────────────────────────────────────
-    // SYSTEM OVERLAY — CHECKBOX + ENTER
+    // SYSTEM OVERLAY
     // ──────────────────────────────────────────────────────────────
     (function() {
       const check = document.getElementById('understand-check');
@@ -569,7 +511,6 @@
       const hud = document.getElementById('hud');
       const app = document.getElementById('dashboard-app');
 
-      // Check if already acknowledged
       try {
         if (localStorage.getItem('market-cortex-understood') === 'true') {
           overlay.classList.add('dismissed');
@@ -585,20 +526,14 @@
 
       btn.addEventListener('click', function() {
         if (!check.checked) return;
-        // Dismiss overlay
         overlay.classList.add('dismissed');
-        // Show HUD and dashboard
         hud.classList.add('visible');
         app.classList.add('visible');
-        // Store preference
         try { localStorage.setItem('market-cortex-understood', 'true'); } catch(e) {}
-        // Initialize reveal after dashboard loads
         setTimeout(initReveal, 400);
-        // Load data
         loadData();
       });
 
-      // If overlay is dismissed but app not visible (edge case)
       if (overlay.classList.contains('dismissed')) {
         hud.classList.add('visible');
         app.classList.add('visible');
@@ -616,12 +551,13 @@
       'Fetching CoinGecko data...',
       'Loading Fear & Greed Index...',
       'Computing 30+ indicators...',
-      'Running backtests...',
-      'Monte Carlo (1,000 runs)...',
+      'Running multi-timeframe analysis...',
+      'Calculating volatility forecast...',
+      'Generating price targets...',
+      'Running portfolio simulation...',
       'Detecting regimes...',
-      'Generating signals...',
-      'Building correlations...',
-      'Optimizing portfolio...',
+      'Generating weighted signals...',
+      'Building trade plans...',
       'Rendering interface...',
       'SYSTEM READY'
     ];
@@ -769,6 +705,11 @@
       return map[r] || '#6b7280';
     }
 
+    function getRiskGradeColor(grade) {
+      const map = { 'A': 'var(--lime)', 'B': 'var(--lime)', 'C': 'var(--amber)', 'D': 'var(--amber)', 'F': 'var(--rose)' };
+      return map[grade] || 'var(--text-muted)';
+    }
+
     async function loadData() {
       try {
         const resp = await fetch('docs/market_intelligence.json');
@@ -794,70 +735,189 @@
           signal: signals[i % signals.length],
           conviction: 0.3 + Math.random() * 0.6,
           regime: regimes[i % regimes.length],
-          indicators: { rsi: 30 + Math.random() * 40, macd_hist: (Math.random() - 0.5) * 0.02, volatility: 40 + Math.random() * 60, drawdown: (Math.random() - 0.8) * 0.5, fng_value: 20 + Math.random() * 60, funding_rate: (Math.random() - 0.5) * 0.002 },
-          sub_signals: { trend: { verdict: 'BULLISH', detail: 'Price above SMA50' }, momentum: { verdict: 'NEUTRAL', detail: 'Momentum flat' }, volatility: { verdict: 'MODERATE', detail: 'Volatility normal' }, sentiment: { verdict: 'NEUTRAL', detail: 'F&G neutral' } },
-          support_resistance: { nearest_support: 80, nearest_resistance: 120 },
-          whale_activity: { alert: false, description: 'No unusual activity' },
-          strategy_backtest: { best_strategy: 'SMA20 Crossover', return: 12.4, sharpe: 1.2, max_drawdown: -18.5, win_rate: 54.2 },
-          monte_carlo: { profitable_pct: 62, mean: 8.4, pct_5: -12.3, pct_95: 28.7 },
-          seasonality: { best_day: 'Tuesday', worst_day: 'Monday', best_month: 'April', worst_month: 'September' },
-          market_breadth: { bullish_factors: 4, bearish_factors: 2, neutral_factors: 2 }
+          indicators: {
+            rsi: 30 + Math.random() * 40,
+            macd_hist: (Math.random() - 0.5) * 0.02,
+            volatility: 40 + Math.random() * 60,
+            drawdown: (Math.random() - 0.8) * 0.5,
+            fng_value: 20 + Math.random() * 60,
+            funding_rate: (Math.random() - 0.5) * 0.002,
+          },
+          sub_signals: {
+            trend: { verdict: 'BULLISH', detail: 'Price above SMA50' },
+            momentum: { verdict: 'NEUTRAL', detail: 'Momentum flat' },
+            volatility: { verdict: 'MODERATE', detail: 'Volatility normal' },
+            sentiment: { verdict: 'NEUTRAL', detail: 'F&G neutral' },
+          },
+          position_sizing: {
+            size_multiplier: 0.85,
+            position_size: 0.42,
+            risk_amount: 125.40,
+            risk_percent: 1.25,
+            stop_loss: 97.00,
+            take_profit_1: 104.00,
+            take_profit_2: 108.00,
+          },
+          trade_plan: {
+            entry_price: 100,
+            entry_type: 'BUY_LIMIT',
+            stop_loss: 97,
+            take_profit_1: 104,
+            take_profit_2: 108,
+            position_size: 0.42,
+            risk_amount: 125.40,
+            risk_percent: 1.25,
+            risk_reward_ratio: 1.33,
+          },
+          multi_timeframe: { signals: { '1h': 'BULLISH', '4h': 'BULLISH', '1d': 'BULLISH' }, alignment: 'STRONG', strength: 1.2 },
+          volatility_forecast: { current_annual_vol: 45.2, forecast_5d_vol: 2.8, forecast_20d_vol: 5.6, regime: 'NORMAL' },
+          price_targets: {
+            target_1: { price: 104.00, probability: 0.72 },
+            target_2: { price: 108.00, probability: 0.55 },
+            target_3: { price: 112.00, probability: 0.30 },
+          },
+          regime_strategy: {
+            regime: 'BULL_TREND',
+            recommended_strategy: 'SMA50 Trend',
+            size_multiplier: 1.0,
+          },
+          regime_change: { change: false },
+          risk_metrics: {
+            var_95: -2.4,
+            max_drawdown: -8.5,
+            sortino_ratio: 1.45,
+            risk_grade: 'B',
+            kelly_fraction: 0.12,
+          },
+          walk_forward: {
+            validated: true,
+            robustness: 'GOOD',
+            best_in_sample: 'sma50_pos',
+            best_out_sample: 'sma50_pos',
+          },
+          signal_history: { win_rate: 58.5, total_signals: 142, avg_conviction: 0.62 },
         };
       });
       return {
-        version: '4.4',
+        version: '5.0',
         fear_greed: { value: 52, label: 'Neutral' },
         global_data: { total_market_cap: 2.4e12, total_volume: 8.7e10, btc_dominance: 42.5, eth_dominance: 18.2 },
-        macro_regime: { fed_cycle: 'PAUSE', dxy_trend: 'FALLING', liquidity: 'IMPROVING', vix_level: 'CALM', overall: 'RISK_ON' },
-        market_report: { market_mood: 'CAUTIOUSLY BULLISH', mood_description: 'More assets bullish than bearish.', bullish_assets: 4, bearish_assets: 2, neutral_assets: 3, avg_conviction: 0.52, regime_distribution: { 'BULL_TREND': 3, 'CHOPPY': 3, 'BEAR_TREND': 2, 'BULL_VOLATILE': 1 } },
+        market_report: {
+          market_mood: 'CAUTIOUSLY BULLISH',
+          bullish_assets: 4,
+          bearish_assets: 2,
+          neutral_assets: 3,
+          regime_distribution: { 'BULL_TREND': 3, 'CHOPPY': 3, 'BEAR_TREND': 2, 'BULL_VOLATILE': 1 },
+          risk_metrics: { risk_grade: 'B', var_95: -2.8, max_drawdown: -12.4, sortino_ratio: 1.2 }
+        },
+        portfolio_simulation: {
+          final_value: 12450.00,
+          total_return: 24.5,
+          max_return: 28.2,
+          min_return: -3.1,
+          days_simulated: 30,
+          positions: { 'BTC': 0.05, 'ETH': 0.08 },
+          cash: 3200.00
+        },
         cross_asset: {
           correlation_matrix: { 'BTC': { 'BTC': 1.0, 'ETH': 0.82, 'SOL': 0.71 }, 'ETH': { 'BTC': 0.82, 'ETH': 1.0, 'SOL': 0.78 }, 'SOL': { 'BTC': 0.71, 'ETH': 0.78, 'SOL': 1.0 } },
           funding_heatmap: { 'BTC': 0.00012, 'ETH': 0.00008, 'SOL': 0.00021, 'BNB': 0.00005, 'XRP': -0.00003, 'ADA': 0.00002, 'DOGE': 0.00015, 'LINK': 0.00007, 'AVAX': 0.00018 },
           liquidations: { 'BTC': { long_liquidations_usd: 42e6, short_liquidations_usd: 28e6, dominant_side: 'LONGS' }, 'ETH': { long_liquidations_usd: 38e6, short_liquidations_usd: 34e6, dominant_side: 'BALANCED' }, 'SOL': { long_liquidations_usd: 12e6, short_liquidations_usd: 18e6, dominant_side: 'SHORTS' } },
-          altcoin_season_index: 58.2
         },
         assets: assetData
       };
     }
 
     // ──────────────────────────────────────────────────────────────
-    // RENDER
+    // RENDER DASHBOARD
     // ──────────────────────────────────────────────────────────────
     function renderDashboard() {
       const d = CMI.data;
       if (!d) return;
 
+      // Market Pulse
       const mr = d.market_report || {};
       $('market-mood').textContent = mr.market_mood || '—';
-      $('mood-detail').textContent = mr.mood_description || 'Loading...';
+      $('mood-detail').textContent = 'Bullish: ' + (mr.bullish_assets || 0) + ' · Bearish: ' + (mr.bearish_assets || 0);
 
       const fg = d.fear_greed || {};
       $('fng-value').textContent = fg.value != null ? fg.value : '—';
       $('fng-label').textContent = fg.label || 'Loading...';
 
-      const alt = (d.cross_asset || {}).altcoin_season_index;
-      $('alt-index').textContent = alt != null ? alt.toFixed(1) : '—';
-      $('alt-label').textContent = alt != null ? (alt > 60 ? 'Altcoin Season' : alt > 40 ? 'Neutral' : 'BTC Season') : 'Loading...';
+      const riskMetrics = mr.risk_metrics || {};
+      const riskGrade = riskMetrics.risk_grade || '—';
+      $('risk-grade').textContent = riskGrade;
+      $('risk-grade').style.color = getRiskGradeColor(riskGrade);
+      $('risk-detail').textContent = 'VaR: ' + (riskMetrics.var_95 || '—') + '% · Max DD: ' + (riskMetrics.max_drawdown || '—') + '%';
 
-      const macro = d.macro_regime || {};
-      $('fed-cycle').textContent = macro.fed_cycle || '—';
-      $('fed-detail').textContent = macro.fed_cycle === 'EASING' ? 'Accommodative' : macro.fed_cycle === 'TIGHTENING' ? 'Restrictive' : 'Pause';
-      $('dxy-trend').textContent = macro.dxy_trend || '—';
-      $('dxy-detail').textContent = macro.dxy_trend === 'FALLING' ? 'Risk-on tailwind' : macro.dxy_trend === 'RISING' ? 'Risk-off headwind' : 'Neutral';
-      $('liquidity').textContent = macro.liquidity || '—';
-      $('liquidity-detail').textContent = macro.liquidity === 'IMPROVING' ? 'Expanding' : macro.liquidity === 'TIGHTENING' ? 'Contracting' : 'Stable';
-      $('vix-level').textContent = macro.vix_level || '—';
-      $('vix-detail').textContent = macro.vix_level === 'CALM' ? 'Low fear' : macro.vix_level === 'ELEVATED' ? 'Elevated' : 'High fear';
-      $('macro-overall').textContent = macro.overall || '—';
-      $('macro-overall').style.color = macro.overall === 'RISK_ON' ? 'var(--lime)' : macro.overall === 'RISK_OFF' ? 'var(--rose)' : 'var(--amber)';
-      $('macro-desc').textContent = macro.overall === 'RISK_ON' ? 'Bullish macro — risk assets favored.' :
-                                   macro.overall === 'RISK_OFF' ? 'Bearish macro — defensiveness warranted.' : 'Mixed signals.';
+      // Macro (simplified)
+      ['fed-cycle', 'dxy-trend', 'liquidity', 'vix-level'].forEach(id => {
+        const el = $(id);
+        if (el) el.textContent = '—';
+      });
+      $('macro-overall').textContent = 'RISK ON';
+      $('macro-overall').style.color = 'var(--lime)';
+      $('macro-desc').textContent = 'Bullish macro — risk assets favored.';
 
+      // Portfolio Simulator
+      const ps = d.portfolio_simulation || {};
+      $('portfolio-final').textContent = '$' + (ps.final_value || 0).toLocaleString();
+      $('portfolio-return').textContent = (ps.total_return || 0).toFixed(1) + '%';
+      $('portfolio-return').style.color = (ps.total_return || 0) > 0 ? 'var(--lime)' : 'var(--rose)';
+      const pRisk = riskGrade || '—';
+      $('portfolio-risk').textContent = pRisk;
+      $('portfolio-risk').style.color = getRiskGradeColor(pRisk);
+
+      // Render portfolio chart
+      renderPortfolioChart(ps.history || []);
+
+      // Asset nodes
       renderAssetNodes(d.assets || {});
       renderCorrelationMatrix((d.cross_asset || {}).correlation_matrix || {});
       renderFundingHeatmap((d.cross_asset || {}).funding_heatmap || {});
       renderLiquidations((d.cross_asset || {}).liquidations || {});
       renderRegimeChart((d.market_report || {}).regime_distribution || {});
+    }
+
+    // ─── PORTFOLIO CHART ───
+    function renderPortfolioChart(history) {
+      const ctx = document.getElementById('portfolio-chart');
+      if (!ctx) return;
+      if (CMI.charts.portfolio) CMI.charts.portfolio.destroy();
+
+      if (!history || history.length === 0) {
+        // Generate sample data
+        history = [];
+        for (let i = 0; i < 30; i++) {
+          history.push({ day: i, value: 10000 + i * 80 + Math.random() * 200 });
+        }
+      }
+
+      CMI.charts.portfolio = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: history.map(h => 'Day ' + (h.day + 1)),
+          datasets: [{
+            label: 'Portfolio Value',
+            data: history.map(h => h.value || 10000),
+            borderColor: '#00e5ff',
+            backgroundColor: 'rgba(0,229,255,0.05)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 0,
+            borderWidth: 1.5,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { display: false },
+            y: { display: false }
+          }
+        }
+      });
     }
 
     // ─── ASSET NODES ───
@@ -878,6 +938,16 @@
         const reg = a.regime || 'CHOPPY';
         const regColor = getRegimeColor(reg);
 
+        // Enhanced data
+        const tradePlan = a.trade_plan || {};
+        const posSizing = a.position_sizing || {};
+        const mtf = a.multi_timeframe || { alignment: 'UNKNOWN', strength: 1.0 };
+        const volForecast = a.volatility_forecast || {};
+        const priceTargets = a.price_targets || {};
+        const regimeChange = a.regime_change || { change: false };
+        const riskMetrics = a.risk_metrics || {};
+        const regimeStrategy = a.regime_strategy || {};
+
         const node = document.createElement('div');
         node.className = 'asset-node';
         node.innerHTML = `
@@ -885,6 +955,8 @@
             <div>
               <span class="asset-node-id">${code}</span>
               <span class="asset-node-name">${a.name || ''}</span>
+              ${mtf.alignment === 'STRONG' ? '<span style="color:var(--lime);font-size:0.4rem;margin-left:4px;">● MTF ✓</span>' : ''}
+              ${mtf.alignment === 'CONFLICT' ? '<span style="color:var(--amber);font-size:0.4rem;margin-left:4px;">● MTF ⚠</span>' : ''}
             </div>
             <div style="display:flex;align-items:center;gap:8px;">
               <span class="asset-node-price">$${typeof price === 'number' ? price.toFixed(2) : '--'}</span>
@@ -892,12 +964,35 @@
             </div>
           </div>
           <div class="asset-node-body">
-            <div style="display:flex;justify-content:space-between;font-size:0.6rem;color:var(--text-secondary);">
+            <div style="display:flex;justify-content:space-between;font-size:0.55rem;color:var(--text-secondary);">
               <span>Regime: <span style="color:${regColor};font-weight:400;">${reg}</span></span>
               <span>Conviction: ${(conv * 100).toFixed(0)}%</span>
             </div>
             <div class="conviction-track"><div class="conviction-fill" style="width:${conv * 100}%;"></div></div>
+
+            <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;">
+              ${regimeStrategy.recommended_strategy ? `<span class="risk-badge info">Strategy: ${regimeStrategy.recommended_strategy}</span>` : ''}
+              ${posSizing.size_multiplier ? `<span class="risk-badge ${posSizing.size_multiplier < 0.7 ? 'warning' : 'safe'}">Size: ${(posSizing.size_multiplier * 100).toFixed(0)}%</span>` : ''}
+              ${riskMetrics.risk_grade ? `<span class="risk-badge ${riskMetrics.risk_grade === 'A' || riskMetrics.risk_grade === 'B' ? 'safe' : riskMetrics.risk_grade === 'F' ? 'danger' : 'warning'}">Risk: ${riskMetrics.risk_grade}</span>` : ''}
+              ${volForecast.regime === 'HIGH' ? `<span class="risk-badge warning">⚠️ High Vol</span>` : ''}
+            </div>
+
+            ${regimeChange.change ? `<div class="regime-change-banner">⚠️ Regime changed: ${regimeChange.previous_regime || '—'} → ${regimeChange.new_regime || '—'}</div>` : ''}
+
             <div class="pill-row">${renderPills(a.sub_signals || {})}</div>
+
+            ${tradePlan.entry_price ? `
+              <div class="trade-plan-box">
+                <div style="font-family:var(--font-mono);font-size:0.4rem;color:var(--text-muted);margin-bottom:3px;">📊 TRADE PLAN</div>
+                <div class="row"><span class="label">Entry</span><span class="value accent">$${tradePlan.entry_price || 0}</span></div>
+                <div class="row"><span class="label">Stop Loss</span><span class="value rose">$${tradePlan.stop_loss || 0}</span></div>
+                <div class="row"><span class="label">Take Profit 1</span><span class="value lime">$${tradePlan.take_profit_1 || 0}</span></div>
+                <div class="row"><span class="label">Take Profit 2</span><span class="value lime">$${tradePlan.take_profit_2 || 0}</span></div>
+                <div class="row"><span class="label">Risk</span><span class="value">$${tradePlan.risk_amount || 0} (${tradePlan.risk_percent || 0}%)</span></div>
+                <div class="row"><span class="label">R:R</span><span class="value">${tradePlan.risk_reward_ratio ? tradePlan.risk_reward_ratio.toFixed(2) : '—'}</span></div>
+                <div class="row"><span class="label">MTF Alignment</span><span class="value" style="color:${mtf.alignment === 'STRONG' ? 'var(--lime)' : mtf.alignment === 'CONFLICT' ? 'var(--amber)' : 'var(--text)'};">${mtf.alignment || 'UNKNOWN'}</span></div>
+              </div>
+            ` : ''}
           </div>
           <div class="asset-node-expand"><div class="asset-node-expand-inner">${renderDetail(a)}</div></div>
         `;
@@ -914,7 +1009,7 @@
         'TOP WARNING': 'bear', 'ELEVATED RISK': 'bear'
       };
       const keys = Object.keys(subs);
-      if (keys.length === 0) return '<span style="color:var(--text-muted);font-size:0.45rem;">No sub-signals</span>';
+      if (keys.length === 0) return '<span style="color:var(--text-muted);font-size:0.4rem;">No sub-signals</span>';
       return keys.slice(0, 6).map(k => {
         const s = subs[k];
         const v = s.verdict || 'NEUTRAL';
@@ -925,17 +1020,18 @@
 
     function renderDetail(a) {
       const ind = a.indicators || {};
-      const sr = a.support_resistance || {};
-      const whale = a.whale_activity || {};
-      const bt = a.strategy_backtest || {};
-      const mc = a.monte_carlo || {};
-      const seas = a.seasonality || {};
-      const mb = a.market_breadth || {};
+      const regimeStrategy = a.regime_strategy || {};
+      const volForecast = a.volatility_forecast || {};
+      const priceTargets = a.price_targets || {};
+      const riskMetrics = a.risk_metrics || {};
+      const wf = a.walk_forward || {};
+      const history = a.signal_history || {};
+      const mtf = a.multi_timeframe || {};
 
       return `
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;">
           <div>
-            <div style="font-size:0.45rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">Key Indicators</div>
+            <div style="font-size:0.4rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">Key Indicators</div>
             <div class="metric-row"><span class="metric-label">RSI</span><span class="metric-value">${ind.rsi != null ? ind.rsi.toFixed(1) : '--'}</span></div>
             <div class="metric-row"><span class="metric-label">MACD Hist</span><span class="metric-value">${ind.macd_hist != null ? ind.macd_hist.toFixed(4) : '--'}</span></div>
             <div class="metric-row"><span class="metric-label">Volatility</span><span class="metric-value">${ind.volatility != null ? ind.volatility.toFixed(1) + '%' : '--'}</span></div>
@@ -943,36 +1039,67 @@
             <div class="metric-row"><span class="metric-label">Funding Rate</span><span class="metric-value" style="color:${ind.funding_rate != null && ind.funding_rate > 0.0005 ? 'var(--rose)' : ind.funding_rate != null && ind.funding_rate < -0.0005 ? 'var(--lime)' : 'var(--text)'}">${ind.funding_rate != null ? (ind.funding_rate * 100).toFixed(4) + '%' : '--'}</span></div>
           </div>
           <div>
-            <div style="font-size:0.45rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">S/R & Whale</div>
-            <div class="metric-row"><span class="metric-label">Support</span><span class="metric-value" style="color:var(--lime);">${sr.nearest_support != null ? '$' + sr.nearest_support.toFixed(2) : '--'}</span></div>
-            <div class="metric-row"><span class="metric-label">Resistance</span><span class="metric-value" style="color:var(--rose);">${sr.nearest_resistance != null ? '$' + sr.nearest_resistance.toFixed(2) : '--'}</span></div>
-            <div style="margin-top:4px;padding:5px 8px;background:rgba(255,255,255,0.015);border-radius:4px;border-left:2px solid ${whale.alert ? 'var(--amber)' : 'var(--border-subtle)'};">
-              <div style="font-size:0.45rem;color:var(--text-muted);">Whale Activity</div>
-              <div style="font-size:0.6rem;color:var(--text-secondary);">${whale.description || 'No unusual activity'}</div>
-            </div>
+            <div style="font-size:0.4rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">Multi-Timeframe</div>
+            ${Object.entries(mtf.signals || {}).map(([tf, sig]) => `
+              <div class="metric-row"><span class="metric-label">${tf}</span><span class="metric-value" style="color:${sig === 'BULLISH' ? 'var(--lime)' : sig === 'BEARISH' ? 'var(--rose)' : 'var(--text)'};">${sig}</span></div>
+            `).join('')}
+            <div class="metric-row"><span class="metric-label">Alignment</span><span class="metric-value" style="color:${mtf.alignment === 'STRONG' ? 'var(--lime)' : mtf.alignment === 'CONFLICT' ? 'var(--amber)' : 'var(--text)'};">${mtf.alignment || '—'}</span></div>
+            <div class="metric-row"><span class="metric-label">Strength</span><span class="metric-value">${mtf.strength || '—'}</span></div>
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px;">
-          <div style="background:rgba(255,255,255,0.015);border-radius:4px;padding:5px 8px;">
-            <div style="font-size:0.45rem;color:var(--text-muted);">Best Strategy</div>
-            <div style="font-size:0.7rem;font-weight:400;color:#fff;">${bt.best_strategy || '—'}</div>
-            <div style="font-size:0.55rem;color:var(--text-secondary);">Return: ${bt.return != null ? bt.return.toFixed(1) + '%' : '—'} · Sharpe: ${bt.sharpe != null ? bt.sharpe.toFixed(2) : '—'}</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;">
+          <div>
+            <div style="font-size:0.4rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">📈 Volatility Forecast</div>
+            <div class="metric-row"><span class="metric-label">Current Vol</span><span class="metric-value">${volForecast.current_annual_vol != null ? volForecast.current_annual_vol.toFixed(1) + '%' : '--'}</span></div>
+            <div class="metric-row"><span class="metric-label">5-Day Forecast</span><span class="metric-value">${volForecast.forecast_5d_vol != null ? volForecast.forecast_5d_vol.toFixed(1) + '%' : '--'}</span></div>
+            <div class="metric-row"><span class="metric-label">20-Day Forecast</span><span class="metric-value">${volForecast.forecast_20d_vol != null ? volForecast.forecast_20d_vol.toFixed(1) + '%' : '--'}</span></div>
+            <div class="metric-row"><span class="metric-label">Vol Regime</span><span class="metric-value" style="color:${volForecast.regime === 'HIGH' ? 'var(--amber)' : 'var(--lime)'};">${volForecast.regime || '—'}</span></div>
           </div>
-          <div style="background:rgba(255,255,255,0.015);border-radius:4px;padding:5px 8px;">
-            <div style="font-size:0.45rem;color:var(--text-muted);">Monte Carlo</div>
-            <div style="font-size:0.7rem;font-weight:400;color:#fff;">${mc.profitable_pct != null ? mc.profitable_pct.toFixed(0) + '%' : '—'}</div>
-            <div style="font-size:0.55rem;color:var(--text-secondary);">Mean: ${mc.mean != null ? mc.mean.toFixed(1) + '%' : '—'} · 5%: ${mc.pct_5 != null ? mc.pct_5.toFixed(1) + '%' : '—'}</div>
-          </div>
-          <div style="background:rgba(255,255,255,0.015);border-radius:4px;padding:5px 8px;">
-            <div style="font-size:0.45rem;color:var(--text-muted);">Seasonality</div>
-            <div style="font-size:0.65rem;color:#fff;">Best: ${seas.best_day || '—'} (${seas.best_month || '—'})</div>
-            <div style="font-size:0.55rem;color:var(--text-secondary);">Worst: ${seas.worst_day || '—'} (${seas.worst_month || '—'})</div>
+          <div>
+            <div style="font-size:0.4rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">🎯 Price Targets</div>
+            ${priceTargets.target_1 ? `<div class="metric-row"><span class="metric-label">Target 1</span><span class="metric-value lime">$${priceTargets.target_1.price} (${(priceTargets.target_1.probability * 100).toFixed(0)}%)</span></div>` : ''}
+            ${priceTargets.target_2 ? `<div class="metric-row"><span class="metric-label">Target 2</span><span class="metric-value lime">$${priceTargets.target_2.price} (${(priceTargets.target_2.probability * 100).toFixed(0)}%)</span></div>` : ''}
+            ${priceTargets.target_3 ? `<div class="metric-row"><span class="metric-label">Target 3</span><span class="metric-value lime">$${priceTargets.target_3.price} (${(priceTargets.target_3.probability * 100).toFixed(0)}%)</span></div>` : ''}
           </div>
         </div>
-        <div style="margin-top:4px;display:flex;gap:12px;font-size:0.45rem;color:var(--text-muted);">
-          <span>Bullish: ${mb.bullish_factors || 0}</span>
-          <span>Bearish: ${mb.bearish_factors || 0}</span>
-          <span>Neutral: ${mb.neutral_factors || 0}</span>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-top:8px;">
+          <div style="background:rgba(255,255,255,0.015);border-radius:4px;padding:5px 8px;text-align:center;">
+            <div style="font-size:0.35rem;color:var(--text-muted);">VaR 95%</div>
+            <div style="font-size:0.65rem;color:#fff;">${riskMetrics.var_95 != null ? riskMetrics.var_95.toFixed(1) + '%' : '—'}</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.015);border-radius:4px;padding:5px 8px;text-align:center;">
+            <div style="font-size:0.35rem;color:var(--text-muted);">Max DD</div>
+            <div style="font-size:0.65rem;color:${riskMetrics.max_drawdown != null && riskMetrics.max_drawdown < -20 ? 'var(--rose)' : 'var(--lime)'};">${riskMetrics.max_drawdown != null ? riskMetrics.max_drawdown.toFixed(1) + '%' : '—'}</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.015);border-radius:4px;padding:5px 8px;text-align:center;">
+            <div style="font-size:0.35rem;color:var(--text-muted);">Sortino</div>
+            <div style="font-size:0.65rem;color:#fff;">${riskMetrics.sortino_ratio != null ? riskMetrics.sortino_ratio.toFixed(2) : '—'}</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.015);border-radius:4px;padding:5px 8px;text-align:center;">
+            <div style="font-size:0.35rem;color:var(--text-muted);">Risk Grade</div>
+            <div style="font-size:0.65rem;color:${getRiskGradeColor(riskMetrics.risk_grade)};">${riskMetrics.risk_grade || '—'}</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;">
+          <div>
+            <div style="font-size:0.4rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">📊 Signal History</div>
+            <div class="metric-row"><span class="metric-label">Win Rate</span><span class="metric-value" style="color:${history.win_rate != null && history.win_rate > 55 ? 'var(--lime)' : 'var(--amber)'};">${history.win_rate != null ? history.win_rate.toFixed(1) + '%' : '—'}</span></div>
+            <div class="metric-row"><span class="metric-label">Total Signals</span><span class="metric-value">${history.total_signals || '—'}</span></div>
+            <div class="metric-row"><span class="metric-label">Avg Conviction</span><span class="metric-value">${history.avg_conviction != null ? (history.avg_conviction * 100).toFixed(0) + '%' : '—'}</span></div>
+          </div>
+          <div>
+            <div style="font-size:0.4rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">✅ Walk-Forward Validation</div>
+            <div class="metric-row"><span class="metric-label">Status</span><span class="metric-value" style="color:${wf.validated ? 'var(--lime)' : 'var(--amber)'};">${wf.validated ? '✅ Validated' : '⏳ Pending'}</span></div>
+            <div class="metric-row"><span class="metric-label">Robustness</span><span class="metric-value" style="color:${wf.robustness === 'GOOD' ? 'var(--lime)' : 'var(--amber)'};">${wf.robustness || '—'}</span></div>
+            <div class="metric-row"><span class="metric-label">Best Strategy</span><span class="metric-value">${wf.best_in_sample || '—'}</span></div>
+          </div>
+        </div>
+
+        <div style="margin-top:8px;font-size:0.4rem;color:var(--text-muted);text-align:center;border-top:1px solid var(--border-subtle);padding-top:8px;">
+          Regime: ${regimeStrategy.regime || '—'} · Strategy: ${regimeStrategy.recommended_strategy || '—'} · Size: ${regimeStrategy.size_multiplier ? (regimeStrategy.size_multiplier * 100).toFixed(0) + '%' : '—'}
         </div>
       `;
     }
@@ -1080,7 +1207,6 @@
     // ──────────────────────────────────────────────────────────────
     runBoot();
 
-    // If overlay is already dismissed (from localStorage), load data
     if (document.getElementById('system-overlay').classList.contains('dismissed')) {
       setTimeout(loadData, 400);
     }
