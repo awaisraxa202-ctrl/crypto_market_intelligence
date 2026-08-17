@@ -1,8 +1,9 @@
-name: Daily Market Intelligence Update
+name: Market Cortex Hourly Update
 
 on:
   schedule:
-    - cron: '0 6 * * *'
+    # Every 2 hours (optimized for free tier)
+    - cron: '0 */2 * * *'
   workflow_dispatch:
 
 permissions:
@@ -20,21 +21,29 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      
       - name: Install dependencies
         run: |
-          pip install pandas numpy requests yfinance scipy
-      - name: Run Market Intelligence Engine
-        run: python crypto_market_intelligence_v44.py
+          pip install pandas numpy requests yfinance
+      
+      - name: Run Market Intelligence Engine (Ultimate)
+        run: python crypto_market_intelligence_v50_ultimate.py
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      
       - name: Commit and push updated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/market_intelligence.json crypto_quant.db
-          git diff --cached --quiet || (git commit -m "Update market intelligence data [$(date -u +%Y-%m-%d)]" && git push)
+          git add docs/market_intelligence.json docs/signal_history.json docs/market_summary.txt crypto_quant.db
+          git diff --cached --quiet || (git commit -m "Hourly update [$(date -u +%Y-%m-%d_%H-%M)]" && git push)
 
   deploy:
     needs: update
@@ -45,7 +54,7 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: '.'
       - name: Deploy to GitHub Pages
