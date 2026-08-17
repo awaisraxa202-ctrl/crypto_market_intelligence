@@ -2,7 +2,7 @@ name: Market Cortex Hourly Update
 
 on:
   schedule:
-    # Every 2 hours
+    # Every 2 hours (optimized for free tier)
     - cron: '0 */2 * * *'
   workflow_dispatch:
 
@@ -31,12 +31,15 @@ jobs:
         run: |
           pip install pandas numpy requests yfinance
 
-      - name: Run Market Intelligence Engine (v5.0 Ultimate)
+      - name: Run Market Cortex v5.0 Ultimate Engine
         run: python crypto_market_intelligence_v50_ultimate.py
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
+          BEACONCHAIN_API_KEY: ${{ secrets.BEACONCHAIN_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
 
       - name: Commit and push updated data
         run: |
