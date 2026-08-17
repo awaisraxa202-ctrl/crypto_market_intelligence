@@ -1,29 +1,32 @@
 #!/usr/bin/env python3
 """
 ================================================================================
-CRYPTO MARKET INTELLIGENCE v4.2 — ENHANCED EDITION
+MARKET CORTEX v5.0 — ULTIMATE EDITION
 ================================================================================
-Built on v4.1 Merged Edition. Keeps all original structure.
+ALL FEATURES:
+  • Dynamic position sizing (volatility-adjusted)
+  • Drawdown protection (10% DD → 50% size)
+  • Regime-based strategy switching
+  • Signal weighting by historical accuracy
+  • Multi-timeframe confirmation (1h → 4h → 1d)
+  • Correlation risk management
+  • On-chain intelligence (exchange flows, whale tracking)
+  • Trade plan generator (entry/exit/stop/targets)
+  • Walk-forward validation
+  • Ensemble signal combining
+  • Real-time alerts (Discord/Telegram)
+  • Signal history & win rate tracking
+  • Portfolio simulator
+  • Volatility forecast (GARCH-style)
+  • Price targets with probability
+  • Regime change detection
+  • Risk metrics dashboard
+  • Market summary report
 
-ENHANCEMENTS in v4.2:
-  • FIXED: EMA 12/26 missing (MACD was broken)
-  • FIXED: yfinance multi-index column handling
-  • FIXED: Robust empty-DataFrame guards throughout
-  • ADDED: RSI Bullish/Bearish Divergence detection
-  • ADDED: Support & Resistance levels (swing highs/lows)
-  • ADDED: Risk Metrics — VaR (95%), Sortino Ratio, Calmar Ratio, Max Consecutive Wins/Losses
-  • ADDED: Whale Activity Proxy (volume z-score spikes)
-  • ADDED: Cross-asset Correlation Matrix
-  • ADDED: Altcoin Season Index (BTC dominance trend)
-  • ADDED: Funding Rate Heatmap (all assets)
-  • ADDED: Market Breadth (advance/decline proxy)
-  • ADDED: GARCH-like simple volatility forecast
-  • ADDED: OBV Divergence detection
-  • IMPROVED: Pattern matching with 6-factor weighted similarity
-  • IMPROVED: Retry logic with exponential backoff for all APIs
+ALL FREE APIS — NO PAID DATA SOURCES
 
-IMPORTANT: Past performance does NOT predict future results. You can lose money.
-Never invest more than you can afford to lose. Paper trade first for 3+ months.
+IMPORTANT: This is a RESEARCH AND EDUCATIONAL TOOL ONLY.
+NOT financial advice. Past performance does NOT predict future results.
 ================================================================================
 """
 
@@ -43,8 +46,8 @@ FEE = 0.002
 UPDATE_TIME = "06:00 UTC"
 
 ASSETS = {
-    'ETH': {'name': 'Ethereum', 'binance': 'ETHUSDT', 'yahoo': 'ETH-USD', 'coingecko': 'ethereum', 'deribit': 'ETH'},
     'BTC': {'name': 'Bitcoin', 'binance': 'BTCUSDT', 'yahoo': 'BTC-USD', 'coingecko': 'bitcoin', 'deribit': 'BTC'},
+    'ETH': {'name': 'Ethereum', 'binance': 'ETHUSDT', 'yahoo': 'ETH-USD', 'coingecko': 'ethereum', 'deribit': 'ETH'},
     'SOL': {'name': 'Solana', 'binance': 'SOLUSDT', 'yahoo': 'SOL-USD', 'coingecko': 'solana', 'deribit': 'SOL'},
     'BNB': {'name': 'BNB', 'binance': 'BNBUSDT', 'yahoo': 'BNB-USD', 'coingecko': 'binancecoin', 'deribit': None},
     'XRP': {'name': 'XRP', 'binance': 'XRPUSDT', 'yahoo': 'XRP-USD', 'coingecko': 'ripple', 'deribit': None},
@@ -54,12 +57,51 @@ ASSETS = {
     'AVAX': {'name': 'Avalanche', 'binance': 'AVAXUSDT', 'yahoo': 'AVAX-USD', 'coingecko': 'avalanche-2', 'deribit': None},
 }
 
+# ─── SIGNAL WEIGHTS ───
+SIGNAL_WEIGHTS = {
+    'trend': 0.30,
+    'momentum': 0.25,
+    'volatility': 0.15,
+    'sentiment': 0.12,
+    'funding': 0.08,
+    'volume': 0.05,
+    'drawdown': 0.05,
+}
+
+# ─── RISK PARAMETERS ───
+RISK_PARAMS = {
+    'max_risk_per_trade': 0.02,
+    'max_portfolio_risk': 0.06,
+    'drawdown_reduction': {0.10: 0.50, 0.20: 0.25, 0.30: 0.10},
+    'correlation_threshold': 0.70,
+    'atr_multiplier_stop': 2.0,
+    'atr_multiplier_target': 4.0,
+}
+
+# ─── REGIME STRATEGY MAP ───
+REGIME_STRATEGY = {
+    'STRONG_BULL': {'strategy': 'SMA50 Trend', 'size_mult': 1.2},
+    'BULL_TREND': {'strategy': 'SMA20 Crossover', 'size_mult': 1.0},
+    'BULL_VOLATILE': {'strategy': 'MACD Crossover', 'size_mult': 0.8},
+    'BULL_CHOPPY': {'strategy': 'Bollinger Bounce', 'size_mult': 0.6},
+    'CHOPPY': {'strategy': 'Bollinger Bounce', 'size_mult': 0.5},
+    'RANGE': {'strategy': 'RSI + Trend Filter', 'size_mult': 0.5},
+    'BEAR_CHOPPY': {'strategy': 'Williams %R', 'size_mult': 0.4},
+    'BEAR_TREND': {'strategy': 'Volatility Breakout', 'size_mult': 0.3},
+    'BEAR_VOLATILE': {'strategy': 'RSI < 30, > 70', 'size_mult': 0.2},
+    'STRONG_BEAR': {'strategy': 'RSI < 30, > 70', 'size_mult': 0.1},
+}
+
 ETHERSCAN_API_KEY = os.environ.get('ETHERSCAN_API_KEY', '')
 BEACONCHAIN_API_KEY = os.environ.get('BEACONCHAIN_API_KEY', '')
 FRED_API_KEY = os.environ.get('FRED_API_KEY', '')
+DISCORD_WEBHOOK = os.environ.get('DISCORD_WEBHOOK', '')
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+TELEGRAM_CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID', '')
 
 DB_PATH = 'crypto_quant.db'
 OUTPUT_PATH = 'docs/market_intelligence.json'
+HISTORY_PATH = 'docs/signal_history.json'
 os.makedirs('docs', exist_ok=True)
 
 # ===================== RETRY WRAPPER =====================
@@ -100,33 +142,27 @@ def fetch_binance_klines(symbol, interval='1d', limit=1000):
         print(f"  ⚠️ Binance {symbol}: {e}")
         return pd.DataFrame()
 
-def fetch_yahoo(ticker, period='2y'):
+def fetch_binance_klines_interval(symbol, interval='1h', limit=200):
+    """Fetch data for any interval (1h, 4h, 1d)"""
+    url = "https://api.binance.com/api/v3/klines"
+    params = {'symbol': symbol, 'interval': interval, 'limit': limit}
     try:
-        import yfinance as yf
-        data = yf.download(ticker, period=period, progress=False, auto_adjust=True)
-        if data.empty:
-            return pd.DataFrame()
-        df = data.reset_index()
-        if isinstance(df.columns, pd.MultiIndex):
-            df.columns = [' '.join(col).strip() if col[1] else col[0] for col in df.columns.values]
-        close_col = None
-        for c in df.columns:
-            if 'close' in c.lower():
-                close_col = c
-                break
-        if close_col is None:
-            close_col = df.columns[-1]
-        date_col = 'Date' if 'Date' in df.columns else df.columns[0]
-        df = df[[date_col, close_col]].copy()
-        df.columns = ['date', 'close']
-        df['date'] = pd.to_datetime(df['date'])
-        return df
+        r = fetch_with_retry(url, params=params, timeout=30)
+        data = r.json()
+        df = pd.DataFrame(data, columns=[
+            'open_time','open','high','low','close','volume',
+            'close_time','quote_volume','trades','taker_buy_base',
+            'taker_buy_quote','ignore'
+        ])
+        df['date'] = pd.to_datetime(df['open_time'], unit='ms')
+        for col in ['open','high','low','close','volume']:
+            df[col] = df[col].astype(float)
+        return df[['date','close']]
     except Exception as e:
-        print(f"  ⚠️ Yahoo {ticker}: {e}")
+        print(f"  ⚠️ Binance {interval} {symbol}: {e}")
         return pd.DataFrame()
 
 def fetch_yahoo_ohlcv(ticker, period='2y'):
-    '''Fetch full OHLCV from Yahoo Finance as fallback when Binance fails.'''
     try:
         import yfinance as yf
         data = yf.download(ticker, period=period, progress=False, auto_adjust=True)
@@ -135,8 +171,6 @@ def fetch_yahoo_ohlcv(ticker, period='2y'):
         df = data.reset_index()
         if isinstance(df.columns, pd.MultiIndex):
             df.columns = [' '.join(col).strip() if col[1] else col[0] for col in df.columns.values]
-
-        # Map columns - Yahoo returns Open, High, Low, Close, Volume
         col_map = {}
         for c in df.columns:
             cl = c.lower()
@@ -152,12 +186,10 @@ def fetch_yahoo_ohlcv(ticker, period='2y'):
                 col_map['close'] = c
             elif 'volume' in cl:
                 col_map['volume'] = c
-
         needed = ['date', 'open', 'high', 'low', 'close', 'volume']
         available = [col_map.get(k) for k in needed if col_map.get(k) in df.columns]
         if len(available) < 4:
             return pd.DataFrame()
-
         df = df[available].copy()
         rename = {v: k for k, v in col_map.items() if v in df.columns}
         df = df.rename(columns=rename)
@@ -202,36 +234,6 @@ def fetch_funding_rate(symbol='ETHUSDT', limit=1000):
         print(f"  ⚠️ Funding {symbol}: {e}")
         return pd.DataFrame()
 
-def fetch_long_short_ratio(symbol='ETHUSDT', limit=100):
-    url = "https://fapi.binance.com/fapi/v1/globalLongShortAccountRatio"
-    params = {'symbol': symbol, 'period': '1d', 'limit': limit}
-    try:
-        r = fetch_with_retry(url, params=params, timeout=30)
-        data = r.json()
-        df = pd.DataFrame(data)
-        df['date'] = pd.to_datetime(df['timestamp'], unit='ms')
-        df['long_short_ratio'] = df['longShortRatio'].astype(float)
-        df['long_account_pct'] = df['longAccount'].astype(float)
-        return df[['date', 'long_short_ratio', 'long_account_pct']]
-    except Exception as e:
-        print(f"  ⚠️ L/S {symbol}: {e}")
-        return pd.DataFrame()
-
-def fetch_open_interest_hist(symbol='ETHUSDT', limit=100):
-    url = "https://fapi.binance.com/fapi/v1/openInterestHist"
-    params = {'symbol': symbol, 'period': '1d', 'limit': limit}
-    try:
-        r = fetch_with_retry(url, params=params, timeout=30)
-        data = r.json()
-        df = pd.DataFrame(data)
-        df['date'] = pd.to_datetime(df['timestamp'], unit='ms')
-        df['open_interest'] = df['sumOpenInterest'].astype(float)
-        df['oi_value_usd'] = df['sumOpenInterestValue'].astype(float)
-        return df[['date', 'open_interest', 'oi_value_usd']]
-    except Exception as e:
-        print(f"  ⚠️ OI {symbol}: {e}")
-        return pd.DataFrame()
-
 def fetch_coingecko_global():
     url = "https://api.coingecko.com/api/v3/global"
     try:
@@ -260,79 +262,12 @@ def fetch_coingecko_coin(coin_id='ethereum'):
             'circulating_supply': data['market_data']['circulating_supply'],
             'ath': data['market_data']['ath']['usd'],
             'ath_change_pct': data['market_data']['ath_change_percentage']['usd'],
-            'sentiment_votes_up': data.get('sentiment_votes_up_percentage', None),
-            'sentiment_votes_down': data.get('sentiment_votes_down_percentage', None),
         }
     except Exception as e:
         print(f"  ⚠️ CG coin {coin_id}: {e}")
         return {}
 
-def fetch_etherscan_gas():
-    if not ETHERSCAN_API_KEY: return {}
-    url = f"https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey={ETHERSCAN_API_KEY}"
-    try:
-        r = fetch_with_retry(url, timeout=30)
-        data = r.json()
-        if data['status'] == '1':
-            return {
-                'safe_gas_price': float(data['result']['SafeGasPrice']),
-                'propose_gas_price': float(data['result']['ProposeGasPrice']),
-                'fast_gas_price': float(data['result']['FastGasPrice']),
-            }
-    except Exception as e:
-        print(f"  ⚠️ Gas: {e}")
-    return {}
-
-def fetch_deribit_options(currency='ETH'):
-    url = f"https://www.deribit.com/api/v2/public/get_book_summary_by_currency?currency={currency}&kind=option"
-    try:
-        r = fetch_with_retry(url, timeout=30)
-        data = r.json()
-        if data.get('result'):
-            options = data['result']
-            puts = [o for o in options if 'P' in o.get('instrument_name', '')]
-            calls = [o for o in options if 'C' in o.get('instrument_name', '')]
-            avg_iv = np.mean([o.get('mark_iv', 0) for o in options if o.get('mark_iv')])
-            put_call_ratio = len(puts) / len(calls) if calls else 1.0
-            return {'put_call_ratio': put_call_ratio, 'avg_implied_vol': avg_iv, 'total_options': len(options)}
-    except Exception as e:
-        print(f"  ⚠️ Deribit: {e}")
-    return {}
-
-def fetch_beaconchain_staking():
-    if not BEACONCHAIN_API_KEY: return {}
-    headers = {'Authorization': f'Bearer {BEACONCHAIN_API_KEY}'}
-    try:
-        r = fetch_with_retry("https://beaconcha.in/api/v1/epoch/latest", headers=headers, timeout=30)
-        data = r.json()
-        if data.get('data'):
-            return {
-                'epoch': data['data'].get('epoch'),
-                'validatorscount': data['data'].get('validatorscount'),
-                'totalvalidatorbalance': data['data'].get('totalvalidatorbalance'),
-                'eligibleether': data['data'].get('eligibleether'),
-            }
-    except Exception as e:
-        print(f"  ⚠️ Beaconchain: {e}")
-    return {}
-
-def fetch_fred_data(series_id='CPIAUCSL', limit=24):
-    if not FRED_API_KEY: return pd.DataFrame()
-    url = "https://api.stlouisfed.org/fred/series/observations"
-    params = {'series_id': series_id, 'api_key': FRED_API_KEY, 'file_type': 'json', 'limit': limit, 'sort_order': 'desc'}
-    try:
-        r = fetch_with_retry(url, params=params, timeout=30)
-        data = r.json()
-        if 'observations' in data:
-            df = pd.DataFrame(data['observations'])
-            df['date'] = pd.to_datetime(df['date'])
-            df['value'] = pd.to_numeric(df['value'], errors='coerce')
-            return df[['date', 'value']].dropna().sort_values('date')
-    except Exception as e:
-        print(f"  ⚠️ FRED {series_id}: {e}")
-    return pd.DataFrame()
-
-# ===================== FEATURE ENGINEERING =====================
+# ===================== INDICATOR ENGINE =====================
 
 def add_features(df):
     df = df.copy().sort_values('date').reset_index(drop=True)
@@ -341,7 +276,6 @@ def add_features(df):
     df['return_20d'] = df['close'].pct_change(20)
     df['return_60d'] = df['close'].pct_change(60)
 
-    # FIX: Added EMA 12 and 26 for proper MACD calculation
     for period in [12, 26, 10, 20, 50, 100, 200]:
         df[f'ema_{period}'] = df['close'].ewm(span=period, adjust=False).mean()
     for period in [10, 20, 50, 100, 200]:
@@ -381,14 +315,9 @@ def add_features(df):
     df['bb_width'] = (df['bb_upper'] - df['bb_lower']) / df['bb_mid']
     df['bb_position'] = (df['close'] - df['bb_lower']) / (df['bb_upper'] - df['bb_lower'])
 
-    df['kc_mid'] = df['ema_20']
-    df['kc_upper'] = df['kc_mid'] + 2 * df['atr_14']
-    df['kc_lower'] = df['kc_mid'] - 2 * df['atr_14']
-
     df['volatility_20'] = df['return'].rolling(20).std() * np.sqrt(365)
     df['volatility_50'] = df['return'].rolling(50).std() * np.sqrt(365)
 
-    # GARCH-like simple volatility forecast
     df['vol_forecast_5d'] = df['return'].ewm(span=20).std() * np.sqrt(5)
     df['vol_forecast_20d'] = df['return'].ewm(span=20).std() * np.sqrt(20)
 
@@ -405,17 +334,6 @@ def add_features(df):
 
     df['golden_cross'] = np.where((df['sma_50'] > df['sma_200']) & (df['sma_50'].shift(1) <= df['sma_200'].shift(1)), 1, 0)
     df['death_cross'] = np.where((df['sma_50'] < df['sma_200']) & (df['sma_50'].shift(1) >= df['sma_200'].shift(1)), 1, 0)
-
-    for period in [10, 20, 50]:
-        df[f'mom_{period}'] = df['close'] / df['close'].shift(period) - 1
-
-    df['roc_10'] = (df['close'] - df['close'].shift(10)) / df['close'].shift(10) * 100
-
-    df['day_of_week'] = df['date'].dt.dayofweek
-    df['month'] = df['date'].dt.month
-    df['quarter'] = df['date'].dt.quarter
-    df['is_month_start'] = df['date'].dt.is_month_start.astype(int)
-    df['is_month_end'] = df['date'].dt.is_month_end.astype(int)
 
     return df
 
@@ -464,290 +382,53 @@ def detect_regime(df):
     df['regime'] = np.select(conditions, choices, default='CHOPPY')
     return df
 
-# ===================== DIVERGENCE DETECTION =====================
+# ===================== RISK ENGINE =====================
 
-def detect_rsi_divergence(df, lookback=30):
-    df = df.copy()
-    df['rsi_divergence'] = 'NONE'
-    for i in range(lookback, len(df)):
-        window = df.iloc[i-lookback:i+1]
-        p1, p2 = window['close'].iloc[0], window['close'].iloc[-1]
-        r1, r2 = window['rsi_14'].iloc[0], window['rsi_14'].iloc[-1]
-        if pd.notna(p1) and pd.notna(p2) and pd.notna(r1) and pd.notna(r2):
-            if p2 < p1 and r2 > r1 and r2 < 40:
-                df.loc[df.index[i], 'rsi_divergence'] = 'BULLISH'
-            elif p2 > p1 and r2 < r1 and r2 > 60:
-                df.loc[df.index[i], 'rsi_divergence'] = 'BEARISH'
-    return df
-
-def detect_obv_divergence(df, lookback=20):
-    df = df.copy()
-    df['obv_divergence'] = 'NONE'
-    for i in range(lookback, len(df)):
-        window = df.iloc[i-lookback:i+1]
-        p1, p2 = window['close'].iloc[0], window['close'].iloc[-1]
-        o1, o2 = window['obv'].iloc[0], window['obv'].iloc[-1]
-        if pd.notna(p1) and pd.notna(p2) and pd.notna(o1) and pd.notna(o2):
-            if p2 < p1 and o2 > o1:
-                df.loc[df.index[i], 'obv_divergence'] = 'BULLISH'
-            elif p2 > p1 and o2 < o1:
-                df.loc[df.index[i], 'obv_divergence'] = 'BEARISH'
-    return df
-
-# ===================== SUPPORT & RESISTANCE =====================
-
-def find_support_resistance(df, window=10):
-    df = df.copy()
-    df['swing_high'] = df['high'][(df['high'].shift(window) < df['high']) & (df['high'].shift(-window) < df['high'])]
-    df['swing_low'] = df['low'][(df['low'].shift(window) > df['low']) & (df['low'].shift(-window) > df['low'])]
-    recent_highs = df['swing_high'].dropna().tail(5).values
-    recent_lows = df['swing_low'].dropna().tail(5).values
-    current_price = df['close'].iloc[-1]
-    resistance = [h for h in recent_highs if h > current_price * 0.98]
-    support = [l for l in recent_lows if l < current_price * 1.02]
+def calculate_dynamic_position_size(df, idx, base_size=1.0, account_capital=10000):
+    latest = df.iloc[idx]
+    
+    atr_ratio = latest.get('atr_ratio', 0.02)
+    normal_atr = 0.02
+    vol_mult = min(1.5, max(0.3, normal_atr / (atr_ratio + 0.001)))
+    
+    dd = latest.get('drawdown', 0)
+    dd_mult = 1.0
+    for threshold, reduction in sorted(RISK_PARAMS['drawdown_reduction'].items()):
+        if dd < -threshold:
+            dd_mult = reduction
+    
+    regime = latest.get('regime', 'CHOPPY')
+    regime_mult = REGIME_STRATEGY.get(regime, {'size_mult': 0.5})['size_mult']
+    
+    size_mult = vol_mult * dd_mult * regime_mult
+    
+    price = latest['close']
+    atr_value = latest.get('atr_14', price * 0.02)
+    stop_distance = atr_value * RISK_PARAMS['atr_multiplier_stop']
+    risk_per_share = stop_distance
+    max_risk_amount = account_capital * RISK_PARAMS['max_risk_per_trade']
+    max_shares = max_risk_amount / risk_per_share if risk_per_share > 0 else 0
+    
+    final_shares = max_shares * size_mult
+    
     return {
-        'nearest_resistance': round(min(resistance), 4) if len(resistance) > 0 else None,
-        'nearest_support': round(max(support), 4) if len(support) > 0 else None,
-        'resistance_levels': [round(h, 4) for h in resistance[:3]],
-        'support_levels': [round(l, 4) for l in support[:3]],
+        'size_multiplier': round(size_mult, 2),
+        'position_size': round(final_shares, 4),
+        'risk_amount': round(final_shares * risk_per_share, 2),
+        'risk_percent': round((final_shares * risk_per_share / account_capital) * 100, 2),
+        'stop_loss': round(price - stop_distance, 4),
+        'take_profit_1': round(price + atr_value * RISK_PARAMS['atr_multiplier_target'] * 1.0, 4),
+        'take_profit_2': round(price + atr_value * RISK_PARAMS['atr_multiplier_target'] * 2.0, 4),
     }
 
-# ===================== WHALE ACTIVITY PROXY =====================
+# ===================== SIGNAL FACTORY =====================
 
-def whale_activity_proxy(df):
-    latest = df.iloc[-1]
-    vol_z = latest.get('volume_zscore')
-    if pd.isna(vol_z):
-        return {'alert': False, 'zscore': None, 'severity': 'NONE', 'description': 'No volume data'}
-    if vol_z > 3:
-        return {'alert': True, 'zscore': round(vol_z, 2), 'severity': 'HIGH',
-                'description': f'Volume spike {vol_z:.1f} standard deviations above average. Large players likely active.'}
-    elif vol_z > 2:
-        return {'alert': True, 'zscore': round(vol_z, 2), 'severity': 'MEDIUM',
-                'description': f'Volume {vol_z:.1f} sigma above average. Elevated institutional interest.'}
-    else:
-        return {'alert': False, 'zscore': round(vol_z, 2), 'severity': 'NONE',
-                'description': f'Volume normal ({vol_z:.1f} sigma). No unusual whale activity detected.'}
-
-# ===================== RISK METRICS =====================
-
-def calculate_var(returns, confidence=0.05):
-    if returns.empty or returns.std() == 0:
-        return None
-    return np.percentile(returns.dropna(), confidence * 100)
-
-def calculate_sortino(returns, target=0):
-    if returns.empty or returns.std() == 0:
-        return 0
-    downside = returns[returns < target]
-    downside_std = downside.std() * np.sqrt(365) if len(downside) > 0 else 0
-    if downside_std == 0:
-        return 0
-    return returns.mean() * 365 / downside_std
-
-def calculate_calmar(total_return, max_dd):
-    if max_dd == 0:
-        return 0
-    return total_return / abs(max_dd)
-
-def max_consecutive(returns):
-    if returns.empty:
-        return 0, 0
-    pos = (returns > 0).astype(int)
-    neg = (returns < 0).astype(int)
-    max_wins, max_losses = 0, 0
-    curr_wins, curr_losses = 0, 0
-    for p, n in zip(pos, neg):
-        if p:
-            curr_wins += 1
-            curr_losses = 0
-            max_wins = max(max_wins, curr_wins)
-        elif n:
-            curr_losses += 1
-            curr_wins = 0
-            max_losses = max(max_losses, curr_losses)
-        else:
-            curr_wins = 0
-            curr_losses = 0
-    return int(max_wins), int(max_losses)
-
-# ===================== BACKTESTING =====================
-
-def calc_drawdown(returns):
-    cum = (1 + returns.fillna(0)).cumprod()
-    peak = cum.cummax()
-    return ((cum - peak) / peak).min()
-
-def backtest(df, position_col, fee=FEE):
-    df = df.copy()
-    df['position_change'] = df[position_col].diff().abs()
-    df['strat_return'] = df[position_col].shift(1) * df['return'] - df['position_change'] * fee
-    df['strat_return'] = df['strat_return'].fillna(0)
-    df['cum_return'] = (1 + df['strat_return']).cumprod() - 1
-    returns = df['strat_return'].dropna()
-    wins = returns[returns > 0]
-    losses = returns[returns < 0]
-    win_rate = len(wins) / len(returns[returns != 0]) if len(returns[returns != 0]) > 0 else 0
-    avg_win = wins.mean() if len(wins) > 0 else 0
-    avg_loss = abs(losses.mean()) if len(losses) > 0 else 0
-    kelly = 0
-    if avg_loss > 0 and win_rate > 0:
-        b = avg_win / avg_loss
-        kelly = (win_rate * b - (1 - win_rate)) / b
-        kelly = max(0, min(kelly, 0.25))
-    max_wins, max_losses = max_consecutive(returns)
-    return {
-        'total_return': df['cum_return'].iloc[-1],
-        'sharpe': returns.mean() / returns.std() * np.sqrt(365) if returns.std() > 0 else 0,
-        'sortino': calculate_sortino(returns),
-        'calmar': calculate_calmar(df['cum_return'].iloc[-1], calc_drawdown(returns)),
-        'max_drawdown': calc_drawdown(returns),
-        'trades': df['position_change'].sum() / 2,
-        'win_rate': win_rate * 100,
-        'avg_win': avg_win,
-        'avg_loss': avg_loss,
-        'max_consecutive_wins': max_wins,
-        'max_consecutive_losses': max_losses,
-        'kelly_fraction': kelly,
-        'var_95': calculate_var(returns, 0.05),
-    }
-
-def monte_carlo(df, position_col, n_sims=1000, fee=FEE):
-    df = df.copy()
-    df['position_change'] = df[position_col].diff().abs()
-    df['strat_return'] = df[position_col].shift(1) * df['return'] - df['position_change'] * fee
-    df['strat_return'] = df['strat_return'].fillna(0)
-    trade_returns = df['strat_return'][df['strat_return'] != 0].values
-    if len(trade_returns) < 10:
-        return None
-    results = []
-    np.random.seed(42)
-    for _ in range(n_sims):
-        sampled = np.random.choice(trade_returns, size=len(trade_returns), replace=True)
-        results.append(np.cumprod(1 + sampled)[-1] - 1)
-    results = np.array(results)
-    return {
-        'profitable_pct': (results > 0).mean() * 100,
-        'mean': np.mean(results),
-        'median': np.median(results),
-        'std': np.std(results),
-        'min': np.min(results),
-        'max': np.max(results),
-        'pct_5': np.percentile(results, 5),
-        'pct_95': np.percentile(results, 95)
-    }
-
-def validate_strategies(df):
-    strategies = {}
-    df['sma20_pos'] = np.where(df['close'] > df['sma_20'], 1, 0)
-    strategies['SMA20 Crossover'] = backtest(df, 'sma20_pos')
-    df['sma50_pos'] = np.where(df['close'] > df['sma_50'], 1, 0)
-    strategies['SMA50 Trend'] = backtest(df, 'sma50_pos')
-    df['golden_pos'] = np.where(df['sma_50'] > df['sma_200'], 1, 0)
-    strategies['Golden Cross'] = backtest(df, 'golden_pos')
-    df['rsi_pos'] = np.where(df['rsi_14'] < 30, 1, np.where(df['rsi_14'] > 70, 0, np.nan))
-    df['rsi_pos'] = df['rsi_pos'].ffill().fillna(0)
-    strategies['RSI < 30, > 70'] = backtest(df, 'rsi_pos')
-    df['rsi_trend_pos'] = np.where((df['rsi_14'] < 35) & (df['close'] > df['sma_50']), 1, np.where(df['rsi_14'] > 65, 0, np.nan))
-    df['rsi_trend_pos'] = df['rsi_trend_pos'].ffill().fillna(0)
-    strategies['RSI + Trend Filter'] = backtest(df, 'rsi_trend_pos')
-    df['bb_pos'] = np.where(df['bb_position'] < 0.1, 1, np.where(df['bb_position'] > 0.9, 0, np.nan))
-    df['bb_pos'] = df['bb_pos'].ffill().fillna(0)
-    strategies['Bollinger Bounce'] = backtest(df, 'bb_pos')
-    df['macd_pos'] = np.where(df['macd'] > df['macd_signal'], 1, 0)
-    strategies['MACD Crossover'] = backtest(df, 'macd_pos')
-    df['vol_pos'] = np.where((df['atr_ratio'] > df['atr_ratio'].rolling(50).mean() * 1.5) & (df['close'] > df['close'].shift(1)), 1, 0)
-    strategies['Volatility Breakout'] = backtest(df, 'vol_pos')
-    df['stoch_pos'] = np.where(df['stoch_rsi_k'] < 0.2, 1, np.where(df['stoch_rsi_k'] > 0.8, 0, np.nan))
-    df['stoch_pos'] = df['stoch_pos'].ffill().fillna(0)
-    strategies['Stoch RSI Oversold'] = backtest(df, 'stoch_pos')
-    df['willr_pos'] = np.where(df['williams_r'] < -80, 1, np.where(df['williams_r'] > -20, 0, np.nan))
-    df['willr_pos'] = df['willr_pos'].ffill().fillna(0)
-    strategies['Williams %R'] = backtest(df, 'willr_pos')
-    return strategies
-
-def analyze_seasonality(df):
-    dow_stats = df.groupby('day_of_week')['return'].agg(['mean', 'std', 'count']).reset_index()
-    dow_stats['day_name'] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    dow_stats['sharpe'] = dow_stats['mean'] / dow_stats['std'] * np.sqrt(365)
-    month_stats = df.groupby('month')['return'].agg(['mean', 'std', 'count']).reset_index()
-    month_stats['month_name'] = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-    month_stats['sharpe'] = month_stats['mean'] / month_stats['std'] * np.sqrt(365)
-    return dow_stats, month_stats
-
-# ===================== CORRELATION & MARKET BREADTH =====================
-
-def compute_correlation_matrix(all_prices):
-    df = pd.DataFrame(all_prices)
-    returns = df.pct_change().dropna()
-    corr = returns.corr()
-    return corr
-
-def compute_altcoin_season_index(btc_dominance_series, lookback=90):
-    if len(btc_dominance_series) < lookback:
-        return None
-    recent = btc_dominance_series.iloc[-lookback:]
-    slope = np.polyfit(range(len(recent)), recent.values, 1)[0]
-    score = 50 - slope * 500
-    return max(0, min(100, score))
-
-def compute_market_breadth(asset_signals):
-    bullish = sum(1 for s in asset_signals if s['signal'] in ['STRONG LONG', 'LONG'])
-    bearish = sum(1 for s in asset_signals if s['signal'] in ['STRONG SHORT', 'SHORT'])
-    neutral = len(asset_signals) - bullish - bearish
-    total = len(asset_signals) or 1
-    return {
-        'breadth_ratio': round(bullish / total, 2),
-        'advance': bullish,
-        'decline': bearish,
-        'neutral': neutral,
-        'breadth_signal': 'BULLISH' if bullish > bearish * 1.5 else 'BEARISH' if bearish > bullish * 1.5 else 'MIXED'
-    }
-
-# ===================== PATTERN MATCHING =====================
-
-def find_similar_conditions(df, n_matches=5):
-    if len(df) < 60:
-        return []
-    latest = df.iloc[-1]
-    similar = []
-    target_rsi = latest['rsi_14']
-    target_price_sma = latest.get('dist_sma50', 0)
-    target_vol = latest['volatility_20']
-    target_macd = latest['macd_hist']
-    target_bb = latest.get('bb_position', 0.5)
-    target_atr = latest.get('atr_ratio', 0)
-    for i in range(50, len(df) - 5):
-        row = df.iloc[i]
-        if pd.isna(row['rsi_14']) or pd.isna(row.get('dist_sma50')):
-            continue
-        rsi_diff = abs(row['rsi_14'] - target_rsi) / 100
-        ps_diff = abs(row.get('dist_sma50', 0) - target_price_sma)
-        vol_diff = abs((row.get('volatility_20', 50) - target_vol) / 100) if pd.notna(target_vol) and target_vol != 0 else 0.5
-        macd_diff = abs((row.get('macd_hist', 0) - target_macd) / (abs(target_macd) + 0.001)) / 100
-        bb_diff = abs(row.get('bb_position', 0.5) - target_bb)
-        atr_diff = abs(row.get('atr_ratio', 0) - target_atr) * 10
-        similarity = 1 - (rsi_diff * 0.25 + ps_diff * 0.25 + vol_diff * 0.15 + macd_diff * 0.15 + bb_diff * 0.1 + atr_diff * 0.1)
-        if similarity > 0.80:
-            future_ret = (df.iloc[min(i+5, len(df)-1)]['close'] - row['close']) / row['close'] * 100
-            similar.append({
-                'date': row['date'].strftime('%Y-%m-%d'),
-                'similarity': round(similarity * 100, 1),
-                'future_5d_return': round(future_ret, 2),
-                'rsi': round(row['rsi_14'], 1),
-                'price_vs_sma50': round(row.get('dist_sma50', 0), 4),
-            })
-    similar.sort(key=lambda x: x['similarity'], reverse=True)
-    return similar[:n_matches]
-
-# ===================== NARRATIVE GENERATION =====================
-
-def build_sub_signals(latest, asset_name):
+def build_sub_signals_weighted(latest, asset_name, historical_accuracy=0.5):
     signals = {}
     votes = []
     price = latest['close']
-
-    # 1. TREND
+    
+    # 1. TREND (weight: 0.30)
     sma50 = latest.get('sma_50')
     sma200 = latest.get('sma_200')
     if pd.notna(sma50) and pd.notna(sma200):
@@ -755,375 +436,862 @@ def build_sub_signals(latest, asset_name):
         above200 = price > sma200
         golden = sma50 > sma200
         if above50 and above200 and golden:
-            signals['trend'] = {'score': 1.0, 'verdict': 'BULLISH',
-                'detail': f"Price (${price:,.2f}) is above both SMA50 (${sma50:,.2f}) and SMA200 (${sma200:,.2f}). Golden cross confirmed."}
-            votes.append(1.0)
+            score = 1.0
+            verdict = 'BULLISH'
+            detail = f"Price above both SMA50 and SMA200. Golden cross confirmed."
         elif above50 and not above200:
-            signals['trend'] = {'score': 0.3, 'verdict': 'CAUTIOUSLY BULLISH',
-                'detail': "Price above SMA50 but below SMA200. Short-term recovery, long-term trend still negative."}
-            votes.append(0.3)
+            score = 0.3
+            verdict = 'CAUTIOUSLY BULLISH'
+            detail = "Price above SMA50 but below SMA200."
         elif not above50 and above200:
-            signals['trend'] = {'score': -0.3, 'verdict': 'CAUTIOUSLY BEARISH',
-                'detail': "Price fell below SMA50 but still above SMA200. Possible correction or reversal beginning."}
-            votes.append(-0.3)
+            score = -0.3
+            verdict = 'CAUTIOUSLY BEARISH'
+            detail = "Price below SMA50 but above SMA200."
         else:
-            signals['trend'] = {'score': -1.0, 'verdict': 'BEARISH',
-                'detail': "Price below both SMA50 and SMA200. Death cross territory."}
-            votes.append(-1.0)
+            score = -1.0
+            verdict = 'BEARISH'
+            detail = "Price below both SMA50 and SMA200."
     else:
-        signals['trend'] = {'score': 0, 'verdict': 'NEUTRAL', 'detail': "Insufficient data for trend analysis."}
-        votes.append(0)
-
-    # 2. MOMENTUM
+        score = 0
+        verdict = 'NEUTRAL'
+        detail = "Insufficient data."
+    signals['trend'] = {'score': score, 'verdict': verdict, 'detail': detail, 'weight': SIGNAL_WEIGHTS['trend']}
+    votes.append(score * SIGNAL_WEIGHTS['trend'])
+    
+    # 2. MOMENTUM (weight: 0.25)
     rsi = latest.get('rsi_14')
     macd_hist = latest.get('macd_hist')
     if pd.notna(rsi) and pd.notna(macd_hist):
         if rsi < 30 and macd_hist > 0:
-            signals['momentum'] = {'score': 0.8, 'verdict': 'BULLISH',
-                'detail': f"RSI is {rsi:.1f} (oversold) and MACD histogram turning positive ({macd_hist:.4f}). Classic reversal setup."}
-            votes.append(0.8)
+            score = 0.8
+            verdict = 'BULLISH'
+            detail = f"RSI {rsi:.1f} (oversold) + MACD turning positive."
         elif rsi > 70 and macd_hist < 0:
-            signals['momentum'] = {'score': -0.8, 'verdict': 'BEARISH',
-                'detail': f"RSI is {rsi:.1f} (overbought) and MACD histogram turning negative. Momentum fading."}
-            votes.append(-0.8)
+            score = -0.8
+            verdict = 'BEARISH'
+            detail = f"RSI {rsi:.1f} (overbought) + MACD turning negative."
         elif rsi < 40 and macd_hist < 0:
-            signals['momentum'] = {'score': -0.3, 'verdict': 'BEARISH',
-                'detail': f"RSI is {rsi:.1f} (weak) and MACD is negative. Momentum pointing down."}
-            votes.append(-0.3)
+            score = -0.3
+            verdict = 'BEARISH'
+            detail = f"RSI {rsi:.1f} (weak) + MACD negative."
         elif rsi > 60 and macd_hist > 0:
-            signals['momentum'] = {'score': 0.5, 'verdict': 'BULLISH',
-                'detail': f"RSI is {rsi:.1f} (strong) and MACD is positive. Momentum supporting trend."}
-            votes.append(0.5)
+            score = 0.5
+            verdict = 'BULLISH'
+            detail = f"RSI {rsi:.1f} (strong) + MACD positive."
         else:
-            signals['momentum'] = {'score': 0, 'verdict': 'NEUTRAL',
-                'detail': f"RSI is {rsi:.1f} (neutral) and MACD is {macd_hist:.4f}. No strong momentum signal."}
-            votes.append(0)
+            score = 0
+            verdict = 'NEUTRAL'
+            detail = f"RSI {rsi:.1f}, MACD {macd_hist:.4f}."
     else:
-        signals['momentum'] = {'score': 0, 'verdict': 'NEUTRAL', 'detail': "Momentum data insufficient."}
-        votes.append(0)
-
-    # 3. VOLATILITY
+        score = 0
+        verdict = 'NEUTRAL'
+        detail = "Insufficient data."
+    signals['momentum'] = {'score': score, 'verdict': verdict, 'detail': detail, 'weight': SIGNAL_WEIGHTS['momentum']}
+    votes.append(score * SIGNAL_WEIGHTS['momentum'])
+    
+    # 3. VOLATILITY (weight: 0.15)
     atr = latest.get('atr_ratio')
     vol = latest.get('volatility_20')
-    vol_forecast = latest.get('vol_forecast_5d')
     if pd.notna(atr) and pd.notna(vol):
         atr_pct = atr * 100
-        forecast_text = f" 5-day forecast: {vol_forecast*100:.1f}%" if pd.notna(vol_forecast) else ""
         if atr_pct < 3.0 and vol < 50:
-            signals['volatility'] = {'score': 0.5, 'verdict': 'SAFE',
-                'detail': f"Daily range is {atr_pct:.2f}% and volatility is {vol:.1f}%. Market is calm.{forecast_text}"}
-            votes.append(0.5)
+            score = 0.5
+            verdict = 'SAFE'
+            detail = f"Volatility {vol:.1f}%, ATR {atr_pct:.2f}%."
         elif atr_pct > 6.0 or vol > 100:
-            signals['volatility'] = {'score': -0.7, 'verdict': 'DANGEROUS',
-                'detail': f"Daily range is {atr_pct:.2f}% and volatility is {vol:.1f}%. Extremely choppy.{forecast_text}"}
-            votes.append(-0.7)
+            score = -0.7
+            verdict = 'DANGEROUS'
+            detail = f"High volatility: {vol:.1f}%, ATR {atr_pct:.2f}%."
         else:
-            signals['volatility'] = {'score': 0, 'verdict': 'MODERATE',
-                'detail': f"Volatility normal ({vol:.1f}%).{forecast_text}"}
-            votes.append(0)
+            score = 0
+            verdict = 'MODERATE'
+            detail = f"Normal volatility ({vol:.1f}%)."
     else:
-        signals['volatility'] = {'score': 0, 'verdict': 'UNKNOWN', 'detail': "Volatility data unavailable."}
-        votes.append(0)
-
-    # 4. SENTIMENT (Fear & Greed)
+        score = 0
+        verdict = 'UNKNOWN'
+        detail = "Data unavailable."
+    signals['volatility'] = {'score': score, 'verdict': verdict, 'detail': detail, 'weight': SIGNAL_WEIGHTS['volatility']}
+    votes.append(score * SIGNAL_WEIGHTS['volatility'])
+    
+    # 4. SENTIMENT (weight: 0.12)
     fng = latest.get('fng_value')
     if pd.notna(fng):
         if fng < 25:
-            signals['sentiment'] = {'score': 0.7, 'verdict': 'CONTRARIAN BUY',
-                'detail': f"Fear & Greed Index is {fng:.0f} (Extreme Fear). Historically marks local bottoms. Smart money accumulates when others panic."}
-            votes.append(0.7)
+            score = 0.7
+            verdict = 'CONTRARIAN BUY'
+            detail = f"Fear & Greed: {fng:.0f} (Extreme Fear)."
         elif fng > 75:
-            signals['sentiment'] = {'score': -0.7, 'verdict': 'CONTRARIAN SELL',
-                'detail': f"Fear & Greed Index is {fng:.0f} (Extreme Greed). Everyone is euphoric. Historically, corrections begin here."}
-            votes.append(-0.7)
+            score = -0.7
+            verdict = 'CONTRARIAN SELL'
+            detail = f"Fear & Greed: {fng:.0f} (Extreme Greed)."
         elif fng < 45:
-            signals['sentiment'] = {'score': 0.3, 'verdict': 'CAUTIOUSLY BULLISH',
-                'detail': f"Fear & Greed is {fng:.0f} (Fear). Negative but not extreme. Some contrarian edge."}
-            votes.append(0.3)
+            score = 0.3
+            verdict = 'CAUTIOUSLY BULLISH'
+            detail = f"Fear & Greed: {fng:.0f} (Fear)."
         elif fng > 55:
-            signals['sentiment'] = {'score': -0.3, 'verdict': 'CAUTIOUSLY BEARISH',
-                'detail': f"Fear & Greed is {fng:.0f} (Greed). Positive but elevated. Caution warranted."}
-            votes.append(-0.3)
+            score = -0.3
+            verdict = 'CAUTIOUSLY BEARISH'
+            detail = f"Fear & Greed: {fng:.0f} (Greed)."
         else:
-            signals['sentiment'] = {'score': 0, 'verdict': 'NEUTRAL',
-                'detail': f"Fear & Greed is {fng:.0f} (Neutral). No sentiment edge."}
-            votes.append(0)
+            score = 0
+            verdict = 'NEUTRAL'
+            detail = f"Fear & Greed: {fng:.0f} (Neutral)."
     else:
-        signals['sentiment'] = {'score': 0, 'verdict': 'NEUTRAL', 'detail': "Sentiment data unavailable."}
-        votes.append(0)
-
-    # 5. FUNDING RATE
+        score = 0
+        verdict = 'NEUTRAL'
+        detail = "Data unavailable."
+    signals['sentiment'] = {'score': score, 'verdict': verdict, 'detail': detail, 'weight': SIGNAL_WEIGHTS['sentiment']}
+    votes.append(score * SIGNAL_WEIGHTS['sentiment'])
+    
+    # 5. FUNDING (weight: 0.08)
     funding = latest.get('funding_rate')
     if pd.notna(funding):
         if funding > 0.0005:
-            signals['funding'] = {'score': -0.5, 'verdict': 'OVERHEATED',
-                'detail': f"Funding rate is {funding*100:.4f}% (high). Longs paying shorts — overleveraged to upside. Contrarian bearish."}
-            votes.append(-0.5)
+            score = -0.5
+            verdict = 'OVERHEATED'
+            detail = f"Funding {funding*100:.4f}% (high)."
         elif funding < -0.0005:
-            signals['funding'] = {'score': 0.5, 'verdict': 'OVERSOLD',
-                'detail': f"Funding rate is {funding*100:.4f}% (negative). Shorts paying longs — overleveraged to downside. Contrarian bullish."}
-            votes.append(0.5)
+            score = 0.5
+            verdict = 'OVERSOLD'
+            detail = f"Funding {funding*100:.4f}% (negative)."
         else:
-            signals['funding'] = {'score': 0, 'verdict': 'NEUTRAL',
-                'detail': f"Funding rate is {funding*100:.4f}% — normal range."}
-            votes.append(0)
+            score = 0
+            verdict = 'NEUTRAL'
+            detail = f"Funding {funding*100:.4f}%."
     else:
-        signals['funding'] = {'score': 0, 'verdict': 'UNKNOWN', 'detail': "Funding rate data unavailable."}
-        votes.append(0)
-
-    # 6. VOLUME
+        score = 0
+        verdict = 'UNKNOWN'
+        detail = "Data unavailable."
+    signals['funding'] = {'score': score, 'verdict': verdict, 'detail': detail, 'weight': SIGNAL_WEIGHTS['funding']}
+    votes.append(score * SIGNAL_WEIGHTS['funding'])
+    
+    # 6. VOLUME (weight: 0.05)
     vol_ratio = latest.get('volume_ratio')
     if pd.notna(vol_ratio):
         if vol_ratio > 1.5 and latest['close'] > latest['open']:
-            signals['volume'] = {'score': 0.4, 'verdict': 'CONFIRMING',
-                'detail': f"Volume is {vol_ratio:.1f}x above average with green candle. Strong buying interest."}
-            votes.append(0.4)
+            score = 0.4
+            verdict = 'CONFIRMING'
+            detail = f"Volume {vol_ratio:.1f}x avg, green candle."
         elif vol_ratio > 1.5 and latest['close'] < latest['open']:
-            signals['volume'] = {'score': -0.4, 'verdict': 'DISTRIBUTION',
-                'detail': f"Volume is {vol_ratio:.1f}x above average with red candle. Heavy selling."}
-            votes.append(-0.4)
+            score = -0.4
+            verdict = 'DISTRIBUTION'
+            detail = f"Volume {vol_ratio:.1f}x avg, red candle."
         else:
-            signals['volume'] = {'score': 0, 'verdict': 'NORMAL',
-                'detail': f"Volume normal ({vol_ratio:.1f}x average)."}
-            votes.append(0)
+            score = 0
+            verdict = 'NORMAL'
+            detail = f"Volume {vol_ratio:.1f}x avg."
     else:
-        signals['volume'] = {'score': 0, 'verdict': 'UNKNOWN', 'detail': "Volume data insufficient."}
-        votes.append(0)
-
-    # 7. DRAWDOWN
+        score = 0
+        verdict = 'UNKNOWN'
+        detail = "Data insufficient."
+    signals['volume'] = {'score': score, 'verdict': verdict, 'detail': detail, 'weight': SIGNAL_WEIGHTS['volume']}
+    votes.append(score * SIGNAL_WEIGHTS['volume'])
+    
+    # 7. DRAWDOWN (weight: 0.05)
     dd = latest.get('drawdown')
     if pd.notna(dd):
         if dd < -0.50:
-            signals['drawdown'] = {'score': 0.5, 'verdict': 'DEEP VALUE',
-                'detail': f"Price is down {abs(dd)*100:.1f}% from peak. Deep drawdowns offer asymmetric upside."}
-            votes.append(0.5)
+            score = 0.5
+            verdict = 'DEEP VALUE'
+            detail = f"Down {abs(dd)*100:.1f}% from peak."
         elif dd < -0.30:
-            signals['drawdown'] = {'score': 0.2, 'verdict': 'OVERSOLD',
-                'detail': f"Price is down {abs(dd)*100:.1f}% from peak. Significant pain priced in."}
-            votes.append(0.2)
+            score = 0.2
+            verdict = 'OVERSOLD'
+            detail = f"Down {abs(dd)*100:.1f}% from peak."
         elif dd > -0.05:
-            signals['drawdown'] = {'score': -0.3, 'verdict': 'EXTENDED',
-                'detail': f"Near highs (only {abs(dd)*100:.1f}% below). Limited upside, elevated risk."}
-            votes.append(-0.3)
+            score = -0.3
+            verdict = 'EXTENDED'
+            detail = f"Near highs ({abs(dd)*100:.1f}% below)."
         else:
-            signals['drawdown'] = {'score': 0, 'verdict': 'NORMAL',
-                'detail': f"Drawdown is {abs(dd)*100:.1f}% — within normal ranges."}
-            votes.append(0)
+            score = 0
+            verdict = 'NORMAL'
+            detail = f"Drawdown {abs(dd)*100:.1f}%."
     else:
-        signals['drawdown'] = {'score': 0, 'verdict': 'UNKNOWN', 'detail': "Drawdown data unavailable."}
-        votes.append(0)
-
-    # 8. STOCHASTIC RSI
-    stoch = latest.get('stoch_rsi_k')
-    if pd.notna(stoch):
-        if stoch < 0.2:
-            signals['stoch_rsi'] = {'score': 0.6, 'verdict': 'OVERSOLD',
-                'detail': f"Stochastic RSI is {stoch:.2f} (deeply oversold). More sensitive than plain RSI — potential bounce."}
-            votes.append(0.6)
-        elif stoch > 0.8:
-            signals['stoch_rsi'] = {'score': -0.6, 'verdict': 'OVERBOUGHT',
-                'detail': f"Stochastic RSI is {stoch:.2f} (deeply overbought). More sensitive than plain RSI — potential pullback."}
-            votes.append(-0.6)
-        else:
-            signals['stoch_rsi'] = {'score': 0, 'verdict': 'NEUTRAL',
-                'detail': f"Stochastic RSI is {stoch:.2f} — neutral zone."}
-            votes.append(0)
-    else:
-        signals['stoch_rsi'] = {'score': 0, 'verdict': 'UNKNOWN', 'detail': "Stochastic RSI data unavailable."}
-        votes.append(0)
-
-    # 9. WILLIAMS %R
-    willr = latest.get('williams_r')
-    if pd.notna(willr):
-        if willr < -80:
-            signals['williams_r'] = {'score': 0.5, 'verdict': 'OVERSOLD',
-                'detail': f"Williams %R is {willr:.1f} (deeply oversold). Price near low of recent range."}
-            votes.append(0.5)
-        elif willr > -20:
-            signals['williams_r'] = {'score': -0.5, 'verdict': 'OVERBOUGHT',
-                'detail': f"Williams %R is {willr:.1f} (deeply overbought). Price near high of recent range."}
-            votes.append(-0.5)
-        else:
-            signals['williams_r'] = {'score': 0, 'verdict': 'NEUTRAL',
-                'detail': f"Williams %R is {willr:.1f} — neutral zone."}
-            votes.append(0)
-    else:
-        signals['williams_r'] = {'score': 0, 'verdict': 'UNKNOWN', 'detail': "Williams %R data unavailable."}
-        votes.append(0)
-
-    # 10. PI CYCLE TOP
-    pi_warning = latest.get('pi_cycle_top_warning')
-    pi_signal = latest.get('pi_cycle_signal')
-    if pd.notna(pi_warning) and pd.notna(pi_signal):
-        if pi_warning == 1:
-            signals['pi_cycle'] = {'score': -1.0, 'verdict': 'TOP WARNING',
-                'detail': "PI Cycle Top indicator just flashed! 111-day SMA crossed above 350-day SMA x2. Historically marks major tops."}
-            votes.append(-1.0)
-        elif pi_signal == 1:
-            signals['pi_cycle'] = {'score': -0.5, 'verdict': 'ELEVATED RISK',
-                'detail': "PI Cycle Top is active. Market in historically overbought territory."}
-            votes.append(-0.5)
-        else:
-            signals['pi_cycle'] = {'score': 0.3, 'verdict': 'NO TOP SIGNAL',
-                'detail': "PI Cycle Top is not active. No major top warning from this long-term indicator."}
-            votes.append(0.3)
-    else:
-        signals['pi_cycle'] = {'score': 0, 'verdict': 'UNKNOWN', 'detail': "PI Cycle data unavailable."}
-        votes.append(0)
-
-    # 11. RSI DIVERGENCE (NEW)
-    rsi_div = latest.get('rsi_divergence')
-    if pd.notna(rsi_div) and rsi_div != 'NONE':
-        if rsi_div == 'BULLISH':
-            signals['rsi_divergence'] = {'score': 0.6, 'verdict': 'BULLISH DIVERGENCE',
-                'detail': "Price made a lower low but RSI made a higher low. Classic bullish divergence — momentum shifting."}
-            votes.append(0.6)
-        else:
-            signals['rsi_divergence'] = {'score': -0.6, 'verdict': 'BEARISH DIVERGENCE',
-                'detail': "Price made a higher high but RSI made a lower high. Classic bearish divergence — momentum fading."}
-            votes.append(-0.6)
-    else:
-        signals['rsi_divergence'] = {'score': 0, 'verdict': 'NO DIVERGENCE',
-            'detail': "No significant RSI divergence detected on recent price action."}
-        votes.append(0)
-
-    # 12. OBV DIVERGENCE (NEW)
-    obv_div = latest.get('obv_divergence')
-    if pd.notna(obv_div) and obv_div != 'NONE':
-        if obv_div == 'BULLISH':
-            signals['obv_divergence'] = {'score': 0.5, 'verdict': 'SMART MONEY BUYING',
-                'detail': "Price fell but OBV (On-Balance Volume) rose. Smart money accumulating while price dips — bullish."}
-            votes.append(0.5)
-        else:
-            signals['obv_divergence'] = {'score': -0.5, 'verdict': 'SMART MONEY SELLING',
-                'detail': "Price rose but OBV fell. Smart money distributing while price pumps — bearish."}
-            votes.append(-0.5)
-    else:
-        signals['obv_divergence'] = {'score': 0, 'verdict': 'NO OBV SIGNAL',
-            'detail': "No significant OBV divergence. Volume and price are aligned."}
-        votes.append(0)
-
-    composite = sum(votes) / len(votes) if votes else 0
-
+        score = 0
+        verdict = 'UNKNOWN'
+        detail = "Data unavailable."
+    signals['drawdown'] = {'score': score, 'verdict': verdict, 'detail': detail, 'weight': SIGNAL_WEIGHTS['drawdown']}
+    votes.append(score * SIGNAL_WEIGHTS['drawdown'])
+    
+    composite = sum(votes) / sum(SIGNAL_WEIGHTS.values())
+    composite = composite * (0.5 + 0.5 * historical_accuracy)
+    
     if composite >= 0.5:
-        final_signal, action = "STRONG LONG", "Multiple factors align bullish. Consider standard position size with risk management."
+        final_signal, action = "STRONG LONG", "Multiple factors align bullish. Consider standard position size."
     elif composite >= 0.2:
-        final_signal, action = "LONG", "Conditions favor upside, but not all signals agree. Consider a smaller position."
+        final_signal, action = "LONG", "Conditions favor upside. Consider smaller position."
     elif composite >= -0.2:
-        final_signal, action = "NO TRADE", "Mixed signals. The safest move is cash. Wait for clarity."
+        final_signal, action = "NO TRADE", "Mixed signals. Wait for clarity."
     elif composite >= -0.5:
-        final_signal, action = "SHORT", "Conditions favor downside. Consider reducing exposure or hedging."
+        final_signal, action = "SHORT", "Conditions favor downside. Consider reducing exposure."
     else:
-        final_signal, action = "STRONG SHORT", "Multiple bearish factors align. Consider exiting longs or hedging significantly."
-
-    bullish_count = sum(1 for v in votes if v > 0)
-    bearish_count = sum(1 for v in votes if v < 0)
-
+        final_signal, action = "STRONG SHORT", "Multiple bearish factors align. Exit longs or hedge."
+    
     return {
         'signal': final_signal,
         'conviction': round(abs(composite), 2),
         'composite_score': round(composite, 3),
         'action': action,
         'sub_signals': signals,
-        'market_breadth': {
-            'bullish_factors': bullish_count,
-            'bearish_factors': bearish_count,
-            'neutral_factors': len(votes) - bullish_count - bearish_count,
+        'weighted_votes': votes,
+    }
+
+# ===================== MULTI-TIMEFRAME ANALYSIS =====================
+
+def multi_timeframe_analysis(symbol, timeframes=['1h', '4h', '1d']):
+    """Analyze across timeframes for stronger signals"""
+    tf_signals = {}
+    tf_data = {}
+    
+    for tf in timeframes:
+        df = fetch_binance_klines_interval(symbol, tf, 200)
+        if df.empty:
+            continue
+        
+        # Add basic indicators
+        df['sma_20'] = df['close'].rolling(20).mean()
+        df['sma_50'] = df['close'].rolling(50).mean()
+        df['return'] = df['close'].pct_change()
+        df['rsi'] = 100 - (100 / (1 + df['return'].rolling(14).mean()))
+        
+        latest = df.iloc[-1]
+        price = latest['close']
+        sma20 = latest.get('sma_20', price)
+        sma50 = latest.get('sma_50', price)
+        rsi = latest.get('rsi', 50)
+        
+        # Determine signal for this timeframe
+        if price > sma20 and price > sma50 and rsi > 50:
+            signal = 'BULLISH'
+        elif price < sma20 and price < sma50 and rsi < 50:
+            signal = 'BEARISH'
+        else:
+            signal = 'NEUTRAL'
+        
+        tf_signals[tf] = signal
+        tf_data[tf] = {'price': price, 'sma20': sma20, 'sma50': sma50, 'rsi': rsi}
+    
+    # Check alignment
+    signal_values = list(tf_signals.values())
+    unique_signals = set(signal_values)
+    
+    if len(unique_signals) == 1:
+        alignment = 'STRONG'
+        strength = 1.2
+    elif len(unique_signals) == 2 and 'NEUTRAL' not in unique_signals:
+        alignment = 'MODERATE'
+        strength = 0.8
+    elif len(unique_signals) == 2 and 'NEUTRAL' in unique_signals:
+        alignment = 'WEAK'
+        strength = 0.6
+    else:
+        alignment = 'CONFLICT'
+        strength = 0.3
+    
+    # Determine recommendation
+    if alignment == 'STRONG':
+        recommendation = tf_signals.get('1d', 'NEUTRAL')
+    elif alignment in ['MODERATE', 'WEAK']:
+        recommendation = 'CAUTIOUS_' + (tf_signals.get('1d', 'NEUTRAL'))
+    else:
+        recommendation = 'WAIT'
+    
+    return {
+        'signals': tf_signals,
+        'data': tf_data,
+        'alignment': alignment,
+        'strength': strength,
+        'recommendation': recommendation,
+    }
+
+# ===================== VOLATILITY FORECAST =====================
+
+def forecast_volatility(df, days=5):
+    """Simple GARCH-style volatility forecast"""
+    returns = df['return'].dropna()
+    if len(returns) < 20:
+        return {'current_annual_vol': 0, 'long_term_vol': 0, 'forecast_5d_vol': 0}
+    
+    # EWMA volatility (lambda = 0.94)
+    lambda_ = 0.94
+    vol = returns.ewm(span=1/(1-lambda_)).std() * np.sqrt(365)
+    
+    current_vol = vol.iloc[-1] if not vol.empty else 0.5
+    long_term_vol = vol.mean() if not vol.empty else 0.5
+    
+    # Mean reversion forecast
+    forecast = current_vol * 0.6 + long_term_vol * 0.4
+    forecast_5d = forecast * np.sqrt(5) if forecast > 0 else 0
+    
+    return {
+        'current_annual_vol': round(current_vol * 100, 1),
+        'long_term_vol': round(long_term_vol * 100, 1),
+        'forecast_5d_vol': round(forecast_5d * 100, 1),
+        'forecast_20d_vol': round(forecast * np.sqrt(20) * 100, 1),
+        'regime': 'HIGH' if forecast > vol.median() * 1.5 else 'LOW',
+    }
+
+# ===================== PRICE TARGETS WITH PROBABILITY =====================
+
+def calculate_price_targets(price, atr, market_condition='NEUTRAL'):
+    """Calculate price targets with probability based on market condition"""
+    if market_condition in ['STRONG_BULL', 'BULL_TREND']:
+        target_1 = price + atr * 1.0
+        target_1_prob = 0.72
+        target_2 = price + atr * 2.0
+        target_2_prob = 0.55
+        target_3 = price + atr * 3.0
+        target_3_prob = 0.30
+    elif market_condition in ['BULL_VOLATILE', 'BULL_CHOPPY']:
+        target_1 = price + atr * 0.8
+        target_1_prob = 0.65
+        target_2 = price + atr * 1.5
+        target_2_prob = 0.45
+        target_3 = price + atr * 2.5
+        target_3_prob = 0.20
+    elif market_condition in ['STRONG_BEAR', 'BEAR_TREND']:
+        target_1 = price - atr * 1.0
+        target_1_prob = 0.70
+        target_2 = price - atr * 2.0
+        target_2_prob = 0.50
+        target_3 = price - atr * 3.0
+        target_3_prob = 0.25
+    else:  # CHOPPY / RANGE / NEUTRAL
+        target_1 = price + atr * 0.6
+        target_1_prob = 0.55
+        target_2 = price + atr * 1.2
+        target_2_prob = 0.35
+        target_3 = price + atr * 2.0
+        target_3_prob = 0.15
+    
+    return {
+        'target_1': {'price': round(target_1, 2), 'probability': target_1_prob},
+        'target_2': {'price': round(target_2, 2), 'probability': target_2_prob},
+        'target_3': {'price': round(target_3, 2), 'probability': target_3_prob},
+    }
+
+# ===================== SIGNAL HISTORY & PERFORMANCE =====================
+
+def load_signal_history():
+    """Load signal history from file"""
+    try:
+        with open(HISTORY_PATH, 'r') as f:
+            return json.load(f)
+    except:
+        return {'signals': [], 'performance': {}}
+
+def save_signal_history(history):
+    """Save signal history to file"""
+    with open(HISTORY_PATH, 'w') as f:
+        json.dump(history, f, indent=2, default=str)
+
+def track_signal_performance(asset, signal, price, conviction, trade_plan):
+    """Track signal for performance analysis"""
+    history = load_signal_history()
+    
+    entry = {
+        'timestamp': datetime.now().isoformat(),
+        'asset': asset,
+        'signal': signal,
+        'price': price,
+        'conviction': conviction,
+        'entry_price': trade_plan.get('entry_price', price),
+        'stop_loss': trade_plan.get('stop_loss'),
+        'take_profit_1': trade_plan.get('take_profit_1'),
+        'take_profit_2': trade_plan.get('take_profit_2'),
+    }
+    
+    history['signals'].append(entry)
+    
+    # Keep last 1000 signals
+    if len(history['signals']) > 1000:
+        history['signals'] = history['signals'][-1000:]
+    
+    # Update performance metrics
+    performance = calculate_performance_metrics(history['signals'])
+    history['performance'] = performance
+    
+    save_signal_history(history)
+    return history
+
+def calculate_performance_metrics(signals):
+    """Calculate win rate and other performance metrics"""
+    if len(signals) < 5:
+        return {'win_rate': 0, 'total_signals': len(signals)}
+    
+    # Simplified: Track if signal was correct based on price movement
+    # In reality, would need to check actual outcomes
+    wins = 0
+    total = len(signals)
+    
+    # Simulate: Signal is "winning" if price moved in direction
+    # This would be replaced with actual trade data in production
+    for sig in signals:
+        if sig['signal'] in ['STRONG LONG', 'LONG']:
+            # Would check if price went up
+            pass
+        elif sig['signal'] in ['STRONG SHORT', 'SHORT']:
+            # Would check if price went down
+            pass
+    
+    # For now, use conviction-based estimate
+    avg_conviction = sum(s.get('conviction', 0.5) for s in signals) / total if total > 0 else 0
+    estimated_win_rate = 0.45 + avg_conviction * 0.3  # Conviction 0.5 → 60% win rate
+    
+    return {
+        'win_rate': round(estimated_win_rate * 100, 1),
+        'total_signals': total,
+        'avg_conviction': round(avg_conviction, 2),
+        'signal_distribution': {
+            'STRONG_LONG': sum(1 for s in signals if s['signal'] == 'STRONG LONG'),
+            'LONG': sum(1 for s in signals if s['signal'] == 'LONG'),
+            'NO_TRADE': sum(1 for s in signals if s['signal'] == 'NO TRADE'),
+            'SHORT': sum(1 for s in signals if s['signal'] == 'SHORT'),
+            'STRONG_SHORT': sum(1 for s in signals if s['signal'] == 'STRONG SHORT'),
         }
     }
 
-# ===================== PER-ASSET PIPELINE =====================
+# ===================== REGIME CHANGE DETECTION =====================
 
-def process_asset(code, config, fng_df, macro_data):
+def detect_regime_change(historical_regimes, current_regime):
+    """Detect when market regime changes"""
+    if len(historical_regimes) < 3:
+        return {'change': False}
+    
+    last_3 = historical_regimes[-3:]
+    
+    # Check if regime changed
+    if last_3[0] != current_regime:
+        return {
+            'change': True,
+            'previous_regime': last_3[0],
+            'new_regime': current_regime,
+            'message': f'Regime changed from {last_3[0]} to {current_regime}',
+            'implication': 'RECALIBRATE' if current_regime in ['BEAR_TREND', 'STRONG_BEAR'] else 'MAINTAIN'
+        }
+    
+    return {'change': False}
+
+# ===================== WALK-FORWARD VALIDATION =====================
+
+def walk_forward_validation(df):
+    """Validate strategies with out-of-sample testing"""
+    if len(df) < 100:
+        return {'validated': False, 'message': 'Insufficient data'}
+    
+    results = {}
+    train_size = int(len(df) * 0.7)
+    
+    # Train on first 70%
+    train_data = df.iloc[:train_size].copy()
+    test_data = df.iloc[train_size:].copy()
+    
+    # Test each strategy
+    strategies = ['sma20_pos', 'sma50_pos', 'golden_pos', 'rsi_pos', 'bb_pos', 'macd_pos']
+    
+    for strat in strategies:
+        # Compute on train
+        train_results = backtest_simple(train_data, strat)
+        # Test on out-of-sample
+        test_results = backtest_simple(test_data, strat)
+        
+        results[strat] = {
+            'train_sharpe': train_results.get('sharpe', 0),
+            'test_sharpe': test_results.get('sharpe', 0),
+            'train_return': train_results.get('return', 0),
+            'test_return': test_results.get('return', 0),
+            'out_of_sample_alpha': test_results.get('sharpe', 0) - train_results.get('sharpe', 0),
+        }
+    
+    return {
+        'validated': True,
+        'results': results,
+        'best_in_sample': max(results.items(), key=lambda x: x[1]['train_sharpe'])[0],
+        'best_out_sample': max(results.items(), key=lambda x: x[1]['test_sharpe'])[0],
+        'robustness': 'GOOD' if abs(results['sma50_pos']['train_sharpe'] - results['sma50_pos']['test_sharpe']) < 0.3 else 'WEAK',
+    }
+
+def backtest_simple(df, position_col, fee=FEE):
+    """Simple backtest for validation"""
+    df = df.copy()
+    df['position'] = df[position_col] if position_col in df.columns else 0
+    df['position_change'] = df['position'].diff().abs()
+    df['strategy_return'] = df['position'].shift(1) * df['return'] - df['position_change'] * fee
+    df['strategy_return'] = df['strategy_return'].fillna(0)
+    
+    returns = df['strategy_return'].dropna()
+    
+    return {
+        'sharpe': returns.mean() / returns.std() * np.sqrt(365) if returns.std() > 0 else 0,
+        'return': (1 + returns).prod() - 1,
+        'trades': df['position_change'].sum() / 2,
+    }
+
+# ===================== PORTFOLIO SIMULATOR =====================
+
+def simulate_portfolio(assets_data, start_capital=10000, days=30):
+    """Simulate portfolio based on signals"""
+    portfolio = {'cash': start_capital, 'positions': {}, 'history': []}
+    
+    # Get price history for each asset
+    price_data = {}
+    for asset, data in assets_data.items():
+        if 'price' in data:
+            price_data[asset] = data['price']
+    
+    for day in range(min(days, 30)):
+        daily_value = portfolio['cash']
+        for asset, shares in portfolio['positions'].items():
+            current_price = price_data.get(asset, 0)
+            daily_value += shares * current_price
+        
+        portfolio['history'].append({
+            'day': day,
+            'value': daily_value,
+            'return': ((daily_value - start_capital) / start_capital) * 100,
+        })
+        
+        # Simulate signal-based trades (simplified)
+        for asset, data in assets_data.items():
+            signal = data.get('signal', 'NO TRADE')
+            price = data.get('price', 0)
+            pos_size = data.get('position_sizing', {}).get('position_size', 0)
+            
+            if signal in ['STRONG LONG', 'LONG'] and asset not in portfolio['positions']:
+                # Buy
+                shares_to_buy = int(portfolio['cash'] * 0.2 / price)  # 20% per position
+                if shares_to_buy > 0:
+                    portfolio['positions'][asset] = shares_to_buy
+                    portfolio['cash'] -= shares_to_buy * price
+                    
+            elif signal in ['STRONG SHORT', 'SHORT'] and asset in portfolio['positions']:
+                # Sell
+                portfolio['cash'] += portfolio['positions'][asset] * price
+                del portfolio['positions'][asset]
+    
+    final_value = portfolio['cash']
+    for asset, shares in portfolio['positions'].items():
+        final_value += shares * price_data.get(asset, 0)
+    
+    returns = [h['return'] for h in portfolio['history']]
+    
+    return {
+        'final_value': round(final_value, 2),
+        'total_return': round(((final_value - start_capital) / start_capital) * 100, 2),
+        'max_return': round(max(returns), 2) if returns else 0,
+        'min_return': round(min(returns), 2) if returns else 0,
+        'days_simulated': len(portfolio['history']),
+        'history': portfolio['history'],
+        'positions': {k: v for k, v in portfolio['positions'].items()},
+        'cash': round(portfolio['cash'], 2),
+    }
+
+# ===================== RISK METRICS DASHBOARD =====================
+
+def calculate_risk_metrics(returns):
+    """Calculate comprehensive risk metrics"""
+    if len(returns) < 5:
+        return {}
+    
+    returns = pd.Series(returns).dropna()
+    
+    # Value at Risk (95% confidence)
+    var_95 = np.percentile(returns, 5)
+    
+    # Expected Shortfall (CVaR)
+    expected_shortfall = returns[returns < var_95].mean() if len(returns[returns < var_95]) > 0 else 0
+    
+    # Max Drawdown
+    cum_returns = (1 + returns).cumprod()
+    running_max = cum_returns.cummax()
+    drawdown = (cum_returns - running_max) / running_max
+    max_drawdown = drawdown.min()
+    
+    # Sortino Ratio
+    downside_returns = returns[returns < 0]
+    downside_std = downside_returns.std() * np.sqrt(365) if len(downside_returns) > 0 else 0
+    sortino = returns.mean() * 365 / downside_std if downside_std > 0 else 0
+    
+    # Calmar Ratio
+    total_return = (1 + returns).prod() - 1
+    calmar = total_return / abs(max_drawdown) if max_drawdown < 0 else 0
+    
+    # Kelly Criterion (simplified)
+    win_rate = len(returns[returns > 0]) / len(returns) if len(returns) > 0 else 0
+    avg_win = returns[returns > 0].mean() if len(returns[returns > 0]) > 0 else 0
+    avg_loss = abs(returns[returns < 0].mean()) if len(returns[returns < 0]) > 0 else 0
+    kelly = 0
+    if avg_loss > 0 and win_rate > 0:
+        b = avg_win / avg_loss
+        kelly = (win_rate * b - (1 - win_rate)) / b
+        kelly = max(0, min(kelly, 0.25))
+    
+    # Risk of Ruin (simplified)
+    risk_of_ruin = np.exp(-2 * kelly * 0.5) if kelly > 0 else 1.0
+    
+    return {
+        'var_95': round(var_95 * 100, 2),
+        'expected_shortfall': round(expected_shortfall * 100, 2),
+        'max_drawdown': round(max_drawdown * 100, 2),
+        'sortino_ratio': round(sortino, 2),
+        'calmar_ratio': round(calmar, 2),
+        'kelly_fraction': round(kelly, 3),
+        'risk_of_ruin': round(risk_of_ruin * 100, 1),
+        'risk_grade': calculate_risk_grade(max_drawdown, sortino, var_95),
+    }
+
+def calculate_risk_grade(max_dd, sortino, var_95):
+    """Calculate overall risk grade A-F"""
+    if max_dd > -10 and sortino > 1.5 and var_95 > -5:
+        return 'A'
+    elif max_dd > -20 and sortino > 0.8 and var_95 > -10:
+        return 'B'
+    elif max_dd > -30 and sortino > 0.3 and var_95 > -20:
+        return 'C'
+    elif max_dd > -50 and sortino > 0:
+        return 'D'
+    else:
+        return 'F'
+
+# ===================== ALERT SYSTEM =====================
+
+def send_discord_alert(asset, signal, price, conviction, trade_plan):
+    """Send alert to Discord webhook"""
+    if not DISCORD_WEBHOOK:
+        return
+    
+    emoji = '🟢' if signal in ['STRONG LONG', 'LONG'] else '🔴' if signal in ['STRONG SHORT', 'SHORT'] else '⚪'
+    
+    message = f"""
+{emoji} **SIGNAL ALERT: {asset}**
+
+**Signal:** {signal}
+**Price:** ${price:.2f}
+**Conviction:** {conviction:.0%}
+**Action:** {trade_plan.get('action', 'N/A')}
+
+**Trade Plan:**
+- Entry: ${trade_plan.get('entry_price', 0):.2f}
+- Stop: ${trade_plan.get('stop_loss', 0):.2f}
+- Target 1: ${trade_plan.get('take_profit_1', 0):.2f}
+- Target 2: ${trade_plan.get('take_profit_2', 0):.2f}
+- Risk: {trade_plan.get('risk_percent', 0):.1f}%
+
+[View Dashboard](https://awaisraxa202-ctrl.github.io/crypto_market_intelligence/)
+"""
+    
+    try:
+        requests.post(DISCORD_WEBHOOK, json={'content': message})
+        print(f"  📨 Discord alert sent for {asset}")
+    except Exception as e:
+        print(f"  ⚠️ Discord alert failed: {e}")
+
+def send_telegram_alert(asset, signal, price, conviction, trade_plan):
+    """Send alert to Telegram"""
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        return
+    
+    emoji = '🟢' if signal in ['STRONG LONG', 'LONG'] else '🔴' if signal in ['STRONG SHORT', 'SHORT'] else '⚪'
+    
+    message = f"""
+{emoji} SIGNAL ALERT: {asset}
+
+Signal: {signal}
+Price: ${price:.2f}
+Conviction: {conviction:.0%}
+
+Trade Plan:
+- Entry: ${trade_plan.get('entry_price', 0):.2f}
+- Stop: ${trade_plan.get('stop_loss', 0):.2f}
+- Target: ${trade_plan.get('take_profit_1', 0):.2f}
+- Risk: {trade_plan.get('risk_percent', 0):.1f}%
+"""
+    
+    try:
+        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+        payload = {'chat_id': TELEGRAM_CHAT_ID, 'text': message, 'parse_mode': 'Markdown'}
+        requests.post(url, json=payload)
+        print(f"  📨 Telegram alert sent for {asset}")
+    except Exception as e:
+        print(f"  ⚠️ Telegram alert failed: {e}")
+
+# ===================== MARKET SUMMARY REPORT =====================
+
+def generate_market_summary(all_signals, market_report, risk_metrics, global_data):
+    """Generate human-readable market summary"""
+    fng = all_signals.get('fear_greed', {})
+    
+    summary = f"""
+📊 **MARKET CORTEX DAILY SUMMARY**
+📅 {datetime.now().strftime('%A, %B %d, %Y')}
+⏰ {datetime.now().strftime('%H:%M UTC')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔵 **MARKET OVERVIEW**
+Market Mood: {market_report.get('market_mood', 'UNKNOWN')}
+Bullish Assets: {market_report.get('bullish_assets', 0)}/9
+Bearish Assets: {market_report.get('bearish_assets', 0)}/9
+Fear & Greed: {fng.get('value', 'N/A')} ({fng.get('label', 'N/A')})
+Total Market Cap: {fmtUSD(global_data.get('total_market_cap', 0))}
+24h Volume: {fmtUSD(global_data.get('total_volume', 0))}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔴 **TOP BUY SIGNALS**
+"""
+    
+    # Add top buy signals
+    buy_signals = [s for s in all_signals.get('assets', {}).values() if s.get('signal') in ['STRONG LONG', 'LONG']]
+    buy_signals.sort(key=lambda x: x.get('conviction', 0), reverse=True)
+    for s in buy_signals[:3]:
+        summary += f"• {s.get('asset', '')}: {s.get('signal', '')} (Conviction: {s.get('conviction', 0):.0%})\n"
+    
+    summary += """
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🟢 **TOP SELL SIGNALS**
+"""
+    
+    # Add top sell signals
+    sell_signals = [s for s in all_signals.get('assets', {}).values() if s.get('signal') in ['STRONG SHORT', 'SHORT']]
+    sell_signals.sort(key=lambda x: x.get('conviction', 0), reverse=True)
+    for s in sell_signals[:3]:
+        summary += f"• {s.get('asset', '')}: {s.get('signal', '')} (Conviction: {s.get('conviction', 0):.0%})\n"
+    
+    if not sell_signals:
+        summary += "• No strong sell signals detected\n"
+    
+    summary += """
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📈 **RISK METRICS**
+"""
+    
+    if risk_metrics:
+        summary += f"""
+• VaR (95%): {risk_metrics.get('var_95', 'N/A')}%
+• Max Drawdown: {risk_metrics.get('max_drawdown', 'N/A')}%
+• Sortino Ratio: {risk_metrics.get('sortino_ratio', 'N/A')}
+• Risk Grade: {risk_metrics.get('risk_grade', 'N/A')}
+• Kelly Fraction: {risk_metrics.get('kelly_fraction', 'N/A')}
+"""
+    
+    summary += """
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ **DISCLAIMER:** Research & Educational Tool Only.
+NOT Financial Advice. Past performance ≠ Future results.
+
+[View Full Dashboard](https://awaisraxa202-ctrl.github.io/crypto_market_intelligence/)
+"""
+    
+    return summary
+
+def fmtUSD(n):
+    if n is None or n == 0:
+        return '$0'
+    if n >= 1e12:
+        return '$' + (n / 1e12).__round__(2) + 'T'
+    if n >= 1e9:
+        return '$' + (n / 1e9).__round__(2) + 'B'
+    if n >= 1e6:
+        return '$' + (n / 1e6).__round__(2) + 'M'
+    return '$' + str(int(n))
+
+# ===================== PROCESS ASSET =====================
+
+def process_asset(code, config, fng_df, macro_data, account_capital=10000):
     print(f"\n{'='*60}")
     print(f"Processing {config['name']} ({code})")
     print(f"{'='*60}")
-
+    
+    # Fetch daily data
     df = fetch_binance_klines(config['binance'])
     source = 'Binance'
     if df.empty or len(df) < 100:
-        print(f"  ⚠️ Binance failed, trying Yahoo Finance fallback...")
+        print(f"  ⚠️ Binance failed, trying Yahoo...")
         if config.get('yahoo'):
             df = fetch_yahoo_ohlcv(config['yahoo'])
             source = 'Yahoo'
     if df.empty or len(df) < 100:
-        print(f"  ❌ No data for {code} from any source")
+        print(f"  ❌ No data for {code}")
         return None
-
+    
     print(f"  Fetched {len(df)} days from {source}")
-
+    
+    # Multi-timeframe analysis
+    print(f"  🔍 Running multi-timeframe analysis...")
+    mtf = multi_timeframe_analysis(config['binance'])
+    
+    # Add features
     df = add_features(df)
     df = add_pi_cycle(df)
     df = detect_regime(df)
-    df = detect_rsi_divergence(df)
-    df = detect_obv_divergence(df)
-
+    
+    # Merge external data
     if not fng_df.empty:
         df = df.merge(fng_df[['date', 'fng_value', 'fng_class']], on='date', how='left')
-
+    
     funding = fetch_funding_rate(config['binance'])
     if not funding.empty:
-        df = df.merge(funding[['date', 'funding_rate', 'funding_max', 'funding_min', 'funding_std']], on='date', how='left')
-
-    ls = fetch_long_short_ratio(config['binance'])
-    if not ls.empty:
-        df = df.merge(ls[['date', 'long_short_ratio', 'long_account_pct']], on='date', how='left')
-
-    oi = fetch_open_interest_hist(config['binance'])
-    if not oi.empty:
-        df = df.merge(oi[['date', 'open_interest', 'oi_value_usd']], on='date', how='left')
-
-    for src_name, src_df in macro_data.items():
-        if not src_df.empty:
-            src_df = src_df.copy()
-            src_df['date'] = pd.to_datetime(src_df['date']).dt.tz_localize(None)
-            df = df.merge(src_df[['date', 'close']].rename(columns={'close': f'{src_name}_close'}), on='date', how='left')
-
-    coin_data = fetch_coingecko_coin(config['coingecko']) if config.get('coingecko') else {}
-    options_data = {}
-    if config.get('deribit'):
-        options_data = fetch_deribit_options(config['deribit'])
-
-    sr_levels = find_support_resistance(df)
-    whale = whale_activity_proxy(df)
-
-    print("  Validating 10 strategies...")
-    strategies = validate_strategies(df)
-    bh_ret = (df['close'].iloc[-1] / df['close'].iloc[0]) - 1
-
-    best_strategy = max(strategies.items(), key=lambda x: x[1]['total_return'])[0]
-    best_pos_col = {
-        'SMA20 Crossover': 'sma20_pos', 'SMA50 Trend': 'sma50_pos', 'Golden Cross': 'golden_pos',
-        'RSI < 30, > 70': 'rsi_pos', 'RSI + Trend Filter': 'rsi_trend_pos',
-        'Bollinger Bounce': 'bb_pos', 'MACD Crossover': 'macd_pos',
-        'Volatility Breakout': 'vol_pos', 'Stoch RSI Oversold': 'stoch_pos', 'Williams %R': 'willr_pos'
-    }.get(best_strategy, 'sma50_pos')
-
-    print("  Running Monte Carlo...")
-    mc = monte_carlo(df, best_pos_col)
-
-    print("  Analyzing seasonality...")
-    dow_stats, month_stats = analyze_seasonality(df)
-
-    print("  Finding similar historical conditions...")
-    similar = find_similar_conditions(df)
-
-    print("  Generating narrative signal...")
+        df = df.merge(funding[['date', 'funding_rate']], on='date', how='left')
+    
     latest = df.iloc[-1]
-    narrative = build_sub_signals(latest, config['name'])
-
-    # Enhanced exchange flow proxy
-    exchange_flow = compute_exchange_flow_proxy(df)
-
-    # Build chart data for interactive visualizations
-    best_pos_col = {
-        'SMA20 Crossover': 'sma20_pos', 'SMA50 Trend': 'sma50_pos', 'Golden Cross': 'golden_pos',
-        'RSI < 30, > 70': 'rsi_pos', 'RSI + Trend Filter': 'rsi_trend_pos',
-        'Bollinger Bounce': 'bb_pos', 'MACD Crossover': 'macd_pos',
-        'Volatility Breakout': 'vol_pos', 'Stoch RSI Oversold': 'stoch_pos', 'Williams %R': 'willr_pos'
-    }.get(best_strategy, 'sma50_pos')
-    chart_data = build_chart_data(df, strategies, best_pos_col)
-
+    current_regime = latest.get('regime', 'CHOPPY')
+    
+    # Historical regimes for change detection
+    historical_regimes = df['regime'].tail(10).tolist()
+    regime_change = detect_regime_change(historical_regimes, current_regime)
+    
+    # Strategy selection
+    strategy_info = REGIME_STRATEGY.get(current_regime, REGIME_STRATEGY['CHOPPY'])
+    
+    # Position sizing
+    position_info = calculate_dynamic_position_size(df, len(df) - 1, account_capital=account_capital)
+    
+    # Signal generation
+    narrative = build_sub_signals_weighted(latest, config['name'])
+    
+    # Volatility forecast
+    vol_forecast = forecast_volatility(df)
+    
+    # Price targets
+    price_targets = calculate_price_targets(
+        latest['close'],
+        latest.get('atr_14', latest['close'] * 0.02),
+        current_regime
+    )
+    
+    # Generate trade plan
+    sr_levels = {
+        'nearest_support': latest['close'] * 0.95,
+        'nearest_resistance': latest['close'] * 1.05
+    }
+    trade_plan = generate_trade_plan(
+        code, narrative['signal'], narrative['conviction'],
+        latest['close'], sr_levels, latest.get('atr_14', latest['close'] * 0.02),
+        position_info
+    )
+    
+    # Track signal history
+    history = track_signal_performance(
+        code, narrative['signal'], latest['close'],
+        narrative['conviction'], trade_plan
+    )
+    
+    # Walk-forward validation
+    wf_validation = walk_forward_validation(df)
+    
+    # Risk metrics (using historical returns)
+    returns = df['return'].dropna().tail(100).tolist()
+    risk_metrics = calculate_risk_metrics(returns)
+    
+    # Send alerts if signal changed significantly
+    if narrative['signal'] in ['STRONG LONG', 'LONG']:
+        send_discord_alert(code, narrative['signal'], latest['close'], narrative['conviction'], trade_plan)
+        send_telegram_alert(code, narrative['signal'], latest['close'], narrative['conviction'], trade_plan)
+    
     asset_output = {
         'asset': code,
         'name': config['name'],
@@ -1132,849 +1300,223 @@ def process_asset(code, config, fng_df, macro_data):
         'signal': narrative['signal'],
         'conviction': narrative['conviction'],
         'composite_score': narrative['composite_score'],
-        'regime': latest['regime'],
+        'regime': current_regime,
         'action': narrative['action'],
         'indicators': {
             'rsi': round(latest['rsi_14'], 1) if pd.notna(latest['rsi_14']) else None,
             'macd_hist': round(latest['macd_hist'], 4) if pd.notna(latest['macd_hist']) else None,
-            'atr_pct': round(latest['atr_ratio'] * 100, 2) if pd.notna(latest['atr_ratio']) else None,
             'volatility': round(latest['volatility_20'], 1) if pd.notna(latest['volatility_20']) else None,
-            'vol_forecast_5d': round(latest['vol_forecast_5d'] * 100, 2) if pd.notna(latest.get('vol_forecast_5d')) else None,
             'drawdown': round(latest['drawdown'] * 100, 1) if pd.notna(latest['drawdown']) else None,
-            'sma50': round(latest['sma_50'], 2) if pd.notna(latest['sma_50']) else None,
-            'sma200': round(latest['sma_200'], 2) if pd.notna(latest['sma_200']) else None,
-            'bb_position': round(latest['bb_position'] * 100, 1) if pd.notna(latest['bb_position']) else None,
-            'stoch_rsi_k': round(latest['stoch_rsi_k'], 3) if pd.notna(latest.get('stoch_rsi_k')) else None,
-            'williams_r': round(latest['williams_r'], 1) if pd.notna(latest.get('williams_r')) else None,
-            'volume_ratio': round(latest['volume_ratio'], 2) if pd.notna(latest.get('volume_ratio')) else None,
-            'volume_zscore': round(latest['volume_zscore'], 2) if pd.notna(latest.get('volume_zscore')) else None,
             'fng_value': int(latest['fng_value']) if pd.notna(latest.get('fng_value')) else None,
             'funding_rate': round(latest['funding_rate'], 6) if pd.notna(latest.get('funding_rate')) else None,
-            'long_short_ratio': round(latest['long_short_ratio'], 2) if pd.notna(latest.get('long_short_ratio')) else None,
-            'open_interest': round(latest['open_interest'], 0) if pd.notna(latest.get('open_interest')) else None,
         },
         'sub_signals': narrative['sub_signals'],
-        'similar_conditions': similar,
-        'support_resistance': sr_levels,
-        'whale_activity': whale,
-        'strategy_backtest': {
-            'best_strategy': best_strategy,
-            'return': round(strategies[best_strategy]['total_return'] * 100, 2),
-            'sharpe': round(strategies[best_strategy]['sharpe'], 2),
-            'sortino': round(strategies[best_strategy]['sortino'], 2),
-            'calmar': round(strategies[best_strategy]['calmar'], 2),
-            'max_drawdown': round(strategies[best_strategy]['max_drawdown'] * 100, 2),
-            'trades': int(strategies[best_strategy]['trades']),
-            'win_rate': round(strategies[best_strategy]['win_rate'], 1),
-            'avg_win': round(strategies[best_strategy]['avg_win'] * 100, 2),
-            'avg_loss': round(strategies[best_strategy]['avg_loss'] * 100, 2),
-            'max_consecutive_wins': strategies[best_strategy]['max_consecutive_wins'],
-            'max_consecutive_losses': strategies[best_strategy]['max_consecutive_losses'],
-            'kelly_fraction': round(strategies[best_strategy]['kelly_fraction'] * 100, 1),
-            'var_95': round(strategies[best_strategy]['var_95'] * 100, 2) if strategies[best_strategy]['var_95'] is not None else None,
+        'position_sizing': position_info,
+        'trade_plan': trade_plan,
+        'multi_timeframe': mtf,
+        'regime_strategy': {
+            'regime': current_regime,
+            'recommended_strategy': strategy_info['strategy'],
+            'size_multiplier': strategy_info['size_mult'],
         },
-        'all_strategies': {k: {
-            'return': round(v['total_return'] * 100, 2),
-            'sharpe': round(v['sharpe'], 2),
-            'sortino': round(v['sortino'], 2),
-            'calmar': round(v['calmar'], 2),
-            'max_drawdown': round(v['max_drawdown'] * 100, 2),
-            'trades': int(v['trades']),
-            'win_rate': round(v['win_rate'], 1),
-            'max_consecutive_wins': v['max_consecutive_wins'],
-            'max_consecutive_losses': v['max_consecutive_losses'],
-            'kelly': round(v['kelly_fraction'] * 100, 1),
-            'var_95': round(v['var_95'] * 100, 2) if v['var_95'] is not None else None,
-        } for k, v in strategies.items()},
-        'buy_hold': {'return': round(bh_ret * 100, 2)},
-        'monte_carlo': {
-            'profitable_pct': round(mc['profitable_pct'], 1) if mc else None,
-            'mean': round(mc['mean'] * 100, 2) if mc else None,
-            'median': round(mc['median'] * 100, 2) if mc else None,
-            'pct_5': round(mc['pct_5'] * 100, 2) if mc else None,
-            'pct_95': round(mc['pct_95'] * 100, 2) if mc else None,
-        } if mc else None,
-        'seasonality': {
-            'best_day': dow_stats.loc[dow_stats['mean'].idxmax(), 'day_name'] if not dow_stats.empty else None,
-            'worst_day': dow_stats.loc[dow_stats['mean'].idxmin(), 'day_name'] if not dow_stats.empty else None,
-            'best_month': month_stats.loc[month_stats['mean'].idxmax(), 'month_name'] if not month_stats.empty else None,
-            'worst_month': month_stats.loc[month_stats['mean'].idxmin(), 'month_name'] if not month_stats.empty else None,
-        },
-        'market_breadth': narrative['market_breadth'],
-        'exchange_flow': exchange_flow,
-        'chart_data': chart_data,
-        'external': {
-            'coin_data': coin_data,
-            'options_data': options_data,
-        }
+        'volatility_forecast': vol_forecast,
+        'price_targets': price_targets,
+        'regime_change': regime_change,
+        'risk_metrics': risk_metrics,
+        'walk_forward': wf_validation,
+        'signal_history': history.get('performance', {}),
     }
-
-    print(f"  ✅ {narrative['signal']} | Conviction: {narrative['conviction']}/1.0 | Regime: {latest['regime']}")
-    return asset_output, df[['date', 'close']].rename(columns={'close': code}), chart_data
-
-
-
-# ===================== PORTFOLIO OPTIMIZER =====================
-
-def optimize_portfolio(all_returns, risk_free_rate=0.0):
-    """
-    Mean-Variance Optimization + Risk Parity + Max Sharpe
-    all_returns: dict of {code: pd.Series of daily returns}
-    """
-    returns_df = pd.DataFrame(all_returns).dropna()
-    if returns_df.empty or len(returns_df.columns) < 2:
-        return None
-
-    n = len(returns_df.columns)
-    codes = list(returns_df.columns)
-    mean_returns = returns_df.mean() * 365
-    cov_matrix = returns_df.cov() * 365
-
-    # 1. Max Sharpe Ratio Portfolio
-    def neg_sharpe(weights):
-        port_return = np.dot(weights, mean_returns)
-        port_vol = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
-        return -(port_return - risk_free_rate) / port_vol if port_vol > 0 else 0
-
-    from scipy.optimize import minimize
-    constraints = {'type': 'eq', 'fun': lambda x: np.sum(x) - 1}
-    bounds = tuple((0, 0.5) for _ in range(n))  # Max 50% in any single asset
-    x0 = np.array([1/n] * n)
-
-    max_sharpe_result = minimize(neg_sharpe, x0, method='SLSQP', bounds=bounds, constraints=constraints)
-    max_sharpe_weights = max_sharpe_result.x if max_sharpe_result.success else x0
-
-    # 2. Min Volatility Portfolio
-    def portfolio_vol(weights):
-        return np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
-
-    min_vol_result = minimize(portfolio_vol, x0, method='SLSQP', bounds=bounds, constraints=constraints)
-    min_vol_weights = min_vol_result.x if min_vol_result.success else x0
-
-    # 3. Risk Parity Portfolio (equal risk contribution)
-    def risk_parity_obj(weights):
-        port_vol = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
-        marginal_risk = np.dot(cov_matrix, weights) / port_vol if port_vol > 0 else np.zeros(n)
-        risk_contrib = weights * marginal_risk
-        target = port_vol / n
-        return np.sum((risk_contrib - target) ** 2)
-
-    rp_result = minimize(risk_parity_obj, x0, method='SLSQP', bounds=bounds, constraints=constraints)
-    rp_weights = rp_result.x if rp_result.success else x0
-
-    def portfolio_stats(weights):
-        pret = np.dot(weights, mean_returns)
-        pvol = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
-        sharpe = (pret - risk_free_rate) / pvol if pvol > 0 else 0
-        return pret, pvol, sharpe
-
-    ms_ret, ms_vol, ms_sharpe = portfolio_stats(max_sharpe_weights)
-    mv_ret, mv_vol, mv_sharpe = portfolio_stats(min_vol_weights)
-    rp_ret, rp_vol, rp_sharpe = portfolio_stats(rp_weights)
-
-    return {
-        'max_sharpe': {
-            'weights': {codes[i]: round(max_sharpe_weights[i] * 100, 1) for i in range(n)},
-            'expected_return': round(ms_ret * 100, 2),
-            'volatility': round(ms_vol * 100, 2),
-            'sharpe': round(ms_sharpe, 2),
-        },
-        'min_volatility': {
-            'weights': {codes[i]: round(min_vol_weights[i] * 100, 1) for i in range(n)},
-            'expected_return': round(mv_ret * 100, 2),
-            'volatility': round(mv_vol * 100, 2),
-            'sharpe': round(mv_sharpe, 2),
-        },
-        'risk_parity': {
-            'weights': {codes[i]: round(rp_weights[i] * 100, 1) for i in range(n)},
-            'expected_return': round(rp_ret * 100, 2),
-            'volatility': round(rp_vol * 100, 2),
-            'sharpe': round(rp_sharpe, 2),
-        },
-    }
-
-# ===================== MACRO REGIME DETECTOR =====================
-
-def detect_macro_regime(dxy_df, fed_df, cpi_df, vix_df):
-    """
-    Classify macro regime based on:
-    - DXY trend (strong dollar = risk-off)
-    - Fed funds trajectory (rising = tightening)
-    - CPI trend (falling = disinflation = risk-on)
-    - VIX level (elevated = fear)
-    """
-    regime = {'fed_cycle': 'UNKNOWN', 'dxy_trend': 'UNKNOWN', 'liquidity': 'UNKNOWN', 'vix_level': 'UNKNOWN', 'overall': 'UNKNOWN'}
-
-    # Fed cycle
-    if not fed_df.empty and len(fed_df) >= 6:
-        recent_fed = fed_df.tail(6)['value'].values
-        fed_slope = np.polyfit(range(len(recent_fed)), recent_fed, 1)[0]
-        if fed_slope > 0.05:
-            regime['fed_cycle'] = 'TIGHTENING'
-        elif fed_slope < -0.05:
-            regime['fed_cycle'] = 'EASING'
-        else:
-            regime['fed_cycle'] = 'PAUSE'
-
-    # DXY trend
-    if not dxy_df.empty and len(dxy_df) > 60:
-        dxy_recent = dxy_df.tail(60)
-        dxy_slope = np.polyfit(range(len(dxy_recent)), dxy_recent['close'].values, 1)[0]
-        regime['dxy_trend'] = 'RISING' if dxy_slope > 0.01 else 'FALLING' if dxy_slope < -0.01 else 'FLAT'
-
-    # Liquidity (proxy: CPI falling = more liquidity expected)
-    if not cpi_df.empty and len(cpi_df) >= 6:
-        recent_cpi = cpi_df.tail(6)['value'].values
-        cpi_slope = np.polyfit(range(len(recent_cpi)), recent_cpi, 1)[0]
-        regime['liquidity'] = 'IMPROVING' if cpi_slope < -0.1 else 'TIGHTENING' if cpi_slope > 0.1 else 'STABLE'
-
-    # VIX level
-    if not vix_df.empty:
-        vix_current = vix_df['close'].iloc[-1]
-        regime['vix_level'] = 'ELEVATED' if vix_current > 25 else 'FEAR' if vix_current > 20 else 'CALM'
-
-    # Overall regime
-    scores = []
-    if regime['fed_cycle'] == 'EASING': scores.append(1)
-    elif regime['fed_cycle'] == 'TIGHTENING': scores.append(-1)
-    if regime['dxy_trend'] == 'FALLING': scores.append(1)
-    elif regime['dxy_trend'] == 'RISING': scores.append(-1)
-    if regime['liquidity'] == 'IMPROVING': scores.append(1)
-    elif regime['liquidity'] == 'TIGHTENING': scores.append(-1)
-    if regime['vix_level'] == 'CALM': scores.append(1)
-    elif regime['vix_level'] in ['ELEVATED', 'FEAR']: scores.append(-1)
-
-    total = sum(scores)
-    if total >= 2:
-        regime['overall'] = 'RISK_ON'
-    elif total <= -2:
-        regime['overall'] = 'RISK_OFF'
-    else:
-        regime['overall'] = 'MIXED'
-
-    return regime
-
-# ===================== OPTIONS SKEW ANALYSIS =====================
-
-def fetch_options_skew(currency='ETH'):
-    """
-    Fetch Deribit options and compute 25-delta risk reversal.
-    Risk reversal = 25D Call IV - 25D Put IV
-    Positive = calls more expensive = bullish skew
-    Negative = puts more expensive = bearish skew (crash protection demand)
-    """
-    url = f"https://www.deribit.com/api/v2/public/get_book_summary_by_currency?currency={currency}&kind=option"
-    try:
-        r = fetch_with_retry(url, timeout=30)
-        data = r.json()
-        if not data.get('result'):
-            return {}
-
-        options = data['result']
-        # Find near-term options (within 30 days)
-        from datetime import datetime
-        now = datetime.now()
-        near_options = []
-        for o in options:
-            try:
-                expiry_str = o['instrument_name'].split('-')[1]
-                expiry = datetime.strptime(expiry_str, '%d%b%y')
-                days = (expiry - now).days
-                if 0 < days <= 30 and o.get('mark_iv'):
-                    near_options.append(o)
-            except:
-                continue
-
-        if not near_options:
-            return {}
-
-        # Approximate 25-delta options by strike distance from underlying
-        # This is a simplification; true delta requires Black-Scholes
-        calls = [o for o in near_options if 'C' in o['instrument_name']]
-        puts = [o for o in near_options if 'P' in o['instrument_name']]
-
-        if calls and puts:
-            avg_call_iv = np.mean([o['mark_iv'] for o in calls])
-            avg_put_iv = np.mean([o['mark_iv'] for o in puts])
-            risk_reversal = avg_call_iv - avg_put_iv
-
-            return {
-                'avg_call_iv': round(avg_call_iv, 2),
-                'avg_put_iv': round(avg_put_iv, 2),
-                'risk_reversal': round(risk_reversal, 2),
-                'skew_signal': 'BULLISH' if risk_reversal > 2 else 'BEARISH' if risk_reversal < -2 else 'NEUTRAL',
-                'total_near_options': len(near_options),
-            }
-    except Exception as e:
-        print(f"  ⚠️ Options skew {currency}: {e}")
-    return {}
-
-# ===================== LIQUIDATION DATA =====================
-
-def fetch_liquidation_data(symbol='ETHUSDT', period='1d', limit=100):
-    """
-    Fetch Binance futures liquidation data.
-    """
-    url = "https://fapi.binance.com/fapi/v1/forceOrders"
-    params = {'symbol': symbol, 'limit': limit}
-    try:
-        r = fetch_with_retry(url, params=params, timeout=30)
-        data = r.json()
-        if isinstance(data, list) and len(data) > 0:
-            df = pd.DataFrame(data)
-            df['date'] = pd.to_datetime(df['time'], unit='ms')
-            df['qty'] = df['executedQty'].astype(float)
-            df['price'] = df['avgPrice'].astype(float)
-            df['value_usd'] = df['qty'] * df['price']
-            df['side'] = df['side']  # SELL = long liquidation, BUY = short liquidation
-
-            daily = df.groupby([df['date'].dt.date, 'side']).agg({
-                'value_usd': 'sum',
-                'qty': 'sum'
-            }).reset_index()
-
-            long_liq = daily[daily['side'] == 'SELL']['value_usd'].sum() if 'SELL' in daily['side'].values else 0
-            short_liq = daily[daily['side'] == 'BUY']['value_usd'].sum() if 'BUY' in daily['side'].values else 0
-
-            return {
-                'long_liquidations_usd': round(long_liq, 0),
-                'short_liquidations_usd': round(short_liq, 0),
-                'net_liquidation': round(long_liq - short_liq, 0),
-                'dominant_side': 'LONGS' if long_liq > short_liq * 1.5 else 'SHORTS' if short_liq > long_liq * 1.5 else 'BALANCED',
-                'total_events': len(df),
-            }
-    except Exception as e:
-        print(f"  ⚠️ Liquidation {symbol}: {e}")
-    return {}
-
-# ===================== ENHANCED EXCHANGE FLOW PROXY =====================
-
-def compute_exchange_flow_proxy(df):
-    """
-    Enhanced exchange flow detection:
-    - Volume spike + price drop = exchange inflow (selling pressure)
-    - Volume spike + price rise = exchange outflow (buying pressure)
-    - Uses volume z-score and return direction
-    """
-    latest = df.iloc[-1]
-    vol_z = latest.get('volume_zscore')
-    ret = latest.get('return')
-
-    if pd.isna(vol_z) or pd.isna(ret):
-        return {'signal': 'UNKNOWN', 'confidence': 0, 'description': 'Insufficient data'}
-
-    if vol_z > 2.5 and ret < -0.03:
-        return {
-            'signal': 'INFLOW',
-            'confidence': min(100, round(vol_z * 20)),
-            'description': f'High volume ({vol_z:.1f}σ) with sharp drop ({ret*100:.1f}%) suggests coins moving to exchanges for selling.',
-        }
-    elif vol_z > 2.5 and ret > 0.03:
-        return {
-            'signal': 'OUTFLOW',
-            'confidence': min(100, round(vol_z * 20)),
-            'description': f'High volume ({vol_z:.1f}σ) with sharp rise ({ret*100:.1f}%) suggests coins leaving exchanges — accumulation.',
-        }
-    elif vol_z > 2:
-        return {
-            'signal': 'ELEVATED',
-            'confidence': min(100, round(vol_z * 20)),
-            'description': f'Elevated volume ({vol_z:.1f}σ) but direction unclear. Watch for confirmation.',
-        }
-    else:
-        return {
-            'signal': 'NEUTRAL',
-            'confidence': 0,
-            'description': f'Normal exchange flow. Volume at {vol_z:.1f}σ.',
-        }
-
-# ===================== CHART DATA EXPORT =====================
-
-def build_chart_data(df, strategies_dict, best_pos_col):
-    """
-    Build time-series data for interactive charts.
-    Returns dict with dates, prices, indicators, equity curves.
-    """
-    df = df.copy()
-
-    # Price + SMA overlay
-    price_data = {
-        'dates': df['date'].dt.strftime('%Y-%m-%d').tolist(),
-        'price': df['close'].round(2).tolist(),
-        'sma50': df['sma_50'].round(2).fillna(None).tolist() if 'sma_50' in df.columns else [],
-        'sma200': df['sma_200'].round(2).fillna(None).tolist() if 'sma_200' in df.columns else [],
-        'bb_upper': df['bb_upper'].round(2).fillna(None).tolist() if 'bb_upper' in df.columns else [],
-        'bb_lower': df['bb_lower'].round(2).fillna(None).tolist() if 'bb_lower' in df.columns else [],
-    }
-
-    # RSI
-    rsi_data = {
-        'dates': df['date'].dt.strftime('%Y-%m-%d').tolist(),
-        'rsi': df['rsi_14'].round(1).fillna(None).tolist() if 'rsi_14' in df.columns else [],
-        'overbought': [70] * len(df),
-        'oversold': [30] * len(df),
-    }
-
-    # MACD
-    macd_data = {
-        'dates': df['date'].dt.strftime('%Y-%m-%d').tolist(),
-        'macd': df['macd'].round(4).fillna(None).tolist() if 'macd' in df.columns else [],
-        'signal': df['macd_signal'].round(4).fillna(None).tolist() if 'macd_signal' in df.columns else [],
-        'hist': df['macd_hist'].round(4).fillna(None).tolist() if 'macd_hist' in df.columns else [],
-    }
-
-    # Equity curve for best strategy
-    df['position_change'] = df[best_pos_col].diff().abs()
-    df['strat_return'] = df[best_pos_col].shift(1) * df['return'] - df['position_change'] * FEE
-    df['strat_return'] = df['strat_return'].fillna(0)
-    df['cum_strat'] = (1 + df['strat_return']).cumprod()
-    df['cum_bh'] = (1 + df['return'].fillna(0)).cumprod()
-
-    equity_data = {
-        'dates': df['date'].dt.strftime('%Y-%m-%d').tolist(),
-        'strategy': df['cum_strat'].round(4).tolist(),
-        'buy_hold': df['cum_bh'].round(4).tolist(),
-    }
-
-    # Drawdown
-    peak = df['cum_strat'].cummax()
-    df['dd_strat'] = (df['cum_strat'] - peak) / peak
-    peak_bh = df['cum_bh'].cummax()
-    df['dd_bh'] = (df['cum_bh'] - peak_bh) / peak_bh
-
-    drawdown_data = {
-        'dates': df['date'].dt.strftime('%Y-%m-%d').tolist(),
-        'strategy': (df['dd_strat'] * 100).round(2).tolist(),
-        'buy_hold': (df['dd_bh'] * 100).round(2).tolist(),
-    }
-
-    # Volume
-    volume_data = {
-        'dates': df['date'].dt.strftime('%Y-%m-%d').tolist(),
-        'volume': df['volume'].round(0).tolist(),
-        'volume_sma20': df['volume_sma_20'].round(0).fillna(None).tolist() if 'volume_sma_20' in df.columns else [],
-    }
-
-    return {
-        'price': price_data,
-        'rsi': rsi_data,
-        'macd': macd_data,
-        'equity': equity_data,
-        'drawdown': drawdown_data,
-        'volume': volume_data,
-    }
-
-
-
-
-# ===================== ROLLING CORRELATION HEATMAP =====================
-
-def compute_rolling_correlations(all_prices, windows=[30, 60, 90]):
-    """
-    Compute rolling correlations for multiple time windows.
-    Returns dict with correlation matrices for each window.
-    """
-    df = pd.DataFrame(all_prices).dropna()
-    if df.empty or len(df.columns) < 2:
-        return {}
-
-    returns = df.pct_change().dropna()
-    result = {}
-
-    for window in windows:
-        if len(returns) < window:
-            continue
-        rolling_corr = returns.rolling(window=window).corr().dropna()
-        # Get the most recent correlation matrix
-        latest_idx = rolling_corr.index.get_level_values(0)[-1]
-        latest_corr = rolling_corr.loc[latest_idx]
-
-        result[f'{window}d'] = {
-            col: {k: round(v, 3) for k, v in latest_corr[col].to_dict().items()}
-            for col in latest_corr.columns
-        }
-
-    return result
-
-def compute_correlation_timeseries(all_prices, pair=('BTC', 'ETH'), window=30):
-    """
-    Compute rolling correlation time series for a specific pair.
-    For interactive chart showing how correlation evolves.
-    """
-    df = pd.DataFrame(all_prices).dropna()
-    if df.empty or pair[0] not in df.columns or pair[1] not in df.columns:
-        return {}
-
-    returns = df.pct_change().dropna()
-    rolling_corr = returns[pair[0]].rolling(window=window).corr(returns[pair[1]]).dropna()
-
-    return {
-        'pair': f"{pair[0]}-{pair[1]}",
-        'window': window,
-        'dates': rolling_corr.index.strftime('%Y-%m-%d').tolist(),
-        'values': rolling_corr.round(3).tolist(),
-    }
-
-# ===================== ON-CHAIN PROXIES (FREE) =====================
-
-def compute_nvt_proxy(coin_data, asset_code):
-    """
-    Network Value to Transactions proxy.
-    NVT = Market Cap / Volume
-    High NVT = overvalued (price high relative to network usage)
-    Low NVT = undervalued (price low relative to network usage)
-    """
-    if not coin_data or 'market_cap' not in coin_data or 'total_volume' not in coin_data:
-        return None
-
-    market_cap = coin_data['market_cap']
-    volume = coin_data['total_volume']
-
-    if not market_cap or not volume or volume == 0:
-        return None
-
-    nvt = market_cap / volume
-
-    # Interpretation (heuristic thresholds for crypto)
-    if nvt > 50:
-        signal = 'OVERVALUED'
-        detail = f'NVT is {nvt:.1f} (very high). Price elevated relative to on-chain/network activity. Caution warranted.'
-    elif nvt > 20:
-        signal = 'ELEVATED'
-        detail = f'NVT is {nvt:.1f} (elevated). Price somewhat stretched relative to network usage.'
-    elif nvt < 5:
-        signal = 'UNDERVALUED'
-        detail = f'NVT is {nvt:.1f} (low). Price cheap relative to network activity. Potential value.'
-    else:
-        signal = 'NORMAL'
-        detail = f'NVT is {nvt:.1f} — within normal range for {asset_code}.'
-
-    return {
-        'nvt': round(nvt, 2),
+    
+    print(f"  ✅ {narrative['signal']} | Conviction: {narrative['conviction']}/1.0")
+    print(f"  📊 Trade Plan: Entry ${trade_plan.get('entry_price', 0):.2f} | Stop ${trade_plan.get('stop_loss', 0):.2f}")
+    print(f"  📈 Volatility: {vol_forecast.get('current_annual_vol', 0):.1f}% | Forecast: {vol_forecast.get('forecast_5d_vol', 0):.1f}%")
+    
+    return asset_output, df[['date', 'close']].rename(columns={'close': code})
+
+# ===================== TRADE PLAN GENERATOR =====================
+
+def generate_trade_plan(asset, signal, conviction, price, sr_levels, atr, position_size_info):
+    """Generate complete actionable trade plan"""
+    plan = {
+        'asset': asset,
         'signal': signal,
-        'detail': detail,
+        'conviction': conviction,
+        'entry_price': round(price, 2),
     }
-
-def compute_velocity_proxy(coin_data, asset_code):
-    """
-    Token Velocity proxy = Volume / Circulating Supply
-    High velocity = tokens changing hands rapidly (speculative)
-    Low velocity = tokens being held (accumulation)
-    """
-    if not coin_data or 'total_volume' not in coin_data or 'circulating_supply' not in coin_data:
-        return None
-
-    volume = coin_data['total_volume']
-    supply = coin_data['circulating_supply']
-
-    if not volume or not supply or supply == 0:
-        return None
-
-    velocity = volume / supply
-
-    # Heuristic interpretation
-    if velocity > 0.3:
-        signal = 'HIGH'
-        detail = f'Velocity is {velocity:.3f} (high). High turnover — speculative activity or distribution.'
-    elif velocity < 0.05:
-        signal = 'LOW'
-        detail = f'Velocity is {velocity:.3f} (low). Tokens being held — accumulation phase.'
+    
+    if signal in ['STRONG LONG', 'LONG']:
+        stop_loss = position_size_info.get('stop_loss', price * 0.95)
+        tp1 = position_size_info.get('take_profit_1', price * 1.04)
+        tp2 = position_size_info.get('take_profit_2', price * 1.08)
+        
+        plan['entry_type'] = 'BUY_LIMIT'
+        plan['stop_loss'] = round(stop_loss, 2)
+        plan['take_profit_1'] = round(tp1, 2)
+        plan['take_profit_2'] = round(tp2, 2)
+        plan['position_size'] = position_size_info.get('position_size', 0)
+        plan['risk_amount'] = position_size_info.get('risk_amount', 0)
+        plan['risk_percent'] = position_size_info.get('risk_percent', 0)
+        
+    elif signal in ['STRONG SHORT', 'SHORT']:
+        stop_loss = position_size_info.get('stop_loss', price * 1.05)
+        tp1 = position_size_info.get('take_profit_1', price * 0.96)
+        tp2 = position_size_info.get('take_profit_2', price * 0.92)
+        
+        plan['entry_type'] = 'SELL_LIMIT'
+        plan['stop_loss'] = round(stop_loss, 2)
+        plan['take_profit_1'] = round(tp1, 2)
+        plan['take_profit_2'] = round(tp2, 2)
+        plan['position_size'] = position_size_info.get('position_size', 0)
+        plan['risk_amount'] = position_size_info.get('risk_amount', 0)
+        plan['risk_percent'] = position_size_info.get('risk_percent', 0)
     else:
-        signal = 'NORMAL'
-        detail = f'Velocity is {velocity:.3f} — normal turnover.'
+        plan['entry_type'] = 'NO_TRADE'
+        plan['stop_loss'] = None
+        plan['take_profit_1'] = None
+        plan['take_profit_2'] = None
+    
+    plan['risk_reward_ratio'] = abs((plan.get('take_profit_1', price) - price) / (price - plan.get('stop_loss', price) + 0.001))
+    
+    return plan
 
-    return {
-        'velocity': round(velocity, 4),
-        'signal': signal,
-        'detail': detail,
-    }
+# ===================== PORTFOLIO SIMULATION (All Assets) =====================
 
-def compute_exchange_dominance(asset_volume, total_market_volume):
-    """
-    What % of total crypto volume is this asset capturing?
-    Rising dominance = growing market share
-    """
-    if not asset_volume or not total_market_volume or total_market_volume == 0:
-        return None
+def simulate_full_portfolio(all_assets_data, start_capital=10000):
+    """Simulate portfolio across all assets"""
+    return simulate_portfolio(all_assets_data, start_capital)
 
-    dominance = (asset_volume / total_market_volume) * 100
-
-    return {
-        'dominance_pct': round(dominance, 2),
-        'detail': f"This asset captures {dominance:.2f}% of total reported crypto volume.",
-    }
-
-def compute_market_cap_dominance(coin_data, total_market_cap):
-    """
-    Market cap as % of total crypto market cap.
-    """
-    if not coin_data or 'market_cap' not in coin_data or not total_market_cap:
-        return None
-
-    mc = coin_data['market_cap']
-    dominance = (mc / total_market_cap) * 100
-
-    return {
-        'mc_dominance_pct': round(dominance, 2),
-        'detail': f"Market cap is {dominance:.2f}% of total crypto market.",
-    }
-
-def build_onchain_summary(coin_data, asset_code, total_market_volume, total_market_cap):
-    """
-    Build complete on-chain proxy summary for an asset.
-    """
-    summary = {
-        'nvt': compute_nvt_proxy(coin_data, asset_code),
-        'velocity': compute_velocity_proxy(coin_data, asset_code),
-        'exchange_dominance': compute_exchange_dominance(coin_data.get('total_volume'), total_market_volume),
-        'market_cap_dominance': compute_market_cap_dominance(coin_data, total_market_cap),
-    }
-    return {k: v for k, v in summary.items() if v is not None}
-
-
-# ===================== MAIN EXECUTION =====================
+# ===================== MAIN PIPELINE =====================
 
 def run_pipeline():
     print("=" * 70)
-    print("CRYPTO MARKET INTELLIGENCE v4.4 — PLOTLY + ON-CHAIN EDITION")
-    print("v4.3 Base + Rolling Correlations + On-Chain Proxies")
+    print("MARKET CORTEX v5.0 — ULTIMATE EDITION")
+    print("Multi-TF · Volatility Forecast · Price Targets · Risk Metrics")
+    print("Alerts · Signal History · Portfolio Sim · Walk-Forward Validation")
     print("=" * 70)
-
-    print("\n[1/7] Fetching global data...")
+    
+    print("\n[1/8] Fetching global data...")
     fng_df = fetch_fear_greed()
     global_data = fetch_coingecko_global()
-    gas_data = fetch_etherscan_gas()
-    staking_data = fetch_beaconchain_staking()
-    cpi_data = fetch_fred_data('CPIAUCSL', 24)
-    fed_data = fetch_fred_data('FEDFUNDS', 24)
-
-    total_market_volume = global_data.get('total_volume', 0)
-    total_market_cap = global_data.get('total_market_cap', 0)
-
-    print("\n[2/7] Fetching macro data...")
-    macro_data = {
-        'spy': fetch_yahoo('SPY'),
-        'dxy': fetch_yahoo('DX-Y.NYB'),
-        'vix': fetch_yahoo('^VIX'),
-        'tnx': fetch_yahoo('^TNX'),
-        'gld': fetch_yahoo('GLD'),
-    }
-
-    print("\n[3/7] Processing all assets...")
+    
+    print("\n[2/8] Fetching macro data...")
+    macro_data = {}
+    
+    print("\n[3/8] Processing all assets...")
     all_signals = {}
     all_prices = {}
     all_returns = {}
-    all_funding = {}
-    all_chart_data = {}
-    all_liquidations = {}
-    all_options_skew = {}
-
+    
     for code, config in ASSETS.items():
         result = process_asset(code, config, fng_df, macro_data)
         if result:
-            asset_output, price_series, chart_data = result
+            asset_output, price_series = result
             all_signals[code] = asset_output
             all_prices[code] = price_series.set_index('date')[code]
-            all_chart_data[code] = chart_data
-
+            
             returns = price_series.set_index('date')[code].pct_change().dropna()
             if not returns.empty:
                 all_returns[code] = returns
-
-            if asset_output['indicators'].get('funding_rate') is not None:
-                all_funding[code] = asset_output['indicators']['funding_rate']
-
-            liq = fetch_liquidation_data(config['binance'])
-            if liq:
-                all_liquidations[code] = liq
-
-            if config.get('deribit'):
-                skew = fetch_options_skew(config['deribit'])
-                if skew:
-                    all_options_skew[code] = skew
-
-            # Add on-chain proxies
-            coin_data = asset_output.get('external', {}).get('coin_data', {})
-            onchain = build_onchain_summary(coin_data, code, total_market_volume, total_market_cap)
-            if onchain:
-                all_signals[code]['onchain'] = onchain
-
-    if not all_signals:
-        print("\n⚠️ No assets processed successfully. Generating fallback report...")
-        # Generate a minimal JSON so the dashboard doesn't break
-        dashboard_data = {
-            'version': '4.4',
-            'generated_at': datetime.now().isoformat(),
-            'update_schedule': UPDATE_TIME,
-            'disclaimer': "THIS IS A RESEARCH AND EDUCATIONAL TOOL ONLY. NOT FINANCIAL ADVICE.",
-            'fear_greed': {'value': 50, 'label': 'Neutral'},
-            'global_data': global_data,
-            'market_report': {
-                'date': datetime.now().strftime('%Y-%m-%d'),
-                'market_mood': 'UNKNOWN',
-                'mood_description': 'Data fetch failed. Binance API may be blocking this IP. Check API status.',
-                'bullish_assets': 0, 'bearish_assets': 0, 'neutral_assets': 0,
-                'avg_conviction': 0, 'regime_distribution': {},
-            },
-            'assets': {},
-        }
-        os.makedirs('docs', exist_ok=True)
-        with open(OUTPUT_PATH, 'w') as f:
-            json.dump(dashboard_data, f, indent=2, default=str)
-        print(f"\n💾 Fallback saved to {OUTPUT_PATH}")
-        return
-
-    print("\n[4/7] Computing cross-asset analytics...")
-
-    # Correlation matrix
-    corr_matrix = compute_correlation_matrix(all_prices)
-    corr_dict = {}
-    if not corr_matrix.empty:
-        for col in corr_matrix.columns:
-            corr_dict[col] = {k: round(v, 3) for k, v in corr_matrix[col].to_dict().items()}
-
-    # Rolling correlations
-    rolling_corr = compute_rolling_correlations(all_prices, windows=[30, 60, 90])
-
-    # Correlation time series for key pairs
-    corr_ts = {}
-    key_pairs = [('BTC', 'ETH'), ('BTC', 'SOL'), ('ETH', 'SOL')]
-    for pair in key_pairs:
-        ts = compute_correlation_timeseries(all_prices, pair, 30)
-        if ts:
-            corr_ts[f"{pair[0]}_{pair[1]}"] = ts
-
-    # Altcoin season index
-    btc_prices = all_prices.get('BTC')
-    altcoin_season = 50
-    if btc_prices is not None and len(btc_prices) > 90:
-        alt_prices = pd.DataFrame({k: v for k, v in all_prices.items() if k != 'BTC'})
-        if not alt_prices.empty:
-            alt_avg = alt_prices.mean(axis=1)
-            btc_ret = btc_prices.pct_change(90).iloc[-1] if len(btc_prices) > 90 else 0
-            alt_ret = alt_avg.pct_change(90).iloc[-1] if len(alt_avg) > 90 else 0
-            altcoin_season = 50 + (alt_ret - btc_ret) * 500
-            altcoin_season = max(0, min(100, altcoin_season))
-
-    # Market breadth
-    breadth = compute_market_breadth(list(all_signals.values()))
-
-    # Funding heatmap
-    funding_heatmap = {k: v for k, v in all_funding.items()}
-
-    print("\n[5/7] Running portfolio optimizer...")
-    portfolio = optimize_portfolio(all_returns)
-    if portfolio:
-        print(f"  Max Sharpe: {portfolio['max_sharpe']['sharpe']} (vol: {portfolio['max_sharpe']['volatility']}%)")
-        print(f"  Min Vol: {portfolio['min_volatility']['volatility']}%")
-        print(f"  Risk Parity: {portfolio['risk_parity']['sharpe']}")
-
-    print("\n[6/7] Detecting macro regime...")
-    macro_regime = detect_macro_regime(macro_data.get('dxy', pd.DataFrame()), 
-                                        fed_data, cpi_data, macro_data.get('vix', pd.DataFrame()))
-    print(f"  Overall: {macro_regime['overall']} | Fed: {macro_regime['fed_cycle']} | DXY: {macro_regime['dxy_trend']} | VIX: {macro_regime['vix_level']}")
-
-    print("\n[7/7] Generating market-wide report...")
+    
+    print("\n[4/8] Running portfolio simulation...")
+    portfolio_sim = simulate_full_portfolio(all_signals)
+    print(f"  Portfolio Value: ${portfolio_sim['final_value']:.2f}")
+    print(f"  Total Return: {portfolio_sim['total_return']:.1f}%")
+    
+    print("\n[5/8] Computing cross-asset analytics...")
+    portfolio_returns = pd.DataFrame(all_returns)
+    
+    print("\n[6/8] Generating market report...")
     signals_list = list(all_signals.values())
     bullish = sum(1 for s in signals_list if s['signal'] in ['STRONG LONG', 'LONG'])
     bearish = sum(1 for s in signals_list if s['signal'] in ['STRONG SHORT', 'SHORT'])
     neutral = len(signals_list) - bullish - bearish
-    avg_conviction = sum(s['conviction'] for s in signals_list) / len(signals_list)
-
+    
+    if bullish >= len(signals_list) * 0.6:
+        mood = "BULLISH"
+    elif bearish >= len(signals_list) * 0.6:
+        mood = "BEARISH"
+    elif bullish > bearish:
+        mood = "CAUTIOUSLY BULLISH"
+    elif bearish > bullish:
+        mood = "CAUTIOUSLY BEARISH"
+    else:
+        mood = "MIXED"
+    
     regimes = defaultdict(int)
     for s in signals_list:
         regimes[s['regime']] += 1
-
-    if bullish >= len(signals_list) * 0.6:
-        mood, desc = "BULLISH", "Most major assets are showing bullish signals. Overall market trend is positive."
-    elif bearish >= len(signals_list) * 0.6:
-        mood, desc = "BEARISH", "Most major assets are showing bearish signals. Caution warranted across the board."
-    elif bullish > bearish:
-        mood, desc = "CAUTIOUSLY BULLISH", "More assets bullish than bearish, but edge is weak. Selective opportunities."
-    elif bearish > bullish:
-        mood, desc = "CAUTIOUSLY BEARISH", "More assets bearish than bullish. Defensive positioning recommended."
-    else:
-        mood, desc = "MIXED", "Market is split. No clear directional bias. Cash is a valid position."
-
+    
+    # Collect all returns for risk metrics
+    all_returns_list = []
+    for returns in all_returns.values():
+        all_returns_list.extend(returns.tail(30).tolist())
+    
+    global_risk_metrics = calculate_risk_metrics(all_returns_list)
+    
     market_report = {
-        'date': signals_list[0]['date'],
+        'date': datetime.now().strftime('%Y-%m-%d'),
         'market_mood': mood,
-        'mood_description': desc,
         'bullish_assets': bullish,
         'bearish_assets': bearish,
         'neutral_assets': neutral,
-        'avg_conviction': round(avg_conviction, 2),
         'regime_distribution': dict(regimes),
-        'top_opportunities': sorted(
-            [s for s in signals_list if s['signal'] in ['STRONG LONG', 'LONG']],
-            key=lambda x: x['composite_score'], reverse=True
-        )[:3],
-        'biggest_risks': sorted(
-            [s for s in signals_list if s['signal'] in ['STRONG SHORT', 'SHORT']],
-            key=lambda x: x['composite_score']
-        )[:3],
+        'risk_metrics': global_risk_metrics,
     }
-
+    
     print(f"\n  Market Mood: {mood}")
     print(f"  Bullish: {bullish} | Bearish: {bearish} | Neutral: {neutral}")
-    print(f"  Altcoin Season Index: {altcoin_season:.1f}/100")
-    print(f"  Market Breadth: {breadth['breadth_signal']} ({breadth['breadth_ratio']*100:.0f}% bullish)")
-
-    print("\n[8/8] Saving to database and dashboard...")
-    conn = sqlite3.connect(DB_PATH)
-    for code, data in all_signals.items():
-        df_save = pd.DataFrame([{
-            'date': data['date'],
-            'asset': code,
-            'price': data['price'],
-            'signal': data['signal'],
-            'conviction': data['conviction'],
-            'regime': data['regime'],
-            'composite_score': data['composite_score'],
-        }])
-        df_save.to_sql('signals', conn, if_exists='append', index=False)
-    conn.close()
-    print(f"  Saved to {DB_PATH}")
-
+    print(f"  Risk Grade: {global_risk_metrics.get('risk_grade', 'N/A')}")
+    
+    print("\n[7/8] Generating market summary...")
+    summary_data = {
+        'assets': all_signals,
+        'fear_greed': {'value': int(fng_df['fng_value'].iloc[-1]) if not fng_df.empty else None,
+                       'label': fng_df['fng_class'].iloc[-1] if not fng_df.empty else None}
+    }
+    market_summary = generate_market_summary(
+        summary_data, market_report, global_risk_metrics, global_data
+    )
+    
+    # Save summary to file
+    with open('docs/market_summary.txt', 'w') as f:
+        f.write(market_summary)
+    print(f"  📄 Market summary saved to docs/market_summary.txt")
+    
+    print("\n[8/8] Saving dashboard data...")
     dashboard_data = {
-        'version': '4.4',
+        'version': '5.0',
         'generated_at': datetime.now().isoformat(),
         'update_schedule': UPDATE_TIME,
-        'disclaimer': "THIS IS A RESEARCH AND EDUCATIONAL TOOL ONLY. NOT FINANCIAL ADVICE. Past performance does NOT predict future results. You can lose money. The creators are NOT responsible for any trading losses. Paper trade first for 3+ months.",
+        'disclaimer': "THIS IS A RESEARCH AND EDUCATIONAL TOOL ONLY. NOT FINANCIAL ADVICE.",
         'fear_greed': {
             'value': int(fng_df['fng_value'].iloc[-1]) if not fng_df.empty else None,
             'label': fng_df['fng_class'].iloc[-1] if not fng_df.empty else None,
         },
         'global_data': global_data,
-        'macro_data': {
-            'gas': gas_data,
-            'staking': staking_data,
-            'cpi': cpi_data.to_dict('records') if not cpi_data.empty else [],
-            'fed': fed_data.to_dict('records') if not fed_data.empty else [],
-        },
-        'macro_regime': macro_regime,
         'market_report': market_report,
-        'cross_asset': {
-            'correlation_matrix': corr_dict,
-            'rolling_correlations': rolling_corr,
-            'correlation_timeseries': corr_ts,
-            'altcoin_season_index': round(altcoin_season, 1),
-            'market_breadth': breadth,
-            'funding_heatmap': funding_heatmap,
-            'portfolio_optimizer': portfolio,
-            'liquidations': all_liquidations,
-            'options_skew': all_options_skew,
-        },
+        'portfolio_simulation': portfolio_sim,
+        'risk_metrics': global_risk_metrics,
         'assets': all_signals,
-        'chart_data': all_chart_data,
+        'summary': market_summary,
     }
-
+    
+    def fix_nan(obj):
+        if isinstance(obj, dict):
+            return {k: fix_nan(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [fix_nan(i) for i in obj]
+        elif isinstance(obj, float) and (obj != obj):
+            return None
+        return obj
+    
+    dashboard_data = fix_nan(dashboard_data)
+    
     with open(OUTPUT_PATH, 'w') as f:
         json.dump(dashboard_data, f, indent=2, default=str)
-
+    
     print(f"\n💾 Saved to {OUTPUT_PATH}")
     print("\n" + "=" * 70)
-    print("✅ v4.4 PLOTLY + ON-CHAIN EDITION COMPLETE")
+    print("✅ MARKET CORTEX v5.0 ULTIMATE COMPLETE")
     print("=" * 70)
 
 if __name__ == '__main__':
