@@ -160,7 +160,7 @@
     .section-header h2 { font-family: var(--font-display); font-weight: 300; font-size: clamp(1rem, 1.6vw, 1.35rem); letter-spacing: -0.02em; color: #fff; }
     .section-header .desc { font-weight: 300; font-size: 0.7rem; color: var(--text-secondary); max-width: 340px; }
 
-    .card-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    .card-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
     .card-grid-2 { grid-template-columns: repeat(2, 1fr); }
     .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
     .card-grid-4 { grid-template-columns: repeat(4, 1fr); }
@@ -168,7 +168,7 @@
 
     .card {
       background: var(--bg-card); border: 1px solid var(--border-subtle);
-      border-radius: var(--radius); padding: 18px 20px;
+      border-radius: var(--radius); padding: 16px 18px;
       transition: all 0.35s var(--ease); position: relative; overflow: hidden;
     }
     .card::before {
@@ -181,17 +181,17 @@
     .card-glow { position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent), transparent); opacity: 0; transition: opacity 0.4s; }
     .card:hover .card-glow { opacity: 0.3; }
 
-    .card-label { font-family: var(--font-mono); font-weight: 300; font-size: 0.5rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
-    .card-value { font-family: var(--font-display); font-weight: 300; font-size: 1.25rem; color: #fff; }
+    .card-label { font-family: var(--font-mono); font-weight: 300; font-size: 0.45rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+    .card-value { font-family: var(--font-display); font-weight: 300; font-size: 1.15rem; color: #fff; }
     .card-value .accent { color: var(--accent); }
     .card-value .rose { color: var(--rose); }
     .card-value .lime { color: var(--lime); }
     .card-value .amber { color: var(--amber); }
-    .card-detail { font-weight: 300; font-size: 0.7rem; color: var(--text-secondary); margin-top: 2px; line-height: 1.5; }
+    .card-detail { font-weight: 300; font-size: 0.6rem; color: var(--text-secondary); margin-top: 2px; line-height: 1.4; }
 
     .risk-badge {
       display: inline-block; padding: 2px 10px; border-radius: 100px;
-      font-family: var(--font-mono); font-weight: 300; font-size: 0.45rem;
+      font-family: var(--font-mono); font-weight: 300; font-size: 0.4rem;
       letter-spacing: 0.04em; text-transform: uppercase;
     }
     .risk-badge.safe { background: rgba(57,255,20,0.08); color: var(--lime); border: 1px solid rgba(57,255,20,0.1); }
@@ -201,15 +201,15 @@
 
     .metric-row {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 5px 0; border-bottom: 1px solid var(--border-subtle);
+      padding: 4px 0; border-bottom: 1px solid var(--border-subtle);
     }
     .metric-row:last-child { border-bottom: none; }
-    .metric-label { font-family: var(--font-mono); font-weight: 300; font-size: 0.45rem; letter-spacing: 0.04em; color: var(--text-secondary); }
-    .metric-value { font-family: var(--font-mono); font-weight: 300; font-size: 0.7rem; color: #fff; }
+    .metric-label { font-family: var(--font-mono); font-weight: 300; font-size: 0.4rem; letter-spacing: 0.04em; color: var(--text-secondary); }
+    .metric-value { font-family: var(--font-mono); font-weight: 300; font-size: 0.65rem; color: #fff; }
 
     .badge {
       display: inline-block; padding: 2px 9px; border-radius: 100px;
-      font-family: var(--font-mono); font-weight: 300; font-size: 0.45rem;
+      font-family: var(--font-mono); font-weight: 300; font-size: 0.4rem;
       letter-spacing: 0.04em; text-transform: uppercase;
     }
     .badge.strong-long { background: rgba(57,255,20,0.08); color: var(--lime); border: 1px solid rgba(57,255,20,0.1); }
@@ -231,12 +231,12 @@
       display: flex; align-items: center; justify-content: space-between;
       padding: 10px 14px; border-bottom: 1px solid var(--border-subtle);
     }
-    .asset-node-id { font-family: var(--font-display); font-weight: 300; font-size: 0.95rem; color: #fff; }
-    .asset-node-name { font-weight: 300; font-size: 0.55rem; color: var(--text-secondary); margin-left: 4px; }
-    .asset-node-price { font-family: var(--font-mono); font-weight: 300; font-size: 0.75rem; color: var(--text-secondary); }
+    .asset-node-id { font-family: var(--font-display); font-weight: 300; font-size: 0.9rem; color: #fff; }
+    .asset-node-name { font-weight: 300; font-size: 0.5rem; color: var(--text-secondary); margin-left: 4px; }
+    .asset-node-price { font-family: var(--font-mono); font-weight: 300; font-size: 0.7rem; color: var(--text-secondary); }
     .asset-node-body { padding: 10px 14px; }
     .asset-node-expand { max-height: 0; overflow: hidden; transition: max-height 0.6s var(--ease), opacity 0.3s; opacity: 0; }
-    .asset-node.expanded .asset-node-expand { max-height: 2800px; opacity: 1; }
+    .asset-node.expanded .asset-node-expand { max-height: 3000px; opacity: 1; }
     .asset-node-expand-inner { padding: 0 14px 14px; border-top: 1px solid var(--border-subtle); }
 
     .pill-row { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
@@ -254,7 +254,7 @@
       background: rgba(0,229,255,0.03); border: 1px solid var(--border-active);
       border-radius: 6px; padding: 8px 10px; margin-top: 6px;
     }
-    .trade-plan-box .row { display: flex; justify-content: space-between; font-size: 0.55rem; padding: 2px 0; }
+    .trade-plan-box .row { display: flex; justify-content: space-between; font-size: 0.5rem; padding: 2px 0; }
     .trade-plan-box .label { color: var(--text-muted); }
     .trade-plan-box .value { color: #fff; font-family: var(--font-mono); }
     .trade-plan-box .value.lime { color: var(--lime); }
@@ -263,7 +263,7 @@
 
     .regime-change-banner {
       background: rgba(255,215,0,0.06); border: 1px solid var(--amber);
-      border-radius: 4px; padding: 4px 8px; font-size: 0.45rem;
+      border-radius: 4px; padding: 4px 8px; font-size: 0.4rem;
       color: var(--amber); margin-top: 4px; font-family: var(--font-mono);
     }
 
@@ -272,27 +272,27 @@
 
     .corr-table {
       width: 100%; border-collapse: separate; border-spacing: 2px;
-      font-family: var(--font-mono); font-weight: 300; font-size: 0.5rem;
+      font-family: var(--font-mono); font-weight: 300; font-size: 0.45rem;
     }
     .corr-table th { padding: 4px; color: var(--text-secondary); font-weight: 300; text-align: center; }
     .corr-table td { padding: 4px; text-align: center; border-radius: 4px; transition: transform 0.15s; }
     .corr-table td:hover { transform: scale(1.05); position: relative; z-index: 2; }
 
-    .funding-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 4px; }
+    .funding-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(55px, 1fr)); gap: 4px; }
     .funding-cell {
       padding: 4px; border-radius: 4px; text-align: center;
       border: 1px solid var(--border-subtle); background: rgba(255,255,255,0.01);
-      font-family: var(--font-mono); font-weight: 300; font-size: 0.45rem;
+      font-family: var(--font-mono); font-weight: 300; font-size: 0.4rem;
     }
-    .funding-cell .asset { font-weight: 400; color: #fff; font-size: 0.55rem; }
-    .funding-cell .rate { font-size: 0.4rem; }
+    .funding-cell .asset { font-weight: 400; color: #fff; font-size: 0.5rem; }
+    .funding-cell .rate { font-size: 0.35rem; }
 
-    .liq-item { margin-bottom: 6px; background: rgba(255,255,255,0.01); border-radius: 6px; padding: 5px 8px; }
-    .liq-item .row { display: flex; justify-content: space-between; font-size: 0.55rem; }
+    .liq-item { margin-bottom: 6px; background: rgba(255,255,255,0.01); border-radius: 6px; padding: 4px 6px; }
+    .liq-item .row { display: flex; justify-content: space-between; font-size: 0.5rem; }
     .liq-item .bars { display: flex; height: 2px; border-radius: 2px; overflow: hidden; margin: 2px 0; }
     .liq-item .bars .long { background: var(--rose); }
     .liq-item .bars .short { background: var(--lime); }
-    .liq-item .meta { display: flex; justify-content: space-between; font-size: 0.4rem; color: var(--text-muted); }
+    .liq-item .meta { display: flex; justify-content: space-between; font-size: 0.35rem; color: var(--text-muted); }
 
     .reveal { opacity: 0; transform: translateY(20px); transition: all 0.7s var(--ease); }
     .reveal.visible { opacity: 1; transform: translateY(0); }
@@ -304,7 +304,7 @@
     footer {
       margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--border-subtle);
       display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
-      font-family: var(--font-mono); font-weight: 300; font-size: 0.45rem;
+      font-family: var(--font-mono); font-weight: 300; font-size: 0.4rem;
       color: var(--text-muted); letter-spacing: 0.04em;
     }
 
@@ -353,43 +353,40 @@
         <div class="badge">Research &amp; Education</div>
       </div>
       <div class="overlay-title">Before You <span class="accent">Enter</span></div>
-      <div class="overlay-sub">This is a research-grade market intelligence terminal with advanced risk management, multi-timeframe analysis, and real-time alerts. Please take a moment to understand what it is — and what it is not.</div>
+      <div class="overlay-sub">This is a research-grade market intelligence terminal with advanced risk management, multi-timeframe analysis, ensemble signals, and real-time alerts.</div>
       <div class="overlay-grid">
         <div class="overlay-col">
           <div class="col-label">✓ What This System <span style="color:var(--lime);">Is</span></div>
           <ul>
             <li><span class="icon icon-check">✓</span> Research-grade market intelligence terminal</li>
-            <li><span class="icon icon-check">✓</span> Real data from 11+ sources (Binance, Yahoo, CoinGecko)</li>
-            <li><span class="icon icon-check">✓</span> 30+ technical indicators from scratch</li>
+            <li><span class="icon icon-check">✓</span> Real data from 11+ sources</li>
+            <li><span class="icon icon-check">✓</span> 30+ technical indicators</li>
             <li><span class="icon icon-check">✓</span> Dynamic position sizing (volatility-adjusted)</li>
             <li><span class="icon icon-check">✓</span> Drawdown protection (10% DD → 50% size)</li>
-            <li><span class="icon icon-check">✓</span> Regime-based strategy switching</li>
-            <li><span class="icon icon-check">✓</span> Multi-timeframe analysis (1h/4h/1d)</li>
-            <li><span class="icon icon-check">✓</span> Volatility forecast &amp; price targets with probability</li>
-            <li><span class="icon icon-check">✓</span> Risk metrics (VaR, Sortino, Calmar, Kelly)</li>
+            <li><span class="icon icon-check">✓</span> Ensemble signal combining</li>
+            <li><span class="icon icon-check">✓</span> Risk of Ruin &amp; Recovery Factor</li>
             <li><span class="icon icon-check">✓</span> Real-time alerts (Discord/Telegram)</li>
-            <li><span class="icon icon-check">✓</span> Portfolio simulator &amp; walk-forward validation</li>
             <li><span class="icon icon-check">✓</span> Automated hourly updates · $0 cost</li>
           </ul>
         </div>
         <div class="overlay-col">
           <div class="col-label">✗ What This System <span style="color:var(--rose);">Is NOT</span></div>
           <ul>
-            <li><span class="icon icon-cross">✗</span> NOT a financial advisor or investment professional</li>
-            <li><span class="icon icon-cross">✗</span> NOT a trading bot — it does NOT execute trades</li>
-            <li><span class="icon icon-cross">✗</span> NOT a crystal ball — past patterns do NOT guarantee future results</li>
+            <li><span class="icon icon-cross">✗</span> NOT a financial advisor</li>
+            <li><span class="icon icon-cross">✗</span> NOT a trading bot</li>
+            <li><span class="icon icon-cross">✗</span> NOT a crystal ball</li>
             <li><span class="icon icon-cross">✗</span> NOT a get-rich-quick scheme</li>
-            <li><span class="icon icon-cross">✗</span> NOT a replacement for professional investment advice</li>
+            <li><span class="icon icon-cross">✗</span> NOT professional investment advice</li>
           </ul>
         </div>
       </div>
       <div class="overlay-warning">
-        <strong>⚠️ IMPORTANT:</strong> Paper trade first for 3+ months. Never risk more than 1–2% of capital on any single trade idea. The creators are NOT responsible for any trading losses. Past performance does NOT predict future results.
+        <strong>⚠️ IMPORTANT:</strong> Paper trade first for 3+ months. Never risk more than 1–2% of capital on any single trade idea.
       </div>
       <div class="overlay-actions">
         <label>
           <input type="checkbox" id="understand-check" />
-          I understand this is a research &amp; educational tool only. I will not use it as financial advice.
+          I understand this is a research &amp; educational tool only.
         </label>
         <button class="btn-enter" id="enter-btn" disabled>Enter Dashboard →</button>
       </div>
@@ -415,25 +412,34 @@
   <div class="app" id="dashboard-app">
 
     <section class="intro">
-      <div class="intro-eyebrow">Quantitative Market Intelligence · v5.0 Ultimate · Risk Management</div>
+      <div class="intro-eyebrow">Quantitative Market Intelligence · v5.0 Ultimate</div>
       <h1 class="intro-title">Market <span class="accent">Cortex</span> <span class="version">v5.0</span></h1>
-      <p class="intro-sub">Real-time analysis across 9 crypto assets with dynamic position sizing, drawdown protection, regime-based strategy switching, multi-timeframe confirmation, volatility forecasting, price targets with probability, and actionable trade plans.</p>
+      <p class="intro-sub">Real-time analysis across 9 crypto assets with dynamic position sizing, drawdown protection, ensemble signals, risk of ruin analysis, and actionable trade plans.</p>
     </section>
 
     <div class="disclaimer-banner">
       <span style="font-size:1rem;">⚠️</span>
-      <span><strong>RESEARCH &amp; EDUCATIONAL TOOL ONLY</strong> — NOT financial advice. Past performance does <strong>NOT</strong> predict future results. <a href="#" onclick="alert('Full Disclaimer: This is a research and educational tool only. NOT financial advice. Past performance does NOT predict future results. You can lose money. The creators are NOT responsible for any trading losses. Paper trade first for 3+ months. Never risk more than 1–2% of capital on any single trade idea.'); return false;">Read full disclaimer →</a></span>
+      <span><strong>RESEARCH &amp; EDUCATIONAL TOOL ONLY</strong> — NOT financial advice. <a href="#" onclick="alert('Full Disclaimer: Research & Educational Tool Only. NOT Financial Advice.'); return false;">Read full →</a></span>
     </div>
 
-    <!-- ─── QUICK STATS ─── -->
+    <!-- ─── MARKET PULSE ─── -->
     <div class="section-header" id="overview">
       <h2><span class="num">01</span>Market Pulse</h2>
-      <span class="desc">Mood · Fear &amp; Greed · Risk Grade</span>
+      <span class="desc">Mood · F&G · Ensemble · Risk Metrics</span>
     </div>
-    <div class="card-grid card-grid-3">
+    <div class="card-grid card-grid-4">
       <div class="card reveal stagger-1"><div class="card-glow"></div><div class="card-label">Market Mood</div><div class="card-value" id="market-mood">—</div><div class="card-detail" id="mood-detail">Loading...</div></div>
       <div class="card reveal stagger-2"><div class="card-glow"></div><div class="card-label">Fear &amp; Greed</div><div class="card-value" id="fng-value">—</div><div class="card-detail" id="fng-label">Loading...</div></div>
       <div class="card reveal stagger-3"><div class="card-glow"></div><div class="card-label">Risk Grade</div><div class="card-value" id="risk-grade">—</div><div class="card-detail" id="risk-detail">Loading...</div></div>
+      <div class="card reveal stagger-4"><div class="card-glow"></div><div class="card-label">Ensemble Signal</div><div class="card-value" id="ensemble-signal">—</div><div class="card-detail" id="ensemble-detail">Confidence: —</div></div>
+    </div>
+
+    <!-- ─── V5.0 NEW METRICS ─── -->
+    <div class="card-grid card-grid-4" style="margin-top:10px;">
+      <div class="card reveal stagger-1"><div class="card-glow"></div><div class="card-label">Profit Factor</div><div class="card-value" id="profit-factor">—</div><div class="card-detail">Gross Profit / Gross Loss</div></div>
+      <div class="card reveal stagger-2"><div class="card-glow"></div><div class="card-label">Recovery Factor</div><div class="card-value" id="recovery-factor">—</div><div class="card-detail">Return / Max Drawdown</div></div>
+      <div class="card reveal stagger-3"><div class="card-glow"></div><div class="card-label">Risk of Ruin</div><div class="card-value" id="risk-ruin">—</div><div class="card-detail" id="ruin-detail">Blow-up probability</div></div>
+      <div class="card reveal stagger-4"><div class="card-glow"></div><div class="card-label">Correlation</div><div class="card-value" id="correlation-status">—</div><div class="card-detail" id="correlation-detail">Loading...</div></div>
     </div>
 
     <!-- ─── MACRO REGIME ─── -->
@@ -458,7 +464,7 @@
     <!-- ─── ASSET NODES ─── -->
     <div class="section-header" id="assets">
       <h2><span class="num">03</span>Asset Signal Nodes</h2>
-      <span class="desc">Expand for trade plan · multi-TF · volatility forecast · price targets</span>
+      <span class="desc">Expand for trade plan · risk metrics · price targets</span>
     </div>
     <div class="card-grid" id="asset-grid"></div>
 
@@ -494,7 +500,7 @@
 
     <footer>
       <span>© 2026 Market Cortex v5.0 — Crypto Intelligence Terminal</span>
-      <span>Multi-TF · Volatility Forecast · Price Targets · Risk Metrics</span>
+      <span>Ensemble Signals · Risk of Ruin · Recovery Factor</span>
       <span>Research &amp; Education · NOT Financial Advice</span>
     </footer>
   </div>
@@ -546,19 +552,11 @@
     const BOOT_LINES = [
       'Initializing neural core...',
       'Loading cryptographic modules...',
-      'Connecting to Binance API...',
-      'Connecting to Yahoo Finance...',
-      'Fetching CoinGecko data...',
-      'Loading Fear & Greed Index...',
-      'Computing 30+ indicators...',
+      'Connecting to data sources...',
       'Running multi-timeframe analysis...',
-      'Calculating volatility forecast...',
-      'Generating price targets...',
-      'Running portfolio simulation...',
-      'Detecting regimes...',
-      'Generating weighted signals...',
-      'Building trade plans...',
-      'Rendering interface...',
+      'Calculating ensemble signals...',
+      'Computing risk metrics...',
+      'Generating trade plans...',
       'SYSTEM READY'
     ];
 
@@ -788,6 +786,7 @@
             sortino_ratio: 1.45,
             risk_grade: 'B',
             kelly_fraction: 0.12,
+            risk_of_ruin: 4.2,
           },
           walk_forward: {
             validated: true,
@@ -796,6 +795,10 @@
             best_out_sample: 'sma50_pos',
           },
           signal_history: { win_rate: 58.5, total_signals: 142, avg_conviction: 0.62 },
+          onchain: {
+            exchange_flow: { signal: 'BULLISH' },
+            network_activity: { signal: 'HEALTHY' },
+          }
         };
       });
       return {
@@ -810,6 +813,10 @@
           regime_distribution: { 'BULL_TREND': 3, 'CHOPPY': 3, 'BEAR_TREND': 2, 'BULL_VOLATILE': 1 },
           risk_metrics: { risk_grade: 'B', var_95: -2.8, max_drawdown: -12.4, sortino_ratio: 1.2 }
         },
+        ensemble_signal: { signal: 'LONG', confidence: 0.78, consensus: 0.67 },
+        profit_factor: 1.85,
+        recovery_factor: 3.2,
+        correlation_breakdown: { breakdown: false, diff: 0.12 },
         portfolio_simulation: {
           final_value: 12450.00,
           total_return: 24.5,
@@ -850,6 +857,37 @@
       $('risk-grade').style.color = getRiskGradeColor(riskGrade);
       $('risk-detail').textContent = 'VaR: ' + (riskMetrics.var_95 || '—') + '% · Max DD: ' + (riskMetrics.max_drawdown || '—') + '%';
 
+      // ─── v5.0 NEW: Ensemble Signal ───
+      const ensemble = d.ensemble_signal || {};
+      $('ensemble-signal').textContent = ensemble.signal || '—';
+      $('ensemble-signal').style.color = ensemble.signal === 'STRONG LONG' || ensemble.signal === 'LONG' ? 'var(--lime)' :
+                                        ensemble.signal === 'STRONG SHORT' || ensemble.signal === 'SHORT' ? 'var(--rose)' : 'var(--text)';
+      $('ensemble-detail').textContent = 'Confidence: ' + (ensemble.confidence ? (ensemble.confidence * 100).toFixed(0) + '%' : '—');
+
+      // ─── v5.0 NEW: Profit Factor ───
+      const pf = d.profit_factor || 0;
+      $('profit-factor').textContent = pf || '—';
+      $('profit-factor').style.color = pf > 1.5 ? 'var(--lime)' : pf > 1 ? 'var(--amber)' : 'var(--rose)';
+
+      // ─── v5.0 NEW: Recovery Factor ───
+      const rf = d.recovery_factor || 0;
+      $('recovery-factor').textContent = rf || '—';
+      $('recovery-factor').style.color = rf > 2 ? 'var(--lime)' : rf > 1 ? 'var(--amber)' : 'var(--rose)';
+
+      // ─── v5.0 NEW: Risk of Ruin ───
+      const globalRisk = d.risk_metrics || {};
+      const ruin = globalRisk.risk_of_ruin || 0;
+      $('risk-ruin').textContent = ruin ? ruin.toFixed(1) + '%' : '—';
+      $('risk-ruin').style.color = ruin > 20 ? 'var(--rose)' : ruin > 5 ? 'var(--amber)' : 'var(--lime)';
+      $('ruin-detail').textContent = ruin > 20 ? '⚠️ High blow-up risk' : ruin > 5 ? 'Moderate risk' : '✅ Low risk';
+
+      // ─── v5.0 NEW: Correlation Status ───
+      const corrBreak = d.correlation_breakdown || {};
+      const isBreakdown = corrBreak.breakdown || false;
+      $('correlation-status').textContent = isBreakdown ? '⚠️ BREAKDOWN' : '✅ STABLE';
+      $('correlation-status').style.color = isBreakdown ? 'var(--amber)' : 'var(--lime)';
+      $('correlation-detail').textContent = isBreakdown ? 'Diversification failing' : 'Correlations normal';
+
       // Macro (simplified)
       ['fed-cycle', 'dxy-trend', 'liquidity', 'vix-level'].forEach(id => {
         const el = $(id);
@@ -886,7 +924,6 @@
       if (CMI.charts.portfolio) CMI.charts.portfolio.destroy();
 
       if (!history || history.length === 0) {
-        // Generate sample data
         history = [];
         for (let i = 0; i < 30; i++) {
           history.push({ day: i, value: 10000 + i * 80 + Math.random() * 200 });
@@ -938,15 +975,15 @@
         const reg = a.regime || 'CHOPPY';
         const regColor = getRegimeColor(reg);
 
-        // Enhanced data
         const tradePlan = a.trade_plan || {};
         const posSizing = a.position_sizing || {};
-        const mtf = a.multi_timeframe || { alignment: 'UNKNOWN', strength: 1.0 };
+        const mtf = a.multi_timeframe || { alignment: 'UNKNOWN' };
         const volForecast = a.volatility_forecast || {};
         const priceTargets = a.price_targets || {};
-        const regimeChange = a.regime_change || { change: false };
         const riskMetrics = a.risk_metrics || {};
         const regimeStrategy = a.regime_strategy || {};
+        const regimeChange = a.regime_change || { change: false };
+        const onchain = a.onchain || {};
 
         const node = document.createElement('div');
         node.className = 'asset-node';
@@ -955,8 +992,7 @@
             <div>
               <span class="asset-node-id">${code}</span>
               <span class="asset-node-name">${a.name || ''}</span>
-              ${mtf.alignment === 'STRONG' ? '<span style="color:var(--lime);font-size:0.4rem;margin-left:4px;">● MTF ✓</span>' : ''}
-              ${mtf.alignment === 'CONFLICT' ? '<span style="color:var(--amber);font-size:0.4rem;margin-left:4px;">● MTF ⚠</span>' : ''}
+              ${mtf.alignment === 'STRONG' ? '<span style="color:var(--lime);font-size:0.35rem;margin-left:4px;">● MTF ✓</span>' : ''}
             </div>
             <div style="display:flex;align-items:center;gap:8px;">
               <span class="asset-node-price">$${typeof price === 'number' ? price.toFixed(2) : '--'}</span>
@@ -964,14 +1000,14 @@
             </div>
           </div>
           <div class="asset-node-body">
-            <div style="display:flex;justify-content:space-between;font-size:0.55rem;color:var(--text-secondary);">
+            <div style="display:flex;justify-content:space-between;font-size:0.5rem;color:var(--text-secondary);">
               <span>Regime: <span style="color:${regColor};font-weight:400;">${reg}</span></span>
               <span>Conviction: ${(conv * 100).toFixed(0)}%</span>
             </div>
             <div class="conviction-track"><div class="conviction-fill" style="width:${conv * 100}%;"></div></div>
 
-            <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;">
-              ${regimeStrategy.recommended_strategy ? `<span class="risk-badge info">Strategy: ${regimeStrategy.recommended_strategy}</span>` : ''}
+            <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;">
+              ${regimeStrategy.recommended_strategy ? `<span class="risk-badge info">${regimeStrategy.recommended_strategy}</span>` : ''}
               ${posSizing.size_multiplier ? `<span class="risk-badge ${posSizing.size_multiplier < 0.7 ? 'warning' : 'safe'}">Size: ${(posSizing.size_multiplier * 100).toFixed(0)}%</span>` : ''}
               ${riskMetrics.risk_grade ? `<span class="risk-badge ${riskMetrics.risk_grade === 'A' || riskMetrics.risk_grade === 'B' ? 'safe' : riskMetrics.risk_grade === 'F' ? 'danger' : 'warning'}">Risk: ${riskMetrics.risk_grade}</span>` : ''}
               ${volForecast.regime === 'HIGH' ? `<span class="risk-badge warning">⚠️ High Vol</span>` : ''}
@@ -983,14 +1019,14 @@
 
             ${tradePlan.entry_price ? `
               <div class="trade-plan-box">
-                <div style="font-family:var(--font-mono);font-size:0.4rem;color:var(--text-muted);margin-bottom:3px;">📊 TRADE PLAN</div>
+                <div style="font-family:var(--font-mono);font-size:0.35rem;color:var(--text-muted);margin-bottom:2px;">📊 TRADE PLAN</div>
                 <div class="row"><span class="label">Entry</span><span class="value accent">$${tradePlan.entry_price || 0}</span></div>
-                <div class="row"><span class="label">Stop Loss</span><span class="value rose">$${tradePlan.stop_loss || 0}</span></div>
-                <div class="row"><span class="label">Take Profit 1</span><span class="value lime">$${tradePlan.take_profit_1 || 0}</span></div>
-                <div class="row"><span class="label">Take Profit 2</span><span class="value lime">$${tradePlan.take_profit_2 || 0}</span></div>
+                <div class="row"><span class="label">Stop</span><span class="value rose">$${tradePlan.stop_loss || 0}</span></div>
+                <div class="row"><span class="label">TP1</span><span class="value lime">$${tradePlan.take_profit_1 || 0}</span></div>
+                <div class="row"><span class="label">TP2</span><span class="value lime">$${tradePlan.take_profit_2 || 0}</span></div>
                 <div class="row"><span class="label">Risk</span><span class="value">$${tradePlan.risk_amount || 0} (${tradePlan.risk_percent || 0}%)</span></div>
                 <div class="row"><span class="label">R:R</span><span class="value">${tradePlan.risk_reward_ratio ? tradePlan.risk_reward_ratio.toFixed(2) : '—'}</span></div>
-                <div class="row"><span class="label">MTF Alignment</span><span class="value" style="color:${mtf.alignment === 'STRONG' ? 'var(--lime)' : mtf.alignment === 'CONFLICT' ? 'var(--amber)' : 'var(--text)'};">${mtf.alignment || 'UNKNOWN'}</span></div>
+                <div class="row"><span class="label">MTF</span><span class="value" style="color:${mtf.alignment === 'STRONG' ? 'var(--lime)' : mtf.alignment === 'CONFLICT' ? 'var(--amber)' : 'var(--text)'};">${mtf.alignment || 'UNKNOWN'}</span></div>
               </div>
             ` : ''}
           </div>
@@ -1009,7 +1045,7 @@
         'TOP WARNING': 'bear', 'ELEVATED RISK': 'bear'
       };
       const keys = Object.keys(subs);
-      if (keys.length === 0) return '<span style="color:var(--text-muted);font-size:0.4rem;">No sub-signals</span>';
+      if (keys.length === 0) return '<span style="color:var(--text-muted);font-size:0.35rem;">No sub-signals</span>';
       return keys.slice(0, 6).map(k => {
         const s = subs[k];
         const v = s.verdict || 'NEUTRAL';
@@ -1020,86 +1056,94 @@
 
     function renderDetail(a) {
       const ind = a.indicators || {};
-      const regimeStrategy = a.regime_strategy || {};
       const volForecast = a.volatility_forecast || {};
       const priceTargets = a.price_targets || {};
       const riskMetrics = a.risk_metrics || {};
-      const wf = a.walk_forward || {};
       const history = a.signal_history || {};
+      const wf = a.walk_forward || {};
       const mtf = a.multi_timeframe || {};
+      const onchain = a.onchain || {};
 
       return `
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;">
           <div>
-            <div style="font-size:0.4rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">Key Indicators</div>
+            <div style="font-size:0.35rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">Key Indicators</div>
             <div class="metric-row"><span class="metric-label">RSI</span><span class="metric-value">${ind.rsi != null ? ind.rsi.toFixed(1) : '--'}</span></div>
             <div class="metric-row"><span class="metric-label">MACD Hist</span><span class="metric-value">${ind.macd_hist != null ? ind.macd_hist.toFixed(4) : '--'}</span></div>
             <div class="metric-row"><span class="metric-label">Volatility</span><span class="metric-value">${ind.volatility != null ? ind.volatility.toFixed(1) + '%' : '--'}</span></div>
             <div class="metric-row"><span class="metric-label">Drawdown</span><span class="metric-value" style="color:${ind.drawdown != null && ind.drawdown < -20 ? 'var(--rose)' : 'var(--text)'}">${ind.drawdown != null ? ind.drawdown.toFixed(1) + '%' : '--'}</span></div>
-            <div class="metric-row"><span class="metric-label">Funding Rate</span><span class="metric-value" style="color:${ind.funding_rate != null && ind.funding_rate > 0.0005 ? 'var(--rose)' : ind.funding_rate != null && ind.funding_rate < -0.0005 ? 'var(--lime)' : 'var(--text)'}">${ind.funding_rate != null ? (ind.funding_rate * 100).toFixed(4) + '%' : '--'}</span></div>
+            <div class="metric-row"><span class="metric-label">Funding</span><span class="metric-value" style="color:${ind.funding_rate != null && ind.funding_rate > 0.0005 ? 'var(--rose)' : ind.funding_rate != null && ind.funding_rate < -0.0005 ? 'var(--lime)' : 'var(--text)'}">${ind.funding_rate != null ? (ind.funding_rate * 100).toFixed(4) + '%' : '--'}</span></div>
           </div>
           <div>
-            <div style="font-size:0.4rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">Multi-Timeframe</div>
+            <div style="font-size:0.35rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">Multi-Timeframe</div>
             ${Object.entries(mtf.signals || {}).map(([tf, sig]) => `
               <div class="metric-row"><span class="metric-label">${tf}</span><span class="metric-value" style="color:${sig === 'BULLISH' ? 'var(--lime)' : sig === 'BEARISH' ? 'var(--rose)' : 'var(--text)'};">${sig}</span></div>
             `).join('')}
             <div class="metric-row"><span class="metric-label">Alignment</span><span class="metric-value" style="color:${mtf.alignment === 'STRONG' ? 'var(--lime)' : mtf.alignment === 'CONFLICT' ? 'var(--amber)' : 'var(--text)'};">${mtf.alignment || '—'}</span></div>
-            <div class="metric-row"><span class="metric-label">Strength</span><span class="metric-value">${mtf.strength || '—'}</span></div>
           </div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;">
           <div>
-            <div style="font-size:0.4rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">📈 Volatility Forecast</div>
-            <div class="metric-row"><span class="metric-label">Current Vol</span><span class="metric-value">${volForecast.current_annual_vol != null ? volForecast.current_annual_vol.toFixed(1) + '%' : '--'}</span></div>
-            <div class="metric-row"><span class="metric-label">5-Day Forecast</span><span class="metric-value">${volForecast.forecast_5d_vol != null ? volForecast.forecast_5d_vol.toFixed(1) + '%' : '--'}</span></div>
-            <div class="metric-row"><span class="metric-label">20-Day Forecast</span><span class="metric-value">${volForecast.forecast_20d_vol != null ? volForecast.forecast_20d_vol.toFixed(1) + '%' : '--'}</span></div>
-            <div class="metric-row"><span class="metric-label">Vol Regime</span><span class="metric-value" style="color:${volForecast.regime === 'HIGH' ? 'var(--amber)' : 'var(--lime)'};">${volForecast.regime || '—'}</span></div>
+            <div style="font-size:0.35rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">📈 Volatility</div>
+            <div class="metric-row"><span class="metric-label">Current</span><span class="metric-value">${volForecast.current_annual_vol != null ? volForecast.current_annual_vol.toFixed(1) + '%' : '--'}</span></div>
+            <div class="metric-row"><span class="metric-label">5-Day</span><span class="metric-value">${volForecast.forecast_5d_vol != null ? volForecast.forecast_5d_vol.toFixed(1) + '%' : '--'}</span></div>
+            <div class="metric-row"><span class="metric-label">Regime</span><span class="metric-value" style="color:${volForecast.regime === 'HIGH' ? 'var(--amber)' : 'var(--lime)'};">${volForecast.regime || '—'}</span></div>
           </div>
           <div>
-            <div style="font-size:0.4rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">🎯 Price Targets</div>
-            ${priceTargets.target_1 ? `<div class="metric-row"><span class="metric-label">Target 1</span><span class="metric-value lime">$${priceTargets.target_1.price} (${(priceTargets.target_1.probability * 100).toFixed(0)}%)</span></div>` : ''}
-            ${priceTargets.target_2 ? `<div class="metric-row"><span class="metric-label">Target 2</span><span class="metric-value lime">$${priceTargets.target_2.price} (${(priceTargets.target_2.probability * 100).toFixed(0)}%)</span></div>` : ''}
-            ${priceTargets.target_3 ? `<div class="metric-row"><span class="metric-label">Target 3</span><span class="metric-value lime">$${priceTargets.target_3.price} (${(priceTargets.target_3.probability * 100).toFixed(0)}%)</span></div>` : ''}
+            <div style="font-size:0.35rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">🎯 Price Targets</div>
+            ${priceTargets.target_1 ? `<div class="metric-row"><span class="metric-label">TP1</span><span class="metric-value lime">$${priceTargets.target_1.price} (${(priceTargets.target_1.probability * 100).toFixed(0)}%)</span></div>` : ''}
+            ${priceTargets.target_2 ? `<div class="metric-row"><span class="metric-label">TP2</span><span class="metric-value lime">$${priceTargets.target_2.price} (${(priceTargets.target_2.probability * 100).toFixed(0)}%)</span></div>` : ''}
+            ${priceTargets.target_3 ? `<div class="metric-row"><span class="metric-label">TP3</span><span class="metric-value lime">$${priceTargets.target_3.price} (${(priceTargets.target_3.probability * 100).toFixed(0)}%)</span></div>` : ''}
           </div>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-top:8px;">
-          <div style="background:rgba(255,255,255,0.015);border-radius:4px;padding:5px 8px;text-align:center;">
-            <div style="font-size:0.35rem;color:var(--text-muted);">VaR 95%</div>
-            <div style="font-size:0.65rem;color:#fff;">${riskMetrics.var_95 != null ? riskMetrics.var_95.toFixed(1) + '%' : '—'}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-top:8px;">
+          <div style="background:rgba(255,255,255,0.015);border-radius:4px;padding:4px 6px;text-align:center;">
+            <div style="font-size:0.3rem;color:var(--text-muted);">VaR 95%</div>
+            <div style="font-size:0.6rem;color:#fff;">${riskMetrics.var_95 != null ? riskMetrics.var_95.toFixed(1) + '%' : '—'}</div>
           </div>
-          <div style="background:rgba(255,255,255,0.015);border-radius:4px;padding:5px 8px;text-align:center;">
-            <div style="font-size:0.35rem;color:var(--text-muted);">Max DD</div>
-            <div style="font-size:0.65rem;color:${riskMetrics.max_drawdown != null && riskMetrics.max_drawdown < -20 ? 'var(--rose)' : 'var(--lime)'};">${riskMetrics.max_drawdown != null ? riskMetrics.max_drawdown.toFixed(1) + '%' : '—'}</div>
+          <div style="background:rgba(255,255,255,0.015);border-radius:4px;padding:4px 6px;text-align:center;">
+            <div style="font-size:0.3rem;color:var(--text-muted);">Max DD</div>
+            <div style="font-size:0.6rem;color:${riskMetrics.max_drawdown != null && riskMetrics.max_drawdown < -20 ? 'var(--rose)' : 'var(--lime)'};">${riskMetrics.max_drawdown != null ? riskMetrics.max_drawdown.toFixed(1) + '%' : '—'}</div>
           </div>
-          <div style="background:rgba(255,255,255,0.015);border-radius:4px;padding:5px 8px;text-align:center;">
-            <div style="font-size:0.35rem;color:var(--text-muted);">Sortino</div>
-            <div style="font-size:0.65rem;color:#fff;">${riskMetrics.sortino_ratio != null ? riskMetrics.sortino_ratio.toFixed(2) : '—'}</div>
+          <div style="background:rgba(255,255,255,0.015);border-radius:4px;padding:4px 6px;text-align:center;">
+            <div style="font-size:0.3rem;color:var(--text-muted);">Risk of Ruin</div>
+            <div style="font-size:0.6rem;color:${riskMetrics.risk_of_ruin != null && riskMetrics.risk_of_ruin > 20 ? 'var(--rose)' : riskMetrics.risk_of_ruin > 5 ? 'var(--amber)' : 'var(--lime)'};">${riskMetrics.risk_of_ruin != null ? riskMetrics.risk_of_ruin.toFixed(1) + '%' : '—'}</div>
           </div>
-          <div style="background:rgba(255,255,255,0.015);border-radius:4px;padding:5px 8px;text-align:center;">
-            <div style="font-size:0.35rem;color:var(--text-muted);">Risk Grade</div>
-            <div style="font-size:0.65rem;color:${getRiskGradeColor(riskMetrics.risk_grade)};">${riskMetrics.risk_grade || '—'}</div>
+          <div style="background:rgba(255,255,255,0.015);border-radius:4px;padding:4px 6px;text-align:center;">
+            <div style="font-size:0.3rem;color:var(--text-muted);">Grade</div>
+            <div style="font-size:0.6rem;color:${getRiskGradeColor(riskMetrics.risk_grade)};">${riskMetrics.risk_grade || '—'}</div>
           </div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;">
           <div>
-            <div style="font-size:0.4rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">📊 Signal History</div>
+            <div style="font-size:0.35rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">📊 Signal History</div>
             <div class="metric-row"><span class="metric-label">Win Rate</span><span class="metric-value" style="color:${history.win_rate != null && history.win_rate > 55 ? 'var(--lime)' : 'var(--amber)'};">${history.win_rate != null ? history.win_rate.toFixed(1) + '%' : '—'}</span></div>
             <div class="metric-row"><span class="metric-label">Total Signals</span><span class="metric-value">${history.total_signals || '—'}</span></div>
             <div class="metric-row"><span class="metric-label">Avg Conviction</span><span class="metric-value">${history.avg_conviction != null ? (history.avg_conviction * 100).toFixed(0) + '%' : '—'}</span></div>
           </div>
           <div>
-            <div style="font-size:0.4rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">✅ Walk-Forward Validation</div>
+            <div style="font-size:0.35rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">✅ Walk-Forward</div>
             <div class="metric-row"><span class="metric-label">Status</span><span class="metric-value" style="color:${wf.validated ? 'var(--lime)' : 'var(--amber)'};">${wf.validated ? '✅ Validated' : '⏳ Pending'}</span></div>
             <div class="metric-row"><span class="metric-label">Robustness</span><span class="metric-value" style="color:${wf.robustness === 'GOOD' ? 'var(--lime)' : 'var(--amber)'};">${wf.robustness || '—'}</span></div>
             <div class="metric-row"><span class="metric-label">Best Strategy</span><span class="metric-value">${wf.best_in_sample || '—'}</span></div>
           </div>
         </div>
 
-        <div style="margin-top:8px;font-size:0.4rem;color:var(--text-muted);text-align:center;border-top:1px solid var(--border-subtle);padding-top:8px;">
-          Regime: ${regimeStrategy.regime || '—'} · Strategy: ${regimeStrategy.recommended_strategy || '—'} · Size: ${regimeStrategy.size_multiplier ? (regimeStrategy.size_multiplier * 100).toFixed(0) + '%' : '—'}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;">
+          <div>
+            <div style="font-size:0.35rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">📡 On-Chain</div>
+            <div class="metric-row"><span class="metric-label">Exchange Flow</span><span class="metric-value" style="color:${onchain.exchange_flow?.signal === 'BULLISH' ? 'var(--lime)' : onchain.exchange_flow?.signal === 'BEARISH' ? 'var(--rose)' : 'var(--text)'};">${onchain.exchange_flow?.signal || '—'}</span></div>
+            <div class="metric-row"><span class="metric-label">Network</span><span class="metric-value" style="color:${onchain.network_activity?.signal === 'HEALTHY' ? 'var(--lime)' : 'var(--amber)'};">${onchain.network_activity?.signal || '—'}</span></div>
+          </div>
+          <div>
+            <div style="font-size:0.35rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">📈 Strategy</div>
+            <div class="metric-row"><span class="metric-label">Regime</span><span class="metric-value">${a.regime_strategy?.regime || '—'}</span></div>
+            <div class="metric-row"><span class="metric-label">Strategy</span><span class="metric-value">${a.regime_strategy?.recommended_strategy || '—'}</span></div>
+            <div class="metric-row"><span class="metric-label">Size</span><span class="metric-value">${a.regime_strategy?.size_multiplier ? (a.regime_strategy.size_multiplier * 100).toFixed(0) + '%' : '—'}</span></div>
+          </div>
         </div>
       `;
     }
