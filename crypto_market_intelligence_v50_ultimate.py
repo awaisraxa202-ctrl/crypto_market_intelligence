@@ -1690,43 +1690,50 @@ def generate_trade_plan(asset, signal, conviction, price, sr_levels, atr, positi
         'signal': signal,
         'conviction': conviction,
         'entry_price': round(price, 2),
+        'entry_type': 'NO_TRADE',
+        'stop_loss': None,
+        'take_profit_1': None,
+        'take_profit_2': None,
+        'position_size': 0,
+        'risk_amount': 0,
+        'risk_percent': 0,
+        'risk_reward_ratio': 0,
     }
-    if signal in ['STRONG LONG', 'LONG']:
-        stop_loss = position_size_info.get('stop_loss', price * 0.95)
-        tp1 = position_size_info.get('take_profit_1', price * 1.04)
-        tp2 = position_size_info.get('take_profit_2', price * 1.08)
-        plan['entry_type'] = 'BUY_LIMIT'
-        plan['stop_loss'] = round(stop_loss, 2)
-        plan['take_profit_1'] = round(tp1, 2)
-        plan['take_profit_2'] = round(tp2, 2)
-        plan['position_size'] = position_size_info.get('position_size', 0)
-        plan['risk_amount'] = position_size_info.get('risk_amount', 0)
-        plan['risk_percent'] = position_size_info.get('risk_percent', 0)
-    elif signal in ['STRONG SHORT', 'SHORT']:
-        stop_loss = position_size_info.get('stop_loss', price * 1.05)
-        tp1 = position_size_info.get('take_profit_1', price * 0.96)
-        tp2 = position_size_info.get('take_profit_2', price * 0.92)
-        plan['entry_type'] = 'SELL_LIMIT'
-        plan['stop_loss'] = round(stop_loss, 2)
-        plan['take_profit_1'] = round(tp1, 2)
-        plan['take_profit_2'] = round(tp2, 2)
-        plan['position_size'] = position_size_info.get('position_size', 0)
-        plan['risk_amount'] = position_size_info.get('risk_amount', 0)
-        plan['risk_percent'] = position_size_info.get('risk_percent', 0)
-    else:
-        plan['entry_type'] = 'NO_TRADE'
-        plan['stop_loss'] = None
-        plan['take_profit_1'] = None
-        plan['take_profit_2'] = None
-        plan['position_size'] = 0
-        plan['risk_amount'] = 0
-        plan['risk_percent'] = 0
     
-    # FIX: Only calculate risk_reward_ratio if we have valid values
-    if plan['stop_loss'] is not None and plan['take_profit_1'] is not None:
-        plan['risk_reward_ratio'] = abs((plan['take_profit_1'] - price) / (price - plan['stop_loss'] + 0.001))
-    else:
-        plan['risk_reward_ratio'] = 0
+    # ALWAYS use position_size_info values, regardless of signal
+    if position_size_info:
+        stop_loss = position_size_info.get('stop_loss')
+        tp1 = position_size_info.get('take_profit_1')
+        tp2 = position_size_info.get('take_profit_2')
+        pos_size = position_size_info.get('position_size', 0)
+        risk_amt = position_size_info.get('risk_amount', 0)
+        risk_pct = position_size_info.get('risk_percent', 0)
+        
+        if stop_loss is not None:
+            plan['stop_loss'] = round(stop_loss, 2)
+        if tp1 is not None:
+            plan['take_profit_1'] = round(tp1, 2)
+        if tp2 is not None:
+            plan['take_profit_2'] = round(tp2, 2)
+        if pos_size:
+            plan['position_size'] = pos_size
+        if risk_amt:
+            plan['risk_amount'] = risk_amt
+        if risk_pct:
+            plan['risk_percent'] = risk_pct
+    
+    # Set entry_type based on signal
+    if signal in ['STRONG LONG', 'LONG']:
+        plan['entry_type'] = 'BUY_LIMIT'
+    elif signal in ['STRONG SHORT', 'SHORT']:
+        plan['entry_type'] = 'SELL_LIMIT'
+    
+    # Calculate risk_reward_ratio if we have valid values
+    if plan['stop_loss'] is not None and plan['take_profit_1'] is not None and plan['stop_loss'] != 0:
+        try:
+            plan['risk_reward_ratio'] = abs((plan['take_profit_1'] - price) / (price - plan['stop_loss'] + 0.001))
+        except:
+            plan['risk_reward_ratio'] = 0
     
     return plan
 
