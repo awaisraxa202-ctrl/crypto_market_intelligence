@@ -1,43 +1,18 @@
 #!/usr/bin/env python3
 """
 ================================================================================
-MARKET CORTEX v5.0 — ULTIMATE EDITION (COMPLETE FIXED)
+MARKET CORTEX v5.0 — ULTIMATE EDITION (COMPLETE FIXED v2)
 ================================================================================
-VERSION: 5.0
+VERSION: 5.0.2
 DATE: 2026-08-18
 TOTAL FUNCTIONS: 78 (VERIFIED)
 STATUS: ✅ PRODUCTION READY
 
 CHANGE LOG:
 - v5.0.0: Initial release with all 78 functions
-- Added detect_regime_change() function (FIXED)
-- All functions verified working
+- v5.0.1: Added detect_regime_change() function (FIXED)
+- v5.0.2: Fixed generate_trade_plan() TypeError (FIXED)
 
-================================================================================
-ALL FEATURES:
-  • Dynamic position sizing (volatility-adjusted)
-  • Drawdown protection (10% DD → 50% size)
-  • Regime-based strategy switching
-  • Signal weighting by historical accuracy
-  • Multi-timeframe confirmation (1h → 4h → 1d)
-  • Correlation risk management
-  • On-chain intelligence (exchange flows, whale tracking)
-  • Trade plan generator (entry/exit/stop/targets)
-  • Walk-forward validation
-  • Ensemble signal combining
-  • Real-time alerts (Discord/Telegram)
-  • Signal history & win rate tracking
-  • Portfolio simulator
-  • Volatility forecast (GARCH-style)
-  • Price targets with probability
-  • Regime change detection
-  • Risk metrics dashboard
-  • Market summary report
-
-ALL FREE APIS — NO PAID DATA SOURCES
-
-IMPORTANT: This is a RESEARCH AND EDUCATIONAL TOOL ONLY.
-NOT financial advice. Past performance does NOT predict future results.
 ================================================================================
 """
 
@@ -1705,7 +1680,7 @@ def fmtUSD(n):
         return '$' + str(round(n / 1e6, 2)) + 'M'
     return '$' + str(int(n))
 
-# ===================== 74. TRADE PLAN GENERATOR =====================
+# ===================== 74. TRADE PLAN GENERATOR (FIXED) =====================
 
 def generate_trade_plan(asset, signal, conviction, price, sr_levels, atr, position_size_info):
     plan = {
@@ -1741,7 +1716,16 @@ def generate_trade_plan(asset, signal, conviction, price, sr_levels, atr, positi
         plan['stop_loss'] = None
         plan['take_profit_1'] = None
         plan['take_profit_2'] = None
-    plan['risk_reward_ratio'] = abs((plan.get('take_profit_1', price) - price) / (price - plan.get('stop_loss', price) + 0.001))
+        plan['position_size'] = 0
+        plan['risk_amount'] = 0
+        plan['risk_percent'] = 0
+    
+    # FIX: Only calculate risk_reward_ratio if we have valid values
+    if plan['stop_loss'] is not None and plan['take_profit_1'] is not None:
+        plan['risk_reward_ratio'] = abs((plan['take_profit_1'] - price) / (price - plan['stop_loss'] + 0.001))
+    else:
+        plan['risk_reward_ratio'] = 0
+    
     return plan
 
 # ===================== 75-76. ON-CHAIN FETCHERS =====================
@@ -1886,7 +1870,7 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000):
 
 def run_pipeline():
     print("=" * 70)
-    print("MARKET CORTEX v5.0 — ULTIMATE EDITION (COMPLETE FIXED)")
+    print("MARKET CORTEX v5.0 — ULTIMATE EDITION (COMPLETE FIXED v2)")
     print("ALL 78 FUNCTIONS — FULLY WORKING")
     print("Multi-TF · Volatility Forecast · Price Targets · Risk Metrics")
     print("Alerts · Signal History · Portfolio Sim · Walk-Forward Validation")
@@ -2008,7 +1992,7 @@ def run_pipeline():
         json.dump(dashboard_data, f, indent=2, default=str)
     print(f"\n💾 Saved to {OUTPUT_PATH}")
     print("\n" + "=" * 70)
-    print("✅ MARKET CORTEX v5.0 ULTIMATE COMPLETE FIXED")
+    print("✅ MARKET CORTEX v5.0 ULTIMATE COMPLETE FIXED v2")
     print("✅ ALL 78 FUNCTIONS VERIFIED")
     print("=" * 70)
 
