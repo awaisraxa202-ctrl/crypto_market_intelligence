@@ -710,7 +710,7 @@
 
     async function loadData() {
       try {
-        const resp = await fetch('docs/market_intelligence.json');
+        const resp = await fetch('/crypto_market_intelligence/docs/market_intelligence.json');
         if (!resp.ok) throw new Error('Data not found');
         CMI.data = await resp.json();
         renderDashboard();
