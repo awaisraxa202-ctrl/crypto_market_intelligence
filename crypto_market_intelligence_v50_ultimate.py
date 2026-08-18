@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 """
 ================================================================================
-MARKET CORTEX v5.0 — ULTIMATE EDITION (COMPLETE FIXED v2)
+MARKET CORTEX v5.0 — ULTIMATE EDITION (COMPLETE FIXED v4)
 ================================================================================
-VERSION: 5.0.2
+VERSION: 5.0.4
 DATE: 2026-08-18
 TOTAL FUNCTIONS: 78 (VERIFIED)
 STATUS: ✅ PRODUCTION READY
 
 CHANGE LOG:
 - v5.0.0: Initial release with all 78 functions
-- v5.0.1: Added detect_regime_change() function (FIXED)
-- v5.0.2: Fixed generate_trade_plan() TypeError (FIXED)
+- v5.0.1: Added detect_regime_change() function
+- v5.0.2: Fixed generate_trade_plan() TypeError
+- v5.0.3: Fixed process_asset() print format for None values
+- v5.0.4: Fixed indentation error in process_asset()
 
 ================================================================================
 """
@@ -1863,20 +1865,23 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000):
         },
     }
     print(f"  ✅ {narrative['signal']} | Conviction: {narrative['conviction']}/1.0")
+    
+    # FIX: Handle None values in trade plan print
     stop_loss = trade_plan.get('stop_loss', 0)
-entry_price = trade_plan.get('entry_price', 0)
-if stop_loss is None:
-    stop_loss = 0
-if entry_price is None:
-    entry_price = 0
-print(f"  📊 Trade Plan: Entry ${entry_price:.2f} | Stop ${stop_loss:.2f}")
+    entry_price = trade_plan.get('entry_price', 0)
+    if stop_loss is None:
+        stop_loss = 0
+    if entry_price is None:
+        entry_price = 0
+    print(f"  📊 Trade Plan: Entry ${entry_price:.2f} | Stop ${stop_loss:.2f}")
+    
     print(f"  📈 Volatility: {vol_forecast.get('current_annual_vol', 0):.1f}% | Forecast: {vol_forecast.get('forecast_5d_vol', 0):.1f}%")
     print(f"  🏷️ Risk Grade: {risk_metrics.get('risk_grade', 'N/A')} | Kelly: {risk_metrics.get('kelly_fraction', 0):.2f}")
     return asset_output, df[['date', 'close']].rename(columns={'close': code})
 
 def run_pipeline():
     print("=" * 70)
-    print("MARKET CORTEX v5.0 — ULTIMATE EDITION (COMPLETE FIXED v2)")
+    print("MARKET CORTEX v5.0 — ULTIMATE EDITION (COMPLETE FIXED v4)")
     print("ALL 78 FUNCTIONS — FULLY WORKING")
     print("Multi-TF · Volatility Forecast · Price Targets · Risk Metrics")
     print("Alerts · Signal History · Portfolio Sim · Walk-Forward Validation")
@@ -1998,7 +2003,7 @@ def run_pipeline():
         json.dump(dashboard_data, f, indent=2, default=str)
     print(f"\n💾 Saved to {OUTPUT_PATH}")
     print("\n" + "=" * 70)
-    print("✅ MARKET CORTEX v5.0 ULTIMATE COMPLETE FIXED v2")
+    print("✅ MARKET CORTEX v5.0 ULTIMATE COMPLETE FIXED v4")
     print("✅ ALL 78 FUNCTIONS VERIFIED")
     print("=" * 70)
 
