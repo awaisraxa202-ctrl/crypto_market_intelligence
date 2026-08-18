@@ -709,17 +709,19 @@
     }
 
     async function loadData() {
-      try {
-        const resp = await fetch('/crypto_market_intelligence/docs/market_intelligence.json');
-        if (!resp.ok) throw new Error('Data not found');
-        CMI.data = await resp.json();
-        renderDashboard();
-      } catch (e) {
-        console.warn('Using fallback data:', e);
-        CMI.data = generateFallbackData();
-        renderDashboard();
-      }
-    }
+  try {
+    // Use absolute URL to ensure it loads
+    const resp = await fetch('https://awaisraxa202-ctrl.github.io/crypto_market_intelligence/docs/market_intelligence.json');
+    if (!resp.ok) throw new Error('Data not found');
+    CMI.data = await resp.json();
+    console.log('✅ Data loaded successfully:', CMI.data);
+    renderDashboard();
+  } catch (e) {
+    console.warn('Using fallback data:', e);
+    CMI.data = generateFallbackData();
+    renderDashboard();
+  }
+}
 
     function generateFallbackData() {
       const assets = ['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'ADA', 'DOGE', 'LINK', 'AVAX'];
