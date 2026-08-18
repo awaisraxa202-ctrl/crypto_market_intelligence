@@ -1863,7 +1863,13 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000):
         },
     }
     print(f"  ✅ {narrative['signal']} | Conviction: {narrative['conviction']}/1.0")
-    print(f"  📊 Trade Plan: Entry ${trade_plan.get('entry_price', 0):.2f} | Stop ${trade_plan.get('stop_loss', 0):.2f}")
+    stop_loss = trade_plan.get('stop_loss', 0)
+entry_price = trade_plan.get('entry_price', 0)
+if stop_loss is None:
+    stop_loss = 0
+if entry_price is None:
+    entry_price = 0
+print(f"  📊 Trade Plan: Entry ${entry_price:.2f} | Stop ${stop_loss:.2f}")
     print(f"  📈 Volatility: {vol_forecast.get('current_annual_vol', 0):.1f}% | Forecast: {vol_forecast.get('forecast_5d_vol', 0):.1f}%")
     print(f"  🏷️ Risk Grade: {risk_metrics.get('risk_grade', 'N/A')} | Kelly: {risk_metrics.get('kelly_fraction', 0):.2f}")
     return asset_output, df[['date', 'close']].rename(columns={'close': code})
