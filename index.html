@@ -710,16 +710,22 @@
 
     async function loadData() {
   try {
-    // Use absolute URL to ensure it loads
     const resp = await fetch('https://awaisraxa202-ctrl.github.io/crypto_market_intelligence/docs/market_intelligence.json');
     if (!resp.ok) throw new Error('Data not found');
     CMI.data = await resp.json();
-    console.log('✅ Data loaded successfully:', CMI.data);
+    console.log('✅ Real data loaded successfully!');
     renderDashboard();
   } catch (e) {
-    console.warn('Using fallback data:', e);
-    CMI.data = generateFallbackData();
-    renderDashboard();
+    console.error('❌ Failed to load data:', e);
+    // Show error message on dashboard instead of fallback data
+    document.getElementById('dashboard-app').innerHTML = `
+      <div style="padding:40px;text-align:center;color:var(--text-secondary);">
+        <h2>⚠️ Unable to load market data</h2>
+        <p>Please check your connection or try again later.</p>
+        <p style="font-size:0.8rem;color:var(--text-muted);">Error: ${e.message}</p>
+        <button onclick="location.reload()" style="margin-top:20px;padding:10px 30px;background:var(--accent);color:#000;border:none;border-radius:6px;cursor:pointer;">Retry</button>
+      </div>
+    `;
   }
 }
 
