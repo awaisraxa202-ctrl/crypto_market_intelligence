@@ -1880,7 +1880,13 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000):
         stop_loss = 0
     if entry_price is None:
         entry_price = 0
-    print(f"  📊 Trade Plan: Entry ${entry_price:.2f} | Stop ${stop_loss:.2f}")
+    stop_loss_val = trade_plan.get('stop_loss', 0)
+entry_price_val = trade_plan.get('entry_price', 0)
+if stop_loss_val is None:
+    stop_loss_val = 0
+if entry_price_val is None:
+    entry_price_val = 0
+print(f"  📊 Trade Plan: Entry ${entry_price_val:.2f} | Stop ${stop_loss_val:.2f}")
     
     print(f"  📈 Volatility: {vol_forecast.get('current_annual_vol', 0):.1f}% | Forecast: {vol_forecast.get('forecast_5d_vol', 0):.1f}%")
     print(f"  🏷️ Risk Grade: {risk_metrics.get('risk_grade', 'N/A')} | Kelly: {risk_metrics.get('kelly_fraction', 0):.2f}")
