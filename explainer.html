@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Market Cortex — Complete Explainer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #08080c;
+      --bg-elevated: #0e0e16;
+      --bg-card: rgba(255,255,255,0.025);
+      --border-subtle: rgba(255,255,255,0.05);
+      --text: #eeeff2;
+      --text-secondary: rgba(238,239,242,0.55);
+      --text-muted: rgba(238,239,242,0.25);
+      --accent: #00e5ff;
+      --accent-dim: rgba(0,229,255,0.05);
+      --rose: #ff3864;
+      --lime: #39ff14;
+      --amber: #ffd700;
+      --violet: #7b5cff;
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --radius: 10px;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    html { font-size: 16px; background: var(--bg); color: var(--text); scroll-behavior: smooth; }
+    body { font-family: var(--font-body); font-weight: 300; background: var(--bg); min-height: 100vh; overflow-x: hidden; }
+    ::selection { background: var(--accent-dim); color: var(--accent); }
+
+    .app { max-width: 1100px; margin: 0 auto; padding: 30px 24px 60px; }
+
+    /* Header */
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 0 30px; border-bottom: 1px solid var(--border-subtle);
+      flex-wrap: wrap; gap: 16px;
+    }
+    .header .brand { font-family: var(--font-display); font-weight: 300; font-size: 1.2rem; color: #fff; }
+    .header .brand span { color: var(--accent); font-style: italic; }
+    .header .back { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-secondary); text-decoration: none; border: 1px solid var(--border-subtle); padding: 6px 16px; border-radius: 100px; transition: all 0.3s var(--ease); }
+    .header .back:hover { border-color: var(--accent); color: var(--accent); }
+
+    .hero { padding: 40px 0 20px; }
+    .hero h1 { font-family: var(--font-display); font-weight: 300; font-size: clamp(2.2rem, 4.5vw, 3.5rem); color: #fff; letter-spacing: -0.02em; }
+    .hero h1 .accent { color: var(--accent); font-style: italic; }
+    .hero p { font-size: 1rem; color: var(--text-secondary); max-width: 600px; margin-top: 8px; line-height: 1.6; }
+
+    /* Search */
+    .search-box { margin: 24px 0 32px; }
+    .search-box input {
+      width: 100%; padding: 12px 20px; background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius); color: var(--text); font-family: var(--font-body); font-size: 0.9rem;
+      transition: border-color 0.3s var(--ease); outline: none;
+    }
+    .search-box input:focus { border-color: var(--accent); }
+    .search-box input::placeholder { color: var(--text-muted); }
+
+    /* Sections */
+    .section { margin-bottom: 40px; }
+    .section-title {
+      font-family: var(--font-display); font-weight: 400; font-size: 1.1rem; color: #fff;
+      margin-bottom: 16px; letter-spacing: -0.01em;
+    }
+    .section-title .num { font-family: var(--font-mono); font-size: 0.55rem; color: var(--accent); margin-right: 8px; }
+
+    /* Cards */
+    .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 768px) { .card-grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius); padding: 18px 20px;
+      transition: border-color 0.3s var(--ease);
+    }
+    .card:hover { border-color: rgba(0,229,255,0.15); }
+
+    .card .term {
+      font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent);
+      letter-spacing: 0.04em; margin-bottom: 4px;
+    }
+    .card .definition {
+      font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 8px;
+    }
+    .card .example {
+      font-size: 0.7rem; color: var(--text-muted); background: rgba(255,255,255,0.02);
+      padding: 8px 12px; border-radius: 6px; border-left: 2px solid var(--amber);
+    }
+    .card .example strong { color: var(--amber); font-weight: 400; }
+    .card .status {
+      display: inline-block; font-size: 0.5rem; padding: 2px 8px; border-radius: 100px;
+      font-family: var(--font-mono); letter-spacing: 0.04em; margin-top: 6px;
+    }
+    .card .status.good { background: rgba(57,255,20,0.08); color: var(--lime); border: 1px solid rgba(57,255,20,0.1); }
+    .card .status.warning { background: rgba(255,215,0,0.08); color: var(--amber); border: 1px solid rgba(255,215,0,0.1); }
+    .card .status.danger { background: rgba(255,56,100,0.08); color: var(--rose); border: 1px solid rgba(255,56,100,0.1); }
+    .card .status.info { background: rgba(0,229,255,0.08); color: var(--accent); border: 1px solid rgba(0,229,255,0.1); }
+
+    /* Single card (full width) */
+    .card-full { grid-column: 1 / -1; }
+
+    /* Colors */
+    .text-good { color: var(--lime); }
+    .text-warning { color: var(--amber); }
+    .text-danger { color: var(--rose); }
+    .text-accent { color: var(--accent); }
+
+    /* Footer */
+    .footer {
+      margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border-subtle);
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+      font-family: var(--font-mono); font-size: 0.5rem; color: var(--text-muted);
+    }
+
+    /* Smooth scroll to search results */
+    .highlight { background: rgba(0,229,255,0.06); border-left: 2px solid var(--accent); }
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ─── HEADER ─── -->
+  <div class="header">
+    <div class="brand">Market <span>Cortex</span> <span style="font-size:0.55rem;color:var(--text-muted);margin-left:8px;">Explainer</span></div>
+    <a href="https://awaisraxa202-ctrl.github.io/crypto_market_intelligence/" class="back">← Back to Dashboard</a>
+  </div>
+
+  <!-- ─── HERO ─── -->
+  <div class="hero">
+    <h1>Understanding Your <span class="accent">Market Intelligence</span></h1>
+    <p>Everything explained in plain English. No jargon. Real examples.</p>
+  </div>
+
+  <!-- ─── SEARCH ─── -->
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="🔍 Search for any term... (e.g., VaR, Sortino, Risk of Ruin)" onkeyup="searchGlossary()" />
+  </div>
+
+  <!-- ─── GLOSSARY SECTIONS ─── -->
+
+  <!-- SECTION 1: RISK METRICS -->
+  <div class="section" id="section-risk">
+    <div class="section-title"><span class="num">01</span>Risk Metrics — "How Much Can I Lose?"</div>
+    <div class="card-grid">
+
+      <!-- VaR -->
+      <div class="card" data-term="var value at risk">
+        <div class="term">VaR (Value at Risk)</div>
+        <div class="definition">Think of it like a <strong>"bad day" prediction</strong>. It tells you how much you could lose on a really bad day.</div>
+        <div class="example"><strong>📌 Example:</strong> If VaR is -3.04%, it means: "On 95 out of 100 days, you won't lose more than 3.04% of your money."</div>
+        <div>
+          <span class="status good">✅ GOOD: Under 5% — Acceptable risk</span>
+          <span class="status warning">⚠️ WARNING: 5-15% — Risk is getting high</span>
+          <span class="status danger">❌ DANGER: Over 15% — Your portfolio is too risky</span>
+        </div>
+      </div>
+
+      <!-- Risk of Ruin -->
+      <div class="card" data-term="risk of ruin blow-up probability">
+        <div class="term">Risk of Ruin</div>
+        <div class="definition">This is the probability you will <strong>lose ALL your money</strong>. It's the most important risk metric.</div>
+        <div class="example"><strong>📌 Example:</strong> If Risk of Ruin is 97.8%, it means: "If you keep trading this way, you have a 97.8% chance of blowing up your account."</div>
+        <div>
+          <span class="status good">✅ GOOD: Under 5% — You're safe</span>
+          <span class="status warning">⚠️ WARNING: 5-15% — You're risking too much</span>
+          <span class="status danger">❌ DANGER: Over 15% — STOP TRADING. Reduce position size.</span>
+        </div>
+      </div>
+
+      <!-- Max Drawdown -->
+      <div class="card" data-term="max drawdown dd">
+        <div class="term">Max Drawdown</div>
+        <div class="definition">The <strong>worst loss</strong> your portfolio has ever experienced from a peak to a trough.</div>
+        <div class="example"><strong>📌 Example:</strong> If Max Drawdown is -20.77%, it means: "At the worst point, your portfolio was down 20.77% from its highest value."</div>
+        <div>
+          <span class="status good">✅ GOOD: Under 15% — Normal</span>
+          <span class="status warning">⚠️ WARNING: 15-30% — High but manageable</span>
+          <span class="status danger">❌ DANGER: Over 30% — You need to change your strategy</span>
+        </div>
+      </div>
+
+      <!-- Sortino Ratio -->
+      <div class="card" data-term="sortino ratio">
+        <div class="term">Sortino Ratio</div>
+        <div class="definition">This tells you <strong>how much return you're getting for the downside risk</strong> you're taking. Higher is better.</div>
+        <div class="example"><strong>📌 Example:</strong> Sortino Ratio of 0.68 means: "You're making 0.68% of return for every 1% of downside risk."</div>
+        <div>
+          <span class="status good">✅ GOOD: Over 1.0 — Excellent risk-adjusted returns</span>
+          <span class="status warning">⚠️ WARNING: 0.5-1.0 — Decent but can improve</span>
+          <span class="status danger">❌ DANGER: Under 0.5 — Poor risk management</span>
+        </div>
+      </div>
+
+      <!-- Calmar Ratio -->
+      <div class="card" data-term="calmar ratio">
+        <div class="term">Calmar Ratio</div>
+        <div class="definition">This tells you <strong>how much return you're making compared to your worst loss</strong>. Higher is better.</div>
+        <div class="example"><strong>📌 Example:</strong> Calmar Ratio of 0.36 means: "For every 1% of max loss, you're making 0.36% of return."</div>
+        <div>
+          <span class="status good">✅ GOOD: Over 2.0 — Excellent recovery from losses</span>
+          <span class="status warning">⚠️ WARNING: 1.0-2.0 — Acceptable</span>
+          <span class="status danger">❌ DANGER: Under 1.0 — Struggling to recover from losses</span>
+        </div>
+      </div>
+
+      <!-- Kelly Fraction -->
+      <div class="card" data-term="kelly fraction kelly criterion">
+        <div class="term">Kelly Fraction</div>
+        <div class="definition">This tells you the <strong>optimal percentage of your portfolio</strong> to risk on each trade to maximize long-term growth.</div>
+        <div class="example"><strong>📌 Example:</strong> Kelly Fraction of 0.03 (3%) means: "You should risk 3% of your portfolio on each trade for maximum growth."</div>
+        <div>
+          <span class="status info">💡 TIP: Use HALF the Kelly number to be safe (1.5% instead of 3%).</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECTION 2: SIGNAL METRICS -->
+  <div class="section" id="section-signal">
+    <div class="section-title"><span class="num">02</span>Signal Metrics — "What Do the Signals Mean?"</div>
+    <div class="card-grid">
+
+      <!-- Market Mood -->
+      <div class="card" data-term="market mood bullish bearish">
+        <div class="term">Market Mood</div>
+        <div class="definition">The overall <strong>direction of the market</strong> based on all assets combined.</div>
+        <div class="example">
+          <strong>📌 Example:</strong>
+          <span class="text-good">BULLISH</span> = Market is likely to go UP<br />
+          <span class="text-danger">BEARISH</span> = Market is likely to go DOWN<br />
+          <span class="text-warning">MIXED</span> = No clear direction
+        </div>
+      </div>
+
+      <!-- Fear & Greed -->
+      <div class="card" data-term="fear greed index fng">
+        <div class="term">Fear &amp; Greed Index</div>
+        <div class="definition">Measures <strong>market emotion</strong>. When everyone is scared (Fear), it's often a good time to buy. When everyone is greedy, it's often a good time to sell.</div>
+        <div class="example">
+          <strong>📌 Example:</strong>
+          <span class="text-good">0-25 = Extreme Fear</span> → Contrarian BUY signal<br />
+          <span class="text-warning">25-45 = Fear</span> → Good time to accumulate<br />
+          <span class="text-warning">45-55 = Neutral</span> → No strong signal<br />
+          <span class="text-warning">55-75 = Greed</span> → Be cautious<br />
+          <span class="text-danger">75-100 = Extreme Greed</span> → Contrarian SELL signal
+        </div>
+      </div>
+
+      <!-- Ensemble Signal -->
+      <div class="card" data-term="ensemble signal combined signal">
+        <div class="term">Ensemble Signal</div>
+        <div class="definition">A <strong>combined signal</strong> from ALL assets using weighted voting. It tells you the overall market direction.</div>
+        <div class="example"><strong>📌 Example:</strong> "Ensemble Signal: LONG (Confidence: 78%)" means: 78% of the system's signals are pointing UP.</div>
+      </div>
+
+      <!-- Conviction -->
+      <div class="card" data-term="conviction confidence">
+        <div class="term">Conviction / Confidence</div>
+        <div class="definition">How <strong>sure</strong> the system is about a signal. Higher conviction = more confidence in the trade.</div>
+        <div class="example"><strong>📌 Example:</strong> 72% conviction means: "We're 72% confident this trade will work."</div>
+        <div>
+          <span class="status good">✅ HIGH: Over 70% — Strong signal, take the trade</span>
+          <span class="status warning">⚠️ MEDIUM: 40-70% — Consider taking a smaller position</span>
+          <span class="status danger">❌ LOW: Under 40% — No trade, wait for better opportunity</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECTION 3: TRADE PLAN METRICS -->
+  <div class="section" id="section-trade">
+    <div class="section-title"><span class="num">03</span>Trade Plan — "How Do I Execute This Trade?"</div>
+    <div class="card-grid">
+
+      <!-- Trade Plan -->
+      <div class="card card-full" data-term="trade plan entry stop take profit">
+        <div class="term">Trade Plan Components</div>
+        <div class="definition">Every trade plan has these parts:</div>
+        <div class="example">
+          <strong>📌 Entry:</strong> The price you buy or sell at<br />
+          <strong>📌 Stop Loss:</strong> The price where you exit if the trade goes against you (protects your capital)<br />
+          <strong>📌 Take Profit 1:</strong> The first target where you take 50% profit<br />
+          <strong>📌 Take Profit 2:</strong> The second target where you take the remaining 50% profit<br />
+          <strong>📌 Risk:</strong> How much of your portfolio you're risking on this trade<br />
+          <strong>📌 R:R (Risk/Reward):</strong> How much you stand to gain vs. how much you stand to lose
+        </div>
+      </div>
+
+      <!-- Risk/Reward -->
+      <div class="card" data-term="risk reward rr ratio">
+        <div class="term">Risk/Reward Ratio (R:R)</div>
+        <div class="definition">How much you stand to <strong>gain vs. how much you stand to lose</strong> on a trade.</div>
+        <div class="example"><strong>📌 Example:</strong> R:R of 2.0 means: "For every $1 you risk, you stand to make $2."</div>
+        <div>
+          <span class="status good">✅ GOOD: Over 2.0 — Excellent risk/reward</span>
+          <span class="status warning">⚠️ WARNING: 1.0-2.0 — Acceptable</span>
+          <span class="status danger">❌ DANGER: Under 1.0 — Not worth the risk</span>
+        </div>
+      </div>
+
+      <!-- Position Size -->
+      <div class="card" data-term="position size sizing">
+        <div class="term">Position Size</div>
+        <div class="definition">How much of your portfolio you allocate to a single trade. The system adjusts this based on your confidence in the trade.</div>
+        <div class="example"><strong>📌 Example:</strong> If Position Size is 1.2%, it means: "You're risking 1.2% of your portfolio on this trade."</div>
+        <div>
+          <span class="status good">✅ GOOD: 1-2% per trade — Standard</span>
+          <span class="status warning">⚠️ WARNING: 3-5% per trade — High risk</span>
+          <span class="status danger">❌ DANGER: Over 5% per trade — You're gambling, not trading</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECTION 4: PERFORMANCE METRICS -->
+  <div class="section" id="section-performance">
+    <div class="section-title"><span class="num">04</span>Performance Metrics — "Is the System Working?"</div>
+    <div class="card-grid">
+
+      <!-- Profit Factor -->
+      <div class="card" data-term="profit factor">
+        <div class="term">Profit Factor</div>
+        <div class="definition">This tells you if you're <strong>making more money than you're losing</strong>.</div>
+        <div class="example"><strong>📌 Example:</strong> Profit Factor of 1.85 means: "For every $1 you lose, you make $1.85."</div>
+        <div>
+          <span class="status good">✅ GOOD: Over 1.5 — Profitable</span>
+          <span class="status warning">⚠️ WARNING: 1.0-1.5 — Barely profitable</span>
+          <span class="status danger">❌ DANGER: Under 1.0 — You're losing money</span>
+        </div>
+      </div>
+
+      <!-- Recovery Factor -->
+      <div class="card" data-term="recovery factor">
+        <div class="term">Recovery Factor</div>
+        <div class="definition">How quickly you <strong>recover from losses</strong>. Higher is better.</div>
+        <div class="example"><strong>📌 Example:</strong> Recovery Factor of 3.2 means: "You recover 3.2x faster from losses than the market average."</div>
+        <div>
+          <span class="status good">✅ GOOD: Over 2.0 — Excellent recovery</span>
+          <span class="status warning">⚠️ WARNING: 1.0-2.0 — Acceptable</span>
+          <span class="status danger">❌ DANGER: Under 1.0 — Struggling to recover</span>
+        </div>
+      </div>
+
+      <!-- Win Rate -->
+      <div class="card" data-term="win rate">
+        <div class="term">Win Rate</div>
+        <div class="definition">The percentage of trades that <strong>win</strong>. But remember: <span class="text-warning">win rate alone doesn't matter — risk/reward matters too!</span></div>
+        <div class="example"><strong>📌 Example:</strong> A 40% win rate with 2:1 R:R is PROFITABLE. A 80% win rate with 0.5:1 R:R loses money.</div>
+        <div>
+          <span class="status info">💡 TRADER'S SECRET: A 40% win rate with 2:1 R:R = PROFITABLE (+20% net). Don't chase high win rate — chase good risk/reward.</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECTION 5: ORDER BOOK & ON-CHAIN -->
+  <div class="section" id="section-advanced">
+    <div class="section-title"><span class="num">05</span>Advanced Data — "What's Really Happening?"</div>
+    <div class="card-grid">
+
+      <!-- Order Book -->
+      <div class="card" data-term="order book depth bid ask">
+        <div class="term">Order Book (Depth)</div>
+        <div class="definition">A real-time list of <strong>buy and sell orders</strong> waiting in the market. It shows you where price is likely to move next.</div>
+        <div class="example">
+          <strong>📌 Example:</strong>
+          <span class="text-good">More buy orders (Bids) = Bullish</span><br />
+          <span class="text-danger">More sell orders (Asks) = Bearish</span><br />
+          <span class="text-warning">Balanced = No clear direction</span>
+        </div>
+      </div>
+
+      <!-- On-Chain -->
+      <div class="card" data-term="on-chain mvrv nvt miner reserves">
+        <div class="term">On-Chain Metrics</div>
+        <div class="definition">Data from the <strong>Bitcoin blockchain itself</strong> — not exchanges. This tells you what whales and miners are actually doing.</div>
+        <div class="example">
+          <strong>📌 MVRV Z-Score:</strong> Tells you if BTC is overvalued or undervalued<br />
+          <strong>📌 NVT Ratio:</strong> High = overvalued, Low = undervalued<br />
+          <strong>📌 Miner Reserves:</strong> Rising = bullish, Falling = miners selling
+        </div>
+      </div>
+
+      <!-- ETF Flows -->
+      <div class="card" data-term="etf flow institutional">
+        <div class="term">ETF Flow Data</div>
+        <div class="definition">Shows how much <strong>institutional money</strong> is flowing into Bitcoin ETFs. Since 2024, this is the primary driver of BTC price.</div>
+        <div class="example">
+          <strong>📌 Example:</strong>
+          <span class="text-good">Strong inflows = Bullish</span><br />
+          <span class="text-danger">Sustained outflows = Bearish</span>
+        </div>
+      </div>
+
+      <!-- Trade Policy Uncertainty -->
+      <div class="card" data-term="tpu trade policy uncertainty">
+        <div class="term">Trade Policy Uncertainty (TPU)</div>
+        <div class="definition">Measures how <strong>uncertain the market is about trade policies</strong> (tariffs, trade wars).</div>
+        <div class="example">
+          <strong>📌 Example:</strong>
+          <span class="text-good">LOW TPU</span> = Fundamentals drive the market (mining costs, supply/demand)<br />
+          <span class="text-warning">HIGH TPU</span> = Sentiment drives the market (fear/greed, news)
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECTION 6: EVENT & NARRATIVE -->
+  <div class="section" id="section-events">
+    <div class="section-title"><span class="num">06</span>Events & Narrative — "What's Coming Up?"</div>
+    <div class="card-grid">
+
+      <!-- Economic Calendar -->
+      <div class="card card-full" data-term="economic calendar fomc cpi jobs">
+        <div class="term">Economic Calendar</div>
+        <div class="definition">A list of <strong>upcoming events</strong> that can move the markets. These are the most important dates to watch.</div>
+        <div class="example">
+          <strong>📌 Key Events:</strong><br />
+          🔴 <strong>FOMC Meetings</strong> — Fed decides interest rates (biggest impact)<br />
+          🟡 <strong>CPI Report</strong> — Inflation data<br />
+          🟡 <strong>Jobs Report</strong> — Employment data<br />
+          🟢 <strong>Powell Speeches</strong> — Fed chair comments<br />
+          <span style="color:var(--amber);margin-top:6px;display:block;">💡 TRADER'S TIP: Reduce position size by 50% before major events. Always wait for the news to hit before trading.</span>
+        </div>
+      </div>
+
+      <!-- Risk Scenario -->
+      <div class="card card-full" data-term="risk scenario planning">
+        <div class="term">Risk Scenario Planning</div>
+        <div class="definition">The system plans for <strong>different possible outcomes</strong> so you're never caught off guard.</div>
+        <div class="example">
+          <strong>📌 Example:</strong><br />
+          <span class="text-good">📈 SCENARIO 1: FOMC Dovish</span> → BTC rallies 3-5%. Action: Take profit.<br />
+          <span class="text-danger">📉 SCENARIO 2: FOMC Hawkish</span> → BTC drops 3-5%. Action: Buy the dip.<br />
+          <span class="text-warning">📊 SCENARIO 3: Neutral</span> → BTC consolidates. Action: Hold positions.
+        </div>
+      </div>
+
+      <!-- Market Narrative -->
+      <div class="card card-full" data-term="market narrative daily briefing">
+        <div class="term">Market Narrative (Daily Briefing)</div>
+        <div class="definition">A <strong>plain English summary</strong> of what's happening in the markets, written like a 15-year veteran trader is speaking to you.</div>
+        <div class="example">
+          <strong>📌 What It Covers:</strong><br />
+          • Macro environment (DXY, Gold, S&P 500)<br />
+          • Technical levels (Support/Resistance)<br />
+          • Sentiment (Fear & Greed)<br />
+          • Upcoming events (FOMC, CPI, Jobs)<br />
+          • Trader's take ("Here's what I would do...")
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECTION 7: TRADE EXPLANATION -->
+  <div class="section" id="section-explanation">
+    <div class="section-title"><span class="num">07</span>Trade Explanations — "Why This Trade?"</div>
+    <div class="card-grid">
+
+      <!-- Trade Explanation -->
+      <div class="card card-full" data-term="trade explanation why this trade">
+        <div class="term">Trade Explanation</div>
+        <div class="definition">Every trade comes with a <strong>complete explanation</strong> of why it was taken. No black box — full transparency.</div>
+        <div class="example">
+          <strong>📌 Example:</strong><br />
+          ✅ <strong>Why We're Taking This Trade:</strong><br />
+          • Trend: Above SMA50 & SMA200 (Golden Cross)<br />
+          • Momentum: RSI 58 + MACD bullish crossover<br />
+          • Volume: 2.1x avg (strong buying)<br />
+          • Sentiment: Fear & Greed 46 (Fear → Contrarian buy)<br />
+          • Order Book: 65% buy orders vs 35% sell orders<br />
+          • On-Chain: Exchange outflow ($120M) — accumulation<br />
+          <br />
+          <strong>Why It Can Hit Target:</strong> Similar setups won 72% of the time.<br />
+          <strong>Risk Factors:</strong> FOMC tomorrow — reduced size by 40%.
+        </div>
+      </div>
+
+      <!-- Post-Mortem -->
+      <div class="card card-full" data-term="post-mortem failed trade analysis">
+        <div class="term">Post-Mortem Analysis (Failed Trades)</div>
+        <div class="definition">When a trade <strong>fails</strong>, the system explains WHY it failed and what to learn from it.</div>
+        <div class="example">
+          <strong>📌 Example:</strong><br />
+          ❌ <strong>Trade Failed: AVAX Short</strong><br />
+          <strong>Why It Failed:</strong> FOMC came out unexpectedly hawkish, AVAX rallied with the broader market.<br />
+          <strong>Lesson:</strong> Use wider stop-loss (5% vs 3%) during event weeks.<br />
+          <strong>Improvement:</strong> Stop-loss multiplier increased from 2x to 2.5x ATR.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── FOOTER ─── -->
+  <div class="footer">
+    <span>© 2026 Market Cortex — Complete Explainer</span>
+    <span>Research &amp; Education · NOT Financial Advice</span>
+    <span><a href="https://awaisraxa202-ctrl.github.io/crypto_market_intelligence/" style="color:var(--text-muted);text-decoration:none;">← Back to Dashboard</a></span>
+  </div>
+
+</div>
+
+<script>
+  // ─── SEARCH FUNCTIONALITY ───
+  function searchGlossary() {
+    const input = document.getElementById('searchInput');
+    const query = input.value.toLowerCase().trim();
+    const cards = document.querySelectorAll('.card');
+
+    cards.forEach(card => {
+      const term = card.getAttribute('data-term') || '';
+      const text = card.textContent.toLowerCase();
+      const matches = query === '' || term.includes(query) || text.includes(query);
+
+      if (matches) {
+        card.style.display = 'block';
+        if (query !== '') {
+          card.style.borderColor = 'var(--accent)';
+        } else {
+          card.style.borderColor = '';
+        }
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // Show/hide sections based on visible cards
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(section => {
+      const visibleCards = section.querySelectorAll('.card[style*="display: block"], .card:not([style*="display: none"])');
+      const hasVisible = Array.from(visibleCards).some(c => c.style.display !== 'none');
+      section.style.display = hasVisible || query === '' ? 'block' : 'none';
+    });
+  }
+
+  // ─── SMOOTH SCROLL FOR SEARCH RESULTS ───
+  document.getElementById('searchInput').addEventListener('focus', function() {
+    this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+
+  // ─── KEYBOARD SHORTCUT: CTRL+K TO FOCUS SEARCH ───
+  document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      document.getElementById('searchInput').focus();
+    }
+  });
+
+  // ─── URL PARAMETER SEARCH ───
+  window.addEventListener('load', function() {
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get('q');
+    if (query) {
+      document.getElementById('searchInput').value = query;
+      searchGlossary();
+    }
+  });
+</script>
+
+</body>
+</html>
