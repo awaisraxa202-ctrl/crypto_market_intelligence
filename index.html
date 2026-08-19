@@ -129,12 +129,12 @@
 
     .app {
       position: relative; z-index: 10;
-      max-width: 1280px; margin: 0 auto; padding: 68px 24px 40px;
+      max-width: 1280px; margin: 0 auto; padding: 10px 24px 40px;
       opacity: 0; transition: opacity 0.8s var(--ease);
     }
     .app.visible { opacity: 1; }
 
-    .intro { padding: 32px 0 16px; display: flex; flex-direction: column; gap: 8px; }
+    .intro { padding: 10px 0 16px; display: flex; flex-direction: column; gap: 8px; }
     .intro-eyebrow { font-family: var(--font-mono); font-weight: 300; font-size: 0.5rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); opacity: 0; animation: fadeUp 0.6s 2.2s var(--ease) forwards; }
     .intro-title { font-family: var(--font-display); font-weight: 300; font-size: clamp(2.4rem, 6vw, 4.6rem); line-height: 1; letter-spacing: -0.03em; color: #fff; opacity: 0; animation: fadeUp 0.8s 2.4s var(--ease) forwards; }
     .intro-title .accent { color: var(--accent); font-weight: 300; font-style: italic; }
@@ -294,6 +294,21 @@
     .liq-item .bars .short { background: var(--lime); }
     .liq-item .meta { display: flex; justify-content: space-between; font-size: 0.35rem; color: var(--text-muted); }
 
+    .education-grid {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;
+    }
+    @media (max-width: 820px) { .education-grid { grid-template-columns: 1fr; } }
+
+    .edu-card {
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius); padding: 18px 20px;
+      transition: border-color 0.3s var(--ease);
+    }
+    .edu-card:hover { border-color: var(--border-active); }
+    .edu-card .edu-icon { font-size: 1.2rem; margin-bottom: 6px; }
+    .edu-card .edu-title { font-family: var(--font-display); font-weight: 400; font-size: 0.7rem; color: var(--accent); margin-bottom: 4px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .edu-card .edu-text { font-size: 0.7rem; color: var(--text-secondary); line-height: 1.6; }
+
     .reveal { opacity: 0; transform: translateY(20px); transition: all 0.7s var(--ease); }
     .reveal.visible { opacity: 1; transform: translateY(0); }
     .stagger-1 { transition-delay: 0.04s; }
@@ -314,6 +329,7 @@
       .app { padding: 52px 14px 24px; }
       .hud-nav { display: none; }
       .card-grid-2, .card-grid-3, .card-grid-4 { grid-template-columns: 1fr; }
+      .education-grid { grid-template-columns: 1fr; }
       .disclaimer-banner { font-size: 0.55rem; padding: 6px 10px; }
     }
     @media (max-width: 480px) {
@@ -353,18 +369,19 @@
         <div class="badge">Research &amp; Education</div>
       </div>
       <div class="overlay-title">Before You <span class="accent">Enter</span></div>
-      <div class="overlay-sub">This is a research-grade market intelligence terminal with advanced risk management, multi-timeframe analysis, ensemble signals, and real-time alerts.</div>
+      <div class="overlay-sub">This is a research-grade market intelligence terminal with advanced risk management, multi-timeframe analysis, ensemble signals, and self-improving logic. Please take a moment to understand what it is — and what it is not.</div>
       <div class="overlay-grid">
         <div class="overlay-col">
           <div class="col-label">✓ What This System <span style="color:var(--lime);">Is</span></div>
           <ul>
             <li><span class="icon icon-check">✓</span> Research-grade market intelligence terminal</li>
-            <li><span class="icon icon-check">✓</span> Real data from 11+ sources</li>
-            <li><span class="icon icon-check">✓</span> 30+ technical indicators</li>
+            <li><span class="icon icon-check">✓</span> Real data from 11+ sources (Binance, Yahoo, CoinGecko)</li>
+            <li><span class="icon icon-check">✓</span> 30+ technical indicators from scratch</li>
             <li><span class="icon icon-check">✓</span> Dynamic position sizing (volatility-adjusted)</li>
             <li><span class="icon icon-check">✓</span> Drawdown protection (10% DD → 50% size)</li>
             <li><span class="icon icon-check">✓</span> Ensemble signal combining</li>
-            <li><span class="icon icon-check">✓</span> Risk of Ruin &amp; Recovery Factor</li>
+            <li><span class="icon icon-check">✓</span> Signal tracking database with performance metrics</li>
+            <li><span class="icon icon-check">✓</span> Self-improving logic based on historical performance</li>
             <li><span class="icon icon-check">✓</span> Real-time alerts (Discord/Telegram)</li>
             <li><span class="icon icon-check">✓</span> Automated hourly updates · $0 cost</li>
           </ul>
@@ -372,21 +389,21 @@
         <div class="overlay-col">
           <div class="col-label">✗ What This System <span style="color:var(--rose);">Is NOT</span></div>
           <ul>
-            <li><span class="icon icon-cross">✗</span> NOT a financial advisor</li>
-            <li><span class="icon icon-cross">✗</span> NOT a trading bot</li>
-            <li><span class="icon icon-cross">✗</span> NOT a crystal ball</li>
+            <li><span class="icon icon-cross">✗</span> NOT a financial advisor or investment professional</li>
+            <li><span class="icon icon-cross">✗</span> NOT a trading bot — it does NOT execute trades</li>
+            <li><span class="icon icon-cross">✗</span> NOT a crystal ball — past patterns do NOT guarantee future results</li>
             <li><span class="icon icon-cross">✗</span> NOT a get-rich-quick scheme</li>
-            <li><span class="icon icon-cross">✗</span> NOT professional investment advice</li>
+            <li><span class="icon icon-cross">✗</span> NOT a replacement for professional investment advice</li>
           </ul>
         </div>
       </div>
       <div class="overlay-warning">
-        <strong>⚠️ IMPORTANT:</strong> Paper trade first for 3+ months. Never risk more than 1–2% of capital on any single trade idea.
+        <strong>⚠️ IMPORTANT:</strong> Paper trade first for 3+ months. Never risk more than 1–2% of capital on any single trade idea. Past performance does NOT predict future results.
       </div>
       <div class="overlay-actions">
         <label>
           <input type="checkbox" id="understand-check" />
-          I understand this is a research &amp; educational tool only.
+          I understand this is a research &amp; educational tool only. I will not use it as financial advice.
         </label>
         <button class="btn-enter" id="enter-btn" disabled>Enter Dashboard →</button>
       </div>
@@ -400,6 +417,7 @@
       <a href="#assets">Assets</a>
       <a href="#portfolio">Portfolio</a>
       <a href="#analytics">Analytics</a>
+      <a href="#performance">Performance</a>
     </div>
     <div class="hud-meta">
       <span id="hud-time">--:-- UTC</span>
@@ -414,12 +432,12 @@
     <section class="intro">
       <div class="intro-eyebrow">Quantitative Market Intelligence · v5.0 Ultimate</div>
       <h1 class="intro-title">Market <span class="accent">Cortex</span> <span class="version">v5.0</span></h1>
-      <p class="intro-sub">Real-time analysis across 9 crypto assets with dynamic position sizing, drawdown protection, ensemble signals, risk of ruin analysis, and actionable trade plans.</p>
+      <p class="intro-sub">Real-time analysis across 9 crypto assets with dynamic position sizing, drawdown protection, ensemble signals, risk of ruin analysis, self-improving logic, and actionable trade plans.</p>
     </section>
 
     <div class="disclaimer-banner">
       <span style="font-size:1rem;">⚠️</span>
-      <span><strong>RESEARCH &amp; EDUCATIONAL TOOL ONLY</strong> — NOT financial advice. <a href="#" onclick="alert('Full Disclaimer: Research & Educational Tool Only. NOT Financial Advice.'); return false;">Read full →</a></span>
+      <span><strong>RESEARCH &amp; EDUCATIONAL TOOL ONLY</strong> — NOT financial advice. <a href="#" onclick="alert('Full Disclaimer: This is a research and educational tool only. NOT financial advice. Past performance does NOT predict future results. You can lose money. The creators are NOT responsible for any trading losses. Paper trade first for 3+ months. Never risk more than 1–2% of capital on any single trade idea.'); return false;">Read full →</a></span>
     </div>
 
     <!-- ─── MARKET PULSE ─── -->
@@ -484,9 +502,41 @@
       <div style="height:120px;margin-top:12px;"><canvas id="portfolio-chart"></canvas></div>
     </div>
 
+    <!-- ─── SIGNAL PERFORMANCE ─── -->
+    <div class="section-header" id="performance">
+      <h2><span class="num">05</span>Signal Performance</h2>
+      <span class="desc">Historical signal tracking · Win Rate · Profit</span>
+    </div>
+    <div class="card-grid card-grid-4">
+      <div class="card reveal stagger-1">
+        <div class="card-glow"></div>
+        <div class="card-label">Total Signals</div>
+        <div class="card-value" id="signal-total">—</div>
+        <div class="card-detail">All signals ever generated</div>
+      </div>
+      <div class="card reveal stagger-2">
+        <div class="card-glow"></div>
+        <div class="card-label">Win Rate</div>
+        <div class="card-value" id="signal-winrate">—</div>
+        <div class="card-detail" id="signal-winrate-detail">Closed signals</div>
+      </div>
+      <div class="card reveal stagger-3">
+        <div class="card-glow"></div>
+        <div class="card-label">Total Profit</div>
+        <div class="card-value" id="signal-profit">—</div>
+        <div class="card-detail" id="signal-profit-detail">Net profit %</div>
+      </div>
+      <div class="card reveal stagger-4">
+        <div class="card-glow"></div>
+        <div class="card-label">Active Signals</div>
+        <div class="card-value" id="signal-active">—</div>
+        <div class="card-detail">Currently open trades</div>
+      </div>
+    </div>
+
     <!-- ─── ANALYTICS ─── -->
     <div class="section-header" id="analytics">
-      <h2><span class="num">05</span>Cross-Asset Analytics</h2>
+      <h2><span class="num">06</span>Cross-Asset Analytics</h2>
       <span class="desc">Correlation · Funding · Liquidations</span>
     </div>
     <div class="card-grid card-grid-2">
@@ -498,9 +548,35 @@
       <div class="card reveal"><div class="card-glow"></div><div class="card-label">Regime Distribution</div><div class="chart-wrap"><canvas id="regime-chart"></canvas></div></div>
     </div>
 
+    <!-- ─── EDUCATION SECTION ─── -->
+    <div class="section-header">
+      <h2><span class="num">07</span>Understanding the System</h2>
+      <span class="desc">How to interpret the signals</span>
+    </div>
+    <div class="card reveal" style="padding:24px;">
+      <div class="card-glow"></div>
+      <div class="education-grid">
+        <div class="edu-card">
+          <div class="edu-icon">📊</div>
+          <div class="edu-title">Win Rate</div>
+          <div class="edu-text">Win rate is NOT the only metric. A 40% win rate with 2:1 risk/reward is PROFITABLE. The system tracks both win rate AND average win/loss size.</div>
+        </div>
+        <div class="edu-card">
+          <div class="edu-icon">🔄</div>
+          <div class="edu-title">Self-Improving</div>
+          <div class="edu-text">The system learns from historical performance. It adjusts position sizes, signal thresholds, and strategy selection based on what has worked in the past.</div>
+        </div>
+        <div class="edu-card">
+          <div class="edu-icon">⚠️</div>
+          <div class="edu-title">Risk Management</div>
+          <div class="edu-text">Never risk more than 1-2% of capital per trade. Paper trade first for 3+ months. Past performance ≠ future results.</div>
+        </div>
+      </div>
+    </div>
+
     <footer>
       <span>© 2026 Market Cortex v5.0 — Crypto Intelligence Terminal</span>
-      <span>Ensemble Signals · Risk of Ruin · Recovery Factor</span>
+      <span>Ensemble Signals · Risk of Ruin · Self-Improving Logic</span>
       <span>Research &amp; Education · NOT Financial Advice</span>
     </footer>
   </div>
@@ -556,6 +632,7 @@
       'Running multi-timeframe analysis...',
       'Calculating ensemble signals...',
       'Computing risk metrics...',
+      'Loading signal database...',
       'Generating trade plans...',
       'SYSTEM READY'
     ];
@@ -709,138 +786,24 @@
     }
 
     async function loadData() {
-  try {
-    const resp = await fetch('https://awaisraxa202-ctrl.github.io/crypto_market_intelligence/docs/market_intelligence.json');
-    if (!resp.ok) throw new Error('Data not found');
-    CMI.data = await resp.json();
-    console.log('✅ Real data loaded successfully!');
-    renderDashboard();
-  } catch (e) {
-    console.error('❌ Failed to load data:', e);
-    // Show error message on dashboard instead of fallback data
-    document.getElementById('dashboard-app').innerHTML = `
-      <div style="padding:40px;text-align:center;color:var(--text-secondary);">
-        <h2>⚠️ Unable to load market data</h2>
-        <p>Please check your connection or try again later.</p>
-        <p style="font-size:0.8rem;color:var(--text-muted);">Error: ${e.message}</p>
-        <button onclick="location.reload()" style="margin-top:20px;padding:10px 30px;background:var(--accent);color:#000;border:none;border-radius:6px;cursor:pointer;">Retry</button>
-      </div>
-    `;
-  }
-}
-
-    function generateFallbackData() {
-      const assets = ['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'ADA', 'DOGE', 'LINK', 'AVAX'];
-      const signals = ['LONG', 'NO TRADE', 'SHORT', 'STRONG LONG', 'NO TRADE', 'LONG', 'SHORT', 'NO TRADE', 'LONG'];
-      const regimes = ['BULL_TREND', 'CHOPPY', 'BULL_VOLATILE', 'CHOPPY', 'BEAR_TREND', 'CHOPPY', 'BEAR_VOLATILE', 'CHOPPY', 'BULL_TREND'];
-      const assetData = {};
-      assets.forEach((a, i) => {
-        assetData[a] = {
-          asset: a, name: a,
-          price: 100 + Math.random() * 900,
-          signal: signals[i % signals.length],
-          conviction: 0.3 + Math.random() * 0.6,
-          regime: regimes[i % regimes.length],
-          indicators: {
-            rsi: 30 + Math.random() * 40,
-            macd_hist: (Math.random() - 0.5) * 0.02,
-            volatility: 40 + Math.random() * 60,
-            drawdown: (Math.random() - 0.8) * 0.5,
-            fng_value: 20 + Math.random() * 60,
-            funding_rate: (Math.random() - 0.5) * 0.002,
-          },
-          sub_signals: {
-            trend: { verdict: 'BULLISH', detail: 'Price above SMA50' },
-            momentum: { verdict: 'NEUTRAL', detail: 'Momentum flat' },
-            volatility: { verdict: 'MODERATE', detail: 'Volatility normal' },
-            sentiment: { verdict: 'NEUTRAL', detail: 'F&G neutral' },
-          },
-          position_sizing: {
-            size_multiplier: 0.85,
-            position_size: 0.42,
-            risk_amount: 125.40,
-            risk_percent: 1.25,
-            stop_loss: 97.00,
-            take_profit_1: 104.00,
-            take_profit_2: 108.00,
-          },
-          trade_plan: {
-            entry_price: 100,
-            entry_type: 'BUY_LIMIT',
-            stop_loss: 97,
-            take_profit_1: 104,
-            take_profit_2: 108,
-            position_size: 0.42,
-            risk_amount: 125.40,
-            risk_percent: 1.25,
-            risk_reward_ratio: 1.33,
-          },
-          multi_timeframe: { signals: { '1h': 'BULLISH', '4h': 'BULLISH', '1d': 'BULLISH' }, alignment: 'STRONG', strength: 1.2 },
-          volatility_forecast: { current_annual_vol: 45.2, forecast_5d_vol: 2.8, forecast_20d_vol: 5.6, regime: 'NORMAL' },
-          price_targets: {
-            target_1: { price: 104.00, probability: 0.72 },
-            target_2: { price: 108.00, probability: 0.55 },
-            target_3: { price: 112.00, probability: 0.30 },
-          },
-          regime_strategy: {
-            regime: 'BULL_TREND',
-            recommended_strategy: 'SMA50 Trend',
-            size_multiplier: 1.0,
-          },
-          regime_change: { change: false },
-          risk_metrics: {
-            var_95: -2.4,
-            max_drawdown: -8.5,
-            sortino_ratio: 1.45,
-            risk_grade: 'B',
-            kelly_fraction: 0.12,
-            risk_of_ruin: 4.2,
-          },
-          walk_forward: {
-            validated: true,
-            robustness: 'GOOD',
-            best_in_sample: 'sma50_pos',
-            best_out_sample: 'sma50_pos',
-          },
-          signal_history: { win_rate: 58.5, total_signals: 142, avg_conviction: 0.62 },
-          onchain: {
-            exchange_flow: { signal: 'BULLISH' },
-            network_activity: { signal: 'HEALTHY' },
-          }
-        };
-      });
-      return {
-        version: '5.0',
-        fear_greed: { value: 52, label: 'Neutral' },
-        global_data: { total_market_cap: 2.4e12, total_volume: 8.7e10, btc_dominance: 42.5, eth_dominance: 18.2 },
-        market_report: {
-          market_mood: 'CAUTIOUSLY BULLISH',
-          bullish_assets: 4,
-          bearish_assets: 2,
-          neutral_assets: 3,
-          regime_distribution: { 'BULL_TREND': 3, 'CHOPPY': 3, 'BEAR_TREND': 2, 'BULL_VOLATILE': 1 },
-          risk_metrics: { risk_grade: 'B', var_95: -2.8, max_drawdown: -12.4, sortino_ratio: 1.2 }
-        },
-        ensemble_signal: { signal: 'LONG', confidence: 0.78, consensus: 0.67 },
-        profit_factor: 1.85,
-        recovery_factor: 3.2,
-        correlation_breakdown: { breakdown: false, diff: 0.12 },
-        portfolio_simulation: {
-          final_value: 12450.00,
-          total_return: 24.5,
-          max_return: 28.2,
-          min_return: -3.1,
-          days_simulated: 30,
-          positions: { 'BTC': 0.05, 'ETH': 0.08 },
-          cash: 3200.00
-        },
-        cross_asset: {
-          correlation_matrix: { 'BTC': { 'BTC': 1.0, 'ETH': 0.82, 'SOL': 0.71 }, 'ETH': { 'BTC': 0.82, 'ETH': 1.0, 'SOL': 0.78 }, 'SOL': { 'BTC': 0.71, 'ETH': 0.78, 'SOL': 1.0 } },
-          funding_heatmap: { 'BTC': 0.00012, 'ETH': 0.00008, 'SOL': 0.00021, 'BNB': 0.00005, 'XRP': -0.00003, 'ADA': 0.00002, 'DOGE': 0.00015, 'LINK': 0.00007, 'AVAX': 0.00018 },
-          liquidations: { 'BTC': { long_liquidations_usd: 42e6, short_liquidations_usd: 28e6, dominant_side: 'LONGS' }, 'ETH': { long_liquidations_usd: 38e6, short_liquidations_usd: 34e6, dominant_side: 'BALANCED' }, 'SOL': { long_liquidations_usd: 12e6, short_liquidations_usd: 18e6, dominant_side: 'SHORTS' } },
-        },
-        assets: assetData
-      };
+      try {
+        const resp = await fetch('https://awaisraxa202-ctrl.github.io/crypto_market_intelligence/docs/market_intelligence.json');
+        if (!resp.ok) throw new Error('Data not found');
+        CMI.data = await resp.json();
+        console.log('✅ Real data loaded successfully!');
+        renderDashboard();
+      } catch (e) {
+        console.error('❌ Failed to load data:', e);
+        document.getElementById('dashboard-app').innerHTML = `
+          <div style="padding:60px 20px;text-align:center;max-width:500px;margin:0 auto;">
+            <div style="font-size:3rem;margin-bottom:16px;">⚠️</div>
+            <h2 style="color:#fff;font-weight:300;margin-bottom:12px;">Unable to Load Data</h2>
+            <p style="color:var(--text-secondary);line-height:1.6;">The market data could not be loaded. Please check your connection or try again later.</p>
+            <p style="font-size:0.7rem;color:var(--text-muted);margin-top:12px;">Error: ${e.message}</p>
+            <button onclick="location.reload()" style="margin-top:24px;padding:10px 32px;background:var(--accent);color:#000;border:none;border-radius:6px;cursor:pointer;font-family:var(--font-mono);font-size:0.8rem;">Retry</button>
+          </div>
+        `;
+      }
     }
 
     // ──────────────────────────────────────────────────────────────
@@ -865,31 +828,31 @@
       $('risk-grade').style.color = getRiskGradeColor(riskGrade);
       $('risk-detail').textContent = 'VaR: ' + (riskMetrics.var_95 || '—') + '% · Max DD: ' + (riskMetrics.max_drawdown || '—') + '%';
 
-      // ─── v5.0 NEW: Ensemble Signal ───
+      // Ensemble Signal
       const ensemble = d.ensemble_signal || {};
       $('ensemble-signal').textContent = ensemble.signal || '—';
       $('ensemble-signal').style.color = ensemble.signal === 'STRONG LONG' || ensemble.signal === 'LONG' ? 'var(--lime)' :
                                         ensemble.signal === 'STRONG SHORT' || ensemble.signal === 'SHORT' ? 'var(--rose)' : 'var(--text)';
       $('ensemble-detail').textContent = 'Confidence: ' + (ensemble.confidence ? (ensemble.confidence * 100).toFixed(0) + '%' : '—');
 
-      // ─── v5.0 NEW: Profit Factor ───
+      // Profit Factor
       const pf = d.profit_factor || 0;
       $('profit-factor').textContent = pf || '—';
       $('profit-factor').style.color = pf > 1.5 ? 'var(--lime)' : pf > 1 ? 'var(--amber)' : 'var(--rose)';
 
-      // ─── v5.0 NEW: Recovery Factor ───
+      // Recovery Factor
       const rf = d.recovery_factor || 0;
       $('recovery-factor').textContent = rf || '—';
       $('recovery-factor').style.color = rf > 2 ? 'var(--lime)' : rf > 1 ? 'var(--amber)' : 'var(--rose)';
 
-      // ─── v5.0 NEW: Risk of Ruin ───
+      // Risk of Ruin
       const globalRisk = d.risk_metrics || {};
       const ruin = globalRisk.risk_of_ruin || 0;
       $('risk-ruin').textContent = ruin ? ruin.toFixed(1) + '%' : '—';
       $('risk-ruin').style.color = ruin > 20 ? 'var(--rose)' : ruin > 5 ? 'var(--amber)' : 'var(--lime)';
       $('ruin-detail').textContent = ruin > 20 ? '⚠️ High blow-up risk' : ruin > 5 ? 'Moderate risk' : '✅ Low risk';
 
-      // ─── v5.0 NEW: Correlation Status ───
+      // Correlation
       const corrBreak = d.correlation_breakdown || {};
       const isBreakdown = corrBreak.breakdown || false;
       $('correlation-status').textContent = isBreakdown ? '⚠️ BREAKDOWN' : '✅ STABLE';
@@ -916,6 +879,17 @@
 
       // Render portfolio chart
       renderPortfolioChart(ps.history || []);
+
+      // ─── SIGNAL PERFORMANCE ───
+      const sp = d.signal_performance || {};
+      $('signal-total').textContent = sp.total_signals || 0;
+      $('signal-winrate').textContent = sp.win_rate ? sp.win_rate.toFixed(1) + '%' : '—';
+      $('signal-winrate').style.color = sp.win_rate > 55 ? 'var(--lime)' : sp.win_rate > 40 ? 'var(--amber)' : 'var(--rose)';
+      $('signal-winrate-detail').textContent = sp.win_count + ' wins · ' + sp.loss_count + ' losses';
+      $('signal-profit').textContent = sp.total_profit_pct ? sp.total_profit_pct.toFixed(1) + '%' : '—';
+      $('signal-profit').style.color = sp.total_profit_pct > 0 ? 'var(--lime)' : sp.total_profit_pct < 0 ? 'var(--rose)' : 'var(--text)';
+      $('signal-profit-detail').textContent = 'Avg win: ' + (sp.avg_profit_pct || 0).toFixed(1) + '% · Avg loss: ' + (sp.avg_loss_pct || 0).toFixed(1) + '%';
+      $('signal-active').textContent = sp.active_signals || 0;
 
       // Asset nodes
       renderAssetNodes(d.assets || {});
