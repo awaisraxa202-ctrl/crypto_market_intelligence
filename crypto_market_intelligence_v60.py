@@ -3146,19 +3146,17 @@ def run_v6_pipeline():
     print(f"  Small Trade: ${small_trade['position_size']:.4f} (Risk: {small_trade['risk_pct']:.1f}%)")
     
     # 8. Trade Explanation
-print("\n[V6.8] Generating trade explanation...")
-# Check if imbalance exists before using it
-if imbalance is not None:
-    order_book_active = imbalance > 0.55
-else:
-    order_book_active = False
+    print("\n[V6.8] Generating trade explanation...")
+    if imbalance is not None:
+        order_book_active = imbalance > 0.55
+    else:
+        order_book_active = False
 
-factors = {
-    'order_book': {'active': order_book_active, 'description': 'Bullish order book imbalance' if order_book_active else 'Order book data unavailable'},
-    'onchain': {'active': True if onchain.get('nvt_ratio', 0) < 20 else False, 'description': 'Low NVT ratio' if onchain.get('nvt_ratio', 0) < 20 else 'NVT ratio normal'},
-    'technical': {'active': True, 'description': 'Bullish technical indicators'},
-    'sentiment': {'active': True, 'description': 'Fear & Greed in buy zone'}
-}
+    factors = {
+        'order_book': {'active': order_book_active, 'description': 'Bullish order book imbalance' if order_book_active else 'Order book data unavailable'},
+        'onchain': {'active': True if onchain.get('nvt_ratio', 0) < 20 else False, 'description': 'Low NVT ratio' if onchain.get('nvt_ratio', 0) < 20 else 'NVT ratio normal'},
+        'sentiment': {'active': True, 'description': 'Fear & Greed in buy zone'}
+    }
     explanation = generate_trade_explanation('BTC', ml_signal['action'], ml_signal['confidence'], factors, {}, {})
     print(f"  Summary: {explanation['summary']}")
     print(f"  Comment: {explanation['trader_comment']}")
