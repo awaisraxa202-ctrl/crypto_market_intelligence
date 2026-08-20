@@ -3098,17 +3098,17 @@ def run_v6_pipeline():
     run_pipeline()
     
     print("\n[V6] Running advanced analytics...")
-    
+
     # 1. Order Book Analysis
     print("\n[V6.1] Fetching order book data...")
     ob_snapshot = fetch_order_book_snapshot('BTCUSDT')
     if ob_snapshot:
-    imbalance = calculate_order_book_imbalance(ob_snapshot)
-    if imbalance is not None:
-        print(f" BTC Order Book Imbalance: {imbalance:.3f}")
-        store_order_book_snapshot(ob_snapshot)
-else:
-    print(" Order book data unavailable")
+        imbalance = calculate_order_book_imbalance(ob_snapshot)
+        if imbalance is not None:
+            print(f"  BTC Order Book Imbalance: {imbalance:.3f}")
+            store_order_book_snapshot(ob_snapshot)
+    else:
+        print("  ⚠️ Order book data unavailable")
     
     # 2. ETF Flow Data
     print("\n[V6.2] Fetching ETF flow data...")
