@@ -3105,10 +3105,10 @@ def run_v6_pipeline():
     if ob_snapshot:
     imbalance = calculate_order_book_imbalance(ob_snapshot)
     if imbalance is not None:
-        print(f"  BTC Order Book Imbalance: {imbalance:.3f}")
-    store_order_book_snapshot(ob_snapshot)
+        print(f" BTC Order Book Imbalance: {imbalance:.3f}")
+        store_order_book_snapshot(ob_snapshot)
 else:
-    print("  ⚠️ Order book data unavailable")
+    print(" Order book data unavailable")
     
     # 2. ETF Flow Data
     print("\n[V6.2] Fetching ETF flow data...")
