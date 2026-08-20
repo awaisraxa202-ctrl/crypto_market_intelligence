@@ -3147,10 +3147,15 @@ def run_v6_pipeline():
     
     # 8. Trade Explanation
     print("\n[V6.8] Generating trade explanation...")
-    if imbalance is not None:
-        order_book_active = imbalance > 0.55
-    else:
+    # Check if imbalance exists (it may not if order book fetch failed)
+    try:
+        if imbalance is not None:
+            order_book_active = imbalance > 0.55
+        else:
+            order_book_active = False
+    except NameError:
         order_book_active = False
+        imbalance = None
 
     factors = {
         'order_book': {'active': order_book_active, 'description': 'Bullish order book imbalance' if order_book_active else 'Order book data unavailable'},
