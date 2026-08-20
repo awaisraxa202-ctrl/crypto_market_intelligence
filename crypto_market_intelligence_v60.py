@@ -3119,7 +3119,7 @@ def run_v6_pipeline():
     
     # 4. Regime Detection
     print("\n[V6.4] Detecting market regime...")
-    regime = detect_regime(tpu_data.get('tpu_value', 0))
+    regime = detect_market_regime(tpu_data.get('tpu_value', 0))
     print(f"  Regime: {regime['regime']} — {regime['dominant_feature']}")
     
     # 5. On-Chain Metrics
