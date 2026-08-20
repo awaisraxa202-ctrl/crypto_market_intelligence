@@ -3103,9 +3103,12 @@ def run_v6_pipeline():
     print("\n[V6.1] Fetching order book data...")
     ob_snapshot = fetch_order_book_snapshot('BTCUSDT')
     if ob_snapshot:
-        imbalance = calculate_order_book_imbalance(ob_snapshot)
+    imbalance = calculate_order_book_imbalance(ob_snapshot)
+    if imbalance is not None:
         print(f"  BTC Order Book Imbalance: {imbalance:.3f}")
-        store_order_book_snapshot(ob_snapshot)
+    store_order_book_snapshot(ob_snapshot)
+else:
+    print("  ⚠️ Order book data unavailable")
     
     # 2. ETF Flow Data
     print("\n[V6.2] Fetching ETF flow data...")
@@ -3143,13 +3146,19 @@ def run_v6_pipeline():
     print(f"  Small Trade: ${small_trade['position_size']:.4f} (Risk: {small_trade['risk_pct']:.1f}%)")
     
     # 8. Trade Explanation
-    print("\n[V6.8] Generating trade explanation...")
-    factors = {
-        'order_book': {'active': True if imbalance and imbalance > 0.55 else False, 'description': 'Bullish order book imbalance'},
-        'onchain': {'active': True if onchain.get('nvt_ratio', 0) < 20 else False, 'description': 'Low NVT ratio'},
-        'technical': {'active': True, 'description': 'Bullish technical indicators'},
-        'sentiment': {'active': True, 'description': 'Fear & Greed in buy zone'}
-    }
+print("\n[V6.8] Generating trade explanation...")
+# Check if imbalance exists before using it
+if imbalance is not None:
+    order_book_active = imbalance > 0.55
+else:
+    order_book_active = False
+
+factors = {
+    'order_book': {'active': order_book_active, 'description': 'Bullish order book imbalance' if order_book_active else 'Order book data unavailable'},
+    'onchain': {'active': True if onchain.get('nvt_ratio', 0) < 20 else False, 'description': 'Low NVT ratio' if onchain.get('nvt_ratio', 0) < 20 else 'NVT ratio normal'},
+    'technical': {'active': True, 'description': 'Bullish technical indicators'},
+    'sentiment': {'active': True, 'description': 'Fear & Greed in buy zone'}
+}
     explanation = generate_trade_explanation('BTC', ml_signal['action'], ml_signal['confidence'], factors, {}, {})
     print(f"  Summary: {explanation['summary']}")
     print(f"  Comment: {explanation['trader_comment']}")
