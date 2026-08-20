@@ -2694,7 +2694,7 @@ def calculate_ml_signal(asset_data, order_book_data, onchain_data):
 # SECTION 6: REGIME DETECTION & SELF-LEARNING
 # =================================================================================
 
-def detect_regime(tpu_value):
+def detect_market_regime(tpu_value):
     """Detect market regime based on Trade Policy Uncertainty"""
     if tpu_value > 200:
         return {
