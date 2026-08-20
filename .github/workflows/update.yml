@@ -31,8 +31,8 @@ jobs:
         run: |
           pip install pandas numpy requests yfinance
 
-      - name: Run Market Cortex v5.0 Ultimate Engine
-        run: python crypto_market_intelligence_v50_ultimate.py
+      - name: Run Market Cortex v6.0 Ultimate Engine
+        run: python crypto_market_intelligence_v60.py
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
