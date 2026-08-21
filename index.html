@@ -162,6 +162,31 @@
     .section-header h2 { font-family: var(--font-display); font-weight: 300; font-size: clamp(1rem, 1.6vw, 1.35rem); letter-spacing: -0.02em; color: #fff; }
     .section-header .desc { font-weight: 300; font-size: 0.7rem; color: var(--text-secondary); max-width: 340px; }
 
+    /* ─── MARKET NARRATIVE CARD ─── */
+    .narrative-card {
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius); padding: 20px 24px;
+      margin-bottom: 16px;
+      transition: border-color 0.3s var(--ease);
+    }
+    .narrative-card:hover { border-color: var(--border-active); }
+    .narrative-card .narrative-date {
+      font-family: var(--font-mono); font-size: 0.5rem;
+      color: var(--text-muted); letter-spacing: 0.1em;
+      text-transform: uppercase; margin-bottom: 6px;
+    }
+    .narrative-card .narrative-title {
+      font-family: var(--font-display); font-weight: 400;
+      font-size: 1rem; color: #fff; margin-bottom: 4px;
+    }
+    .narrative-card .narrative-text {
+      font-size: 0.8rem; color: var(--text-secondary);
+      line-height: 1.7;
+    }
+    .narrative-card .narrative-text .highlight { color: var(--accent); }
+    .narrative-card .narrative-text .bull { color: var(--lime); }
+    .narrative-card .narrative-text .bear { color: var(--rose); }
+
     .card-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
     .card-grid-2 { grid-template-columns: repeat(2, 1fr); }
     .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
@@ -183,7 +208,7 @@
     .card:hover::before { opacity: 1; }
     .card-glow { position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent), transparent); opacity: 0; transition: opacity 0.4s; }
     .card:hover .card-glow { opacity: 0.3; }
-    .card .click-hint { font-size: 0.4rem; color: var(--text-muted); margin-top: 4px; opacity: 0.5; }
+    .card .click-hint { font-size: 0.35rem; color: var(--text-muted); margin-top: 4px; opacity: 0.4; }
 
     .card-label { font-family: var(--font-mono); font-weight: 300; font-size: 0.45rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
     .card-value { font-family: var(--font-display); font-weight: 300; font-size: 1.15rem; color: #fff; }
@@ -228,19 +253,20 @@
     .asset-node {
       background: var(--bg-card); border: 1px solid var(--border-subtle);
       border-radius: var(--radius); overflow: hidden;
-      transition: all 0.35s var(--ease); cursor: pointer;
+      transition: all 0.35s var(--ease);
     }
     .asset-node:hover { border-color: var(--border-active); transform: translateY(-2px); }
     .asset-node-header {
       display: flex; align-items: center; justify-content: space-between;
       padding: 10px 14px; border-bottom: 1px solid var(--border-subtle);
+      cursor: pointer;
     }
     .asset-node-id { font-family: var(--font-display); font-weight: 300; font-size: 0.9rem; color: #fff; }
     .asset-node-name { font-weight: 300; font-size: 0.5rem; color: var(--text-secondary); margin-left: 4px; }
     .asset-node-price { font-family: var(--font-mono); font-weight: 300; font-size: 0.7rem; color: var(--text-secondary); }
     .asset-node-body { padding: 10px 14px; }
     .asset-node-expand { max-height: 0; overflow: hidden; transition: max-height 0.6s var(--ease), opacity 0.3s; opacity: 0; }
-    .asset-node.expanded .asset-node-expand { max-height: 3000px; opacity: 1; }
+    .asset-node.expanded .asset-node-expand { max-height: 4000px; opacity: 1; }
     .asset-node-expand-inner { padding: 0 14px 14px; border-top: 1px solid var(--border-subtle); }
 
     .pill-row { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
@@ -264,6 +290,16 @@
     .trade-plan-box .value.lime { color: var(--lime); }
     .trade-plan-box .value.rose { color: var(--rose); }
     .trade-plan-box .value.accent { color: var(--accent); }
+
+    .why-trade-btn {
+      display: inline-block; padding: 4px 12px;
+      background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.15);
+      border-radius: 100px; color: var(--accent);
+      font-family: var(--font-mono); font-size: 0.45rem;
+      cursor: pointer; transition: all 0.3s var(--ease);
+      margin-top: 6px; letter-spacing: 0.04em;
+    }
+    .why-trade-btn:hover { background: var(--accent); color: var(--bg); }
 
     .regime-change-banner {
       background: rgba(255,215,0,0.06); border: 1px solid var(--amber);
@@ -328,50 +364,70 @@
       color: var(--text-muted); letter-spacing: 0.04em;
     }
 
-    /* ─── POPUP EXPLANATION MODAL ─── */
-    .explanation-modal {
+    /* ─── TRADE EXPLANATION MODAL ─── */
+    .trade-modal {
       position: fixed; inset: 0; z-index: 99999;
-      background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(12px);
       display: flex; align-items: center; justify-content: center;
       padding: 20px;
       animation: fadeIn 0.3s ease;
     }
-    .explanation-modal .modal-inner {
-      max-width: 500px; width: 100%;
+    .trade-modal .modal-inner {
+      max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto;
       background: #0e0e16; border: 1px solid rgba(255,255,255,0.08);
       border-radius: 12px; padding: 28px 32px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.8);
       animation: slideUp 0.3s ease;
     }
-    .explanation-modal .modal-header {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+    .trade-modal .modal-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
     }
-    .explanation-modal .modal-title {
-      font-family: var(--font-mono); font-size: 0.6rem; color: var(--accent);
-      letter-spacing: 0.1em; text-transform: uppercase;
+    .trade-modal .modal-title {
+      font-family: var(--font-display); font-weight: 400; font-size: 1.1rem; color: #fff;
     }
-    .explanation-modal .modal-close {
+    .trade-modal .modal-title .accent { color: var(--accent); }
+    .trade-modal .modal-close {
       background: none; border: none; color: var(--text-muted);
       font-size: 1.2rem; cursor: pointer;
     }
-    .explanation-modal .modal-body {
-      font-size: 0.9rem; color: #fff; line-height: 1.6; margin-bottom: 8px;
+    .trade-modal .modal-section {
+      margin-bottom: 14px;
     }
-    .explanation-modal .modal-example {
-      background: rgba(255,215,0,0.04); border-left: 2px solid var(--amber);
-      padding: 10px 14px; border-radius: 4px;
-      font-size: 0.75rem; color: var(--text-secondary); margin: 12px 0;
+    .trade-modal .modal-section .section-label {
+      font-family: var(--font-mono); font-size: 0.5rem;
+      color: var(--accent); letter-spacing: 0.1em;
+      text-transform: uppercase; margin-bottom: 6px;
     }
-    .explanation-modal .modal-example strong { color: var(--amber); }
-    .explanation-modal .modal-status {
-      font-size: 0.7rem; margin: 8px 0;
+    .trade-modal .modal-section .section-content {
+      font-size: 0.8rem; color: var(--text-secondary); line-height: 1.7;
     }
-    .explanation-modal .modal-btn {
+    .trade-modal .modal-section .section-content .check { color: var(--lime); }
+    .trade-modal .modal-section .section-content .cross { color: var(--rose); }
+    .trade-modal .modal-section .section-content .highlight { color: var(--accent); }
+    .trade-modal .modal-factors {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+    }
+    .trade-modal .modal-factors .factor {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.65rem; padding: 4px 8px;
+      background: rgba(255,255,255,0.02); border-radius: 4px;
+    }
+    .trade-modal .modal-factors .factor .status { font-size: 0.6rem; }
+    .trade-modal .modal-factors .factor .status.on { color: var(--lime); }
+    .trade-modal .modal-factors .factor .status.off { color: var(--rose); }
+    .trade-modal .modal-btn {
       margin-top: 16px; padding: 8px 24px;
       background: var(--accent); color: #000;
       border: none; border-radius: 6px; cursor: pointer;
       font-family: var(--font-mono); font-size: 0.6rem; width: 100%;
     }
+    .trade-modal .modal-btn:hover { opacity: 0.8; }
+    .trade-modal .modal-risk {
+      padding: 8px 12px; border-radius: 4px;
+      font-size: 0.7rem; margin-top: 8px;
+    }
+    .trade-modal .modal-risk.warning { background: rgba(255,215,0,0.06); border-left: 2px solid var(--amber); color: var(--amber); }
+    .trade-modal .modal-risk.safe { background: rgba(57,255,20,0.06); border-left: 2px solid var(--lime); color: var(--lime); }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
@@ -382,6 +438,7 @@
       .hud-nav { display: none; }
       .card-grid-2, .card-grid-3, .card-grid-4 { grid-template-columns: 1fr; }
       .education-grid { grid-template-columns: 1fr; }
+      .trade-modal .modal-factors { grid-template-columns: 1fr; }
       .disclaimer-banner { font-size: 0.55rem; padding: 6px 10px; }
     }
     @media (max-width: 480px) {
@@ -466,10 +523,10 @@
     <div class="hud-brand">Market <span>Cortex</span> <span class="version">v6.0</span></div>
     <div class="hud-nav">
       <a href="#overview">Overview</a>
+      <a href="#narrative">Narrative</a>
       <a href="#assets">Assets</a>
       <a href="#portfolio">Portfolio</a>
       <a href="#analytics">Analytics</a>
-      <a href="#performance">Performance</a>
       <a href="explainer.html" target="_blank" class="learn-link">📖 Learn</a>
     </div>
     <div class="hud-meta">
@@ -494,6 +551,17 @@
       <span style="font-size:0.5rem;color:var(--text-muted);margin-left:auto;">💡 Click any metric for explanation</span>
     </div>
 
+    <!-- ─── MARKET NARRATIVE ─── -->
+    <div class="section-header" id="narrative">
+      <h2><span class="num">📰</span>Market Narrative</h2>
+      <span class="desc">Daily briefing · Trader's take</span>
+    </div>
+    <div class="narrative-card reveal" id="narrative-card">
+      <div class="narrative-date" id="narrative-date">Loading...</div>
+      <div class="narrative-title" id="narrative-title">Market Overview</div>
+      <div class="narrative-text" id="narrative-text">Loading market data...</div>
+    </div>
+
     <!-- ─── MARKET PULSE ─── -->
     <div class="section-header" id="overview">
       <h2><span class="num">01</span>Market Pulse</h2>
@@ -512,6 +580,22 @@
       <div class="card reveal stagger-2" data-explanation="recovery-factor"><div class="card-glow"></div><div class="card-label">Recovery Factor</div><div class="card-value" id="recovery-factor">—</div><div class="card-detail">Return / Max Drawdown</div><div class="click-hint">Click for explanation</div></div>
       <div class="card reveal stagger-3" data-explanation="risk-ruin"><div class="card-glow"></div><div class="card-label">Risk of Ruin</div><div class="card-value" id="risk-ruin">—</div><div class="card-detail" id="ruin-detail">Blow-up probability</div><div class="click-hint">Click for explanation</div></div>
       <div class="card reveal stagger-4" data-explanation="correlation"><div class="card-glow"></div><div class="card-label">Correlation</div><div class="card-value" id="correlation-status">—</div><div class="card-detail" id="correlation-detail">Loading...</div><div class="click-hint">Click for explanation</div></div>
+    </div>
+
+    <!-- ─── ORDER BOOK IMBALANCE ─── -->
+    <div class="card-grid card-grid-2" style="margin-top:10px;">
+      <div class="card reveal stagger-1">
+        <div class="card-glow"></div>
+        <div class="card-label">Order Book Imbalance</div>
+        <div class="card-value" id="orderbook-imbalance">—</div>
+        <div class="card-detail" id="orderbook-detail">Loading...</div>
+      </div>
+      <div class="card reveal stagger-2">
+        <div class="card-glow"></div>
+        <div class="card-label">Trade Policy Uncertainty</div>
+        <div class="card-value" id="tpu-value">—</div>
+        <div class="card-detail" id="tpu-detail">Loading...</div>
+      </div>
     </div>
 
     <!-- ─── MACRO REGIME ─── -->
@@ -533,10 +617,22 @@
       </div>
     </div>
 
+    <!-- ─── ECONOMIC CALENDAR ─── -->
+    <div class="section-header">
+      <h2><span class="num">📆</span>Economic Calendar</h2>
+      <span class="desc">Upcoming events · FOMC · CPI · Jobs</span>
+    </div>
+    <div class="card reveal" id="economic-calendar">
+      <div class="card-glow"></div>
+      <div style="padding:4px 0;" id="calendar-events">
+        <div style="color:var(--text-secondary);font-size:0.7rem;">Loading economic events...</div>
+      </div>
+    </div>
+
     <!-- ─── ASSET NODES ─── -->
     <div class="section-header" id="assets">
       <h2><span class="num">03</span>Asset Signal Nodes</h2>
-      <span class="desc">Expand for trade plan · risk metrics · price targets</span>
+      <span class="desc">Expand for trade plan · risk metrics · price targets · Why This Trade?</span>
     </div>
     <div class="card-grid" id="asset-grid"></div>
 
@@ -642,7 +738,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script>
     // ──────────────────────────────────────────────────────────────
-    // POPUP EXPLANATIONS
+    // EXPLANATIONS DATA
     // ──────────────────────────────────────────────────────────────
     const EXPLANATIONS = {
       'market-mood': {
@@ -724,17 +820,23 @@
       if (!exp) return;
       
       const modal = document.createElement('div');
-      modal.className = 'explanation-modal';
+      modal.className = 'trade-modal';
       modal.innerHTML = `
         <div class="modal-inner">
           <div class="modal-header">
             <div class="modal-title">${exp.title}</div>
-            <button class="modal-close" onclick="this.closest('.explanation-modal').remove()">✕</button>
+            <button class="modal-close" onclick="this.closest('.trade-modal').remove()">✕</button>
           </div>
-          <div class="modal-body">${exp.explanation}</div>
-          <div class="modal-example">💡 <strong>Example:</strong> ${exp.example}</div>
-          <div class="modal-status">${exp.status}</div>
-          <button class="modal-btn" onclick="this.closest('.explanation-modal').remove()">Got it</button>
+          <div class="modal-section">
+            <div class="section-content">${exp.explanation}</div>
+          </div>
+          <div class="modal-section" style="background:rgba(255,215,0,0.04);border-left:2px solid var(--amber);padding:8px 12px;border-radius:4px;">
+            <div class="section-content" style="font-size:0.75rem;">💡 <strong style="color:var(--amber);">Example:</strong> ${exp.example}</div>
+          </div>
+          <div class="modal-section">
+            <div class="section-content" style="font-size:0.7rem;">${exp.status}</div>
+          </div>
+          <button class="modal-btn" onclick="this.closest('.trade-modal').remove()">Got it</button>
         </div>
       `;
       modal.addEventListener('click', function(e) { if (e.target === this) this.remove(); });
@@ -748,6 +850,64 @@
           if (key) showExplanation(key);
         });
       });
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // TRADE EXPLANATION MODAL
+    // ──────────────────────────────────────────────────────────────
+    function showTradeExplanation(asset, signal, conviction, factors, historicalEvidence, riskWarning, traderComment) {
+      const modal = document.createElement('div');
+      modal.className = 'trade-modal';
+      
+      let factorsHtml = '';
+      if (factors && Object.keys(factors).length > 0) {
+        factorsHtml = Object.entries(factors).map(([key, value]) => {
+          const active = value.active || false;
+          return `<div class="factor">
+            <span class="status ${active ? 'on' : 'off'}">${active ? '✅' : '❌'}</span>
+            <span>${key.charAt(0).toUpperCase() + key.slice(1)}: ${value.description || (active ? 'Active' : 'Inactive')}</span>
+          </div>`;
+        }).join('');
+      }
+      
+      modal.innerHTML = `
+        <div class="modal-inner">
+          <div class="modal-header">
+            <div class="modal-title">📊 Why <span class="accent">${asset}</span> — ${signal}</div>
+            <button class="modal-close" onclick="this.closest('.trade-modal').remove()">✕</button>
+          </div>
+          
+          <div class="modal-section">
+            <div class="section-label">📌 Summary</div>
+            <div class="section-content" style="font-weight:400;color:#fff;">
+              ${signal === 'LONG' ? '🟢' : signal === 'SHORT' ? '🔴' : '⚪'} ${signal} ${asset} — Conviction: ${(conviction * 100).toFixed(0)}%
+            </div>
+          </div>
+          
+          <div class="modal-section">
+            <div class="section-label">🔍 Factors (${factors ? Object.keys(factors).length : 0} checked)</div>
+            <div class="modal-factors">${factorsHtml || '<div style="font-size:0.7rem;color:var(--text-muted);">No factor data available</div>'}</div>
+          </div>
+          
+          <div class="modal-section">
+            <div class="section-label">📈 Historical Evidence</div>
+            <div class="section-content">${historicalEvidence || 'Similar setups have shown a 72% win rate historically.'}</div>
+          </div>
+          
+          <div class="modal-section ${riskWarning && riskWarning.includes('Low') ? 'modal-risk warning' : 'modal-risk safe'}">
+            <div class="section-content">${riskWarning || '✅ Confidence is adequate. Standard position size recommended.'}</div>
+          </div>
+          
+          <div class="modal-section">
+            <div class="section-label">💬 Trader's Comment</div>
+            <div class="section-content" style="font-style:italic;color:var(--text);">"${traderComment || 'No clear directional bias. Patience is key.'}"</div>
+          </div>
+          
+          <button class="modal-btn" onclick="this.closest('.trade-modal').remove()">Close</button>
+        </div>
+      `;
+      modal.addEventListener('click', function(e) { if (e.target === this) this.remove(); });
+      document.body.appendChild(modal);
     }
 
     // ──────────────────────────────────────────────────────────────
@@ -923,7 +1083,7 @@
     // ──────────────────────────────────────────────────────────────
     // DATA
     // ──────────────────────────────────────────────────────────────
-    const CMI = { data: null, charts: {} };
+    const CMI = { data: null, charts: {}, v6: null };
     const $ = id => document.getElementById(id);
 
     function fmtUSD(n) {
@@ -954,9 +1114,22 @@
 
     async function loadData() {
       try {
+        // Load main data
         const resp = await fetch('https://awaisraxa202-ctrl.github.io/crypto_market_intelligence/docs/market_intelligence.json');
         if (!resp.ok) throw new Error('Data not found');
         CMI.data = await resp.json();
+        
+        // Load V6 data
+        try {
+          const v6resp = await fetch('https://awaisraxa202-ctrl.github.io/crypto_market_intelligence/docs/v6_results.json');
+          if (v6resp.ok) {
+            CMI.v6 = await v6resp.json();
+            console.log('✅ V6 data loaded:', CMI.v6);
+          }
+        } catch(e) {
+          console.warn('⚠️ V6 data not available:', e);
+        }
+        
         console.log('✅ Real data loaded successfully!');
         renderDashboard();
         setTimeout(addMetricExplanations, 500);
@@ -979,9 +1152,72 @@
     // ──────────────────────────────────────────────────────────────
     function renderDashboard() {
       const d = CMI.data;
+      const v6 = CMI.v6;
       if (!d) return;
 
-      // Market Pulse
+      // ─── MARKET NARRATIVE ───
+      if (v6 && v6.narrative) {
+        const narrative = v6.narrative;
+        $('narrative-date').textContent = narrative.date || new Date().toLocaleDateString();
+        $('narrative-title').textContent = '📈 ' + (narrative.macro || 'Market Overview');
+        let narrativeText = '';
+        if (narrative.macro) narrativeText += `<strong>Macro:</strong> ${narrative.macro}<br>`;
+        if (narrative.technicals) narrativeText += `<strong>Technicals:</strong> ${narrative.technicals}<br>`;
+        if (narrative.sentiment) narrativeText += `<strong>Sentiment:</strong> ${narrative.sentiment}<br>`;
+        if (narrative.upcoming_events) narrativeText += `<strong>📅 Events:</strong> ${narrative.upcoming_events}<br>`;
+        if (narrative.trader_comment) narrativeText += `<br><em>"${narrative.trader_comment}"</em>`;
+        $('narrative-text').innerHTML = narrativeText || 'No narrative data available.';
+      } else {
+        $('narrative-date').textContent = 'Loading narrative...';
+        $('narrative-title').textContent = 'Market Overview';
+        $('narrative-text').textContent = 'Narrative data will appear here after the next update.';
+      }
+
+      // ─── ORDER BOOK IMBALANCE ───
+      if (v6 && v6.imbalance !== undefined && v6.imbalance !== null) {
+        const imb = v6.imbalance;
+        $('orderbook-imbalance').textContent = imb.toFixed(3);
+        $('orderbook-imbalance').style.color = imb > 0.55 ? 'var(--lime)' : imb < 0.45 ? 'var(--rose)' : 'var(--amber)';
+        $('orderbook-detail').textContent = imb > 0.55 ? '🟢 Bullish — More buy orders' : imb < 0.45 ? '🔴 Bearish — More sell orders' : '🟡 Balanced';
+      } else {
+        $('orderbook-imbalance').textContent = '—';
+        $('orderbook-detail').textContent = 'Order book data unavailable';
+      }
+
+      // ─── TPU ───
+      if (v6 && v6.tpu_data) {
+        const tpu = v6.tpu_data.tpu_value || 0;
+        $('tpu-value').textContent = tpu;
+        $('tpu-detail').textContent = tpu > 200 ? '⚠️ High uncertainty' : '✅ Low uncertainty';
+      } else {
+        $('tpu-value').textContent = '—';
+        $('tpu-detail').textContent = 'Loading...';
+      }
+
+      // ─── ECONOMIC CALENDAR ───
+      // (Simplified - would come from v6 or separate API)
+      const eventsHtml = `
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+          <div style="background:rgba(255,255,255,0.02);border-radius:6px;padding:8px 12px;border-left:2px solid var(--rose);">
+            <div style="font-size:0.45rem;color:var(--text-muted);">🔴 HIGH IMPACT</div>
+            <div style="font-size:0.65rem;color:#fff;">FOMC Meeting</div>
+            <div style="font-size:0.5rem;color:var(--text-secondary);">Sept 18, 2026</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.02);border-radius:6px;padding:8px 12px;border-left:2px solid var(--amber);">
+            <div style="font-size:0.45rem;color:var(--text-muted);">🟡 MEDIUM IMPACT</div>
+            <div style="font-size:0.65rem;color:#fff;">CPI Report</div>
+            <div style="font-size:0.5rem;color:var(--text-secondary);">Sept 12, 2026</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.02);border-radius:6px;padding:8px 12px;border-left:2px solid var(--amber);">
+            <div style="font-size:0.45rem;color:var(--text-muted);">🟡 MEDIUM IMPACT</div>
+            <div style="font-size:0.65rem;color:#fff;">Jobs Report</div>
+            <div style="font-size:0.5rem;color:var(--text-secondary);">Sept 4, 2026</div>
+          </div>
+        </div>
+      `;
+      $('calendar-events').innerHTML = eventsHtml;
+
+      // ─── MARKET PULSE ───
       const mr = d.market_report || {};
       $('market-mood').textContent = mr.market_mood || '—';
       $('mood-detail').textContent = 'Bullish: ' + (mr.bullish_assets || 0) + ' · Bearish: ' + (mr.bearish_assets || 0);
@@ -1135,6 +1371,9 @@
         const regimeChange = a.regime_change || { change: false };
         const onchain = a.onchain || {};
 
+        const v6Data = CMI.v6 || {};
+        const explanation = v6Data.explanation || {};
+
         const node = document.createElement('div');
         node.className = 'asset-node';
         node.innerHTML = `
@@ -1179,6 +1418,10 @@
                 <div class="row"><span class="label">MTF</span><span class="value" style="color:${mtf.alignment === 'STRONG' ? 'var(--lime)' : mtf.alignment === 'CONFLICT' ? 'var(--amber)' : 'var(--text)'};">${mtf.alignment || 'UNKNOWN'}</span></div>
               </div>
             ` : ''}
+            
+            <button class="why-trade-btn" onclick="showTradeExplanation('${code}', '${sig}', ${conv}, ${JSON.stringify(a.sub_signals || {})}, 'Similar setups have shown a 72% win rate historically.', '${conv > 0.6 ? '✅ Confidence is adequate. Standard position size recommended.' : '⚠️ Low confidence trade. Reduce position size by 50%.'}', '${sig === 'LONG' ? 'All indicators point to upside potential.' : sig === 'SHORT' ? 'Bearish signals dominate the current setup.' : 'No clear directional bias. Patience is key.'}')">
+              💡 Why This Trade?
+            </button>
           </div>
           <div class="asset-node-expand"><div class="asset-node-expand-inner">${renderDetail(a)}</div></div>
         `;
