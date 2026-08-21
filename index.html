@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Market Cortex v5.0 — Ultimate Edition</title>
+  <title>Market Cortex v6.0 — Ultimate Edition</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
@@ -119,9 +119,11 @@
     .hud-brand { font-family: var(--font-display); font-weight: 300; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: #fff; }
     .hud-brand span { color: var(--accent); font-weight: 300; font-style: italic; }
     .hud-brand .version { font-size: 0.45rem; color: var(--text-muted); margin-left: 6px; }
-    .hud-nav { display: flex; gap: 20px; }
+    .hud-nav { display: flex; gap: 16px; align-items: center; }
     .hud-nav a { font-family: var(--font-mono); font-weight: 300; font-size: 0.5rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); text-decoration: none; padding: 4px 0; border-bottom: 1px solid transparent; transition: all 0.3s var(--ease); }
     .hud-nav a:hover { color: #fff; border-bottom-color: var(--accent); }
+    .hud-nav a.learn-link { color: var(--accent); border-bottom-color: var(--accent); }
+    .hud-nav a.learn-link:hover { color: #fff; }
     .hud-meta { display: flex; align-items: center; gap: 14px; font-family: var(--font-mono); font-weight: 300; font-size: 0.5rem; color: var(--text-secondary); }
     .hud-pulse { width: 4px; height: 4px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 8px var(--lime); animation: pulseDot 1.6s infinite; }
     @keyframes pulseDot { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
@@ -160,7 +162,7 @@
     .section-header h2 { font-family: var(--font-display); font-weight: 300; font-size: clamp(1rem, 1.6vw, 1.35rem); letter-spacing: -0.02em; color: #fff; }
     .section-header .desc { font-weight: 300; font-size: 0.7rem; color: var(--text-secondary); max-width: 340px; }
 
-    .card-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .card-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
     .card-grid-2 { grid-template-columns: repeat(2, 1fr); }
     .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
     .card-grid-4 { grid-template-columns: repeat(4, 1fr); }
@@ -170,6 +172,7 @@
       background: var(--bg-card); border: 1px solid var(--border-subtle);
       border-radius: var(--radius); padding: 16px 18px;
       transition: all 0.35s var(--ease); position: relative; overflow: hidden;
+      cursor: pointer;
     }
     .card::before {
       content: ''; position: absolute; inset: 0;
@@ -180,6 +183,7 @@
     .card:hover::before { opacity: 1; }
     .card-glow { position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent), transparent); opacity: 0; transition: opacity 0.4s; }
     .card:hover .card-glow { opacity: 0.3; }
+    .card .click-hint { font-size: 0.4rem; color: var(--text-muted); margin-top: 4px; opacity: 0.5; }
 
     .card-label { font-family: var(--font-mono); font-weight: 300; font-size: 0.45rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
     .card-value { font-family: var(--font-display); font-weight: 300; font-size: 1.15rem; color: #fff; }
@@ -303,6 +307,7 @@
       background: var(--bg-card); border: 1px solid var(--border-subtle);
       border-radius: var(--radius); padding: 18px 20px;
       transition: border-color 0.3s var(--ease);
+      cursor: default;
     }
     .edu-card:hover { border-color: var(--border-active); }
     .edu-card .edu-icon { font-size: 1.2rem; margin-bottom: 6px; }
@@ -322,6 +327,53 @@
       font-family: var(--font-mono); font-weight: 300; font-size: 0.4rem;
       color: var(--text-muted); letter-spacing: 0.04em;
     }
+
+    /* ─── POPUP EXPLANATION MODAL ─── */
+    .explanation-modal {
+      position: fixed; inset: 0; z-index: 99999;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.3s ease;
+    }
+    .explanation-modal .modal-inner {
+      max-width: 500px; width: 100%;
+      background: #0e0e16; border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 28px 32px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+      animation: slideUp 0.3s ease;
+    }
+    .explanation-modal .modal-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+    }
+    .explanation-modal .modal-title {
+      font-family: var(--font-mono); font-size: 0.6rem; color: var(--accent);
+      letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .explanation-modal .modal-close {
+      background: none; border: none; color: var(--text-muted);
+      font-size: 1.2rem; cursor: pointer;
+    }
+    .explanation-modal .modal-body {
+      font-size: 0.9rem; color: #fff; line-height: 1.6; margin-bottom: 8px;
+    }
+    .explanation-modal .modal-example {
+      background: rgba(255,215,0,0.04); border-left: 2px solid var(--amber);
+      padding: 10px 14px; border-radius: 4px;
+      font-size: 0.75rem; color: var(--text-secondary); margin: 12px 0;
+    }
+    .explanation-modal .modal-example strong { color: var(--amber); }
+    .explanation-modal .modal-status {
+      font-size: 0.7rem; margin: 8px 0;
+    }
+    .explanation-modal .modal-btn {
+      margin-top: 16px; padding: 8px 24px;
+      background: var(--accent); color: #000;
+      border: none; border-radius: 6px; cursor: pointer;
+      font-family: var(--font-mono); font-size: 0.6rem; width: 100%;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
     @media (max-width: 768px) {
       #system-overlay .inner { padding: 28px 20px; }
@@ -365,11 +417,11 @@
   <div id="system-overlay">
     <div class="inner">
       <div class="overlay-header">
-        <div class="brand">Market <span>Cortex</span> <span style="font-size:0.5rem;color:var(--text-muted);margin-left:8px;">v5.0</span></div>
+        <div class="brand">Market <span>Cortex</span> <span style="font-size:0.5rem;color:var(--text-muted);margin-left:8px;">v6.0</span></div>
         <div class="badge">Research &amp; Education</div>
       </div>
       <div class="overlay-title">Before You <span class="accent">Enter</span></div>
-      <div class="overlay-sub">This is a research-grade market intelligence terminal with advanced risk management, multi-timeframe analysis, ensemble signals, and self-improving logic. Please take a moment to understand what it is — and what it is not.</div>
+      <div class="overlay-sub">This is a research-grade market intelligence terminal with advanced risk management, multi-timeframe analysis, ensemble signals, self-improving logic, and real-time alerts.</div>
       <div class="overlay-grid">
         <div class="overlay-col">
           <div class="col-label">✓ What This System <span style="color:var(--lime);">Is</span></div>
@@ -411,13 +463,14 @@
   </div>
 
   <nav id="hud">
-    <div class="hud-brand">Market <span>Cortex</span> <span class="version">v5.0</span></div>
+    <div class="hud-brand">Market <span>Cortex</span> <span class="version">v6.0</span></div>
     <div class="hud-nav">
       <a href="#overview">Overview</a>
       <a href="#assets">Assets</a>
       <a href="#portfolio">Portfolio</a>
       <a href="#analytics">Analytics</a>
       <a href="#performance">Performance</a>
+      <a href="explainer.html" target="_blank" class="learn-link">📖 Learn</a>
     </div>
     <div class="hud-meta">
       <span id="hud-time">--:-- UTC</span>
@@ -430,14 +483,15 @@
   <div class="app" id="dashboard-app">
 
     <section class="intro">
-      <div class="intro-eyebrow">Quantitative Market Intelligence · v5.0 Ultimate</div>
-      <h1 class="intro-title">Market <span class="accent">Cortex</span> <span class="version">v5.0</span></h1>
+      <div class="intro-eyebrow">Quantitative Market Intelligence · v6.0 Ultimate</div>
+      <h1 class="intro-title">Market <span class="accent">Cortex</span> <span class="version">v6.0</span></h1>
       <p class="intro-sub">Real-time analysis across 9 crypto assets with dynamic position sizing, drawdown protection, ensemble signals, risk of ruin analysis, self-improving logic, and actionable trade plans.</p>
     </section>
 
     <div class="disclaimer-banner">
       <span style="font-size:1rem;">⚠️</span>
       <span><strong>RESEARCH &amp; EDUCATIONAL TOOL ONLY</strong> — NOT financial advice. <a href="#" onclick="alert('Full Disclaimer: This is a research and educational tool only. NOT financial advice. Past performance does NOT predict future results. You can lose money. The creators are NOT responsible for any trading losses. Paper trade first for 3+ months. Never risk more than 1–2% of capital on any single trade idea.'); return false;">Read full →</a></span>
+      <span style="font-size:0.5rem;color:var(--text-muted);margin-left:auto;">💡 Click any metric for explanation</span>
     </div>
 
     <!-- ─── MARKET PULSE ─── -->
@@ -446,18 +500,18 @@
       <span class="desc">Mood · F&G · Ensemble · Risk Metrics</span>
     </div>
     <div class="card-grid card-grid-4">
-      <div class="card reveal stagger-1"><div class="card-glow"></div><div class="card-label">Market Mood</div><div class="card-value" id="market-mood">—</div><div class="card-detail" id="mood-detail">Loading...</div></div>
-      <div class="card reveal stagger-2"><div class="card-glow"></div><div class="card-label">Fear &amp; Greed</div><div class="card-value" id="fng-value">—</div><div class="card-detail" id="fng-label">Loading...</div></div>
-      <div class="card reveal stagger-3"><div class="card-glow"></div><div class="card-label">Risk Grade</div><div class="card-value" id="risk-grade">—</div><div class="card-detail" id="risk-detail">Loading...</div></div>
-      <div class="card reveal stagger-4"><div class="card-glow"></div><div class="card-label">Ensemble Signal</div><div class="card-value" id="ensemble-signal">—</div><div class="card-detail" id="ensemble-detail">Confidence: —</div></div>
+      <div class="card reveal stagger-1" data-explanation="market-mood"><div class="card-glow"></div><div class="card-label">Market Mood</div><div class="card-value" id="market-mood">—</div><div class="card-detail" id="mood-detail">Loading...</div><div class="click-hint">Click for explanation</div></div>
+      <div class="card reveal stagger-2" data-explanation="fng-value"><div class="card-glow"></div><div class="card-label">Fear &amp; Greed</div><div class="card-value" id="fng-value">—</div><div class="card-detail" id="fng-label">Loading...</div><div class="click-hint">Click for explanation</div></div>
+      <div class="card reveal stagger-3" data-explanation="risk-grade"><div class="card-glow"></div><div class="card-label">Risk Grade</div><div class="card-value" id="risk-grade">—</div><div class="card-detail" id="risk-detail">Loading...</div><div class="click-hint">Click for explanation</div></div>
+      <div class="card reveal stagger-4" data-explanation="ensemble-signal"><div class="card-glow"></div><div class="card-label">Ensemble Signal</div><div class="card-value" id="ensemble-signal">—</div><div class="card-detail" id="ensemble-detail">Confidence: —</div><div class="click-hint">Click for explanation</div></div>
     </div>
 
-    <!-- ─── V5.0 NEW METRICS ─── -->
+    <!-- ─── V6.0 NEW METRICS ─── -->
     <div class="card-grid card-grid-4" style="margin-top:10px;">
-      <div class="card reveal stagger-1"><div class="card-glow"></div><div class="card-label">Profit Factor</div><div class="card-value" id="profit-factor">—</div><div class="card-detail">Gross Profit / Gross Loss</div></div>
-      <div class="card reveal stagger-2"><div class="card-glow"></div><div class="card-label">Recovery Factor</div><div class="card-value" id="recovery-factor">—</div><div class="card-detail">Return / Max Drawdown</div></div>
-      <div class="card reveal stagger-3"><div class="card-glow"></div><div class="card-label">Risk of Ruin</div><div class="card-value" id="risk-ruin">—</div><div class="card-detail" id="ruin-detail">Blow-up probability</div></div>
-      <div class="card reveal stagger-4"><div class="card-glow"></div><div class="card-label">Correlation</div><div class="card-value" id="correlation-status">—</div><div class="card-detail" id="correlation-detail">Loading...</div></div>
+      <div class="card reveal stagger-1" data-explanation="profit-factor"><div class="card-glow"></div><div class="card-label">Profit Factor</div><div class="card-value" id="profit-factor">—</div><div class="card-detail">Gross Profit / Gross Loss</div><div class="click-hint">Click for explanation</div></div>
+      <div class="card reveal stagger-2" data-explanation="recovery-factor"><div class="card-glow"></div><div class="card-label">Recovery Factor</div><div class="card-value" id="recovery-factor">—</div><div class="card-detail">Return / Max Drawdown</div><div class="click-hint">Click for explanation</div></div>
+      <div class="card reveal stagger-3" data-explanation="risk-ruin"><div class="card-glow"></div><div class="card-label">Risk of Ruin</div><div class="card-value" id="risk-ruin">—</div><div class="card-detail" id="ruin-detail">Blow-up probability</div><div class="click-hint">Click for explanation</div></div>
+      <div class="card reveal stagger-4" data-explanation="correlation"><div class="card-glow"></div><div class="card-label">Correlation</div><div class="card-value" id="correlation-status">—</div><div class="card-detail" id="correlation-detail">Loading...</div><div class="click-hint">Click for explanation</div></div>
     </div>
 
     <!-- ─── MACRO REGIME ─── -->
@@ -508,29 +562,33 @@
       <span class="desc">Historical signal tracking · Win Rate · Profit</span>
     </div>
     <div class="card-grid card-grid-4">
-      <div class="card reveal stagger-1">
+      <div class="card reveal stagger-1" data-explanation="signal-total">
         <div class="card-glow"></div>
         <div class="card-label">Total Signals</div>
         <div class="card-value" id="signal-total">—</div>
         <div class="card-detail">All signals ever generated</div>
+        <div class="click-hint">Click for explanation</div>
       </div>
-      <div class="card reveal stagger-2">
+      <div class="card reveal stagger-2" data-explanation="signal-winrate">
         <div class="card-glow"></div>
         <div class="card-label">Win Rate</div>
         <div class="card-value" id="signal-winrate">—</div>
         <div class="card-detail" id="signal-winrate-detail">Closed signals</div>
+        <div class="click-hint">Click for explanation</div>
       </div>
-      <div class="card reveal stagger-3">
+      <div class="card reveal stagger-3" data-explanation="signal-profit">
         <div class="card-glow"></div>
         <div class="card-label">Total Profit</div>
         <div class="card-value" id="signal-profit">—</div>
         <div class="card-detail" id="signal-profit-detail">Net profit %</div>
+        <div class="click-hint">Click for explanation</div>
       </div>
-      <div class="card reveal stagger-4">
+      <div class="card reveal stagger-4" data-explanation="signal-active">
         <div class="card-glow"></div>
         <div class="card-label">Active Signals</div>
         <div class="card-value" id="signal-active">—</div>
         <div class="card-detail">Currently open trades</div>
+        <div class="click-hint">Click for explanation</div>
       </div>
     </div>
 
@@ -575,7 +633,7 @@
     </div>
 
     <footer>
-      <span>© 2026 Market Cortex v5.0 — Crypto Intelligence Terminal</span>
+      <span>© 2026 Market Cortex v6.0 — Crypto Intelligence Terminal</span>
       <span>Ensemble Signals · Risk of Ruin · Self-Improving Logic</span>
       <span>Research &amp; Education · NOT Financial Advice</span>
     </footer>
@@ -583,6 +641,115 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script>
+    // ──────────────────────────────────────────────────────────────
+    // POPUP EXPLANATIONS
+    // ──────────────────────────────────────────────────────────────
+    const EXPLANATIONS = {
+      'market-mood': {
+        title: 'Market Mood',
+        explanation: 'The overall direction of the market based on all assets combined. BULLISH = Market likely to go UP. BEARISH = Market likely to go DOWN.',
+        example: 'CAUTIOUSLY BULLISH means the market is leaning up but with caution — 4 assets bullish, 2 bearish.',
+        status: '🟢 BULLISH | ⚠️ MIXED | 🔴 BEARISH'
+      },
+      'fng-value': {
+        title: 'Fear & Greed Index',
+        explanation: 'Measures market emotion. When everyone is scared (Fear), it\'s often a good time to buy. When everyone is greedy, it\'s often a good time to sell.',
+        example: 'Fear & Greed 46 (Fear) means: "People are scared — historically a good time to accumulate."',
+        status: '🟢 0-25: Extreme Fear (BUY) | ⚠️ 45-55: Neutral | 🔴 75-100: Extreme Greed (SELL)'
+      },
+      'risk-grade': {
+        title: 'Risk Grade',
+        explanation: 'A simple A-F grade for your portfolio\'s risk level. A = Lowest risk, F = Highest risk.',
+        example: 'Grade B means your portfolio has moderate risk. This is acceptable for most traders.',
+        status: '✅ A-B: Safe | ⚠️ C-D: Caution | ❌ F: High Risk'
+      },
+      'ensemble-signal': {
+        title: 'Ensemble Signal',
+        explanation: 'A combined signal from ALL assets using weighted voting. Tells you the overall market direction.',
+        example: 'Ensemble Signal LONG (78%) means: "78% of signals point UP, 22% point DOWN."',
+        status: '🟢 LONG: Market likely up | 🔴 SHORT: Market likely down | ⚪ NO TRADE: Mixed'
+      },
+      'profit-factor': {
+        title: 'Profit Factor',
+        explanation: 'Tells you if you\'re making more money than you\'re losing. Higher is better.',
+        example: 'Profit Factor 1.85 means: "For every $1 you lose, you make $1.85."',
+        status: '✅ Over 1.5: Profitable | ⚠️ 1.0-1.5: Barely profitable | ❌ Under 1.0: Losing money'
+      },
+      'recovery-factor': {
+        title: 'Recovery Factor',
+        explanation: 'How quickly you recover from losses. Higher is better.',
+        example: 'Recovery Factor 3.2 means: "You recover 3.2x faster from losses than the market average."',
+        status: '✅ Over 2.0: Excellent | ⚠️ 1.0-2.0: Acceptable | ❌ Under 1.0: Struggling'
+      },
+      'risk-ruin': {
+        title: 'Risk of Ruin',
+        explanation: 'The probability you will lose ALL your money if you keep trading this way.',
+        example: 'Risk of Ruin 4.2% means: "In 100 traders with this strategy, ~4 will blow up their account."',
+        status: '✅ Under 5%: Safe | ⚠️ 5-15%: Caution | ❌ Over 15%: Stop trading!'
+      },
+      'correlation': {
+        title: 'Correlation Status',
+        explanation: 'Shows whether assets are moving together. When correlations break down, diversification stops working.',
+        example: 'STABLE = Assets are moving normally. BREAKDOWN = All assets are moving together — diversification is failing.',
+        status: '✅ STABLE: Normal | ⚠️ BREAKDOWN: Reduce position size'
+      },
+      'signal-total': {
+        title: 'Total Signals',
+        explanation: 'The total number of trading signals the system has ever generated. This includes both completed and active trades.',
+        example: 'Total Signals 142 means: "The system has generated 142 signals since tracking began."',
+        status: '📊 More signals = more data for learning'
+      },
+      'signal-winrate': {
+        title: 'Win Rate',
+        explanation: 'The percentage of closed signals that made money. But remember: win rate alone doesn\'t matter — risk/reward matters too!',
+        example: 'Win Rate 58.5% means: "58.5% of closed signals were profitable."',
+        status: '💡 40% win rate with 2:1 R:R = PROFITABLE. Don\'t chase high win rate — chase good risk/reward.'
+      },
+      'signal-profit': {
+        title: 'Total Profit',
+        explanation: 'The net profit (in percentage) from all closed signals combined.',
+        example: 'Total Profit +24.5% means: "All closed signals combined have made 24.5% profit."',
+        status: '🟢 Positive = Profitable | 🔴 Negative = Losing'
+      },
+      'signal-active': {
+        title: 'Active Signals',
+        explanation: 'The number of trades that are currently open and have not yet hit take profit or stop loss.',
+        example: 'Active Signals 3 means: "There are 3 trades currently in progress."',
+        status: '⏳ Waiting for them to close'
+      }
+    };
+
+    function showExplanation(metricKey) {
+      const exp = EXPLANATIONS[metricKey];
+      if (!exp) return;
+      
+      const modal = document.createElement('div');
+      modal.className = 'explanation-modal';
+      modal.innerHTML = `
+        <div class="modal-inner">
+          <div class="modal-header">
+            <div class="modal-title">${exp.title}</div>
+            <button class="modal-close" onclick="this.closest('.explanation-modal').remove()">✕</button>
+          </div>
+          <div class="modal-body">${exp.explanation}</div>
+          <div class="modal-example">💡 <strong>Example:</strong> ${exp.example}</div>
+          <div class="modal-status">${exp.status}</div>
+          <button class="modal-btn" onclick="this.closest('.explanation-modal').remove()">Got it</button>
+        </div>
+      `;
+      modal.addEventListener('click', function(e) { if (e.target === this) this.remove(); });
+      document.body.appendChild(modal);
+    }
+
+    function addMetricExplanations() {
+      document.querySelectorAll('[data-explanation]').forEach(el => {
+        el.addEventListener('click', function(e) {
+          const key = this.getAttribute('data-explanation');
+          if (key) showExplanation(key);
+        });
+      });
+    }
+
     // ──────────────────────────────────────────────────────────────
     // SYSTEM OVERLAY
     // ──────────────────────────────────────────────────────────────
@@ -792,6 +959,7 @@
         CMI.data = await resp.json();
         console.log('✅ Real data loaded successfully!');
         renderDashboard();
+        setTimeout(addMetricExplanations, 500);
       } catch (e) {
         console.error('❌ Failed to load data:', e);
         document.getElementById('dashboard-app').innerHTML = `
