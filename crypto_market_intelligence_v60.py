@@ -2958,7 +2958,7 @@ def generate_market_narrative(asset_data, order_book_data, onchain_data, events)
     
     # Macro analysis
     tpu = fetch_trade_policy_uncertainty()
-    regime = detect_regime(tpu.get('tpu_value', 0))
+    regime = detect_market_regime(tpu.get('tpu_value', 0))   # ← FIXED — using V6 function
     narrative['macro'] = f"Macro Regime: {regime['regime']} — {regime['description']}"
     
     # Technical analysis
