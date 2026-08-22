@@ -3054,10 +3054,10 @@ def run_v6_pipeline():
     run_pipeline()
     
     print("\n[V6] Running advanced analytics...")
-
+    
     # Initialize imbalance to None (will be set if order book works)
     imbalance = None
-
+    
     # 1. Order Book Analysis
     print("\n[V6.1] Fetching order book data...")
     ob_snapshot = fetch_order_book_snapshot('BTCUSDT')
