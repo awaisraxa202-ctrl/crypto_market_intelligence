@@ -3058,19 +3058,19 @@ def run_v6_pipeline():
     
     print("\n[V6] Running advanced analytics...")
     
-    # Initialize all variables to prevent UnboundLocalError
+    # Initialize all variables with default values
     ob_snapshot = None
     imbalance = None
-    etf_data = {'total_net_flow': 0}
-    tpu_data = {'tpu_value': 0}
-    regime = {'regime': 'LOW_UNCERTAINTY', 'dominant_feature': 'MINING_COSTS'}
-    onchain = {'nvt_ratio': 0}
+    etf_data = {'total_net_flow': 0, 'cumulative_holdings': 0, 'daily_change': 0}
+    tpu_data = {'tpu_value': 0, 'source': 'fallback'}
+    regime = {'regime': 'LOW_UNCERTAINTY', 'description': 'Low trade policy uncertainty', 'dominant_feature': 'MINING_COSTS'}
+    onchain = {'nvt_ratio': 0, 'mvrv_zscore': 0, 'miner_reserves': 0}
     ml_signal = {'action': 'HOLD', 'confidence': 0.5, 'trade_qualified': False}
-    big_trade = {'position_size': 0, 'risk_pct': 0}
-    small_trade = {'position_size': 0, 'risk_pct': 0}
-    explanation = {'summary': 'No trade', 'trader_comment': 'No data available'}
+    big_trade = {'position_size': 0, 'risk_pct': 0, 'target_movement': 0, 'trade_type': 'BIG'}
+    small_trade = {'position_size': 0, 'risk_pct': 0, 'target_movement': 0, 'trade_type': 'SMALL'}
+    explanation = {'summary': 'No trade', 'trader_comment': 'No data available', 'factors': []}
     exit_strategy = {'scenarios': []}
-    narrative = {'macro': 'Loading...', 'technicals': 'Loading...', 'sentiment': 'Loading...', 'upcoming_events': 'No events'}
+    narrative = {'date': datetime.now().strftime('%B %d, %Y'), 'macro': 'Loading...', 'technicals': 'Loading...', 'sentiment': 'Loading...', 'upcoming_events': 'No events', 'trader_comment': 'No data available'}
     learning_result = {'accuracy': 0, 'threshold_adjustment': '0.00'}
     
     # 1. Order Book Analysis
@@ -3080,8 +3080,10 @@ def run_v6_pipeline():
         if ob_snapshot:
             imbalance = calculate_order_book_imbalance(ob_snapshot)
             if imbalance is not None:
-                print(f"  BTC Order Book Imbalance: {imbalance:.3f}")
+                print(f"  ✅ BTC Order Book Imbalance: {imbalance:.3f}")
                 store_order_book_snapshot(ob_snapshot)
+            else:
+                print("  ⚠️ Could not calculate imbalance")
         else:
             print("  ⚠️ Order book data unavailable")
     except Exception as e:
@@ -3107,7 +3109,7 @@ def run_v6_pipeline():
     print("\n[V6.4] Detecting market regime...")
     try:
         regime = detect_market_regime(tpu_data.get('tpu_value', 0))
-        print(f"  Regime: {regime['regime']} — {regime['dominant_feature']}")
+        print(f"  Regime: {regime.get('regime', 'UNKNOWN')} — {regime.get('dominant_feature', 'UNKNOWN')}")
     except Exception as e:
         print(f"  ⚠️ Regime detection error: {e}")
     
@@ -3127,7 +3129,7 @@ def run_v6_pipeline():
             order_book_data = {'BTC': {'imbalance': imbalance}}
         onchain_data = {'BTC': {'mvrv_zscore': 0.5, 'nvt_ratio': onchain.get('nvt_ratio', 0)}}
         ml_signal = calculate_ml_signal({}, order_book_data.get('BTC', {}), onchain_data.get('BTC', {}))
-        print(f"  ML Signal: {ml_signal['action']} (Confidence: {ml_signal['confidence']:.1%})")
+        print(f"  ML Signal: {ml_signal.get('action', 'HOLD')} (Confidence: {ml_signal.get('confidence', 0.5):.1%})")
     except Exception as e:
         print(f"  ⚠️ ML signal error: {e}")
     
@@ -3135,8 +3137,9 @@ def run_v6_pipeline():
     print("\n[V6.7] Calculating trade sizes...")
     try:
         btc_price = 64000
-        big_trade = calculate_trade_size_big(btc_price, ml_signal.get('confidence', 0.5))
-        small_trade = calculate_trade_size_small(btc_price, ml_signal.get('confidence', 0.5))
+        confidence = ml_signal.get('confidence', 0.5)
+        big_trade = calculate_trade_size_big(btc_price, confidence)
+        small_trade = calculate_trade_size_small(btc_price, confidence)
         print(f"  Big Trade: {big_trade.get('position_size', 0):.4f} shares (Risk: {big_trade.get('risk_pct', 0):.1f}%)")
         print(f"  Small Trade: {small_trade.get('position_size', 0):.4f} shares (Risk: {small_trade.get('risk_pct', 0):.1f}%)")
     except Exception as e:
@@ -3166,7 +3169,7 @@ def run_v6_pipeline():
     try:
         btc_price = 64000
         exit_strategy = generate_exit_strategy(btc_price, ml_signal.get('action', 'NO TRADE'), btc_price * 1.01, btc_price * 0.02)
-        for scenario in exit_strategy.get('scenarios', []):
+        for scenario in exit_strategy.get('scenarios', [])[:3]:
             print(f"  • {scenario.get('condition', '')}: {scenario.get('action', '')}")
     except Exception as e:
         print(f"  ⚠️ Exit strategy error: {e}")
@@ -3192,11 +3195,10 @@ def run_v6_pipeline():
     
     print("\n" + "=" * 70)
     print("✅ MARKET CORTEX v6.0 COMPLETE")
-    print("✅ ALL 42 FEATURES VERIFIED")
-    print("✅ ORDER BOOK · ML · SELF-LEARNING · TWO-TIER TRADES")
     print("=" * 70)
     
-    return {
+    # Build return dictionary
+    result = {
         'order_book': ob_snapshot,
         'imbalance': imbalance,
         'etf_data': etf_data,
@@ -3211,6 +3213,28 @@ def run_v6_pipeline():
         'narrative': narrative,
         'learning_result': learning_result
     }
+    
+    # ⚠️ CRITICAL: Save V6 results to JSON
+    try:
+        with open('docs/v6_results.json', 'w') as f:
+            clean_results = {
+                'timestamp': datetime.now().isoformat(),
+                'imbalance': result.get('imbalance'),
+                'regime': result.get('regime', {}),
+                'ml_signal': result.get('ml_signal', {}),
+                'big_trade': result.get('big_trade', {}),
+                'small_trade': result.get('small_trade', {}),
+                'explanation': result.get('explanation', {}),
+                'narrative': result.get('narrative', {}),
+                'tpu_data': result.get('tpu_data', {}),
+                'etf_data': result.get('etf_data', {})
+            }
+            json.dump(clean_results, f, indent=2, default=str)
+        print("\n💾 V6 results saved to docs/v6_results.json")
+    except Exception as e:
+        print(f"  ❌ CRITICAL: Could not save V6 results: {e}")
+    
+    return result
 
 if __name__ == '__main__':
     # Run V6 pipeline with all new features
