@@ -3051,95 +3051,144 @@ def run_v6_pipeline():
     print("=" * 70)
     
     # Run existing V5 pipeline first
-    run_pipeline()
+    try:
+        run_pipeline()
+    except Exception as e:
+        print(f"  ⚠️ V5 pipeline error: {e}")
     
     print("\n[V6] Running advanced analytics...")
     
-    # Initialize imbalance to None (will be set if order book works)
+    # Initialize all variables to prevent UnboundLocalError
+    ob_snapshot = None
     imbalance = None
+    etf_data = {'total_net_flow': 0}
+    tpu_data = {'tpu_value': 0}
+    regime = {'regime': 'LOW_UNCERTAINTY', 'dominant_feature': 'MINING_COSTS'}
+    onchain = {'nvt_ratio': 0}
+    ml_signal = {'action': 'HOLD', 'confidence': 0.5, 'trade_qualified': False}
+    big_trade = {'position_size': 0, 'risk_pct': 0}
+    small_trade = {'position_size': 0, 'risk_pct': 0}
+    explanation = {'summary': 'No trade', 'trader_comment': 'No data available'}
+    exit_strategy = {'scenarios': []}
+    narrative = {'macro': 'Loading...', 'technicals': 'Loading...', 'sentiment': 'Loading...', 'upcoming_events': 'No events'}
+    learning_result = {'accuracy': 0, 'threshold_adjustment': '0.00'}
     
     # 1. Order Book Analysis
     print("\n[V6.1] Fetching order book data...")
-    ob_snapshot = fetch_order_book_snapshot('BTCUSDT')
-    if ob_snapshot:
-        imbalance = calculate_order_book_imbalance(ob_snapshot)
-        if imbalance is not None:
-            print(f"  BTC Order Book Imbalance: {imbalance:.3f}")
-            store_order_book_snapshot(ob_snapshot)
-    else:
-        print("  ⚠️ Order book data unavailable")
+    try:
+        ob_snapshot = fetch_order_book_snapshot('BTCUSDT')
+        if ob_snapshot:
+            imbalance = calculate_order_book_imbalance(ob_snapshot)
+            if imbalance is not None:
+                print(f"  BTC Order Book Imbalance: {imbalance:.3f}")
+                store_order_book_snapshot(ob_snapshot)
+        else:
+            print("  ⚠️ Order book data unavailable")
+    except Exception as e:
+        print(f"  ⚠️ Order book error: {e}")
     
     # 2. ETF Flow Data
     print("\n[V6.2] Fetching ETF flow data...")
-    etf_data = fetch_etf_flow_data()
-    print(f"  ETF Net Flow: ${etf_data.get('total_net_flow', 0):.2f}M")
+    try:
+        etf_data = fetch_etf_flow_data()
+        print(f"  ETF Net Flow: ${etf_data.get('total_net_flow', 0):.2f}M")
+    except Exception as e:
+        print(f"  ⚠️ ETF data error: {e}")
     
     # 3. Trade Policy Uncertainty
     print("\n[V6.3] Fetching Trade Policy Uncertainty...")
-    tpu_data = fetch_trade_policy_uncertainty()
-    print(f"  TPU Index: {tpu_data.get('tpu_value', 0)}")
+    try:
+        tpu_data = fetch_trade_policy_uncertainty()
+        print(f"  TPU Index: {tpu_data.get('tpu_value', 0)}")
+    except Exception as e:
+        print(f"  ⚠️ TPU error: {e}")
     
     # 4. Regime Detection
     print("\n[V6.4] Detecting market regime...")
-    regime = detect_market_regime(tpu_data.get('tpu_value', 0))
-    print(f"  Regime: {regime['regime']} — {regime['dominant_feature']}")
+    try:
+        regime = detect_market_regime(tpu_data.get('tpu_value', 0))
+        print(f"  Regime: {regime['regime']} — {regime['dominant_feature']}")
+    except Exception as e:
+        print(f"  ⚠️ Regime detection error: {e}")
     
     # 5. On-Chain Metrics
     print("\n[V6.5] Fetching on-chain metrics...")
-    onchain = fetch_onchain_metrics()
-    print(f"  NVT Ratio: {onchain.get('nvt_ratio', 'N/A')}")
+    try:
+        onchain = fetch_onchain_metrics()
+        print(f"  NVT Ratio: {onchain.get('nvt_ratio', 'N/A')}")
+    except Exception as e:
+        print(f"  ⚠️ On-chain error: {e}")
     
     # 6. ML Signal Generation
     print("\n[V6.6] Generating ML predictions...")
-    order_book_data = {}
-    if ob_snapshot and imbalance is not None:
-        order_book_data = {'BTC': {'imbalance': imbalance}}
-    onchain_data = {'BTC': {'mvrv_zscore': 0.5, 'nvt_ratio': onchain.get('nvt_ratio', 0)}}
-    ml_signal = calculate_ml_signal({}, order_book_data.get('BTC', {}), onchain_data.get('BTC', {}))
-    print(f"  ML Signal: {ml_signal['action']} (Confidence: {ml_signal['confidence']:.1%})")
+    try:
+        order_book_data = {}
+        if ob_snapshot and imbalance is not None:
+            order_book_data = {'BTC': {'imbalance': imbalance}}
+        onchain_data = {'BTC': {'mvrv_zscore': 0.5, 'nvt_ratio': onchain.get('nvt_ratio', 0)}}
+        ml_signal = calculate_ml_signal({}, order_book_data.get('BTC', {}), onchain_data.get('BTC', {}))
+        print(f"  ML Signal: {ml_signal['action']} (Confidence: {ml_signal['confidence']:.1%})")
+    except Exception as e:
+        print(f"  ⚠️ ML signal error: {e}")
     
     # 7. Trade Size Selection
     print("\n[V6.7] Calculating trade sizes...")
-    btc_price = 64000
-    big_trade = calculate_trade_size_big(btc_price, ml_signal['confidence'])
-    small_trade = calculate_trade_size_small(btc_price, ml_signal['confidence'])
-    print(f"  Big Trade: {big_trade['position_size']:.4f} shares (Risk: {big_trade['risk_pct']:.1f}%)")
-    print(f"  Small Trade: {small_trade['position_size']:.4f} shares (Risk: {small_trade['risk_pct']:.1f}%)")
+    try:
+        btc_price = 64000
+        big_trade = calculate_trade_size_big(btc_price, ml_signal.get('confidence', 0.5))
+        small_trade = calculate_trade_size_small(btc_price, ml_signal.get('confidence', 0.5))
+        print(f"  Big Trade: {big_trade.get('position_size', 0):.4f} shares (Risk: {big_trade.get('risk_pct', 0):.1f}%)")
+        print(f"  Small Trade: {small_trade.get('position_size', 0):.4f} shares (Risk: {small_trade.get('risk_pct', 0):.1f}%)")
+    except Exception as e:
+        print(f"  ⚠️ Trade size error: {e}")
     
     # 8. Trade Explanation
     print("\n[V6.8] Generating trade explanation...")
-    if imbalance is not None:
-        order_book_active = imbalance > 0.55
-    else:
-        order_book_active = False
-    
-    factors = {
-        'order_book': {'active': order_book_active, 'description': 'Bullish order book imbalance' if order_book_active else 'Order book data unavailable'},
-        'onchain': {'active': True if onchain.get('nvt_ratio', 0) < 20 else False, 'description': 'Low NVT ratio' if onchain.get('nvt_ratio', 0) < 20 else 'NVT ratio normal'},
-        'sentiment': {'active': True, 'description': 'Fear & Greed in buy zone'}
-    }
-    explanation = generate_trade_explanation('BTC', ml_signal['action'], ml_signal['confidence'], factors, {}, {})
-    print(f"  Summary: {explanation['summary']}")
-    print(f"  Comment: {explanation['trader_comment']}")
+    try:
+        if imbalance is not None:
+            order_book_active = imbalance > 0.55
+        else:
+            order_book_active = False
+        
+        factors = {
+            'order_book': {'active': order_book_active, 'description': 'Bullish order book imbalance' if order_book_active else 'Order book data unavailable'},
+            'onchain': {'active': True if onchain.get('nvt_ratio', 0) < 20 else False, 'description': 'Low NVT ratio' if onchain.get('nvt_ratio', 0) < 20 else 'NVT ratio normal'},
+            'sentiment': {'active': True, 'description': 'Fear & Greed in buy zone'}
+        }
+        explanation = generate_trade_explanation('BTC', ml_signal.get('action', 'NO TRADE'), ml_signal.get('confidence', 0.5), factors, {}, {})
+        print(f"  Summary: {explanation.get('summary', 'No summary')}")
+        print(f"  Comment: {explanation.get('trader_comment', 'No comment')}")
+    except Exception as e:
+        print(f"  ⚠️ Trade explanation error: {e}")
     
     # 9. Exit Strategy
     print("\n[V6.9] Generating exit strategy...")
-    exit_strategy = generate_exit_strategy(btc_price, ml_signal['action'], btc_price * 1.01, btc_price * 0.02)
-    for scenario in exit_strategy.get('scenarios', []):
-        print(f"  • {scenario['condition']}: {scenario['action']}")
+    try:
+        btc_price = 64000
+        exit_strategy = generate_exit_strategy(btc_price, ml_signal.get('action', 'NO TRADE'), btc_price * 1.01, btc_price * 0.02)
+        for scenario in exit_strategy.get('scenarios', []):
+            print(f"  • {scenario.get('condition', '')}: {scenario.get('action', '')}")
+    except Exception as e:
+        print(f"  ⚠️ Exit strategy error: {e}")
     
     # 10. Market Narrative
     print("\n[V6.10] Generating market narrative...")
-    events = fetch_economic_calendar()
-    narrative = generate_market_narrative({}, ob_snapshot or {}, onchain, events)
-    print(f"  Macro: {narrative['macro']}")
-    print(f"  Upcoming: {narrative.get('upcoming_events', 'No events')}")
+    try:
+        events = fetch_economic_calendar()
+        narrative = generate_market_narrative({}, ob_snapshot or {}, onchain, events)
+        print(f"  Macro: {narrative.get('macro', 'N/A')}")
+        print(f"  Upcoming: {narrative.get('upcoming_events', 'No events')}")
+    except Exception as e:
+        print(f"  ⚠️ Narrative error: {e}")
     
     # 11. Online Learning
     print("\n[V6.11] Running online learning...")
-    learning_result = online_learning()
-    print(f"  Accuracy: {learning_result.get('accuracy', 0):.1%}")
-    print(f"  Threshold Adjustment: {learning_result.get('threshold_adjustment', '0.00')}")
+    try:
+        learning_result = online_learning()
+        print(f"  Accuracy: {learning_result.get('accuracy', 0):.1%}")
+        print(f"  Threshold Adjustment: {learning_result.get('threshold_adjustment', '0.00')}")
+    except Exception as e:
+        print(f"  ⚠️ Online learning error: {e}")
     
     print("\n" + "=" * 70)
     print("✅ MARKET CORTEX v6.0 COMPLETE")
@@ -3161,6 +3210,7 @@ def run_v6_pipeline():
         'exit_strategy': exit_strategy,
         'narrative': narrative,
         'learning_result': learning_result
+    }
     }
 
 if __name__ == '__main__':
