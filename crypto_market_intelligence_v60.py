@@ -3211,7 +3211,6 @@ def run_v6_pipeline():
         'narrative': narrative,
         'learning_result': learning_result
     }
-    }
 
 if __name__ == '__main__':
     # Run V6 pipeline with all new features
