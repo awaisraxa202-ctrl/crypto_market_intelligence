@@ -818,21 +818,40 @@
     }
 
     function getBadge(signal) {
-      const map = { 'STRONG LONG': 'strong-long', 'LONG': 'long', 'NO TRADE': 'no-trade', 'SHORT': 'short', 'STRONG SHORT': 'strong-short' };
+      const map = {
+        'STRONG LONG': 'strong-long',
+        'LONG': 'long',
+        'NO TRADE': 'no-trade',
+        'SHORT': 'short',
+        'STRONG SHORT': 'strong-short'
+      };
       return map[signal] || 'no-trade';
     }
 
     function getRegimeColor(r) {
       const map = {
-        'STRONG_BULL': '#39ff14', 'BULL_TREND': '#39ff14', 'BULL_VOLATILE': '#80ff66', 'BULL_CHOPPY': '#ccff99',
-        'STRONG_BEAR': '#ff3864', 'BEAR_TREND': '#ff3864', 'BEAR_VOLATILE': '#ff6b8a', 'BEAR_CHOPPY': '#ff99b0',
-        'CHOPPY': '#ffd700', 'RANGE': '#ffd700'
+        'STRONG_BULL': '#39ff14',
+        'BULL_TREND': '#39ff14',
+        'BULL_VOLATILE': '#80ff66',
+        'BULL_CHOPPY': '#ccff99',
+        'STRONG_BEAR': '#ff3864',
+        'BEAR_TREND': '#ff3864',
+        'BEAR_VOLATILE': '#ff6b8a',
+        'BEAR_CHOPPY': '#ff99b0',
+        'CHOPPY': '#ffd700',
+        'RANGE': '#ffd700'
       };
       return map[r] || '#6b7280';
     }
 
     function getRiskGradeColor(grade) {
-      const map = { 'A': 'var(--lime)', 'B': 'var(--lime)', 'C': 'var(--amber)', 'D': 'var(--amber)', 'F': 'var(--rose)' };
+      const map = {
+        'A': 'var(--lime)',
+        'B': 'var(--lime)',
+        'C': 'var(--amber)',
+        'D': 'var(--amber)',
+        'F': 'var(--rose)'
+      };
       return map[grade] || 'var(--text-muted)';
     }
 
@@ -848,17 +867,17 @@
           if (v6.narrative) {
             const n = v6.narrative;
             document.getElementById('narrative-content').textContent = `
-📅 ${n.date || 'Today'}
+    📅 ${n.date || 'Today'}
 
-📊 Macro: ${n.macro || 'Loading...'}
-📈 Technicals: ${n.technicals || 'Loading...'}
-😊 Sentiment: ${n.sentiment || 'Loading...'}
-📅 Upcoming: ${n.upcoming_events || 'No events'}
+    📊 Macro: ${n.macro || 'Loading...'}
+    📈 Technicals: ${n.technicals || 'Loading...'}
+    😊 Sentiment: ${n.sentiment || 'Loading...'}
+    📅 Upcoming: ${n.upcoming_events || 'No events'}
 
-💬 Trader's Comment: ${n.trader_comment || 'No comment'}
+    💬 Trader's Comment: ${n.trader_comment || 'No comment'}
             `;
           }
-          
+
           // Order Book Imbalance
           if (v6.imbalance !== undefined && v6.imbalance !== null) {
             const imb = v6.imbalance;
@@ -866,7 +885,7 @@
             document.getElementById('orderbook-imbalance').style.color = imb > 0.55 ? 'var(--lime)' : imb < 0.45 ? 'var(--rose)' : 'var(--amber)';
             document.getElementById('orderbook-detail').textContent = imb > 0.55 ? '🟢 Bullish imbalance' : imb < 0.45 ? '🔴 Bearish imbalance' : '🟡 Balanced';
           }
-          
+
           // Trade Policy Uncertainty
           if (v6.tpu_data) {
             const tpu = v6.tpu_data.tpu_value || 0;
@@ -1063,7 +1082,7 @@
         const regimeStrategy = a.regime_strategy || {};
         const regimeChange = a.regime_change || { change: false };
         const onchain = a.onchain || {};
-        
+
         // ─── V6 Data: BIG/SMALL Trade Sizes ───
         const bigTrade = a.big_trade || {};
         const smallTrade = a.small_trade || {};
@@ -1124,11 +1143,23 @@
 
     function renderPills(subs) {
       const verdictMap = {
-        'BULLISH': 'bull', 'BULLISH DIVERGENCE': 'bull', 'OVERSOLD': 'bull', 'CONTRARIAN BUY': 'bull',
-        'CONFIRMING': 'bull', 'DEEP VALUE': 'bull', 'SMART MONEY BUYING': 'bull',
-        'BEARISH': 'bear', 'BEARISH DIVERGENCE': 'bear', 'OVERBOUGHT': 'bear', 'CONTRARIAN SELL': 'bear',
-        'DISTRIBUTION': 'bear', 'EXTENDED': 'bear', 'OVERHEATED': 'bear', 'SMART MONEY SELLING': 'bear',
-        'TOP WARNING': 'bear', 'ELEVATED RISK': 'bear'
+        'BULLISH': 'bull',
+        'BULLISH DIVERGENCE': 'bull',
+        'OVERSOLD': 'bull',
+        'CONTRARIAN BUY': 'bull',
+        'CONFIRMING': 'bull',
+        'DEEP VALUE': 'bull',
+        'SMART MONEY BUYING': 'bull',
+        'BEARISH': 'bear',
+        'BEARISH DIVERGENCE': 'bear',
+        'OVERBOUGHT': 'bear',
+        'CONTRARIAN SELL': 'bear',
+        'DISTRIBUTION': 'bear',
+        'EXTENDED': 'bear',
+        'OVERHEATED': 'bear',
+        'SMART MONEY SELLING': 'bear',
+        'TOP WARNING': 'bear',
+        'ELEVATED RISK': 'bear'
       };
       const keys = Object.keys(subs);
       if (keys.length === 0) return '<span style="color:var(--text-muted);font-size:0.35rem;">No sub-signals</span>';
@@ -1243,7 +1274,7 @@
         })
         .then(v6 => {
           const exp = v6.explanation || {};
-          
+
           const popup = document.createElement('div');
           popup.style.cssText = `
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -1252,16 +1283,16 @@
             width: 90%; max-height: 80vh; overflow-y: auto;
             z-index: 1000; box-shadow: 0 20px 60px rgba(0,0,0,0.8);
           `;
-          
+
           let factorsHtml = '';
           if (exp.factors && exp.factors.length > 0) {
-            factorsHtml = exp.factors.map(f => 
+            factorsHtml = exp.factors.map(f =>
               `<li style="padding:4px 8px;background:rgba(255,255,255,0.02);border-radius:4px;font-size:0.75rem;">${f}</li>`
             ).join('');
           } else {
             factorsHtml = '<li style="color:var(--text-muted);">No factors available</li>';
           }
-          
+
           popup.innerHTML = `
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
               <h3 style="font-family:var(--font-display);font-weight:300;color:#fff;">🧠 Why This Trade? — ${asset}</h3>
