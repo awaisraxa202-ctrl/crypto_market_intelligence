@@ -3355,7 +3355,7 @@ def run_v6_pipeline():
             'onchain': {'active': True if onchain.get('nvt_ratio', 0) < 20 else False, 'description': 'Low NVT ratio' if onchain.get('nvt_ratio', 0) < 20 else 'NVT ratio normal'},
             'sentiment': {'active': True, 'description': 'Fear & Greed in buy zone'}
         }
-        explanation = generate_trade_explanation('BTC', ml_signal.get('action', 'NO TRADE'), ml_signal.get('confidence', 0.5), factors, {}, {})
+        explanation = generate_trade_explanation('BTC', ml_signal.get('action', 'NO TRADE'), ml_signal.get('confidence', 0.5), factors, {}, {}, df)
         print(f"  Summary: {explanation.get('summary', 'No summary')}")
         print(f"  Comment: {explanation.get('trader_comment', 'No comment')}")
     except Exception as e:
