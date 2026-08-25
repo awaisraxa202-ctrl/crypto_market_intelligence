@@ -3298,18 +3298,24 @@ def run_v6_pipeline():
     
     # 5. On-Chain Metrics
     print("\n[V6.5] Fetching on-chain metrics...")
-    onchain = fetch_onchain_metrics()
-    print(f"  NVT Ratio: {onchain.get('nvt_ratio', 'N/A')}")
+    try:
+        onchain = fetch_onchain_metrics()
+        print(f"  NVT Ratio: {onchain.get('nvt_ratio', 'N/A')}")
+    except Exception as e:
+        print(f"  ⚠️ On-chain error: {e}")
+        onchain = {}
     
     # 5.5. Macro Data (NEW)
     print("\n[V6.5b] Fetching macro data...")
-    macro_data = fetch_macro_data()
-    print(f"  Fed: {macro_data.get('fed_trend', 'UNKNOWN')} ({macro_data.get('fed_rate', 'N/A')}%)")
-    print(f"  DXY: {macro_data.get('dxy_trend', 'UNKNOWN')} ({macro_data.get('dxy', 'N/A')})")
-    print(f"  VIX: {macro_data.get('vix_level', 'UNKNOWN')} ({macro_data.get('vix', 'N/A')})")
-    print(f"  Overall: {macro_data.get('overall', 'UNKNOWN')}")
+    try:
+        macro_data = fetch_macro_data()
+        print(f"  Fed: {macro_data.get('fed_trend', 'UNKNOWN')} ({macro_data.get('fed_rate', 'N/A')}%)")
+        print(f"  DXY: {macro_data.get('dxy_trend', 'UNKNOWN')} ({macro_data.get('dxy', 'N/A')})")
+        print(f"  VIX: {macro_data.get('vix_level', 'UNKNOWN')} ({macro_data.get('vix', 'N/A')})")
+        print(f"  Overall: {macro_data.get('overall', 'UNKNOWN')}")
     except Exception as e:
-        print(f"  ⚠️ On-chain error: {e}")
+        print(f"  ⚠️ Macro data error: {e}")
+        macro_data = {}
     
     # 6. ML Signal Generation
     print("\n[V6.6] Generating ML predictions...")
@@ -3322,6 +3328,7 @@ def run_v6_pipeline():
         print(f"  ML Signal: {ml_signal.get('action', 'HOLD')} (Confidence: {ml_signal.get('confidence', 0.5):.1%})")
     except Exception as e:
         print(f"  ⚠️ ML signal error: {e}")
+        ml_signal = {'action': 'HOLD', 'confidence': 0.5}
     
     # 7. Trade Size Selection
     print("\n[V6.7] Calculating trade sizes...")
