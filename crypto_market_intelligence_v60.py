@@ -3073,17 +3073,15 @@ def run_v6_pipeline():
     narrative = {'date': datetime.now().strftime('%B %d, %Y'), 'macro': 'Loading...', 'technicals': 'Loading...', 'sentiment': 'Loading...', 'upcoming_events': 'No events', 'trader_comment': 'No data available'}
     learning_result = {'accuracy': 0, 'threshold_adjustment': '0.00'}
     
-    # 1. Order Book Analysis
+        # 1. Order Book Analysis
     print("\n[V6.1] Fetching order book data...")
     try:
         ob_snapshot = fetch_order_book_snapshot('BTCUSDT')
         if ob_snapshot:
-            imbalance = calculate_order_book_imbalance(ob_snapshot)
-            if imbalance is not None:
-                print(f"  ✅ BTC Order Book Imbalance: {imbalance:.3f}")
-                store_order_book_snapshot(ob_snapshot)
-            else:
-                print("  ⚠️ Could not calculate imbalance")
+                imbalance = calculate_order_book_imbalance(ob_snapshot)
+                if imbalance is not None:
+                        print(f"  BTC Order Book Imbalance: {imbalance:.3f}")
+                        store_order_book_snapshot(ob_snapshot)
         else:
             print("  ⚠️ Order book data unavailable")
     except Exception as e:
