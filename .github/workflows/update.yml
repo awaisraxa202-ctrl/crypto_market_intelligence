@@ -45,7 +45,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/market_intelligence.json docs/signal_history.json docs/market_summary.txt crypto_quant.db
+          git add docs/market_intelligence.json docs/signal_history.json docs/signal_database.json docs/v6_results.json docs/market_summary.txt crypto_quant.db
           git diff --cached --quiet || (git commit -m "Hourly update [$(date -u +%Y-%m-%d_%H-%M)]" && git push)
 
   deploy:
