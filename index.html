@@ -857,26 +857,101 @@
 
     // ─── LOAD V6 DATA ───
     function loadV6Data() {
-      fetch('docs/v6_results.json')
+    fetch('docs/v6_results.json')
         .then(res => {
-          if (!res.ok) throw new Error('V6 data not found');
-          return res.json();
+            if (!res.ok) throw new Error('V6 data not found');
+            return res.json();
         })
         .then(v6 => {
-          // Narrative
-          if (v6.narrative) {
-            const n = v6.narrative;
-            document.getElementById('narrative-content').textContent = `
-    📅 ${n.date || 'Today'}
+            // Narrative
+            if (v6.narrative) {
+                const n = v6.narrative;
+                const el = document.getElementById('narrative-content');
+                if (el) {
+                    el.textContent = `
+📅 ${n.date || 'Today'}
 
-    📊 Macro: ${n.macro || 'Loading...'}
-    📈 Technicals: ${n.technicals || 'Loading...'}
-    😊 Sentiment: ${n.sentiment || 'Loading...'}
-    📅 Upcoming: ${n.upcoming_events || 'No events'}
+📊 Macro: ${n.macro || 'Loading...'}
+📈 Technicals: ${n.technicals || 'Loading...'}
+😊 Sentiment: ${n.sentiment || 'Loading...'}
+📅 Upcoming: ${n.upcoming_events || 'No events'}
 
-    💬 Trader's Comment: ${n.trader_comment || 'No comment'}
-            `;
-          }
+💬 Trader's Comment: ${n.trader_comment || 'No comment'}
+                    `;
+                }
+            }
+            
+            // ─── MACRO DATA ───
+            if (v6.macro_data) {
+                const m = v6.macro_data;
+                
+                // Update Fed
+                const fedEl = document.getElementById('fed-cycle');
+                const fedDetail = document.getElementById('fed-detail');
+                if (fedEl) fedEl.textContent = m.fed_trend || '—';
+                if (fedDetail) fedDetail.textContent = m.fed_label || 'Loading...';
+                
+                // Update DXY
+                const dxyEl = document.getElementById('dxy-trend');
+                const dxyDetail = document.getElementById('dxy-detail');
+                if (dxyEl) dxyEl.textContent = m.dxy_trend || '—';
+                if (dxyDetail) dxyDetail.textContent = m.dxy_label || 'Loading...';
+                
+                // Update Liquidity
+                const liqEl = document.getElementById('liquidity');
+                const liqDetail = document.getElementById('liquidity-detail');
+                if (liqEl) liqEl.textContent = m.liquidity || '—';
+                if (liqDetail) liqDetail.textContent = m.liquidity_desc || 'Loading...';
+                
+                // Update VIX
+                const vixEl = document.getElementById('vix-level');
+                const vixDetail = document.getElementById('vix-detail');
+                if (vixEl) vixEl.textContent = m.vix_level || '—';
+                if (vixDetail) vixDetail.textContent = m.vix_label || 'Loading...';
+                
+                // Update Overall
+                const overallEl = document.getElementById('macro-overall');
+                const descEl = document.getElementById('macro-desc');
+                if (overallEl) {
+                    overallEl.textContent = m.overall || '—';
+                    overallEl.style.color = m.overall_color || 'var(--lime)';
+                }
+                if (descEl) descEl.textContent = m.overall_desc || 'Loading...';
+            }
+            
+            // Order Book Imbalance
+            if (v6.imbalance !== undefined && v6.imbalance !== null) {
+                const imb = v6.imbalance;
+                const el = document.getElementById('orderbook-imbalance');
+                const detail = document.getElementById('orderbook-detail');
+                if (el) {
+                    el.textContent = imb.toFixed(3);
+                    el.style.color = imb > 0.55 ? 'var(--lime)' : imb < 0.45 ? 'var(--rose)' : 'var(--amber)';
+                }
+                if (detail) {
+                    detail.textContent = imb > 0.55 ? '🟢 Bullish imbalance' : imb < 0.45 ? '🔴 Bearish imbalance' : '🟡 Balanced';
+                }
+            }
+            
+            // Trade Policy Uncertainty
+            if (v6.tpu_data) {
+                const tpu = v6.tpu_data.tpu_value || 0;
+                const el = document.getElementById('tpu-value');
+                const detail = document.getElementById('tpu-detail');
+                if (el) {
+                    el.textContent = tpu;
+                    el.style.color = tpu < 100 ? 'var(--lime)' : tpu < 200 ? 'var(--amber)' : 'var(--rose)';
+                }
+                if (detail) {
+                    detail.textContent = tpu < 100 ? '✅ Low uncertainty' : tpu < 200 ? '⚠️ Moderate uncertainty' : '🔴 High uncertainty';
+                }
+            }
+        })
+        .catch(() => {
+            const el = document.getElementById('narrative-content');
+            if (el) el.textContent = '⚠️ V6 data not available yet. Run the workflow.';
+        });
+}
 
           // Order Book Imbalance
           if (v6.imbalance !== undefined && v6.imbalance !== null) {
