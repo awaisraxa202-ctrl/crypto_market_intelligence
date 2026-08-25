@@ -2794,8 +2794,8 @@ def rank_trades(trade_list):
     """Rank trades by best opportunity"""
     return sorted(trade_list, key=lambda x: x.get('confidence', 0), reverse=True)
 
-def generate_trade_explanation(asset, signal, confidence, factors, order_book, onchain):
-    """Generate comprehensive explanation for a trade"""
+def generate_trade_explanation(asset, signal, confidence, factors, order_book, onchain, df=None):
+    """Generate comprehensive explanation for a trade with REAL historical data"""
     
     explanation = {
         'asset': asset,
@@ -2804,37 +2804,61 @@ def generate_trade_explanation(asset, signal, confidence, factors, order_book, o
         'summary': '',
         'factors': [],
         'historical_evidence': '',
+        'historical_trades': [],
         'risk_warning': '',
         'trader_comment': ''
     }
     
+    # Build factor explanations
     factor_texts = []
+    active_count = 0
     for factor, value in factors.items():
         if value.get('active', False):
             factor_texts.append(f"✅ {factor}: {value['description']}")
+            active_count += 1
         else:
             factor_texts.append(f"❌ {factor}: {value['description']}")
     
     explanation['factors'] = factor_texts
     
+    # ─── REAL HISTORICAL EVIDENCE ───
+    historical_win_rate = 50
+    if df is not None and len(df) > 60:
+        try:
+            similar_trades = find_similar_conditions(df, n_matches=10)
+            if similar_trades:
+                wins = sum(1 for t in similar_trades if t.get('future_5d_return', 0) > 0)
+                historical_win_rate = (wins / len(similar_trades)) * 100 if similar_trades else 50
+                explanation['historical_trades'] = similar_trades
+                explanation['historical_evidence'] = f"Similar setups have shown a {historical_win_rate:.0f}% win rate historically."
+            else:
+                explanation['historical_evidence'] = "Not enough historical data for this pattern."
+        except Exception as e:
+            explanation['historical_evidence'] = f"Historical analysis limited."
+    else:
+        explanation['historical_evidence'] = "Building historical database. Check back soon."
+    
+    # Generate summary
     if signal == 'LONG':
-        summary = f"BUY {asset} — {len([f for f in factors.values() if f.get('active')])} factors align bullish"
-        trader_comment = "All indicators point to upside potential."
+        summary = f"BUY {asset} — {active_count} factors align bullish"
+        trader_comment = f"All indicators point to upside potential. Historical win rate: {historical_win_rate:.0f}%."
     elif signal == 'SHORT':
-        summary = f"SHORT {asset} — {len([f for f in factors.values() if f.get('active')])} factors align bearish"
-        trader_comment = "Bearish signals dominate the current setup."
+        summary = f"SHORT {asset} — {active_count} factors align bearish"
+        trader_comment = f"Bearish signals dominate the current setup. Historical win rate: {historical_win_rate:.0f}%."
     else:
         summary = f"HOLD {asset} — Mixed signals. Wait for clarity."
         trader_comment = "No clear directional bias. Patience is key."
     
     explanation['summary'] = summary
     explanation['trader_comment'] = trader_comment
-    explanation['historical_evidence'] = "Similar setups have shown a 72% win rate historically."
     
+    # Risk warning
     if confidence < 0.6:
         explanation['risk_warning'] = "⚠️ Low confidence trade. Reduce position size by 50%."
+    elif confidence < 0.8:
+        explanation['risk_warning'] = "✅ Moderate confidence. Standard position size recommended."
     else:
-        explanation['risk_warning'] = "✅ Confidence is adequate. Standard position size recommended."
+        explanation['risk_warning'] = "🟢 High confidence trade. Can consider increased position size."
     
     return explanation
 
