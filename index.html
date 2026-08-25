@@ -1267,57 +1267,179 @@
 
     // ─── WHY THIS TRADE? POPUP ───
     function showTradeExplanation(asset) {
-      fetch('docs/v6_results.json')
+    // Get the asset data from the main JSON first
+    let assetData = null;
+    if (CMI.data && CMI.data.assets && CMI.data.assets[asset]) {
+        assetData = CMI.data.assets[asset];
+    }
+    
+    // Then get V6 data
+    fetch('docs/v6_results.json')
         .then(res => {
-          if (!res.ok) throw new Error('V6 data not found');
-          return res.json();
+            if (!res.ok) throw new Error('V6 data not found');
+            return res.json();
         })
         .then(v6 => {
-          const exp = v6.explanation || {};
-
-          const popup = document.createElement('div');
-          popup.style.cssText = `
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: #0e0e16; border: 1px solid rgba(0,229,255,0.2);
-            border-radius: 12px; padding: 30px; max-width: 600px;
-            width: 90%; max-height: 80vh; overflow-y: auto;
-            z-index: 1000; box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-          `;
-
-          let factorsHtml = '';
-          if (exp.factors && exp.factors.length > 0) {
-            factorsHtml = exp.factors.map(f =>
-              `<li style="padding:4px 8px;background:rgba(255,255,255,0.02);border-radius:4px;font-size:0.75rem;">${f}</li>`
-            ).join('');
-          } else {
-            factorsHtml = '<li style="color:var(--text-muted);">No factors available</li>';
-          }
-
-          popup.innerHTML = `
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-              <h3 style="font-family:var(--font-display);font-weight:300;color:#fff;">🧠 Why This Trade? — ${asset}</h3>
-              <button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:1.5rem;cursor:pointer;">✕</button>
-            </div>
-            <div style="font-family:var(--font-display);font-size:1.1rem;color:var(--accent);margin-bottom:8px;">${exp.summary || 'No active trade'}</div>
-            <div style="font-size:0.85rem;color:var(--text-secondary);line-height:1.6;margin-bottom:12px;">${exp.trader_comment || ''}</div>
-            <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:8px;">📊 Factors:</div>
-            <ul style="list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0;">
-              ${factorsHtml}
-            </ul>
-            <div style="margin-top:12px;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;border-left:2px solid var(--amber);font-size:0.7rem;color:var(--text-secondary);">
-              ${exp.risk_warning || '⚠️ Risk management advised.'}
-            </div>
-            ${exp.historical_evidence ? `
-            <div style="margin-top:8px;padding:8px;background:rgba(57,255,20,0.03);border-radius:6px;border-left:2px solid var(--lime);font-size:0.65rem;color:var(--text-secondary);">
-              📈 ${exp.historical_evidence}
-            </div>` : ''}
-          `;
-          document.body.appendChild(popup);
+            const exp = v6.explanation || {};
+            
+            // Build REAL factors from asset sub_signals
+            let factorsHtml = '';
+            if (assetData && assetData.sub_signals) {
+                const subs = assetData.sub_signals;
+                const verdictMap = {
+                    'BULLISH': '🟢',
+                    'BULLISH DIVERGENCE': '🟢',
+                    'OVERSOLD': '🟢',
+                    'CONTRARIAN BUY': '🟢',
+                    'CONFIRMING': '🟢',
+                    'DEEP VALUE': '🟢',
+                    'SMART MONEY BUYING': '🟢',
+                    'BEARISH': '🔴',
+                    'BEARISH DIVERGENCE': '🔴',
+                    'OVERBOUGHT': '🔴',
+                    'CONTRARIAN SELL': '🔴',
+                    'DISTRIBUTION': '🔴',
+                    'EXTENDED': '🔴',
+                    'OVERHEATED': '🔴',
+                    'SMART MONEY SELLING': '🔴',
+                    'TOP WARNING': '🔴'
+                };
+                
+                const factorNames = {
+                    'trend': 'Trend',
+                    'momentum': 'Momentum',
+                    'volatility': 'Volatility',
+                    'sentiment': 'Sentiment',
+                    'funding': 'Funding',
+                    'volume': 'Volume',
+                    'drawdown': 'Drawdown',
+                    'stoch_rsi': 'Stochastic RSI',
+                    'williams_r': 'Williams %R',
+                    'pi_cycle': 'Pi Cycle',
+                    'rsi_divergence': 'RSI Divergence',
+                    'obv_divergence': 'OBV Divergence'
+                };
+                
+                const factorItems = Object.entries(subs).map(([key, value]) => {
+                    const verdict = value.verdict || 'NEUTRAL';
+                    const icon = verdictMap[verdict] || '⚪';
+                    const name = factorNames[key] || key;
+                    const detail = value.detail || '';
+                    return `<li style="padding:4px 8px;background:rgba(255,255,255,0.02);border-radius:4px;font-size:0.75rem;display:flex;justify-content:space-between;align-items:center;">
+                        <span>${icon} ${name}</span>
+                        <span style="color:${verdict === 'BULLISH' ? 'var(--lime)' : verdict === 'BEARISH' ? 'var(--rose)' : 'var(--text-muted)'};">${verdict}</span>
+                    </li>`;
+                });
+                factorsHtml = factorItems.join('');
+            } else if (exp.factors && exp.factors.length > 0) {
+                factorsHtml = exp.factors.map(f =>
+                    `<li style="padding:4px 8px;background:rgba(255,255,255,0.02);border-radius:4px;font-size:0.75rem;">${f}</li>`
+                ).join('');
+            } else {
+                factorsHtml = '<li style="color:var(--text-muted);">No factors available</li>';
+            }
+            
+            // Calculate REAL win rate from asset data
+            let historicalEvidence = 'Building historical database. Check back soon.';
+            if (assetData && assetData.signal_history) {
+                const winRate = assetData.signal_history.win_rate;
+                if (winRate && winRate > 0) {
+                    historicalEvidence = `Similar setups have shown a ${winRate.toFixed(1)}% win rate historically.`;
+                }
+            } else if (exp.historical_evidence) {
+                historicalEvidence = exp.historical_evidence;
+            }
+            
+            // Build the popup
+            const popup = document.createElement('div');
+            popup.style.cssText = `
+                position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                background: #0e0e16; border: 1px solid rgba(0,229,255,0.2);
+                border-radius: 12px; padding: 30px; max-width: 600px;
+                width: 90%; max-height: 80vh; overflow-y: auto;
+                z-index: 1000; box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            `;
+            
+            const signal = assetData ? assetData.signal : 'NO TRADE';
+            const conviction = assetData ? (assetData.conviction * 100).toFixed(0) : '—';
+            
+            popup.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                    <h3 style="font-family:var(--font-display);font-weight:300;color:#fff;">🧠 Why This Trade? — ${asset}</h3>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:1.5rem;cursor:pointer;">✕</button>
+                </div>
+                <div style="font-family:var(--font-display);font-size:1.1rem;color:${signal === 'LONG' || signal === 'STRONG LONG' ? 'var(--lime)' : signal === 'SHORT' || signal === 'STRONG SHORT' ? 'var(--rose)' : 'var(--amber)'};margin-bottom:8px;">
+                    ${signal} — Conviction: ${conviction}%
+                </div>
+                <div style="font-size:0.85rem;color:var(--text-secondary);line-height:1.6;margin-bottom:12px;">
+                    ${exp.trader_comment || 'No clear directional bias. Patience is key.'}
+                </div>
+                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:8px;">📊 Sub-Signals:</div>
+                <ul style="list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0;">
+                    ${factorsHtml}
+                </ul>
+                <div style="margin-top:12px;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;border-left:2px solid var(--amber);font-size:0.7rem;color:var(--text-secondary);">
+                    ${exp.risk_warning || '⚠️ Risk management advised.'}
+                </div>
+                <div style="margin-top:8px;padding:8px;background:rgba(57,255,20,0.03);border-radius:6px;border-left:2px solid var(--lime);font-size:0.65rem;color:var(--text-secondary);">
+                    📈 ${historicalEvidence}
+                </div>
+            `;
+            document.body.appendChild(popup);
         })
         .catch(() => {
-          alert('⚠️ Trade explanation not available yet. Run the workflow to generate data.');
+            // Fallback: Use asset data directly
+            if (assetData && assetData.sub_signals) {
+                const subs = assetData.sub_signals;
+                const factorNames = {
+                    'trend': 'Trend',
+                    'momentum': 'Momentum',
+                    'volatility': 'Volatility',
+                    'sentiment': 'Sentiment',
+                    'funding': 'Funding',
+                    'volume': 'Volume',
+                    'drawdown': 'Drawdown'
+                };
+                const factorItems = Object.entries(subs).map(([key, value]) => {
+                    const verdict = value.verdict || 'NEUTRAL';
+                    const icon = verdict === 'BULLISH' ? '🟢' : verdict === 'BEARISH' ? '🔴' : '⚪';
+                    const name = factorNames[key] || key;
+                    return `<li style="padding:4px 8px;background:rgba(255,255,255,0.02);border-radius:4px;font-size:0.75rem;display:flex;justify-content:space-between;">
+                        <span>${icon} ${name}</span>
+                        <span style="color:${verdict === 'BULLISH' ? 'var(--lime)' : verdict === 'BEARISH' ? 'var(--rose)' : 'var(--text-muted)'};">${verdict}</span>
+                    </li>`;
+                }).join('');
+                
+                const popup = document.createElement('div');
+                popup.style.cssText = `
+                    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                    background: #0e0e16; border: 1px solid rgba(0,229,255,0.2);
+                    border-radius: 12px; padding: 30px; max-width: 600px;
+                    width: 90%; max-height: 80vh; overflow-y: auto;
+                    z-index: 1000; box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+                `;
+                popup.innerHTML = `
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                        <h3 style="font-family:var(--font-display);font-weight:300;color:#fff;">🧠 Why This Trade? — ${asset}</h3>
+                        <button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:1.5rem;cursor:pointer;">✕</button>
+                    </div>
+                    <div style="font-family:var(--font-display);font-size:1.1rem;color:${assetData.signal === 'LONG' || assetData.signal === 'STRONG LONG' ? 'var(--lime)' : assetData.signal === 'SHORT' || assetData.signal === 'STRONG SHORT' ? 'var(--rose)' : 'var(--amber)'};margin-bottom:8px;">
+                        ${assetData.signal} — Conviction: ${(assetData.conviction * 100).toFixed(0)}%
+                    </div>
+                    <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:8px;">📊 Sub-Signals:</div>
+                    <ul style="list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0;">
+                        ${factorItems}
+                    </ul>
+                    <div style="margin-top:12px;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;border-left:2px solid var(--amber);font-size:0.7rem;color:var(--text-secondary);">
+                        ⚠️ Risk management advised.
+                    </div>
+                `;
+                document.body.appendChild(popup);
+            } else {
+                alert('⚠️ Trade explanation not available yet. Run the workflow to generate data.');
+            }
         });
-    }
+}
 
     // ─── CORRELATION ───
     function renderCorrelationMatrix(matrix) {
