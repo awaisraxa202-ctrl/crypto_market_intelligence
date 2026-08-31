@@ -73,7 +73,13 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 import warnings
 import asyncio
-import websockets
+try:
+    import websockets
+    WEBSOCKETS_AVAILABLE = True
+except ImportError:
+    websockets = None
+    WEBSOCKETS_AVAILABLE = False
+    print("  ⚠️ websockets not installed — order book streaming disabled (snapshots still work)")
 import threading
 from collections import deque
 
@@ -137,6 +143,7 @@ DB_PATH = 'crypto_quant.db'
 OUTPUT_PATH = 'docs/market_intelligence.json'
 HISTORY_PATH = 'docs/signal_history.json'
 SIGNAL_DB_PATH = 'docs/signal_database.json'
+PAPER_ACCOUNT_PATH = 'docs/paper_account.json'
 os.makedirs('docs', exist_ok=True)
 
 # ===================== 1. RETRY WRAPPER =====================
@@ -1455,7 +1462,16 @@ def multi_timeframe_analysis(symbol, timeframes=['1h', '4h', '1d']):
         df['sma_20'] = df['close'].rolling(20).mean()
         df['sma_50'] = df['close'].rolling(50).mean()
         df['return'] = df['close'].pct_change()
-        df['rsi'] = 100 - (100 / (1 + df['return'].rolling(14).mean()))
+        # BUGFIX: the previous formula was 100 - 100/(1 + mean_return), which yields
+        # values in roughly the 0-1 range instead of 0-100. Because the BULLISH branch
+        # below requires rsi > 50, that condition could NEVER be true, so no timeframe
+        # could ever return BULLISH and multi-timeframe alignment collapsed to CONFLICT
+        # on every asset on every run. This is proper Wilder's RSI.
+        _delta = df['close'].diff()
+        _gain = _delta.clip(lower=0).ewm(alpha=1/14, adjust=False).mean()
+        _loss = (-_delta.clip(upper=0)).ewm(alpha=1/14, adjust=False).mean()
+        _rs = _gain / _loss.replace(0, np.nan)
+        df['rsi'] = (100 - (100 / (1 + _rs))).fillna(50)
         latest = df.iloc[-1]
         price = latest['close']
         sma20 = latest.get('sma_20', price)
@@ -1642,12 +1658,18 @@ def update_signal_status(db, asset, current_price):
                     signal['exit_date'] = datetime.now().isoformat()
                     signal['profit_pct'] = ((current_price - entry) / entry) * 100
                     signal['holding_days'] = (datetime.now() - datetime.fromisoformat(signal['entry_date'])).days
+                    track_prediction_accuracy(signal['asset'], signal['signal'], False)
+                    signal['post_mortem'] = generate_post_mortem(
+                        signal['asset'], entry, current_price, signal['signal'],
+                        datetime.fromisoformat(signal['entry_date']), datetime.now()
+                    )
                 elif tp2 and current_price >= tp2:
                     signal['status'] = 'CLOSED_WIN'
                     signal['exit_price'] = current_price
                     signal['exit_date'] = datetime.now().isoformat()
                     signal['profit_pct'] = ((current_price - entry) / entry) * 100
                     signal['holding_days'] = (datetime.now() - datetime.fromisoformat(signal['entry_date'])).days
+                    track_prediction_accuracy(signal['asset'], signal['signal'], True)
             elif signal['signal'] in ['STRONG SHORT', 'SHORT']:
                 if sl and current_price >= sl:
                     signal['status'] = 'CLOSED_LOSS'
@@ -1655,12 +1677,18 @@ def update_signal_status(db, asset, current_price):
                     signal['exit_date'] = datetime.now().isoformat()
                     signal['profit_pct'] = ((entry - current_price) / entry) * 100
                     signal['holding_days'] = (datetime.now() - datetime.fromisoformat(signal['entry_date'])).days
+                    track_prediction_accuracy(signal['asset'], signal['signal'], False)
+                    signal['post_mortem'] = generate_post_mortem(
+                        signal['asset'], entry, current_price, signal['signal'],
+                        datetime.fromisoformat(signal['entry_date']), datetime.now()
+                    )
                 elif tp2 and current_price <= tp2:
                     signal['status'] = 'CLOSED_WIN'
                     signal['exit_price'] = current_price
                     signal['exit_date'] = datetime.now().isoformat()
                     signal['profit_pct'] = ((entry - current_price) / entry) * 100
                     signal['holding_days'] = (datetime.now() - datetime.fromisoformat(signal['entry_date'])).days
+                    track_prediction_accuracy(signal['asset'], signal['signal'], True)
     
     db = update_signal_performance(db)
     save_signal_database(db)
@@ -1758,55 +1786,403 @@ def backtest_simple(df, position_col, fee=FEE):
 
 # ===================== 72. PORTFOLIO SIMULATOR =====================
 
-def simulate_portfolio(assets_data, start_capital=10000, days=30):
+# ===================== PERSISTENT PAPER TRADING ACCOUNT =====================
+# The old simulate_portfolio() reset to $10,000 on every run and threw the result
+# away, so no position ever survived between runs. That made DCA impossible and
+# starved the self-learning engine (which needs closed trades). This account
+# persists to disk, so positions live across runs, compound, and produce the
+# closed-trade record everything else depends on.
+
+PAPER_CONFIG = {
+    'starting_capital': 10000.0,
+    'fee_pct': 0.002,              # matches FEE used in backtests
+    'max_open_positions': 5,
+    'max_correlated_exposure': 0.40,   # cap total capital in one correlated bloc
+    'tp1_close_fraction': 0.5,     # take half off at TP1
+    'dca_max_tranches': 3,         # initial entry + up to 2 add-ons
+    'dca_trigger_drawdown': 0.05,  # add when position is 5% underwater
+    'dca_size_multiplier': 0.75,   # each tranche smaller than the last
+    'dca_min_conviction': 0.15,    # only average down if signal still holds
+}
+
+
+def load_paper_account():
+    try:
+        with open(PAPER_ACCOUNT_PATH, 'r') as f:
+            acct = json.load(f)
+            acct.setdefault('cash', PAPER_CONFIG['starting_capital'])
+            acct.setdefault('positions', {})
+            acct.setdefault('closed_trades', [])
+            acct.setdefault('equity_curve', [])
+            return acct
+    except Exception:
+        return {
+            'created': datetime.now().isoformat(),
+            'starting_capital': PAPER_CONFIG['starting_capital'],
+            'cash': PAPER_CONFIG['starting_capital'],
+            'positions': {},
+            'closed_trades': [],
+            'equity_curve': [],
+        }
+
+
+def save_paper_account(acct):
+    try:
+        with open(PAPER_ACCOUNT_PATH, 'w') as f:
+            json.dump(acct, f, indent=2, default=str)
+    except Exception as e:
+        print(f"  ⚠️ Could not save paper account: {e}")
+
+
+def _paper_close(acct, code, pos, price, qty, reason):
+    """Close `qty` units of a position, bank the proceeds, record the trade."""
+    fee = PAPER_CONFIG['fee_pct']
+    if pos['side'] == 'LONG':
+        gross = qty * price
+        pnl = (price - pos['avg_entry']) * qty
+    else:
+        gross = qty * pos['avg_entry']
+        pnl = (pos['avg_entry'] - price) * qty
+    proceeds = gross - (qty * price * fee)
+    acct['cash'] += proceeds if pos['side'] == 'LONG' else (qty * pos['avg_entry']) + pnl - (qty * price * fee)
+    cost_basis = qty * pos['avg_entry']
+    acct['closed_trades'].append({
+        'asset': code,
+        'side': pos['side'],
+        'reason': reason,
+        'entry_price': round(pos['avg_entry'], 6),
+        'exit_price': round(price, 6),
+        'qty': round(qty, 8),
+        'tranches': pos.get('tranches', 1),
+        'pnl': round(pnl, 2),
+        'return_pct': round((pnl / cost_basis) * 100, 2) if cost_basis else 0,
+        'opened': pos.get('opened'),
+        'closed': datetime.now().isoformat(),
+        'holding_days': (datetime.now() - datetime.fromisoformat(pos['opened'])).days
+                        if pos.get('opened') else 0,
+    })
+    # Every closed trade feeds the self-learning engine
+    try:
+        track_prediction_accuracy(code, pos['side'], pnl > 0)
+    except Exception:
+        pass
+    return pnl
+
+
+def run_paper_account(all_signals, correlation_matrix=None):
+    """Advance the persistent paper account by one cycle.
+
+    Order of operations each run:
+      1. mark open positions to current price
+      2. exits first  — stop-loss, TP1 partial, TP2 full
+      3. DCA add-ons  — average down on still-valid signals
+      4. new entries  — subject to position and correlation limits
+    """
+    acct = load_paper_account()
+    fee = PAPER_CONFIG['fee_pct']
+    events = []
+
+    # ---------- 1 & 2: manage existing positions ----------
+    for code in list(acct['positions'].keys()):
+        pos = acct['positions'][code]
+        sig = all_signals.get(code)
+        if not sig:
+            continue
+        price = sig.get('price')
+        if not price:
+            continue
+        plan = sig.get('trade_plan', {}) or {}
+        sl = pos.get('stop_loss') or plan.get('stop_loss')
+        tp1 = pos.get('take_profit_1') or plan.get('take_profit_1')
+        tp2 = pos.get('take_profit_2') or plan.get('take_profit_2')
+        long = pos['side'] == 'LONG'
+
+        # Stop loss — full exit
+        if sl and ((long and price <= sl) or (not long and price >= sl)):
+            pnl = _paper_close(acct, code, pos, price, pos['qty'], 'STOP_LOSS')
+            events.append(f"{code} stopped out ({pnl:+.2f})")
+            del acct['positions'][code]
+            continue
+
+        # TP1 — partial exit, then move stop to breakeven
+        if tp1 and not pos.get('tp1_hit') and ((long and price >= tp1) or (not long and price <= tp1)):
+            qty = pos['qty'] * PAPER_CONFIG['tp1_close_fraction']
+            pnl = _paper_close(acct, code, pos, price, qty, 'TAKE_PROFIT_1_PARTIAL')
+            pos['qty'] -= qty
+            pos['tp1_hit'] = True
+            pos['stop_loss'] = pos['avg_entry']       # breakeven stop on the runner
+            events.append(f"{code} TP1 hit — took {int(PAPER_CONFIG['tp1_close_fraction']*100)}% off ({pnl:+.2f}), stop to breakeven")
+            if pos['qty'] <= 0:
+                del acct['positions'][code]
+                continue
+
+        # TP2 — close the remainder
+        if tp2 and ((long and price >= tp2) or (not long and price <= tp2)):
+            pnl = _paper_close(acct, code, pos, price, pos['qty'], 'TAKE_PROFIT_2')
+            events.append(f"{code} TP2 hit — closed ({pnl:+.2f})")
+            del acct['positions'][code]
+            continue
+
+        # ---------- 3: DCA / averaging down ----------
+        drawdown = ((pos['avg_entry'] - price) / pos['avg_entry']) if long \
+                   else ((price - pos['avg_entry']) / pos['avg_entry'])
+        still_valid = (sig.get('signal') in (['STRONG LONG', 'LONG'] if long else ['STRONG SHORT', 'SHORT'])
+                       and sig.get('conviction', 0) >= PAPER_CONFIG['dca_min_conviction'])
+        if (drawdown >= PAPER_CONFIG['dca_trigger_drawdown']
+                and pos.get('tranches', 1) < PAPER_CONFIG['dca_max_tranches']
+                and not pos.get('tp1_hit')
+                and still_valid):
+            add_notional = pos['last_tranche_notional'] * PAPER_CONFIG['dca_size_multiplier']
+            if acct['cash'] >= add_notional > 0:
+                add_qty = add_notional / price
+                total_cost = pos['avg_entry'] * pos['qty'] + price * add_qty
+                pos['qty'] += add_qty
+                pos['avg_entry'] = total_cost / pos['qty']
+                pos['tranches'] = pos.get('tranches', 1) + 1
+                pos['last_tranche_notional'] = add_notional
+                acct['cash'] -= add_notional * (1 + fee)
+                # re-anchor the stop to the new average entry using the original risk distance
+                if pos.get('risk_distance'):
+                    pos['stop_loss'] = (pos['avg_entry'] - pos['risk_distance']) if long \
+                                       else (pos['avg_entry'] + pos['risk_distance'])
+                events.append(f"{code} DCA tranche {pos['tranches']} @ {price:.4f} — avg now {pos['avg_entry']:.4f}")
+
+    # ---------- 4: new entries ----------
+    equity_now = acct['cash'] + sum(
+        p['qty'] * (all_signals.get(c, {}).get('price') or p['avg_entry'])
+        for c, p in acct['positions'].items())
+
+    ranked = sorted(
+        [(c, s) for c, s in all_signals.items()
+         if c not in acct['positions']
+         and s.get('signal') in ('STRONG LONG', 'LONG', 'STRONG SHORT', 'SHORT')],
+        key=lambda kv: kv[1].get('conviction', 0), reverse=True)
+
+    for code, sig in ranked:
+        if len(acct['positions']) >= PAPER_CONFIG['max_open_positions']:
+            break
+        price = sig.get('price')
+        plan = sig.get('trade_plan', {}) or {}
+        if not price or not plan.get('stop_loss'):
+            continue
+
+        # Correlation cap: don't stack capital into assets that move together
+        if correlation_matrix:
+            correlated_notional = 0.0
+            for held in acct['positions']:
+                rho = (correlation_matrix.get(code, {}) or {}).get(held)
+                if rho is not None and abs(rho) >= 0.7:
+                    hp = acct['positions'][held]
+                    correlated_notional += hp['qty'] * (all_signals.get(held, {}).get('price') or hp['avg_entry'])
+            if equity_now and (correlated_notional / equity_now) >= PAPER_CONFIG['max_correlated_exposure']:
+                events.append(f"{code} skipped — correlated exposure cap")
+                continue
+
+        # Size from the asset's own risk plan (risk_amount / stop distance)
+        risk_distance = abs(price - plan['stop_loss'])
+        if risk_distance <= 0:
+            continue
+        risk_amount = equity_now * min(0.02, max(0.005, sig.get('conviction', 0.1) * 0.03))
+        qty = risk_amount / risk_distance
+        notional = qty * price
+        if notional > acct['cash'] * 0.30:      # never more than 30% of cash in one entry
+            notional = acct['cash'] * 0.30
+            qty = notional / price
+        if notional <= 0 or acct['cash'] < notional * (1 + fee):
+            continue
+
+        acct['cash'] -= notional * (1 + fee)
+        acct['positions'][code] = {
+            'side': 'LONG' if sig['signal'] in ('STRONG LONG', 'LONG') else 'SHORT',
+            'qty': qty,
+            'avg_entry': price,
+            'opened': datetime.now().isoformat(),
+            'tranches': 1,
+            'last_tranche_notional': notional,
+            'stop_loss': plan.get('stop_loss'),
+            'take_profit_1': plan.get('take_profit_1'),
+            'take_profit_2': plan.get('take_profit_2'),
+            'risk_distance': risk_distance,
+            'entry_conviction': sig.get('conviction'),
+            'tp1_hit': False,
+        }
+        events.append(f"{code} OPENED {acct['positions'][code]['side']} {qty:.6f} @ {price:.4f}")
+
+    # ---------- snapshot ----------
+    equity = acct['cash'] + sum(
+        p['qty'] * (all_signals.get(c, {}).get('price') or p['avg_entry'])
+        for c, p in acct['positions'].items())
+    acct['equity_curve'].append({'ts': datetime.now().isoformat(), 'equity': round(equity, 2)})
+    acct['equity_curve'] = acct['equity_curve'][-500:]
+
+    closed = acct['closed_trades']
+    wins = [t for t in closed if t['pnl'] > 0]
+    losses = [t for t in closed if t['pnl'] <= 0]
+    gross_win = sum(t['pnl'] for t in wins)
+    gross_loss = abs(sum(t['pnl'] for t in losses))
+    acct['stats'] = {
+        'equity': round(equity, 2),
+        'cash': round(acct['cash'], 2),
+        'open_positions': len(acct['positions']),
+        'total_return_pct': round(((equity - acct['starting_capital']) / acct['starting_capital']) * 100, 2),
+        'closed_trades': len(closed),
+        'wins': len(wins),
+        'losses': len(losses),
+        'win_rate': round(len(wins) / len(closed) * 100, 1) if closed else None,
+        'profit_factor': round(gross_win / gross_loss, 2) if gross_loss else None,
+        'avg_win': round(gross_win / len(wins), 2) if wins else None,
+        'avg_loss': round(-gross_loss / len(losses), 2) if losses else None,
+        'dca_positions': sum(1 for p in acct['positions'].values() if p.get('tranches', 1) > 1),
+        'last_events': events[-12:],
+    }
+    save_paper_account(acct)
+    return acct
+
+
+def simulate_portfolio(assets_data, price_history=None, start_capital=10000, days=30):
+    """
+    Walks REAL historical daily closes (price_history) day by day and simulates
+    entries/exits using each asset's actual trade plan (stop_loss / take_profit).
+
+    price_history: dict of {asset_code: pandas Series of historical closes, indexed by date}
+                    (this is all_prices from run_pipeline — real fetched OHLCV, not today's
+                    single snapshot repeated). If not provided, falls back to the old
+                    static-price approximation so this still runs standalone.
+
+    Trade duration note: this system only fetches DAILY candles for the 9-asset pipeline
+    (fetch_binance_klines interval='1d'). There is no minute-level history stored anywhere,
+    so a true minute-by-minute scalp simulation isn't possible with the data this pipeline
+    collects — doing so would require a separate intraday data pull. What this function DOES
+    correctly handle: real day-to-day price movement, and exits triggered by actual
+    stop-loss / take-profit levels rather than waiting for the daily signal to flip — so a
+    trade that hits its target on day 2 exits on day 2, not on whatever day the model's
+    opinion happens to change.
+    """
     portfolio = {'cash': start_capital, 'positions': {}, 'history': []}
-    
-    price_data = {}
-    for asset, data in assets_data.items():
-        if 'price' in data:
-            price_data[asset] = data['price']
-    
-    for day in range(min(days, 30)):
+
+    has_real_history = bool(price_history) and any(
+        hasattr(s, '__len__') and len(s) > 1 for s in price_history.values()
+    )
+
+    if not has_real_history:
+        # Fallback: no historical series available, approximate with today's price held flat.
+        # (Old behavior — kept only so this function doesn't break if called without history.)
+        price_data = {a: d.get('price', 0) for a, d in assets_data.items()}
+        for day in range(min(days, 30)):
+            daily_value = portfolio['cash'] + sum(
+                pos['shares'] * price_data.get(a, 0) for a, pos in portfolio['positions'].items()
+            )
+            portfolio['history'].append({
+                'day': day, 'value': round(daily_value, 2),
+                'return': round(((daily_value - start_capital) / start_capital) * 100, 2),
+            })
+        final_value = portfolio['cash'] + sum(
+            pos['shares'] * price_data.get(a, 0) for a, pos in portfolio['positions'].items()
+        )
+        returns = [h['return'] for h in portfolio['history']]
+        return {
+            'final_value': round(final_value, 2),
+            'total_return': round(((final_value - start_capital) / start_capital) * 100, 2),
+            'max_return': round(max(returns), 2) if returns else 0,
+            'min_return': round(min(returns), 2) if returns else 0,
+            'days_simulated': len(portfolio['history']),
+            'history': portfolio['history'],
+            'positions': {}, 'cash': round(portfolio['cash'], 2),
+            'data_mode': 'static_fallback_no_history',
+        }
+
+    # Real walk: use the most recent `days` of REAL history (not the oldest), so
+    # day 0 = (window) days ago and the last day = today's actual close.
+    window = min(days, min(len(s) for s in price_history.values()))
+    price_history = {a: s.iloc[-window:].reset_index(drop=True) for a, s in price_history.items()}
+    trade_plans = {a: d.get('trade_plan', {}) for a, d in assets_data.items()}
+    closed_trades = []
+
+    for day in range(window):
+        # Mark-to-market with today's real close for each open position
         daily_value = portfolio['cash']
-        for asset, shares in portfolio['positions'].items():
-            current_price = price_data.get(asset, 0)
-            daily_value += shares * current_price
-        
+        for asset, pos in list(portfolio['positions'].items()):
+            series = price_history.get(asset)
+            price_today = float(series.iloc[day]) if series is not None and day < len(series) else pos['entry_price']
+
+            sl = pos.get('stop_loss')
+            tp2 = pos.get('take_profit_2')
+            exit_reason = None
+            if pos['side'] == 'LONG':
+                if sl and price_today <= sl:
+                    exit_reason = 'STOP_LOSS'
+                elif tp2 and price_today >= tp2:
+                    exit_reason = 'TAKE_PROFIT'
+            else:  # SHORT
+                if sl and price_today >= sl:
+                    exit_reason = 'STOP_LOSS'
+                elif tp2 and price_today <= tp2:
+                    exit_reason = 'TAKE_PROFIT'
+
+            if exit_reason:
+                pnl = (price_today - pos['entry_price']) * pos['shares'] if pos['side'] == 'LONG' \
+                    else (pos['entry_price'] - price_today) * pos['shares']
+                portfolio['cash'] += pos['shares'] * pos['entry_price'] + pnl
+                closed_trades.append({
+                    'asset': asset, 'side': pos['side'], 'reason': exit_reason,
+                    'holding_days': day - pos['entry_day'],
+                    'return_pct': round((pnl / (pos['shares'] * pos['entry_price'])) * 100, 2)
+                        if pos['shares'] * pos['entry_price'] else 0,
+                })
+                del portfolio['positions'][asset]
+            else:
+                daily_value += pos['shares'] * price_today
+
         portfolio['history'].append({
-            'day': day,
-            'value': round(daily_value, 2),
+            'day': day, 'value': round(daily_value, 2),
             'return': round(((daily_value - start_capital) / start_capital) * 100, 2),
         })
-        
-        for asset, data in assets_data.items():
-            signal = data.get('signal', 'NO TRADE')
-            price = data.get('price', 0)
-            conviction = data.get('conviction', 0.5)
-            
-            if price == 0:
-                continue
-            
-            size_multiplier = 0.5 + (conviction * 0.5)
-            
-            if signal in ['STRONG LONG', 'LONG'] and asset not in portfolio['positions']:
-                max_position_size = portfolio['cash'] * 0.20 * size_multiplier
-                shares_to_buy = max_position_size / price if price > 0 else 0
-                if shares_to_buy > 0:
-                    portfolio['positions'][asset] = shares_to_buy
-                    portfolio['cash'] -= shares_to_buy * price
-            
-            elif signal in ['STRONG SHORT', 'SHORT'] and asset in portfolio['positions']:
-                shares_to_sell = portfolio['positions'][asset]
-                portfolio['cash'] += shares_to_sell * price
-                del portfolio['positions'][asset]
-    
+
+        # Only open NEW positions using the signal as of day 0 (today's actual model output) —
+        # every later day's exits are driven purely by the price hitting SL/TP, not by
+        # re-guessing the signal from a snapshot that isn't real historical data.
+        if day == 0:
+            for asset, data in assets_data.items():
+                signal = data.get('signal', 'NO TRADE')
+                conviction = data.get('conviction', 0.5)
+                series = price_history.get(asset)
+                entry_price = float(series.iloc[0]) if series is not None and len(series) else data.get('price', 0)
+                if entry_price <= 0 or asset in portfolio['positions']:
+                    continue
+                plan = trade_plans.get(asset, {})
+                size_multiplier = 0.5 + (conviction * 0.5)
+                if signal in ('STRONG LONG', 'LONG'):
+                    alloc = portfolio['cash'] * 0.20 * size_multiplier
+                    shares = alloc / entry_price
+                    if shares > 0:
+                        portfolio['positions'][asset] = {
+                            'shares': shares, 'side': 'LONG', 'entry_price': entry_price,
+                            'entry_day': 0, 'stop_loss': plan.get('stop_loss'),
+                            'take_profit_2': plan.get('take_profit_2'),
+                        }
+                        portfolio['cash'] -= shares * entry_price
+                elif signal in ('STRONG SHORT', 'SHORT'):
+                    alloc = portfolio['cash'] * 0.20 * size_multiplier
+                    shares = alloc / entry_price
+                    if shares > 0:
+                        portfolio['positions'][asset] = {
+                            'shares': shares, 'side': 'SHORT', 'entry_price': entry_price,
+                            'entry_day': 0, 'stop_loss': plan.get('stop_loss'),
+                            'take_profit_2': plan.get('take_profit_2'),
+                        }
+                        portfolio['cash'] -= shares * entry_price
+
     final_value = portfolio['cash']
-    for asset, shares in portfolio['positions'].items():
-        final_value += shares * price_data.get(asset, 0)
-    
+    for asset, pos in portfolio['positions'].items():
+        series = price_history.get(asset)
+        last_price = float(series.iloc[-1]) if series is not None and len(series) else pos['entry_price']
+        pnl = (last_price - pos['entry_price']) * pos['shares'] if pos['side'] == 'LONG' \
+            else (pos['entry_price'] - last_price) * pos['shares']
+        final_value += pos['shares'] * pos['entry_price'] + pnl
+
     returns = [h['return'] for h in portfolio['history']]
     total_return = ((final_value - start_capital) / start_capital) * 100
-    
+
     return {
         'final_value': round(final_value, 2),
         'total_return': round(total_return, 2),
@@ -1814,9 +2190,15 @@ def simulate_portfolio(assets_data, start_capital=10000, days=30):
         'min_return': round(min(returns), 2) if returns else 0,
         'days_simulated': len(portfolio['history']),
         'history': portfolio['history'],
-        'positions': {k: round(v, 4) for k, v in portfolio['positions'].items()},
+        'positions': {k: round(v['shares'], 4) for k, v in portfolio['positions'].items()},
+        'closed_trades': closed_trades,
         'cash': round(portfolio['cash'], 2),
+        'data_mode': 'real_historical_walk',
+        'note': 'Uses real daily closes and actual stop-loss/take-profit exits. '
+                'Only daily-resolution data is available — intraday/minute-level '
+                'trades are not simulated at this resolution.',
     }
+
 
 # ===================== 73-77. RISK METRICS =====================
 
@@ -2148,7 +2530,7 @@ def fetch_network_activity(symbol='BTC'):
 
 # ===================== 85-86. MAIN PIPELINE =====================
 
-def process_asset(code, config, fng_df, macro_data, account_capital=10000):
+def process_asset(code, config, fng_df, macro_data, account_capital=10000, learned_adjustment=0.0):
     print(f"\n{'='*60}")
     print(f"Processing {config['name']} ({code})")
     print(f"{'='*60}")
@@ -2183,9 +2565,47 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000):
     strategy_info = REGIME_STRATEGY.get(current_regime, REGIME_STRATEGY['CHOPPY'])
     position_info = calculate_dynamic_position_size(df, len(df) - 1, account_capital=account_capital)
     narrative = build_sub_signals_weighted(latest, config['name'])
+
+    # ─── ACCURACY: apply multi-timeframe confirmation to conviction ───
+    # multi_timeframe_analysis returns a `strength` multiplier (STRONG 1.2 /
+    # MODERATE 0.8 / WEAK 0.6 / CONFLICT 0.3) but nothing ever used it — conviction
+    # was raw |composite| regardless of whether 1h/4h/1d agreed. This is the actual
+    # "multi-timeframe confirmation" the system claims to do: agreement across
+    # timeframes raises conviction, disagreement cuts it.
+    _raw_conviction = narrative['conviction']
+    _mtf_strength = mtf.get('strength', 1.0) if isinstance(mtf, dict) else 1.0
+    narrative['conviction'] = round(min(1.0, _raw_conviction * _mtf_strength), 2)
+    narrative['conviction_raw'] = _raw_conviction
+    narrative['mtf_multiplier'] = _mtf_strength
+
+    # ─── ACCURACY: apply the false-signal filter to the signal itself ───
+    # false_signal_filter was computed but its verdict was ignored; a signal that
+    # failed volume/volatility confirmation still traded at full conviction.
+    try:
+        _vr = float(latest.get('volume_ratio')) if pd.notna(latest.get('volume_ratio')) else 1.0
+        _vt = float(latest.get('atr_pct')) if pd.notna(latest.get('atr_pct')) else 0.5
+        _pre_filter = false_signal_filter(narrative['signal'], narrative['conviction'], _vr, _vt)
+        if _pre_filter.get('filter'):
+            narrative['filtered_reason'] = _pre_filter.get('reason')
+            narrative['signal_before_filter'] = narrative['signal']
+            narrative['signal'] = 'NO TRADE'
+            narrative['action'] = f"Filtered: {_pre_filter.get('reason')}"
+            narrative['conviction'] = round(narrative['conviction'] * 0.5, 2)
+    except Exception as _fe:
+        print(f"  ⚠️ Signal filter failed for {code}: {_fe}")
     vol_forecast = forecast_volatility(df)
     price_targets = calculate_price_targets(latest['close'], latest.get('atr_14', latest['close'] * 0.02), current_regime)
-    sr_levels = {'nearest_support': latest['close'] * 0.95, 'nearest_resistance': latest['close'] * 1.05}
+    # Use REAL swing-based support/resistance (find_support_resistance was defined
+    # but never called; the old code used flat ±5% placeholders regardless of chart).
+    try:
+        _sr = find_support_resistance(df)
+        _support = _sr.get('nearest_support') or latest['close'] * 0.95
+        _resistance = _sr.get('nearest_resistance') or latest['close'] * 1.05
+    except Exception as _e:
+        print(f"  ⚠️ S/R calc failed for {code}: {_e}")
+        _sr = {}
+        _support, _resistance = latest['close'] * 0.95, latest['close'] * 1.05
+    sr_levels = {'nearest_support': _support, 'nearest_resistance': _resistance}
     trade_plan = generate_trade_plan(code, narrative['signal'], narrative['conviction'], latest['close'], sr_levels, latest.get('atr_14', latest['close'] * 0.02), position_info)
     history = track_signal_performance(code, narrative['signal'], latest['close'], narrative['conviction'], trade_plan)
     wf_validation = walk_forward_validation(df)
@@ -2193,6 +2613,70 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000):
     risk_metrics = calculate_risk_metrics(returns)
     exchange_flow = fetch_exchange_flow(code)
     network_activity = fetch_network_activity(code)
+
+    # ─── Previously-dead V5 analytics, now actually computed ───
+    try:
+        # validate_strategies builds its position columns on its OWN copy, so pass a
+        # frame we keep a reference to — otherwise those *_pos columns vanish and the
+        # downstream Monte Carlo has no position column to simulate.
+        _strat_df = df.copy()
+        _strat_val = validate_strategies(_strat_df)
+    except Exception as _e:
+        print(f"  ⚠️ Strategy validation failed for {code}: {_e}")
+        _strat_df, _strat_val = df.copy(), {}
+    try:
+        _best_col = None
+        if _strat_val:
+            _best = max(_strat_val.items(), key=lambda kv: (kv[1] or {}).get('sharpe', -99))
+            _best_col = {'SMA20 Crossover': 'sma20_pos', 'SMA50 Trend': 'sma50_pos',
+                         'Golden Cross': 'golden_pos', 'RSI < 30, > 70': 'rsi_pos',
+                         'RSI + Trend Filter': 'rsi_trend_pos', 'Bollinger Bounce': 'bb_pos',
+                         'MACD Crossover': 'macd_pos'}.get(_best[0])
+        _mc_raw = (monte_carlo(_strat_df.copy(), _best_col, n_sims=300)
+                   if _best_col and _best_col in _strat_df.columns else {})
+        _mc = {k: (round(float(v), 4) if isinstance(v, (int, float, np.floating, np.integer)) else v)
+               for k, v in (_mc_raw or {}).items()}
+    except Exception as _e:
+        print(f"  ⚠️ Monte Carlo failed for {code}: {_e}")
+        _mc = {}
+    try:
+        _perf = history.get('performance', {}) if isinstance(history, dict) else {}
+        _kelly = calculate_optimal_position_size(
+            (_perf.get('win_rate') or 0) / 100.0,
+            abs(_perf.get('avg_win') or 0),
+            abs(_perf.get('avg_loss') or 0) or 1,
+        )
+    except Exception as _e:
+        _kelly = 0
+    try:
+        _chart = build_chart_data(_strat_df, _strat_val, _best_col) if _best_col else {}
+    except Exception as _e:
+        print(f"  ⚠️ Chart data failed for {code}: {_e}")
+        _chart = {}
+    try:
+        # analyze_seasonality returns a (dow_df, month_df) tuple of DataFrames, which is
+        # not JSON-serializable — condense it into the best/worst day and month.
+        if 'day_of_week' in df.columns and 'month' in df.columns:
+            _dow, _mon = analyze_seasonality(df)
+            _dow = _dow.dropna(subset=['sharpe']); _mon = _mon.dropna(subset=['sharpe'])
+            _season = {
+                'best_day': str(_dow.loc[_dow['sharpe'].idxmax(), 'day_name']) if not _dow.empty else None,
+                'worst_day': str(_dow.loc[_dow['sharpe'].idxmin(), 'day_name']) if not _dow.empty else None,
+                'best_month': str(_mon.loc[_mon['sharpe'].idxmax(), 'month_name']) if not _mon.empty else None,
+                'worst_month': str(_mon.loc[_mon['sharpe'].idxmin(), 'month_name']) if not _mon.empty else None,
+            }
+        else:
+            _season = {}
+    except Exception as _e:
+        print(f"  ⚠️ Seasonality failed for {code}: {_e}")
+        _season = {}
+    # false_signal_filter: flags signals that fail volume/volatility confirmation
+    try:
+        _vol_ratio = float(latest.get('volume_ratio')) if pd.notna(latest.get('volume_ratio')) else 1.0
+        _volat = float(latest.get('atr_pct')) if pd.notna(latest.get('atr_pct')) else 0.5
+        _filt = false_signal_filter(narrative['signal'], narrative['conviction'], _vol_ratio, _volat)
+    except Exception as _e:
+        _filt = {'filter': False, 'reason': 'filter unavailable'}
     
     # Add signal to database
     if narrative['signal'] in ['STRONG LONG', 'LONG', 'STRONG SHORT', 'SHORT']:
@@ -2244,21 +2728,47 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000):
             'exchange_flow': exchange_flow,
             'network_activity': network_activity,
         },
+        # ─── PREVIOUSLY-DEAD V5 ANALYTICS, NOW WIRED ───
+        'conviction_raw': narrative.get('conviction_raw'),
+        'mtf_multiplier': narrative.get('mtf_multiplier'),
+        'filtered_reason': narrative.get('filtered_reason'),
+        'signal_before_filter': narrative.get('signal_before_filter'),
+        'support_resistance': _sr,
+        'whale_activity': whale_activity_proxy(df),
+        'exchange_flow': compute_exchange_flow_proxy(df),
+        'monte_carlo': _mc,
+        'strategy_validation': _strat_val,
+        'rolling_sharpe': calculate_sharpe_ratio_rolling(df['return'].dropna())[-30:] if 'return' in df.columns else [],
+        'adaptive_threshold': adaptive_threshold_adjustment(
+            float(df['atr_pct'].iloc[-1]) if 'atr_pct' in df.columns and pd.notna(df['atr_pct'].iloc[-1]) else 0.5
+        ),
+        'kelly_position_size': _kelly,
+        'chart_data': _chart,
+        'seasonality': _season,
+        'signal_filter': _filt,
+        # ─── FEATURE ATTRIBUTION (why the score is what it is) ───
+        'feature_attribution': calculate_shap_importance(
+            narrative.get('sub_signals', {}), narrative.get('composite_score', 0)
+        ),
+        # ─── RECOMMENDED SIZE via select_trade_size (previously never called) ───
+        'recommended_trade_size': select_trade_size(latest['close'], narrative['conviction']),
         # ─── PER-ASSET BIG/SMALL TRADE SIZING ───
-        'big_trade': {
-            'position_size': calculate_trade_size_big(latest['close'], narrative['conviction'])['position_size'],
-            'risk_pct': calculate_trade_size_big(latest['close'], narrative['conviction'])['risk_pct'],
-            'target_movement': calculate_trade_size_big(latest['close'], narrative['conviction'])['target_movement'],
-            'trade_type': 'BIG',
-            'asset': code
-        },
-        'small_trade': {
-            'position_size': calculate_trade_size_small(latest['close'], narrative['conviction'])['position_size'],
-            'risk_pct': calculate_trade_size_small(latest['close'], narrative['conviction'])['risk_pct'],
-            'target_movement': calculate_trade_size_small(latest['close'], narrative['conviction'])['target_movement'],
-            'trade_type': 'SMALL',
-            'asset': code
-        }
+        # Only show a live position size when there's an actual tradeable signal
+        # and conviction clears the bar. The bar itself shifts slightly based on
+        # online_learning()'s real recent accuracy (learned_adjustment): the system
+        # earns a lower bar when it's been right lately, and gets stricter when it hasn't.
+        'big_trade': (
+            {**calculate_trade_size_big(latest['close'], narrative['conviction']), 'asset': code}
+            if narrative['action'] not in ('NO TRADE', 'HOLD')
+            and narrative['conviction'] >= max(0.3, 0.6 - learned_adjustment)
+            else {'position_size': 0, 'risk_pct': 0, 'target_movement': 0, 'trade_type': 'NO_TRADE', 'asset': code}
+        ),
+        'small_trade': (
+            {**calculate_trade_size_small(latest['close'], narrative['conviction']), 'asset': code}
+            if narrative['action'] not in ('NO TRADE', 'HOLD')
+            and narrative['conviction'] >= max(0.15, 0.4 - learned_adjustment)
+            else {'position_size': 0, 'risk_pct': 0, 'target_movement': 0, 'trade_type': 'NO_TRADE', 'asset': code}
+        )
     }
     print(f"  ✅ {narrative['signal']} | Conviction: {narrative['conviction']}/1.0")
     
@@ -2287,13 +2797,18 @@ def run_pipeline():
     fng_df = fetch_fear_greed()
     global_data = fetch_coingecko_global()
     print("\n[2/9] Fetching macro data...")
-    macro_data = {}
+    macro_data = fetch_macro_data()
+    print("\n[2b/9] Checking self-learning state...")
+    learning_result = online_learning()
+    learned_adjustment = float(learning_result.get('threshold_adjustment', '0.00'))
+    _a0 = learning_result.get('accuracy')
+    print(f"  📊 Recent accuracy: {_a0:.1%} | Threshold shift: {learned_adjustment:+.2f}" if _a0 is not None else f"  📊 Learning: {learning_result.get('status','UNKNOWN')} ({learning_result.get('sample_size',0)} closed trades) | No adjustment yet")
     print("\n[3/9] Processing all assets...")
     all_signals = {}
     all_prices = {}
     all_returns = {}
     for code, config in ASSETS.items():
-        result = process_asset(code, config, fng_df, macro_data)
+        result = process_asset(code, config, fng_df, macro_data, learned_adjustment=learned_adjustment)
         if result:
             asset_output, price_series = result
             all_signals[code] = asset_output
@@ -2302,7 +2817,8 @@ def run_pipeline():
             if not returns.empty:
                 all_returns[code] = returns
     print("\n[4/9] Running portfolio simulation...")
-    portfolio_sim = simulate_portfolio(all_signals)
+    portfolio_sim = simulate_portfolio(all_signals, price_history=all_prices)
+
     print(f"  Portfolio Value: ${portfolio_sim['final_value']:.2f}")
     print(f"  Total Return: {portfolio_sim['total_return']:.1f}%")
     print("\n[5/9] Computing cross-asset analytics...")
@@ -2315,6 +2831,21 @@ def run_pipeline():
         for col in corr_matrix.columns:
             corr_dict[col] = {k: round(v, 3) for k, v in corr_matrix[col].to_dict().items()}
     print(f"  ✅ Correlation matrix: {len(corr_dict)} assets")
+    # ─── PERSISTENT PAPER ACCOUNT (survives between runs) ───
+    print("\n[4b/9] Advancing persistent paper account...")
+    try:
+        paper = run_paper_account(all_signals, correlation_matrix=corr_dict)
+        _ps = paper['stats']
+        print(f"  💼 Equity: ${_ps['equity']:.2f} ({_ps['total_return_pct']:+.2f}%) | "
+              f"Open: {_ps['open_positions']} | Closed: {_ps['closed_trades']}")
+        if _ps['win_rate'] is not None:
+            print(f"  📊 Win rate: {_ps['win_rate']}% | Profit factor: {_ps['profit_factor']}")
+        for ev in _ps['last_events']:
+            print(f"    • {ev}")
+    except Exception as e:
+        print(f"  ⚠️ Paper account error: {e}")
+        paper = {'stats': {}, 'positions': {}, 'closed_trades': []}
+
     
     # Funding Heatmap
     funding_heatmap = {}
@@ -2346,6 +2877,78 @@ def run_pipeline():
             altcoin_season = max(0, min(100, altcoin_season))
     print(f"  ✅ Altcoin Season Index: {altcoin_season:.1f}")
     
+    # ─── DERIVATIVES / POSITIONING (previously-dead V5 fetchers, now wired) ───
+    derivatives = {}
+    for code, config in ASSETS.items():
+        if code not in all_signals:
+            continue
+        entry = {}
+        try:
+            lsr = fetch_long_short_ratio(config['binance'])
+            if lsr is not None and not (hasattr(lsr, 'empty') and lsr.empty):
+                entry['long_short_ratio'] = float(lsr['long_short_ratio'].iloc[-1]) \
+                    if hasattr(lsr, 'columns') and 'long_short_ratio' in lsr.columns else None
+        except Exception as e:
+            print(f"  ⚠️ L/S ratio {code}: {e}")
+        try:
+            oi = fetch_open_interest_hist(config['binance'])
+            if oi is not None and not (hasattr(oi, 'empty') and oi.empty):
+                entry['open_interest'] = float(oi['open_interest'].iloc[-1]) \
+                    if hasattr(oi, 'columns') and 'open_interest' in oi.columns else None
+        except Exception as e:
+            print(f"  ⚠️ OI {code}: {e}")
+        if entry:
+            derivatives[code] = entry
+    # Bybit funding as a cross-exchange check against Binance funding
+    try:
+        bybit = fetch_bybit_funding('BTCUSDT')
+        if bybit is not None and not (hasattr(bybit, 'empty') and bybit.empty):
+            derivatives.setdefault('BTC', {})['bybit_funding'] = float(
+                bybit['funding_rate'].iloc[-1]) if 'funding_rate' in bybit.columns else None
+    except Exception as e:
+        print(f"  ⚠️ Bybit funding: {e}")
+    # Options skew (Deribit) + ETH network extras
+    try:
+        derivatives['options_btc'] = fetch_deribit_options('BTC')
+    except Exception as e:
+        print(f"  ⚠️ Deribit options: {e}")
+    eth_extras = {}
+    try:
+        eth_extras['gas'] = fetch_etherscan_gas()
+        eth_extras['staking'] = fetch_beaconchain_staking()
+    except Exception as e:
+        print(f"  ⚠️ ETH extras: {e}")
+    print(f"  ✅ Derivatives data: {len(derivatives)} entries")
+
+    # ─── ON-CHAIN SUMMARY per asset (build_onchain_summary was never called) ───
+    onchain_summaries = {}
+    try:
+        _tot_vol = (global_data or {}).get('total_volume_usd') or 0
+        _tot_cap = (global_data or {}).get('total_market_cap_usd') or 0
+        for code, config in ASSETS.items():
+            if code not in all_signals:
+                continue
+            try:
+                cd = fetch_coingecko_coin(config['coingecko'])
+                if cd:
+                    onchain_summaries[code] = build_onchain_summary(cd, code, _tot_vol, _tot_cap)
+            except Exception as e:
+                print(f"  ⚠️ On-chain summary {code}: {e}")
+    except Exception as e:
+        print(f"  ⚠️ On-chain summaries failed: {e}")
+    print(f"  ✅ On-chain summaries: {len(onchain_summaries)} assets")
+
+    # Altcoin Season Index via the real function (was computed inline instead)
+    try:
+        if 'BTC' in all_prices and len(all_prices['BTC']) > 90:
+            _btc_dom_series = all_prices['BTC'] / pd.DataFrame(all_prices).sum(axis=1)
+            _asi = compute_altcoin_season_index(_btc_dom_series)
+            if _asi is not None:
+                altcoin_season = _asi
+                print(f"  ✅ Altcoin Season Index (function): {altcoin_season}")
+    except Exception as e:
+        print(f"  ⚠️ Altcoin season index function: {e}")
+
     # Market Breadth
     breadth = compute_market_breadth(list(all_signals.values()))
     print(f"  ✅ Market Breadth: {breadth['breadth_signal']}")
@@ -2433,6 +3036,12 @@ def run_pipeline():
         'global_data': global_data,
         'market_report': market_report,
         'portfolio_simulation': portfolio_sim,
+        'paper_account': {
+            'stats': paper.get('stats', {}),
+            'positions': paper.get('positions', {}),
+            'recent_closed': paper.get('closed_trades', [])[-15:],
+            'equity_curve': paper.get('equity_curve', [])[-100:],
+        },
         'risk_metrics': global_risk_metrics,
         'correlation_risk': correlation_risk,
         'correlation_breakdown': correlation_breakdown,
@@ -2440,6 +3049,21 @@ def run_pipeline():
         'profit_factor': profit_factor,
         'recovery_factor': recovery_factor,
         'signal_performance': signal_performance,
+        'self_learning': {
+            'recent_accuracy': (round(learning_result['accuracy'], 3)
+                                if learning_result.get('accuracy') is not None else None),
+            'threshold_adjustment': learned_adjustment,
+            'status': learning_result.get('status', 'UNKNOWN'),
+            'sample_size': learning_result.get('sample_size', 0),
+            'predictions_needed': learning_result.get('needed'),
+            'predictions_tracked': len(load_signal_database().get('predictions', [])),
+        },
+        'trade_rankings': rank_trades([
+            {'asset': code, 'signal': a.get('signal'), 'confidence': a.get('conviction', 0),
+             'action': a.get('action')}
+            for code, a in all_signals.items()
+            if a.get('action') not in ('NO TRADE', 'HOLD')
+        ]),
         'assets': all_signals,
         'summary': market_summary,
         'cross_asset': {
@@ -2448,6 +3072,9 @@ def run_pipeline():
             'liquidations': all_liquidations,
             'altcoin_season_index': altcoin_season,
             'market_breadth': breadth,
+            'derivatives': derivatives,
+            'eth_network': eth_extras,
+            'onchain_summaries': onchain_summaries,
         },
     }
     
@@ -2621,20 +3248,55 @@ def get_order_book_imbalance(symbol='BTCUSDT'):
     return None
 
 def fetch_etf_flow_data():
-    """Fetch Bitcoin ETF flow data from public sources"""
+    """Bitcoin ETF flow PROXY from real spot-ETF price/volume data (yfinance).
+
+    Honest scope note: true creation/redemption flow numbers (e.g. Farside) have
+    no free API. This computes a real, observable proxy instead — dollar volume
+    and price change across the major US spot BTC ETFs — and labels itself as a
+    proxy so it is never mistaken for actual net creation flows.
+    """
+    tickers = ['IBIT', 'FBTC', 'ARKB', 'BITB']
     try:
+        total_dollar_volume = 0.0
+        weighted_change = 0.0
+        counted = 0
+        per_etf = {}
+        for t in tickers:
+            df = fetch_yahoo_ohlcv(t, period='5d')
+            if df is None or df.empty or len(df) < 2:
+                continue
+            last, prev = df.iloc[-1], df.iloc[-2]
+            dollar_vol = float(last['close']) * float(last['volume'])
+            pct_change = ((float(last['close']) - float(prev['close'])) / float(prev['close'])) * 100
+            per_etf[t] = {'close': round(float(last['close']), 2),
+                          'dollar_volume': round(dollar_vol, 2),
+                          'pct_change': round(pct_change, 2)}
+            total_dollar_volume += dollar_vol
+            weighted_change += pct_change
+            counted += 1
+
+        if counted == 0:
+            raise ValueError('no ETF data returned')
+
+        avg_change = weighted_change / counted
         return {
-            'total_net_flow': 0,
-            'cumulative_holdings': 0,
-            'daily_change': 0,
-            'source': 'farside.co.uk'
+            'total_net_flow': round(total_dollar_volume, 2),
+            'cumulative_holdings': None,
+            'daily_change': round(avg_change, 2),
+            'etfs_tracked': counted,
+            'per_etf': per_etf,
+            'metric': 'dollar_volume_proxy',
+            'source': 'yfinance spot BTC ETFs (proxy, not true creation/redemption flow)'
         }
     except Exception as e:
         print(f"  ⚠️ ETF flow data failed: {e}")
         return {
             'total_net_flow': 0,
-            'cumulative_holdings': 0,
+            'cumulative_holdings': None,
             'daily_change': 0,
+            'etfs_tracked': 0,
+            'per_etf': {},
+            'metric': 'unavailable',
             'source': 'fallback'
         }
 
@@ -2684,7 +3346,40 @@ def fetch_onchain_metrics(symbol='BTC'):
                 metrics['nvt_ratio'] = round(market_cap / total_volume, 2)
     except Exception as e:
         print(f"  ⚠️ On-chain metrics failed: {e}")
-    
+
+    # MVRV proxy: true MVRV needs realized-cap data (paid on-chain APIs only).
+    # This uses price vs its 200-day mean, z-scored — a real, computable stand-in,
+    # labelled as a proxy so it is not mistaken for true MVRV Z-score.
+    try:
+        df = fetch_binance_klines('BTCUSDT', interval='1d', limit=365)
+        if df is not None and not df.empty and len(df) >= 200:
+            closes = df['close']
+            ma200 = closes.rolling(200).mean()
+            ratio = closes / ma200
+            r = ratio.dropna()
+            if len(r) > 30 and r.std() > 0:
+                metrics['mvrv_zscore'] = round(float((r.iloc[-1] - r.mean()) / r.std()), 3)
+                metrics['mvrv_is_proxy'] = True
+    except Exception as e:
+        print(f"  ⚠️ MVRV proxy failed: {e}")
+
+    # Wire in miner reserves (was previously defined but never called)
+    try:
+        miner = fetch_miner_reserves()
+        metrics['miner_reserves'] = miner.get('value')
+        metrics['miner_reserves_trend'] = miner.get('trend')
+    except Exception as e:
+        print(f"  ⚠️ Miner reserves wiring failed: {e}")
+
+    # Hashrate trend from the same blockchain.info source family
+    try:
+        r = fetch_with_retry("https://blockchain.info/charts/hash-rate?format=json", timeout=30)
+        vals = r.json().get('values', [])
+        if len(vals) > 1:
+            metrics['hashrate_trend'] = 'RISING' if vals[-1]['y'] > vals[-2]['y'] else 'FALLING'
+    except Exception as e:
+        print(f"  ⚠️ Hashrate trend failed: {e}")
+
     return metrics
 
 def fetch_miner_reserves():
@@ -2840,6 +3535,51 @@ def calculate_ml_signal(asset_data, order_book_data, onchain_data):
         'trade_qualified': result['trade_qualified']
     }
 
+def calculate_shap_importance(sub_signals, composite_score):
+    """Real per-feature contribution attribution for a signal.
+
+    This was listed as a feature but had no implementation at all. Rather than
+    pretending to run SHAP on a model that does not exist (there is no trained
+    network here), this computes exact additive attribution against the real
+    scoring formula the system actually uses: each sub-signal's contribution is
+    score * weight / total_weight, which sums back to the composite. That is a
+    true decomposition, not an estimate.
+    """
+    try:
+        if not sub_signals:
+            return {'features': [], 'method': 'none', 'note': 'no sub-signals available'}
+
+        total_weight = sum(sig.get('weight', 0) for sig in sub_signals.values()) or 1
+        contribs = []
+        for name, sig in sub_signals.items():
+            score = sig.get('score', 0) or 0
+            weight = sig.get('weight', 0) or 0
+            contribution = (score * weight) / total_weight
+            contribs.append({
+                'feature': name,
+                'contribution': round(contribution, 4),
+                'direction': 'BULLISH' if contribution > 0 else 'BEARISH' if contribution < 0 else 'NEUTRAL',
+                'raw_score': round(score, 3),
+                'weight': weight,
+                'verdict': sig.get('verdict', ''),
+            })
+
+        contribs.sort(key=lambda c: abs(c['contribution']), reverse=True)
+        total_abs = sum(abs(c['contribution']) for c in contribs) or 1
+        for c in contribs:
+            c['importance_pct'] = round((abs(c['contribution']) / total_abs) * 100, 1)
+
+        return {
+            'features': contribs,
+            'top_driver': contribs[0]['feature'] if contribs else None,
+            'sum_of_contributions': round(sum(c['contribution'] for c in contribs), 4),
+            'composite_score': composite_score,
+            'method': 'exact_additive_attribution',
+        }
+    except Exception as e:
+        print(f"  ⚠️ Feature attribution failed: {e}")
+        return {'features': [], 'method': 'error'}
+
 def detect_market_regime(tpu_value):
     """Detect market regime based on Trade Policy Uncertainty"""
     if tpu_value > 200:
@@ -2874,23 +3614,25 @@ def adjust_weights(regime):
             'macro_weight': 0.15
         }
 
-def track_prediction_accuracy(prediction, actual_outcome):
-    """Track prediction accuracy for self-learning"""
+def track_prediction_accuracy(asset, signal, was_correct):
+    """Track prediction accuracy for self-learning. was_correct is a real
+    win/loss boolean determined by update_signal_status() from actual
+    stop-loss/take-profit outcomes — not a guess."""
     try:
         db = load_signal_database()
         if 'predictions' not in db:
             db['predictions'] = []
-        
+
         db['predictions'].append({
             'timestamp': datetime.now().isoformat(),
-            'predicted_direction': prediction,
-            'actual_outcome': actual_outcome,
-            'correct': prediction == actual_outcome
+            'asset': asset,
+            'predicted_direction': signal,
+            'correct': bool(was_correct)
         })
-        
+
         if len(db['predictions']) > 1000:
             db['predictions'] = db['predictions'][-1000:]
-        
+
         save_signal_database(db)
     except Exception as e:
         print(f"  ⚠️ Track prediction failed: {e}")
@@ -2905,18 +3647,31 @@ def online_learning():
             recent = predictions[-20:]
             correct = sum(1 for p in recent if p.get('correct', False))
             accuracy = correct / len(recent) if recent else 0
-            
-            print(f"  📊 Online Learning: Recent accuracy = {accuracy:.1%}")
-            
+
+            print(f"  📊 Online Learning: Recent accuracy = {accuracy:.1%} "
+                  f"({correct}/{len(recent)} closed trades)")
+
             if accuracy > 0.7:
-                return {'threshold_adjustment': '+0.05', 'accuracy': accuracy}
+                return {'threshold_adjustment': '+0.05', 'accuracy': accuracy,
+                        'status': 'ACTIVE', 'sample_size': len(recent)}
             elif accuracy < 0.5:
-                return {'threshold_adjustment': '-0.05', 'accuracy': accuracy}
-        
-        return {'threshold_adjustment': '0.00', 'accuracy': 0.6}
+                return {'threshold_adjustment': '-0.05', 'accuracy': accuracy,
+                        'status': 'ACTIVE', 'sample_size': len(recent)}
+            return {'threshold_adjustment': '0.00', 'accuracy': accuracy,
+                    'status': 'ACTIVE', 'sample_size': len(recent)}
+
+        # Not enough closed trades yet. Report this honestly instead of returning a
+        # fabricated 0.6 accuracy, which made the dashboard show "60% accuracy"
+        # when literally zero trades had ever closed.
+        print(f"  📊 Online Learning: WARMING UP "
+              f"({len(predictions)}/11 closed trades needed before adjusting)")
+        return {'threshold_adjustment': '0.00', 'accuracy': None,
+                'status': 'WARMING_UP', 'sample_size': len(predictions),
+                'needed': 11}
     except Exception as e:
         print(f"  ⚠️ Online learning failed: {e}")
-        return {'threshold_adjustment': '0.00', 'accuracy': 0.5}
+        return {'threshold_adjustment': '0.00', 'accuracy': None,
+                'status': 'ERROR', 'sample_size': 0}
 
 def calculate_trade_size_big(price, confidence, account_size=10000):
     """Calculate big trade size ($3k-$4k BTC movement)"""
@@ -3049,9 +3804,18 @@ def generate_post_mortem(asset, entry_price, exit_price, signal, entry_date, exi
     return post_mortem
 
 def fetch_economic_calendar():
-    """Fetch upcoming economic events"""
+    """Fetch upcoming economic events.
+    FOMC dates are the real published 2026 schedule. CPI and Jobs Report dates
+    are not fetched from a live feed (none is wired into this system) — they're
+    estimated using the standard recurring pattern (Jobs Report: first Friday of
+    the month; CPI: ~2nd week of the month) and marked estimated=True so that's
+    visible rather than presented as confirmed dates.
+    """
+    from datetime import date, timedelta
+    import calendar as cal
+
     events = []
-    
+
     fomc_dates = [
         {'date': '2026-01-28', 'event': 'FOMC Meeting', 'impact': 'HIGH'},
         {'date': '2026-03-18', 'event': 'FOMC Meeting', 'impact': 'HIGH'},
@@ -3062,32 +3826,50 @@ def fetch_economic_calendar():
         {'date': '2026-11-05', 'event': 'FOMC Meeting', 'impact': 'HIGH'},
         {'date': '2026-12-16', 'event': 'FOMC Meeting', 'impact': 'HIGH'},
     ]
-    
     for fomc in fomc_dates:
-        events.append(fomc)
-    
+        events.append({**fomc, 'estimated': False})
+
+    today = date.today()
+    for m_offset in range(0, 3):
+        year = today.year + ((today.month - 1 + m_offset) // 12)
+        month = ((today.month - 1 + m_offset) % 12) + 1
+
+        # Jobs Report: first Friday of the month
+        first_day = date(year, month, 1)
+        days_to_friday = (4 - first_day.weekday()) % 7
+        jobs_date = first_day + timedelta(days=days_to_friday)
+        if jobs_date >= today:
+            events.append({'date': jobs_date.isoformat(), 'event': 'Jobs Report',
+                            'impact': 'MEDIUM', 'estimated': True})
+
+        # CPI Report: approximated as the 12th of the month (BLS typically releases
+        # in the second week; exact day shifts month to month without a live feed)
+        cpi_day = min(12, cal.monthrange(year, month)[1])
+        cpi_date = date(year, month, cpi_day)
+        if cpi_date >= today:
+            events.append({'date': cpi_date.isoformat(), 'event': 'CPI Report',
+                            'impact': 'MEDIUM', 'estimated': True})
+
+    events.sort(key=lambda e: e['date'])
     return events
 
 def predict_event_impact(event_type, current_price):
-    """Predict impact of an event on price"""
+    """Predict impact of an event on price, using current_price to give a real
+    expected range instead of just a static percentage string."""
     if event_type == 'FOMC':
-        return {
-            'expected_move': '±3-5%',
-            'direction': 'UNCERTAIN',
-            'recommendation': 'Reduce position size by 50% before event'
-        }
+        move_pct, recommendation = 0.04, 'Reduce position size by 50% before event'
     elif event_type == 'CPI':
-        return {
-            'expected_move': '±2-3%',
-            'direction': 'UNCERTAIN',
-            'recommendation': 'Wait for data release before trading'
-        }
+        move_pct, recommendation = 0.025, 'Wait for data release before trading'
     else:
-        return {
-            'expected_move': '±1-2%',
-            'direction': 'UNCERTAIN',
-            'recommendation': 'Monitor the event'
-        }
+        move_pct, recommendation = 0.015, 'Monitor the event'
+
+    return {
+        'expected_move': f'±{move_pct*100:.1f}%',
+        'expected_range_low': round(current_price * (1 - move_pct), 2) if current_price else None,
+        'expected_range_high': round(current_price * (1 + move_pct), 2) if current_price else None,
+        'direction': 'UNCERTAIN',
+        'recommendation': recommendation
+    }
 
 def generate_market_narrative(asset_data, order_book_data, onchain_data, events):
     """Generate daily market narrative"""
@@ -3260,10 +4042,24 @@ def run_v6_pipeline():
     exit_strategy = {'scenarios': []}
     narrative = {'date': datetime.now().strftime('%B %d, %Y'), 'macro': 'Loading...', 'technicals': 'Loading...', 'sentiment': 'Loading...', 'upcoming_events': 'No events', 'trader_comment': 'No data available'}
     learning_result = {'accuracy': 0, 'threshold_adjustment': '0.00'}
+    economic_calendar = []
+    event_risk = {}
+    btc_price = 0
+    ml_predictions = {}
+    feature_attribution = {}
     
         # 1. Order Book Analysis
     print("\n[V6.1] Fetching order book data...")
     try:
+        # Run a short bounded WebSocket burst to populate ORDER_BOOK_HISTORY.
+        # stream_order_book() was defined but never called; a persistent stream is
+        # wrong for a 2h batch job, so this collects a brief real sample then exits.
+        if WEBSOCKETS_AVAILABLE:
+            try:
+                asyncio.run(asyncio.wait_for(stream_order_book('BTCUSDT', duration_seconds=8), timeout=20))
+                print(f"  📊 Order book history depth: {len(ORDER_BOOK_HISTORY)} snapshots")
+            except Exception as se:
+                print(f"  ⚠️ Order book stream skipped: {se}")
         ob_snapshot = fetch_order_book_snapshot('BTCUSDT')
         if ob_snapshot:
                 imbalance = calculate_order_book_imbalance(ob_snapshot)
@@ -3295,6 +4091,11 @@ def run_v6_pipeline():
     print("\n[V6.4] Detecting market regime...")
     regime = detect_market_regime(tpu_data.get('tpu_value', 0))
     print(f"  Regime: {regime['regime']} — {regime['dominant_feature']}")
+    # Wire adjust_weights (previously defined but never called) so the regime
+    # actually changes how features are weighted, instead of being display-only.
+    regime_weights = adjust_weights(regime.get('regime', 'LOW_UNCERTAINTY'))
+    regime['active_weights'] = regime_weights
+    print(f"  Active weights: {regime_weights}")
     
     # 5. On-Chain Metrics
     print("\n[V6.5] Fetching on-chain metrics...")
@@ -3323,8 +4124,20 @@ def run_v6_pipeline():
         order_book_data = {}
         if ob_snapshot and imbalance is not None:
             order_book_data = {'BTC': {'imbalance': imbalance}}
-        onchain_data = {'BTC': {'mvrv_zscore': 0.5, 'nvt_ratio': onchain.get('nvt_ratio', 0)}}
+        # Use the REAL computed MVRV proxy, not a hardcoded 0.5 placeholder
+        onchain_data = {'BTC': {
+            'mvrv_zscore': onchain.get('mvrv_zscore') if onchain.get('mvrv_zscore') is not None else 0.5,
+            'nvt_ratio': onchain.get('nvt_ratio', 0),
+            'miner_reserves': onchain.get('miner_reserves'),
+        }}
         ml_signal = calculate_ml_signal({}, order_book_data.get('BTC', {}), onchain_data.get('BTC', {}))
+        # Wire build_ml_predictions_json (previously defined but never called)
+        try:
+            ml_predictions = build_ml_predictions_json(
+                {'BTC': {}}, {'BTC': order_book_data.get('BTC', {})}, {'BTC': onchain_data.get('BTC', {})}
+            )
+        except Exception as me:
+            print(f"  ⚠️ ML predictions export failed: {me}")
         print(f"  ML Signal: {ml_signal.get('action', 'HOLD')} (Confidence: {ml_signal.get('confidence', 0.5):.1%})")
     except Exception as e:
         print(f"  ⚠️ ML signal error: {e}")
@@ -3333,7 +4146,11 @@ def run_v6_pipeline():
     # 7. Trade Size Selection
     print("\n[V6.7] Calculating trade sizes...")
     try:
-        btc_price = 64000
+        # Use the REAL current BTC price, not a hardcoded stale constant.
+        try:
+            btc_price = float(fetch_binance_klines('BTCUSDT', interval='1d', limit=1)['close'].iloc[-1])
+        except Exception:
+            btc_price = 0
         confidence = ml_signal.get('confidence', 0.5)
         big_trade = calculate_trade_size_big(btc_price, confidence)
         small_trade = calculate_trade_size_small(btc_price, confidence)
@@ -3350,12 +4167,23 @@ def run_v6_pipeline():
         else:
             order_book_active = False
         
+        _nvt = onchain.get('nvt_ratio')
         factors = {
             'order_book': {'active': order_book_active, 'description': 'Bullish order book imbalance' if order_book_active else 'Order book data unavailable'},
-            'onchain': {'active': True if onchain.get('nvt_ratio', 0) < 20 else False, 'description': 'Low NVT ratio' if onchain.get('nvt_ratio', 0) < 20 else 'NVT ratio normal'},
+            'onchain': {'active': bool(_nvt is not None and _nvt < 20), 'description': 'Low NVT ratio' if (_nvt is not None and _nvt < 20) else 'NVT ratio normal'},
             'sentiment': {'active': True, 'description': 'Fear & Greed in buy zone'}
         }
-        explanation = generate_trade_explanation('BTC', ml_signal.get('action', 'NO TRADE'), ml_signal.get('confidence', 0.5), factors, {}, {}, df)
+        # `df` was referenced here but never defined in this scope — every run threw
+        # NameError, silently swallowed by the except below, so the historical
+        # pattern-matching path of the explanation engine never actually executed.
+        try:
+            _btc_df = fetch_binance_klines('BTCUSDT', interval='1d', limit=365)
+            if _btc_df is not None and not _btc_df.empty:
+                _btc_df = add_features(_btc_df)
+        except Exception as _de:
+            print(f"  ⚠️ BTC history for explanation unavailable: {_de}")
+            _btc_df = None
+        explanation = generate_trade_explanation('BTC', ml_signal.get('action', 'NO TRADE'), ml_signal.get('confidence', 0.5), factors, {}, {}, _btc_df)
         print(f"  Summary: {explanation.get('summary', 'No summary')}")
         print(f"  Comment: {explanation.get('trader_comment', 'No comment')}")
     except Exception as e:
@@ -3364,7 +4192,12 @@ def run_v6_pipeline():
     # 9. Exit Strategy
     print("\n[V6.9] Generating exit strategy...")
     try:
-        btc_price = 64000
+        # btc_price is already fetched live in V6.7 above; fall back only if missing.
+        if not btc_price:
+            try:
+                btc_price = float(fetch_binance_klines('BTCUSDT', interval='1d', limit=1)['close'].iloc[-1])
+            except Exception:
+                btc_price = 0
         exit_strategy = generate_exit_strategy(btc_price, ml_signal.get('action', 'NO TRADE'), btc_price * 1.01, btc_price * 0.02)
         for scenario in exit_strategy.get('scenarios', [])[:3]:
             print(f"  • {scenario.get('condition', '')}: {scenario.get('action', '')}")
@@ -3375,6 +4208,16 @@ def run_v6_pipeline():
     print("\n[V6.10] Generating market narrative...")
     try:
         events = fetch_economic_calendar()
+        economic_calendar = events
+        upcoming_high_impact = next((e for e in events if e.get('impact') == 'HIGH'), events[0] if events else None)
+        if upcoming_high_impact:
+            try:
+                btc_ref_price = float(fetch_binance_klines('BTCUSDT', interval='1d', limit=1)['close'].iloc[-1])
+            except Exception:
+                btc_ref_price = 0
+            event_key = 'FOMC' if 'FOMC' in upcoming_high_impact['event'] else \
+                        'CPI' if 'CPI' in upcoming_high_impact['event'] else 'OTHER'
+            event_risk = {**predict_event_impact(event_key, btc_ref_price), 'event': upcoming_high_impact}
         narrative = generate_market_narrative({}, ob_snapshot or {}, onchain, events)
         print(f"  Macro: {narrative.get('macro', 'N/A')}")
         print(f"  Upcoming: {narrative.get('upcoming_events', 'No events')}")
@@ -3384,7 +4227,8 @@ def run_v6_pipeline():
     # 11. Online Learning
     print("\n[V6.11] Running online learning...")
     learning_result = online_learning()
-    print(f"  Accuracy: {learning_result.get('accuracy', 0):.1%}")
+    _acc = learning_result.get('accuracy')
+    print(f"  Accuracy: {_acc:.1%}" if _acc is not None else f"  Accuracy: n/a ({learning_result.get('status','UNKNOWN')})")
     print(f"  Threshold Adjustment: {learning_result.get('threshold_adjustment', '0.00')}")
     
     print("\n" + "=" * 70)
@@ -3407,7 +4251,12 @@ def run_v6_pipeline():
         'explanation': explanation,
         'exit_strategy': exit_strategy,
         'narrative': narrative,
-        'learning_result': learning_result
+        'learning_result': learning_result,
+        'economic_calendar': economic_calendar,
+        'event_risk': event_risk,
+        'ml_predictions': ml_predictions,
+        'order_book_history_depth': len(ORDER_BOOK_HISTORY),
+        'btc_price': btc_price
     }
 
 if __name__ == '__main__':
@@ -3425,7 +4274,16 @@ if __name__ == '__main__':
                 'big_trade': results.get('big_trade', {}),
                 'small_trade': results.get('small_trade', {}),
                 'explanation': results.get('explanation', {}),
-                'narrative': results.get('narrative', {})
+                'narrative': results.get('narrative', {}),
+                'macro_data': results.get('macro_data', {}),
+                'tpu_data': results.get('tpu_data', {}),
+                'economic_calendar': results.get('economic_calendar', []),
+                'event_risk': results.get('event_risk', {}),
+                'etf_data': results.get('etf_data', {}),
+                'onchain': results.get('onchain', {}),
+                'exit_strategy': results.get('exit_strategy', {}),
+                'ml_predictions': results.get('ml_predictions', {}),
+                'order_book_history_depth': results.get('order_book_history_depth', 0)
             }
             json.dump(clean_results, f, indent=2, default=str)
         print("\n💾 V6 results saved to docs/v6_results.json")
