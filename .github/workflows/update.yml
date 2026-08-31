@@ -26,7 +26,7 @@ jobs:
           python-version: '3.11'
       - name: Install dependencies
         run: |
-          pip install pandas numpy requests yfinance
+          pip install pandas numpy requests yfinance websockets scipy
       - name: Run Market Cortex v6.0 Ultimate Engine
         run: python crypto_market_intelligence_v60.py
         env:
