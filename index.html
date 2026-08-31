@@ -482,7 +482,7 @@
     </div>
 
     <!-- ─── V6.0: ORDER BOOK & TPU ─── -->
-    <div class="card-grid card-grid-2" style="margin-top:10px;">
+    <div class="card-grid card-grid-3" style="margin-top:10px;">
       <div class="card reveal stagger-1">
         <div class="card-glow"></div>
         <div class="card-label">Order Book Imbalance</div>
@@ -494,6 +494,12 @@
         <div class="card-label">Trade Policy Uncertainty</div>
         <div class="card-value" id="tpu-value">—</div>
         <div class="card-detail" id="tpu-detail">Loading...</div>
+      </div>
+      <div class="card reveal stagger-3">
+        <div class="card-glow"></div>
+        <div class="card-label">ML Ensemble Signal</div>
+        <div class="card-value" id="ml-ensemble-signal">—</div>
+        <div class="card-detail" id="ml-ensemble-detail">BiLSTM + CNN · Loading...</div>
       </div>
     </div>
 
@@ -524,6 +530,56 @@
       </div>
     </div>
 
+    <!-- ─── PERSISTENT PAPER TRADING ACCOUNT ─── -->
+    <div class="section-header">
+      <h2><span class="num">💼</span>Paper Trading Account</h2>
+      <span class="desc">Persistent · DCA · partial exits · real track record</span>
+    </div>
+    <div class="card-grid card-grid-4" style="margin-top:4px;">
+      <div class="card reveal"><div class="card-glow"></div><div class="card-label">Equity</div>
+        <div class="card-value" id="pa-equity">—</div><div class="card-detail" id="pa-return">—</div></div>
+      <div class="card reveal"><div class="card-glow"></div><div class="card-label">Closed Trades</div>
+        <div class="card-value" id="pa-closed">—</div><div class="card-detail" id="pa-winrate">—</div></div>
+      <div class="card reveal"><div class="card-glow"></div><div class="card-label">Open Positions</div>
+        <div class="card-value" id="pa-open">—</div><div class="card-detail" id="pa-dca">—</div></div>
+      <div class="card reveal"><div class="card-glow"></div><div class="card-label">Profit Factor</div>
+        <div class="card-value" id="pa-pf">—</div><div class="card-detail" id="pa-avg">—</div></div>
+    </div>
+    <div class="card-grid card-grid-2" style="margin-top:10px;">
+      <div class="card reveal"><div class="card-glow"></div><div class="card-label">Open Positions Detail</div>
+        <div id="pa-positions" style="font-size:0.62rem;color:var(--text-secondary);margin-top:8px;">Loading...</div></div>
+      <div class="card reveal"><div class="card-glow"></div><div class="card-label">Recent Activity</div>
+        <div id="pa-events" style="font-size:0.62rem;color:var(--text-secondary);margin-top:8px;">Loading...</div></div>
+    </div>
+
+    <!-- ─── V6.0: SIGNAL ATTRIBUTION / RANKINGS / ETF / SELF-LEARNING ─── -->
+    <div class="section-header">
+      <h2><span class="num">🧠</span>Signal Intelligence</h2>
+      <span class="desc">Attribution · Rankings · ETF flow · Learning state</span>
+    </div>
+    <div class="card-grid card-grid-2" style="margin-top:4px;">
+      <div class="card reveal">
+        <div class="card-glow"></div>
+        <div class="card-label">Top Trade Opportunities</div>
+        <div id="trade-rankings" style="font-size:0.72rem;color:var(--text-secondary);margin-top:8px;">Loading...</div>
+      </div>
+      <div class="card reveal">
+        <div class="card-glow"></div>
+        <div class="card-label">Self-Learning State</div>
+        <div id="self-learning-box" style="font-size:0.72rem;color:var(--text-secondary);margin-top:8px;">Loading...</div>
+      </div>
+      <div class="card reveal">
+        <div class="card-glow"></div>
+        <div class="card-label">Spot BTC ETF Activity (proxy)</div>
+        <div id="etf-box" style="font-size:0.72rem;color:var(--text-secondary);margin-top:8px;">Loading...</div>
+      </div>
+      <div class="card reveal">
+        <div class="card-glow"></div>
+        <div class="card-label">On-Chain Metrics</div>
+        <div id="onchain-box" style="font-size:0.72rem;color:var(--text-secondary);margin-top:8px;">Loading...</div>
+      </div>
+    </div>
+
     <!-- ─── V6.0: ECONOMIC CALENDAR ─── -->
     <div class="section-header">
       <h2><span class="num">📆</span>Economic Calendar</h2>
@@ -532,21 +588,7 @@
     <div class="card reveal" id="calendar-box">
       <div class="card-glow"></div>
       <div id="calendar-content" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;padding:4px;">
-        <div style="background:rgba(255,56,100,0.05);border-radius:6px;padding:12px;border-left:2px solid var(--rose);">
-          <div style="font-size:0.45rem;color:var(--rose);text-transform:uppercase;letter-spacing:0.08em;">🔴 HIGH IMPACT</div>
-          <div style="font-size:0.75rem;color:#fff;font-weight:400;">FOMC Meeting</div>
-          <div style="font-size:0.6rem;color:var(--text-secondary);">Sept 18, 2026</div>
-        </div>
-        <div style="background:rgba(255,215,0,0.05);border-radius:6px;padding:12px;border-left:2px solid var(--amber);">
-          <div style="font-size:0.45rem;color:var(--amber);text-transform:uppercase;letter-spacing:0.08em;">🟡 MEDIUM IMPACT</div>
-          <div style="font-size:0.75rem;color:#fff;font-weight:400;">CPI Report</div>
-          <div style="font-size:0.6rem;color:var(--text-secondary);">Sept 12, 2026</div>
-        </div>
-        <div style="background:rgba(255,215,0,0.05);border-radius:6px;padding:12px;border-left:2px solid var(--amber);">
-          <div style="font-size:0.45rem;color:var(--amber);text-transform:uppercase;letter-spacing:0.08em;">🟡 MEDIUM IMPACT</div>
-          <div style="font-size:0.75rem;color:#fff;font-weight:400;">Jobs Report</div>
-          <div style="font-size:0.6rem;color:var(--text-secondary);">Sept 4, 2026</div>
-        </div>
+        <div style="grid-column:1/-1;color:var(--text-secondary);font-size:0.7rem;">Loading calendar...</div>
       </div>
     </div>
 
@@ -918,6 +960,28 @@
                 }
                 if (descEl) descEl.textContent = m.overall_desc || 'Loading...';
             }
+
+            // ─── ECONOMIC CALENDAR (real data, was previously hardcoded/frozen) ───
+            if (v6.economic_calendar && v6.economic_calendar.length) {
+                const calEl = document.getElementById('calendar-content');
+                if (calEl) {
+                    const upcoming = v6.economic_calendar.slice(0, 3);
+                    calEl.innerHTML = upcoming.map(ev => {
+                        const isHigh = ev.impact === 'HIGH';
+                        const color = isHigh ? 'var(--rose)' : 'var(--amber)';
+                        const bg = isHigh ? 'rgba(255,56,100,0.05)' : 'rgba(255,215,0,0.05)';
+                        const icon = isHigh ? '🔴' : '🟡';
+                        const dateObj = new Date(ev.date + 'T00:00:00');
+                        const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                        const estTag = ev.estimated ? ' (est.)' : '';
+                        return `<div style="background:${bg};border-radius:6px;padding:12px;border-left:2px solid ${color};">
+                          <div style="font-size:0.45rem;color:${color};text-transform:uppercase;letter-spacing:0.08em;">${icon} ${ev.impact} IMPACT</div>
+                          <div style="font-size:0.75rem;color:#fff;font-weight:400;">${ev.event}</div>
+                          <div style="font-size:0.6rem;color:var(--text-secondary);">${dateStr}${estTag}</div>
+                        </div>`;
+                    }).join('');
+                }
+            }
             
             // Order Book Imbalance
             if (v6.imbalance !== undefined && v6.imbalance !== null) {
@@ -946,33 +1010,56 @@
                     detail.textContent = tpu < 100 ? '✅ Low uncertainty' : tpu < 200 ? '⚠️ Moderate uncertainty' : '🔴 High uncertainty';
                 }
             }
+
+            // ─── ETF Flow (proxy) ───
+            const etfEl = document.getElementById('etf-box');
+            if (etfEl) {
+                const e = v6.etf_data || {};
+                if (e.metric === 'dollar_volume_proxy') {
+                    const vol = (e.total_net_flow || 0) / 1e6;
+                    const chg = e.daily_change || 0;
+                    etfEl.innerHTML = `Traded volume: <b style="color:#fff;">$${vol.toFixed(1)}M</b><br>
+                      Avg price move: <b style="color:${chg >= 0 ? 'var(--lime)' : 'var(--rose)'};">${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</b><br>
+                      ETFs tracked: <b style="color:#fff;">${e.etfs_tracked || 0}</b>
+                      <br><span style="color:var(--text-muted);font-size:0.62rem;">Volume proxy, not true creation/redemption flow.</span>`;
+                } else {
+                    etfEl.textContent = 'ETF data unavailable.';
+                }
+            }
+
+            // ─── On-Chain Metrics ───
+            const ocEl = document.getElementById('onchain-box');
+            if (ocEl) {
+                const o = v6.onchain || {};
+                const fmt = (v) => (v === null || v === undefined) ? '—' : v;
+                ocEl.innerHTML = `NVT ratio: <b style="color:#fff;">${fmt(o.nvt_ratio)}</b><br>
+                  MVRV (proxy): <b style="color:#fff;">${fmt(o.mvrv_zscore)}</b><br>
+                  Miner revenue: <b style="color:#fff;">${o.miner_reserves ? Number(o.miner_reserves).toLocaleString() : '—'}</b>
+                  ${o.miner_reserves_trend ? ` (${o.miner_reserves_trend})` : ''}<br>
+                  Hashrate: <b style="color:#fff;">${fmt(o.hashrate_trend)}</b>`;
+            }
+
+            // ML Ensemble Signal (BiLSTM + CNN) — computed all along, never displayed until now
+            if (v6.ml_signal) {
+                const ml = v6.ml_signal;
+                const sigEl = document.getElementById('ml-ensemble-signal');
+                const detEl = document.getElementById('ml-ensemble-detail');
+                if (sigEl) {
+                    sigEl.textContent = ml.action || '—';
+                    sigEl.style.color = ml.action === 'BUY' ? 'var(--lime)' : ml.action === 'SELL' ? 'var(--rose)' : 'var(--amber)';
+                }
+                if (detEl) {
+                    const conf = ml.confidence !== undefined ? (ml.confidence * 100).toFixed(0) + '%' : '—';
+                    const qualified = ml.trade_qualified ? '✅ Qualified' : '⚠️ Below threshold';
+                    detEl.textContent = `Confidence: ${conf} · ${qualified}`;
+                }
+            }
         })
         .catch(() => {
             const el = document.getElementById('narrative-content');
             if (el) el.textContent = '⚠️ V6 data not available yet. Run the workflow.';
         });
 }
-
-          // Order Book Imbalance
-          if (v6.imbalance !== undefined && v6.imbalance !== null) {
-            const imb = v6.imbalance;
-            document.getElementById('orderbook-imbalance').textContent = imb.toFixed(3);
-            document.getElementById('orderbook-imbalance').style.color = imb > 0.55 ? 'var(--lime)' : imb < 0.45 ? 'var(--rose)' : 'var(--amber)';
-            document.getElementById('orderbook-detail').textContent = imb > 0.55 ? '🟢 Bullish imbalance' : imb < 0.45 ? '🔴 Bearish imbalance' : '🟡 Balanced';
-          }
-
-          // Trade Policy Uncertainty
-          if (v6.tpu_data) {
-            const tpu = v6.tpu_data.tpu_value || 0;
-            document.getElementById('tpu-value').textContent = tpu;
-            document.getElementById('tpu-value').style.color = tpu < 100 ? 'var(--lime)' : tpu < 200 ? 'var(--amber)' : 'var(--rose)';
-            document.getElementById('tpu-detail').textContent = tpu < 100 ? '✅ Low uncertainty' : tpu < 200 ? '⚠️ Moderate uncertainty' : '🔴 High uncertainty';
-          }
-        })
-        .catch(() => {
-          document.getElementById('narrative-content').textContent = '⚠️ V6 data not available yet. Run the workflow.';
-        });
-    }
 
     // ─── LOAD DATA ───
     async function loadData() {
@@ -1020,6 +1107,82 @@
       $('risk-detail').textContent = 'VaR: ' + (riskMetrics.var_95 || '—') + '% · Max DD: ' + (riskMetrics.max_drawdown || '—') + '%';
 
       // Ensemble Signal
+      // ─── Persistent Paper Trading Account ───
+      const pa = d.paper_account || {};
+      const pst = pa.stats || {};
+      if ($('pa-equity')) {
+        $('pa-equity').textContent = pst.equity !== undefined ? '$' + pst.equity.toLocaleString() : '—';
+        const ret = pst.total_return_pct;
+        const rEl = $('pa-return');
+        if (rEl) {
+          rEl.textContent = ret !== undefined ? `${ret >= 0 ? '+' : ''}${ret}% total` : '—';
+          rEl.style.color = ret > 0 ? 'var(--lime)' : ret < 0 ? 'var(--rose)' : 'var(--text-secondary)';
+        }
+        $('pa-closed').textContent = pst.closed_trades ?? 0;
+        $('pa-winrate').textContent = pst.win_rate !== null && pst.win_rate !== undefined
+          ? `${pst.win_rate}% win rate (${pst.wins}W/${pst.losses}L)`
+          : 'No closed trades yet';
+        $('pa-open').textContent = pst.open_positions ?? 0;
+        $('pa-dca').textContent = pst.dca_positions ? `${pst.dca_positions} averaged down` : 'No DCA active';
+        $('pa-pf').textContent = pst.profit_factor ?? '—';
+        $('pa-avg').textContent = (pst.avg_win !== null && pst.avg_win !== undefined)
+          ? `Avg win $${pst.avg_win} · avg loss $${pst.avg_loss}` : 'Awaiting closed trades';
+      }
+      const posEl = $('pa-positions');
+      if (posEl) {
+        const ps = pa.positions || {};
+        const keys = Object.keys(ps);
+        posEl.innerHTML = keys.length ? keys.map(k => {
+          const p = ps[k];
+          return `<div style="padding:4px 0;border-bottom:1px solid var(--border-subtle);">
+            <b style="color:#fff;">${k}</b> ${p.side} · ${Number(p.qty).toFixed(6)} @ ${Number(p.avg_entry).toFixed(4)}
+            ${p.tranches > 1 ? `<span style="color:var(--amber);"> · DCA x${p.tranches}</span>` : ''}
+            ${p.tp1_hit ? '<span style="color:var(--lime);"> · TP1 taken, stop at breakeven</span>' : ''}
+          </div>`;
+        }).join('') : 'No open positions.';
+      }
+      const evEl = $('pa-events');
+      if (evEl) {
+        const evs = pst.last_events || [];
+        evEl.innerHTML = evs.length
+          ? evs.slice().reverse().map(e => `<div style="padding:3px 0;">• ${e}</div>`).join('')
+          : 'No activity this cycle.';
+      }
+
+      // ─── Trade Rankings (rank_trades output) ───
+      const rankEl = $('trade-rankings');
+      if (rankEl) {
+        const ranks = d.trade_rankings || [];
+        rankEl.innerHTML = ranks.length
+          ? ranks.slice(0, 5).map((r, i) =>
+              `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border-subtle);">
+                 <span>${i + 1}. <b style="color:#fff;">${r.asset}</b> — ${r.signal || '—'}</span>
+                 <span style="color:var(--accent);">${((r.confidence || 0) * 100).toFixed(0)}%</span>
+               </div>`).join('')
+          : 'No qualifying trades right now — all assets below the conviction threshold.';
+      }
+
+      // ─── Self-Learning State (online_learning output) ───
+      const slEl = $('self-learning-box');
+      if (slEl) {
+        const sl = d.self_learning || {};
+        const warming = sl.status === 'WARMING_UP' || sl.recent_accuracy === null || sl.recent_accuracy === undefined;
+        const adj = sl.threshold_adjustment !== undefined ? (sl.threshold_adjustment >= 0 ? '+' : '') + sl.threshold_adjustment : '—';
+        if (warming) {
+          const need = sl.predictions_needed || 11;
+          slEl.innerHTML = `Status: <b style="color:var(--amber);">WARMING UP</b><br>
+            Closed trades: <b style="color:#fff;">${sl.sample_size ?? 0} / ${need}</b><br>
+            Threshold shift: <b style="color:#fff;">none yet</b>
+            <br><span style="color:var(--text-muted);font-size:0.62rem;">No accuracy figure until ${need} trades have closed at stop-loss or target. Nothing is being adjusted yet.</span>`;
+        } else {
+          slEl.innerHTML = `Status: <b style="color:var(--lime);">ACTIVE</b><br>
+            Recent accuracy: <b style="color:var(--accent);">${(sl.recent_accuracy * 100).toFixed(0)}%</b>
+            <span style="color:var(--text-muted);font-size:0.62rem;">(last ${sl.sample_size} trades)</span><br>
+            Threshold shift: <b style="color:#fff;">${adj}</b><br>
+            Outcomes recorded: <b style="color:#fff;">${sl.predictions_tracked ?? 0}</b>`;
+        }
+      }
+
       const ensemble = d.ensemble_signal || {};
       $('ensemble-signal').textContent = ensemble.signal || '—';
       $('ensemble-signal').style.color = ensemble.signal === 'STRONG LONG' || ensemble.signal === 'LONG' ? 'var(--lime)' :
@@ -1161,6 +1324,15 @@
         // ─── V6 Data: BIG/SMALL Trade Sizes ───
         const bigTrade = a.big_trade || {};
         const smallTrade = a.small_trade || {};
+        const sr = a.support_resistance || {};
+        const whale = a.whale_activity || {};
+        const mc = a.monte_carlo || {};
+        const season = a.seasonality || {};
+        const attribution = a.feature_attribution || {};
+        const stratVal = a.strategy_validation || {};
+        const bestStrat = Object.entries(stratVal).length
+          ? Object.entries(stratVal).sort((x, y) => (y[1]?.sharpe ?? -99) - (x[1]?.sharpe ?? -99))[0]
+          : null;
 
         const node = document.createElement('div');
         node.className = 'asset-node';
@@ -1188,13 +1360,51 @@
               ${posSizing.size_multiplier ? `<span class="risk-badge ${posSizing.size_multiplier < 0.7 ? 'warning' : 'safe'}">Size: ${(posSizing.size_multiplier * 100).toFixed(0)}%</span>` : ''}
               ${riskMetrics.risk_grade ? `<span class="risk-badge ${riskMetrics.risk_grade === 'A' || riskMetrics.risk_grade === 'B' ? 'safe' : riskMetrics.risk_grade === 'F' ? 'danger' : 'warning'}">Risk: ${riskMetrics.risk_grade}</span>` : ''}
               ${volForecast.regime === 'HIGH' ? `<span class="risk-badge warning">⚠️ High Vol</span>` : ''}
-              ${bigTrade.position_size ? `<span class="risk-badge info">BIG: ${bigTrade.position_size.toFixed(4)}</span>` : ''}
-              ${smallTrade.position_size ? `<span class="risk-badge info">SMALL: ${smallTrade.position_size.toFixed(4)}</span>` : ''}
+              ${bigTrade.position_size ? `<span class="risk-badge info">BIG: ${bigTrade.position_size.toFixed(4)}</span>`
+                 : `<span class="risk-badge" style="opacity:.55;">BIG: gated (needs 60% conv)</span>`}
+              ${smallTrade.position_size ? `<span class="risk-badge info">SMALL: ${smallTrade.position_size.toFixed(4)}</span>`
+                 : `<span class="risk-badge" style="opacity:.55;">SMALL: gated (needs 40% conv)</span>`}
+              ${a.mtf_multiplier !== undefined ? `<span class="risk-badge ${a.mtf_multiplier >= 1 ? 'safe' : a.mtf_multiplier <= 0.3 ? 'danger' : 'warning'}">MTF x${a.mtf_multiplier}</span>` : ''}
+              ${a.kelly_position_size ? `<span class="risk-badge info">Kelly: ${(a.kelly_position_size * 100).toFixed(1)}%</span>` : ''}
             </div>
+            ${a.filtered_reason ? `<div class="regime-change-banner">🚫 Signal filtered: ${a.filtered_reason} (was ${a.signal_before_filter})</div>` : ''}
 
             ${regimeChange.change ? `<div class="regime-change-banner">⚠️ Regime changed: ${regimeChange.previous_regime || '—'} → ${regimeChange.new_regime || '—'}</div>` : ''}
 
             <div class="pill-row">${renderPills(a.sub_signals || {})}</div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;font-size:0.52rem;color:var(--text-secondary);">
+              ${sr.nearest_support || sr.nearest_resistance ? `
+                <div style="background:rgba(255,255,255,0.02);border-radius:5px;padding:7px;">
+                  <div style="color:var(--text-muted);font-size:0.45rem;text-transform:uppercase;letter-spacing:.06em;">Support / Resistance</div>
+                  <div>S: <b style="color:var(--lime);">${sr.nearest_support ?? '—'}</b> &nbsp; R: <b style="color:var(--rose);">${sr.nearest_resistance ?? '—'}</b></div>
+                </div>` : ''}
+              ${whale.severity ? `
+                <div style="background:rgba(255,255,255,0.02);border-radius:5px;padding:7px;">
+                  <div style="color:var(--text-muted);font-size:0.45rem;text-transform:uppercase;letter-spacing:.06em;">Whale Activity</div>
+                  <div><b style="color:${whale.severity === 'HIGH' ? 'var(--rose)' : whale.severity === 'MEDIUM' ? 'var(--amber)' : '#fff'};">${whale.severity}</b>${whale.description ? `<br><span style="font-size:0.48rem;">${whale.description}</span>` : ''}</div>
+                </div>` : ''}
+              ${mc.profitable_pct !== undefined ? `
+                <div style="background:rgba(255,255,255,0.02);border-radius:5px;padding:7px;">
+                  <div style="color:var(--text-muted);font-size:0.45rem;text-transform:uppercase;letter-spacing:.06em;">Monte Carlo (300 sims)</div>
+                  <div>Profitable: <b style="color:var(--accent);">${mc.profitable_pct.toFixed(0)}%</b>${mc.median !== undefined ? ` · median ${(mc.median * 100).toFixed(1)}%` : ''}</div>
+                </div>` : ''}
+              ${bestStrat ? `
+                <div style="background:rgba(255,255,255,0.02);border-radius:5px;padding:7px;">
+                  <div style="color:var(--text-muted);font-size:0.45rem;text-transform:uppercase;letter-spacing:.06em;">Best Backtested Strategy</div>
+                  <div><b style="color:#fff;">${bestStrat[0]}</b> · Sharpe ${(bestStrat[1].sharpe ?? 0).toFixed(2)}</div>
+                </div>` : ''}
+              ${season && season.best_day ? `
+                <div style="background:rgba(255,255,255,0.02);border-radius:5px;padding:7px;">
+                  <div style="color:var(--text-muted);font-size:0.45rem;text-transform:uppercase;letter-spacing:.06em;">Seasonality</div>
+                  <div>Best day: <b style="color:#fff;">${season.best_day}</b>${season.best_month ? ` · Best month: <b style="color:#fff;">${season.best_month}</b>` : ''}</div>
+                </div>` : ''}
+              ${attribution.top_driver ? `
+                <div style="background:rgba(255,255,255,0.02);border-radius:5px;padding:7px;">
+                  <div style="color:var(--text-muted);font-size:0.45rem;text-transform:uppercase;letter-spacing:.06em;">Top Signal Driver</div>
+                  <div><b style="color:var(--accent);">${attribution.top_driver}</b> ${attribution.features && attribution.features[0] ? `(${attribution.features[0].importance_pct}%)` : ''}</div>
+                </div>` : ''}
+            </div>
 
             ${tradePlan.entry_price ? `
               <div class="trade-plan-box">
