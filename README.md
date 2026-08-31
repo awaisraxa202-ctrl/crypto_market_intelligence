@@ -1,205 +1,207 @@
-# Crypto Market Intelligence v4.2 — Enhanced Edition
+# Market Cortex v6.0
 
-> **Built on v4.1 Merged Edition** with real-world enhancements, bug fixes, and professional risk metrics.
+Automated cryptocurrency market intelligence. Runs every 2 hours via GitHub Actions, pulls live data from 11+ free sources, analyses 9 assets, and publishes a static dashboard to GitHub Pages.
 
-## What This System Is
+**Live dashboard:** https://awaisraxa202-ctrl.github.io/crypto_market_intelligence/
 
-A daily research dashboard that analyzes **9 major cryptocurrencies** using real market data, **35+ technical indicators**, **10 strategy backtests**, **Monte Carlo simulation**, **cross-asset correlation analysis**, and plain-English narrative explanations.
+> **RESEARCH AND EDUCATIONAL TOOL ONLY. NOT FINANCIAL ADVICE.**
+> Past performance does not predict future results. Paper trade for at least 3 months before risking real capital.
 
-## What's New in v4.2
+---
 
-### 🔧 Bug Fixes
-- **Fixed EMA 12/26 calculation** — MACD now computes correctly (was broken in v4.1)
-- **Fixed yfinance multi-index columns** — handles newer yfinance API format
-- **Fixed empty DataFrame crashes** — robust guards throughout the pipeline
-- **Added retry logic with exponential backoff** — all APIs now auto-retry on 429/rate-limit
+## What it does
 
-### 🆕 New Features
+Every 2 hours the pipeline:
 
-| Feature | Description |
-|---------|-------------|
-| **RSI Divergence** | Detects bullish/bearish divergences between price and RSI |
-| **OBV Divergence** | Smart money proxy — volume accumulation vs price |
-| **Support & Resistance** | Swing high/low levels computed from recent price action |
-| **Whale Activity Proxy** | Volume z-score spikes flag unusual institutional activity |
-| **VaR (95%)** | Value at Risk — "worst expected daily loss" metric |
-| **Sortino Ratio** | Risk-adjusted return using only downside deviation |
-| **Calmar Ratio** | Annualized return / max drawdown |
-| **Max Consecutive Wins/Losses** | Streak analysis for strategy robustness |
-| **Correlation Matrix** | Cross-asset correlations for portfolio construction |
-| **Altcoin Season Index** | 0-100 score: is it Bitcoin season or altcoin season? |
-| **Market Breadth** | Advance/decline proxy across all 9 assets |
-| **Funding Rate Heatmap** | All assets' funding rates in one view |
-| **Volatility Forecast** | GARCH-like EWMA 5-day and 20-day volatility projections |
-| **6-Factor Pattern Matching** | RSI, price vs SMA, volatility, MACD, BB position, ATR |
+1. Fetches OHLCV, funding rates, open interest, order books, on-chain and macro data
+2. Computes ~35 technical indicators per asset
+3. Scores each asset into a weighted composite signal with a conviction level
+4. Confirms (or penalises) that signal across 1h / 4h / 1d timeframes
+5. Filters signals failing volume or volatility confirmation
+6. Builds a full trade plan — entry, stop-loss, two take-profit levels, R:R
+7. Sizes positions by volatility, drawdown state and conviction
+8. Backtests 10 strategies, runs Monte Carlo, computes risk metrics
+9. Writes `docs/market_intelligence.json` + `docs/v6_results.json`
+10. Commits, then deploys to GitHub Pages
 
-### 📊 Data Sources (11 free APIs)
-- **Binance** — OHLCV, funding rates, open interest, long/short ratios
-- **Yahoo Finance** — SPY, DXY, VIX, TNX, GLD macro proxies
-- **Fear & Greed Index** — Market sentiment (contrarian signal)
-- **CoinGecko** — Market cap, dominance, ATH data
-- **Deribit** — Options put/call ratio, implied volatility
-- **Etherscan** — Gas prices (network congestion proxy)
-- **Beaconchain** — ETH validator count & staking data
-- **FRED** — CPI and Fed Funds Rate
+**Assets:** BTC, ETH, SOL, BNB, XRP, ADA, DOGE, LINK, AVAX
 
-## Supported Assets (9)
-
-| Code | Name | Options | On-Chain |
-|------|------|---------|----------|
-| BTC | Bitcoin | Deribit | — |
-| ETH | Ethereum | Deribit | Etherscan, Beaconchain |
-| SOL | Solana | Deribit | — |
-| BNB | BNB | — | — |
-| XRP | XRP | — | — |
-| ADA | Cardano | — | — |
-| DOGE | Dogecoin | — | — |
-| LINK | Chainlink | — | — |
-| AVAX | Avalanche | — | — |
-
-## The 12 Sub-Signals
-
-| # | Signal | Weight | Description |
-|---|--------|--------|-------------|
-| 1 | Trend | High | Price vs SMA50 & SMA200 (Golden/Death Cross) |
-| 2 | Momentum | High | RSI + MACD histogram direction |
-| 3 | Volatility | Medium | ATR% and annualized volatility |
-| 4 | Sentiment | Medium | Fear & Greed Index (contrarian) |
-| 5 | Funding Rate | Medium | Binance futures funding (contrarian) |
-| 6 | Volume | Low | Volume vs 20-day average |
-| 7 | Drawdown | Low | Distance from all-time high |
-| 8 | Stoch RSI | Low | More sensitive momentum indicator |
-| 9 | Williams %R | Low | Overbought/oversold oscillator |
-| 10 | PI Cycle Top | High | 111 SMA vs 350 SMA x2 (BTC top detector) |
-| 11 | RSI Divergence | Medium | Price-RSI divergence detection |
-| 12 | OBV Divergence | Medium | Volume-price divergence (smart money) |
-
-## Signal Levels
-
-| Score | Signal | Action |
-|-------|--------|--------|
-| +0.5 to +1.0 | STRONG LONG | Multiple factors align bullish |
-| +0.2 to +0.5 | LONG | Conditions favor upside |
-| -0.2 to +0.2 | NO TRADE | Mixed signals. Stay in cash. |
-| -0.5 to -0.2 | SHORT | Conditions favor downside |
-| -1.0 to -0.5 | STRONG SHORT | Multiple bearish factors align |
-
-## 10 Pre-Validated Strategies
-
-Each backtested with 0.2% fees (0.1% taker + 0.1% slippage):
-
-1. SMA20 Crossover
-2. SMA50 Trend
-3. Golden Cross
-4. RSI < 30, > 70
-5. RSI + Trend Filter
-6. Bollinger Bounce
-7. MACD Crossover
-8. Volatility Breakout
-9. Stoch RSI Oversold
-10. Williams %R
-
-## Risk Metrics (NEW in v4.2)
-
-| Metric | What It Tells You |
-|--------|-------------------|
-| **VaR (95%)** | "With 95% confidence, daily loss won't exceed X%" |
-| **Sortino Ratio** | Return per unit of downside risk (Sharpe but better) |
-| **Calmar Ratio** | Return per unit of max drawdown |
-| **Max Consecutive Losses** | Worst losing streak — test your psychology |
-| **Kelly Fraction** | Optimal bet size as % of capital |
-
-## Zero-Cost Deployment
-
-### Step 1: Create GitHub Repo
-1. Go to [github.com/new](https://github.com/new)
-2. Name it `crypto-market-intelligence`
-3. Make it **Public**
-4. Click **Create repository**
-
-### Step 2: Upload Files
-Upload these files to the repo root:
-- `crypto_market_intelligence_v42.py`
-- `index.html`
-- `requirements.txt`
-- `.github/workflows/update.yml`
-
-### Step 3: Enable GitHub Pages
-Settings → Pages → Source: GitHub Actions
-
-### Step 4: Enable GitHub Actions
-Actions tab → "I understand my workflows, go ahead and enable them"
-
-### Step 5: (Optional) Add API Keys as Secrets
-Settings → Secrets and variables → Actions → New repository secret:
-- `ETHERSCAN_API_KEY` — Get free at [etherscan.io/apis](https://etherscan.io/apis)
-- `BEACONCHAIN_API_KEY` — Get free at [beaconcha.in](https://beaconcha.in)
-- `FRED_API_KEY` — Get free at [fred.stlouisfed.org](https://fred.stlouisfed.org)
-
-> The system works without API keys — they just unlock extra data (gas, staking, macro).
-
-### Live URL
-```
-https://YOUR_USERNAME.github.io/crypto-market-intelligence/
-```
-
-**Total cost: $0**
+---
 
 ## Architecture
 
 ```
-┌─────────────────┐     ┌─────────────────────┐     ┌─────────────────┐
-│  11 Data Sources │────▶│  Python Engine v4.2 │────▶│    Dashboard    │
-├─────────────────┤     ├─────────────────────┤     ├─────────────────┤
-│ Binance (prices)│     │ Fetch & Clean       │     │ index.html      │
-│ Yahoo (macro)   │     │ 35+ Indicators      │     │ Expandable Cards│
-│ Fear & Greed    │     │ 10 Strategy Tests   │     │ Narratives      │
-│ CoinGecko       │     │ Monte Carlo         │     │ Pattern Match   │
-│ Deribit (opts)  │     │ Kelly Criterion     │     │ Seasonality     │
-│ Etherscan (gas) │     │ Risk Metrics (NEW)  │     │ Regime Bars     │
-│ Beaconchain     │     │ Correlation Matrix  │     │ S/R Levels      │
-│ FRED (CPI/Fed)  │     │ Altcoin Season Idx  │     │ Whale Alerts    │
-└─────────────────┘     │ Market Breadth      │     └─────────────────┘
-                        │ Funding Heatmap     │
-                        │ Narrative Generation│
-                        └─────────────────────┘
-                                   │
-                        ┌──────────┘
-                        ▼
-                   GitHub Actions
-                   (Daily @ 06:00 UTC)
+crypto_market_intelligence_v60.py   Engine (~3,900 lines, 122 functions)
+├── run_pipeline()                  Main 9-asset pass  -> market_intelligence.json
+└── run_v6_pipeline()               BTC deep-dive pass -> v6_results.json
+
+index.html                          Dashboard (reads both JSON files)
+explainer.html                      Static plain-English guide
+offline_test.py                     End-to-end test harness (mocked network)
+.github/workflows/update.yml        Scheduled run + Pages deploy
 ```
 
-## What This Proves
+---
 
-| Skill | Evidence |
-|-------|----------|
-| Data Engineering | 11 APIs, multi-source pipeline, time-series alignment, SQLite |
-| Feature Engineering | 35+ indicators from scratch (RSI, MACD, ATR, Bollinger, Pi Cycle, Divergence, etc.) |
-| Quantitative Analysis | Walk-forward backtesting, regime detection, pattern matching, Monte Carlo |
-| Risk Management | VaR, Sortino, Calmar, Kelly Criterion, drawdown tracking, volatility filters |
-| Statistical Rigor | Correlation matrices, seasonality, bootstrap simulation |
-| DevOps/CI-CD | GitHub Actions cron, automated deployment, secrets management |
-| Intellectual Honesty | Clear disclaimers, shows strategy failures, admits limitations |
+## Feature status — verified, not claimed
 
-## Important Warnings
+Every entry was checked against the actual call graph and exercised in `offline_test.py`. **47/47 checks pass.**
 
-**THIS IS A RESEARCH AND EDUCATIONAL TOOL ONLY. NOT FINANCIAL ADVICE.**
+### Signals & analysis
+| Feature | Status |
+|---|---|
+| 35+ technical indicators | Working |
+| Weighted composite scoring | Working |
+| Multi-timeframe confirmation (1h/4h/1d) | Working — **adjusts conviction** |
+| Regime detection + strategy switching | Working |
+| False-signal filter (volume/volatility) | Working — **downgrades signals** |
+| Feature attribution (per-signal contribution) | Working |
+| Support/resistance (real swing levels) | Working |
+| RSI + OBV divergence | Working |
+| Whale activity proxy | Working |
+| Seasonality (best/worst day & month) | Working |
+| Monte Carlo (300 sims) | Working |
+| 10-strategy backtest validation | Working |
+| Walk-forward validation | Working |
 
-- Past performance does NOT predict future results
-- Markets change. You can lose money.
-- The system has losing streaks.
-- Crypto is extremely volatile — never invest more than you can afford to lose.
-- The creators are NOT responsible for any trading losses.
+### Risk & sizing
+| Feature | Status |
+|---|---|
+| Dynamic volatility-adjusted sizing | Working |
+| Drawdown protection (10% DD -> 50% size) | Working |
+| Two-tier BIG/SMALL trades | Working — **gated by conviction** |
+| Kelly optimal sizing | Working |
+| Risk of ruin, VaR, Sortino, Calmar | Working |
+| Correlation risk + breakdown detection | Working |
+| Risk grading (A-F) | Working |
 
-## How to Use Responsibly
+### Market data
+| Feature | Status |
+|---|---|
+| Order book snapshots + imbalance | Working |
+| Order book WebSocket burst | Working (8s bounded sample) |
+| Funding rates (Binance + Bybit) | Working |
+| Long/short ratio, open interest | Working |
+| Deribit options (put/call, IV) | Working |
+| Macro (Fed, DXY, VIX, liquidity) | Working |
+| Economic calendar | Working (FOMC real; CPI/Jobs estimated) |
+| On-chain (NVT, miner, hashrate) | Working |
+| MVRV | **Proxy** — see limitations |
+| ETF flow | **Proxy** — see limitations |
 
-1. **Paper trade first** — follow signals with fake money for 3+ months
-2. **Track every signal** in a journal
-3. **Never risk more than 1-2%** of your capital on any single trade idea
-4. **Use this as ONE input among many**
-5. **If you don't understand an indicator, don't trade based on it**
+### Learning & tracking
+| Feature | Status |
+|---|---|
+| Signal history + win/loss tracking | Working |
+| Outcome recording on SL/TP hit | Working |
+| Online learning (threshold adaptation) | Working — **dormant until 11 closed trades** |
+| Post-mortem on losses | Working (generic template) |
+| Portfolio simulator | Working — real historical walk |
+| Trade ranking | Working |
+| **Persistent paper account** | Working — survives between runs |
+| **DCA / averaging down** | Working — up to 3 tranches |
+| **Partial exit at TP1** | Working — 50% off, stop to breakeven |
+| **Correlation exposure cap** | Working — 40% max per correlated bloc |
 
-## License
+### Paper trading account
 
-MIT License — free to use, modify, and deploy. No warranty provided. Use at your own risk.
+`docs/paper_account.json` persists across runs. Each cycle it marks positions to
+market, then applies exits before entries:
+
+1. **Stop-loss** → full exit
+2. **TP1** → close 50%, move stop to breakeven on the runner
+3. **TP2** → close the remainder
+4. **DCA** → if a position is 5%+ underwater, the signal still holds, and TP1 has
+   not been hit, add a smaller tranche (0.75x the last) and re-average entry.
+   Max 3 tranches. The stop re-anchors to the new average entry.
+5. **New entries** → highest conviction first, capped at 5 open positions, 30% of
+   cash per entry, and 40% total exposure to any correlated bloc (|ρ| ≥ 0.7).
+
+Every closed trade feeds `track_prediction_accuracy()`, which is what eventually
+wakes the self-learning engine. Fees of 0.2% are charged on every fill.
+
+This account is a **simulation**. It places no real orders — there is no exchange
+API key, no order-placement code, and no execution path anywhere in this repo.
+
+---
+
+## Honest limitations
+
+These are real. Do not mistake them for working features.
+
+**"BiLSTM" and "CNN" are not neural networks.** They are rule-based heuristics. There is no trained model file in this repository. The ensemble math is real; the two inputs it averages are formulas, not learned models.
+
+**MVRV is a proxy.** True MVRV Z-score requires realized-cap data from a paid on-chain API. This uses price vs its 200-day mean, z-scored. Labelled `mvrv_is_proxy: true`.
+
+**ETF flow is a proxy.** True creation/redemption flows have no free API. This uses dollar volume across IBIT/FBTC/ARKB/BITB. Labelled `metric: dollar_volume_proxy`.
+
+**CPI and Jobs dates are estimated.** FOMC dates are the real published schedule. CPI/Jobs use the standard recurring pattern and are flagged `estimated: true`.
+
+**Daily resolution only.** No intraday history is stored, so minute-level scalp trades cannot be backtested. The portfolio simulator walks real daily closes and exits on real SL/TP hits — but a 15-minute trade and a 3-day trade are both tracked on daily candles.
+
+**Self-learning is dormant, not broken.** It requires 11 closed trades before adjusting anything. Until then the dashboard shows `WARMING UP — n/11`, not a fabricated accuracy figure.
+
+**Post-mortems are templated.** Every loss returns the same explanatory text. It reports *that* a stop was hit, not a genuine root-cause analysis.
+
+**BIG/SMALL trades are frequently invisible.** BIG requires 60% conviction, SMALL requires 40%. In quiet markets most assets sit well below both, so the badges show "gated". That is the risk gate working, not a display bug.
+
+---
+
+## Setup
+
+### Requirements
+```bash
+pip install -r requirements.txt
+```
+
+### Optional API keys (repo -> Settings -> Secrets -> Actions)
+| Secret | Enables | Required? |
+|---|---|---|
+| `FRED_API_KEY` | Fed funds rate, macro regime | Recommended |
+| `ETHERSCAN_API_KEY` | ETH gas metrics | Optional |
+| `BEACONCHAIN_API_KEY` | ETH staking data | Optional |
+| `DISCORD_WEBHOOK` | Signal alerts | Optional |
+| `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` | Signal alerts | Optional |
+
+Everything else runs on free, keyless endpoints. Missing keys degrade gracefully — those features return empty, they do not crash the run.
+
+### Run locally
+```bash
+python crypto_market_intelligence_v60.py
+```
+
+### Run tests
+```bash
+python offline_test.py
+```
+Mocks all network calls and runs the real pipeline end to end. **Back up `docs/` first — it writes there.**
+
+### GitHub Pages
+Settings -> Pages -> Source: **GitHub Actions**. The deploy job checks out `ref: main` so it always publishes the data the run just committed.
+
+---
+
+## Output files
+
+| File | Contents |
+|---|---|
+| `docs/market_intelligence.json` | All 9 assets, signals, trade plans, risk, rankings, learning state |
+| `docs/v6_results.json` | BTC deep analytics, macro, ML, calendar, narrative |
+| `docs/signal_history.json` | Every signal ever generated + outcomes |
+| `docs/signal_database.json` | Open positions + prediction outcomes (learning input) |
+| `docs/market_summary.txt` | Plain-text briefing |
+
+---
+
+## Reading the dashboard
+
+- **Conviction** — final confidence after multi-timeframe adjustment. `MTF x1.2` means all timeframes agreed and conviction was raised; `x0.3` means they conflicted and it was cut.
+- **NO TRADE is the normal state.** The system is designed to be selective. Most assets, most of the time, will not qualify.
+- **Win rate is not the goal.** A 40% win rate at 2:1 R:R is profitable. Judge on profit factor and expectancy.
+- **Risk of ruin above ~50%** means position sizing is too aggressive for that asset's volatility.
+
+---
+
+## License & disclaimer
+
+Educational use. No warranty. The author is not liable for financial losses. Cryptocurrency trading carries substantial risk of total capital loss.
