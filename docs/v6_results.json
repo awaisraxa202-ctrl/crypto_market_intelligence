@@ -1,10 +1,17 @@
 {
-  "timestamp": "2026-08-31T23:30:49.659761",
-  "imbalance": 0.959,
+  "timestamp": "2026-09-01T00:22:56.162484",
+  "imbalance": 0.003,
   "regime": {
     "regime": "LOW_UNCERTAINTY",
     "description": "Low trade policy uncertainty \u2014 fundamentals-driven market",
-    "dominant_feature": "MINING_COSTS"
+    "dominant_feature": "MINING_COSTS",
+    "active_weights": {
+      "sentiment_weight": 0.1,
+      "order_book_weight": 0.25,
+      "onchain_weight": 0.35,
+      "technical_weight": 0.15,
+      "macro_weight": 0.15
+    }
   },
   "ml_signal": {
     "bilstm_score": 0.5,
@@ -15,28 +22,214 @@
     "trade_qualified": false
   },
   "big_trade": {
-    "position_size": 0.1367,
-    "risk_pct": 3.5,
-    "target_movement": 2560.0,
+    "position_size": 0,
+    "risk_pct": 0,
+    "target_movement": 0,
     "trade_type": "BIG"
   },
   "small_trade": {
-    "position_size": 0.1172,
-    "risk_pct": 0.75,
-    "target_movement": 640.0,
+    "position_size": 0,
+    "risk_pct": 0,
+    "target_movement": 0,
     "trade_type": "SMALL"
   },
   "explanation": {
-    "summary": "No trade",
-    "trader_comment": "No data available",
-    "factors": []
+    "asset": "BTC",
+    "signal": "HOLD",
+    "confidence": 0.5,
+    "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
+    "factors": [
+      "\u274c order_book: Order book data unavailable",
+      "\u274c onchain: NVT ratio normal",
+      "\u2705 sentiment: Fear & Greed in buy zone"
+    ],
+    "historical_evidence": "Building historical database. Check back soon.",
+    "historical_trades": [],
+    "risk_warning": "\u26a0\ufe0f Low confidence trade. Reduce position size by 50%.",
+    "trader_comment": "No clear directional bias. Patience is key."
   },
   "narrative": {
-    "date": "August 31, 2026",
+    "date": "September 01, 2026",
     "macro": "Macro Regime: LOW_UNCERTAINTY \u2014 Low trade policy uncertainty \u2014 fundamentals-driven market",
     "technicals": "Order book data unavailable.",
     "sentiment": "Neutral sentiment. No extremes.",
     "upcoming_events": "Next event: FOMC Meeting on 2026-01-28 (Impact: HIGH)",
     "trader_comment": "Market is in a consolidation phase. Watch for breakout."
-  }
+  },
+  "macro_data": {
+    "fed_trend": "UNKNOWN",
+    "fed_label": "Data unavailable",
+    "dxy": 99.38,
+    "dxy_trend": "FALLING",
+    "dxy_label": "FALLING (99.38)",
+    "vix": 14.92,
+    "vix_level": "LOW",
+    "vix_label": "CALM (14.92)",
+    "fed_impact": "\ud83d\udfe1 NEUTRAL",
+    "dxy_impact": "\ud83d\udfe2 BULLISH",
+    "vix_impact": "\ud83d\udfe2 BULLISH",
+    "overall": "RISK_ON",
+    "overall_desc": "Bullish macro \u2014 risk assets favored.",
+    "overall_color": "#39ff14",
+    "bullish_signals": 2,
+    "total_signals": 3
+  },
+  "tpu_data": {
+    "tpu_value": 0,
+    "source": "fallback"
+  },
+  "economic_calendar": [
+    {
+      "date": "2026-01-28",
+      "event": "FOMC Meeting",
+      "impact": "HIGH",
+      "estimated": false
+    },
+    {
+      "date": "2026-03-18",
+      "event": "FOMC Meeting",
+      "impact": "HIGH",
+      "estimated": false
+    },
+    {
+      "date": "2026-05-06",
+      "event": "FOMC Meeting",
+      "impact": "HIGH",
+      "estimated": false
+    },
+    {
+      "date": "2026-06-17",
+      "event": "FOMC Meeting",
+      "impact": "HIGH",
+      "estimated": false
+    },
+    {
+      "date": "2026-07-29",
+      "event": "FOMC Meeting",
+      "impact": "HIGH",
+      "estimated": false
+    },
+    {
+      "date": "2026-09-04",
+      "event": "Jobs Report",
+      "impact": "MEDIUM",
+      "estimated": true
+    },
+    {
+      "date": "2026-09-12",
+      "event": "CPI Report",
+      "impact": "MEDIUM",
+      "estimated": true
+    },
+    {
+      "date": "2026-09-18",
+      "event": "FOMC Meeting",
+      "impact": "HIGH",
+      "estimated": false
+    },
+    {
+      "date": "2026-10-02",
+      "event": "Jobs Report",
+      "impact": "MEDIUM",
+      "estimated": true
+    },
+    {
+      "date": "2026-10-12",
+      "event": "CPI Report",
+      "impact": "MEDIUM",
+      "estimated": true
+    },
+    {
+      "date": "2026-11-05",
+      "event": "FOMC Meeting",
+      "impact": "HIGH",
+      "estimated": false
+    },
+    {
+      "date": "2026-11-06",
+      "event": "Jobs Report",
+      "impact": "MEDIUM",
+      "estimated": true
+    },
+    {
+      "date": "2026-11-12",
+      "event": "CPI Report",
+      "impact": "MEDIUM",
+      "estimated": true
+    },
+    {
+      "date": "2026-12-16",
+      "event": "FOMC Meeting",
+      "impact": "HIGH",
+      "estimated": false
+    }
+  ],
+  "event_risk": {
+    "expected_move": "\u00b14.0%",
+    "expected_range_low": null,
+    "expected_range_high": null,
+    "direction": "UNCERTAIN",
+    "recommendation": "Reduce position size by 50% before event",
+    "event": {
+      "date": "2026-01-28",
+      "event": "FOMC Meeting",
+      "impact": "HIGH",
+      "estimated": false
+    }
+  },
+  "etf_data": {
+    "total_net_flow": 2127420794.38,
+    "cumulative_holdings": null,
+    "daily_change": 1.74,
+    "etfs_tracked": 4,
+    "per_etf": {
+      "IBIT": {
+        "close": 44.67,
+        "dollar_volume": 1885849706.59,
+        "pct_change": 1.75
+      },
+      "FBTC": {
+        "close": 68.61,
+        "dollar_volume": 166939589.36,
+        "pct_change": 1.73
+      },
+      "ARKB": {
+        "close": 26.17,
+        "dollar_volume": 27996509.06,
+        "pct_change": 1.75
+      },
+      "BITB": {
+        "close": 42.81,
+        "dollar_volume": 46634989.38,
+        "pct_change": 1.71
+      }
+    },
+    "metric": "dollar_volume_proxy",
+    "source": "yfinance spot BTC ETFs (proxy, not true creation/redemption flow)"
+  },
+  "onchain": {
+    "mvrv_zscore": null,
+    "miner_reserves": 0,
+    "nvt_ratio": null,
+    "hashrate_trend": null,
+    "exchange_flow_net": null,
+    "miner_reserves_trend": "UNKNOWN"
+  },
+  "exit_strategy": {
+    "entry": 0,
+    "signal": "HOLD",
+    "current_price": 0.0,
+    "scenarios": []
+  },
+  "ml_predictions": {
+    "BTC": {
+      "bilstm_score": 0.5,
+      "cnn_score": 0.5,
+      "ensemble_score": 0.5,
+      "action": "HOLD",
+      "confidence": 0.5,
+      "trade_qualified": false
+    }
+  },
+  "order_book_history_depth": 1
 }
