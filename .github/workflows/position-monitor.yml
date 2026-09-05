@@ -48,7 +48,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/paper_account.json docs/signal_database.json
+          # -A (all) plus explicit paths, and don't fail if a path doesn't exist yet
+          for f in docs/paper_account.json docs/signal_database.json; do
+            [ -f "$f" ] && git add "$f"
+          done
           if git diff --staged --quiet; then
             echo "No changes — nothing to commit."
             exit 0
