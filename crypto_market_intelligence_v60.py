@@ -2892,6 +2892,11 @@ def quick_position_check():
     acct = load_paper_account()
     if not acct['positions']:
         print("No open positions — nothing to check.")
+        # Save anyway. On a fresh repo this file doesn't exist yet, and if this
+        # function returns without writing it, `git add docs/paper_account.json`
+        # in the workflow fails with "pathspec did not match any files" — save
+        # here so the file exists from the very first run, position or not.
+        save_paper_account(acct)
         return acct
 
     events = []
