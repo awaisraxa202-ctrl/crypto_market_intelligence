@@ -10,8 +10,12 @@ permissions:
   pages: write
   id-token: write
 
+# Shared with position-monitor.yml — both write docs/paper_account.json and push
+# to main, so they must queue rather than run simultaneously and clobber each
+# other. (This also still serialises the Pages deploy, which is what the old
+# "pages" group did.)
 concurrency:
-  group: "pages"
+  group: market-cortex-write
   cancel-in-progress: false
 
 jobs:
