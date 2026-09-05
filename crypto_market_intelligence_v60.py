@@ -3639,11 +3639,24 @@ class MarketMLModels:
             return 0.5
     
     def _fallback_prediction(self, data):
-        """Fallback when ML libraries are not available"""
-        if isinstance(data, dict):
+        """Fallback when ML libraries are not available.
+
+        This was a confirmed dead-in-production bug: GitHub Actions never installs
+        tensorflow/scikit-learn (not in requirements.txt or the workflow's pip
+        install), so models_loaded is always False here. This fallback is therefore
+        the ONLY code path that ever actually runs for bilstm/cnn scores. It looked
+        for 'rsi'/'macd_hist' keys — but predict_cnn calls it with order_book_data
+        (which only has 'imbalance', no rsi/macd), so it always fell through to a
+        flat 0.5. The ML Ensemble Signal card was permanently inert regardless of
+        real market conditions. Now it uses whatever real signal it's actually
+        given instead of assuming one specific data shape.
+        """
+        if not isinstance(data, dict):
+            return 0.5
+
+        if 'rsi' in data or 'macd_hist' in data:
             rsi = data.get('rsi', 50)
             macd = data.get('macd_hist', 0)
-            
             if rsi < 30 and macd > 0:
                 return 0.7
             elif rsi > 70 and macd < 0:
@@ -3652,7 +3665,26 @@ class MarketMLModels:
                 return 0.6
             elif rsi < 40 and macd < 0:
                 return 0.4
-        
+            return 0.5
+
+        if 'imbalance' in data:
+            imbalance = data.get('imbalance', 0.5)
+            if imbalance > 0.6:
+                return round(min(1.0, 0.6 + (imbalance - 0.6) * 1.5), 3)
+            elif imbalance < 0.4:
+                return round(max(0.0, 0.4 - (0.4 - imbalance) * 1.5), 3)
+            return 0.5
+
+        if 'mvrv_zscore' in data:
+            mvrv = data.get('mvrv_zscore', 0)
+            if mvrv is None:
+                return 0.5
+            if mvrv < -1:
+                return 0.7   # historically cheap
+            elif mvrv > 3:
+                return 0.3   # historically extended
+            return 0.5
+
         return 0.5
     
     def ensemble_predict(self, bilstm_score, cnn_score):
@@ -4235,6 +4267,14 @@ def run_v6_pipeline():
         ob_snapshot = fetch_order_book_snapshot('BTCUSDT')
         if ob_snapshot:
                 imbalance = calculate_order_book_imbalance(ob_snapshot)
+                # Confirmed bug: fetch_order_book_snapshot never includes 'imbalance'
+                # in its own return dict, and this value was only ever kept in a
+                # separate local variable — so generate_market_narrative(), which
+                # reads order_book_data.get('imbalance'), always saw None and
+                # printed "Order book data unavailable" even on a fully successful
+                # fetch with a real computed imbalance sitting right next to it.
+                if isinstance(ob_snapshot, dict):
+                    ob_snapshot['imbalance'] = imbalance
                 if imbalance is not None:
                         print(f"  BTC Order Book Imbalance: {imbalance:.3f}")
                         store_order_book_snapshot(ob_snapshot)
@@ -4318,11 +4358,24 @@ def run_v6_pipeline():
     # 7. Trade Size Selection
     print("\n[V6.7] Calculating trade sizes...")
     try:
-        # Use the REAL current BTC price, not a hardcoded stale constant.
+        # Reuse the BTC price run_pipeline() already fetched successfully a moment
+        # ago (it's sitting in the just-written market_intelligence.json) instead
+        # of a third separate live Binance call — that extra call was observed
+        # failing in production (rate-limit risk after ~9 prior Binance calls in
+        # the same run), silently leaving big_trade/small_trade/exit_strategy at
+        # zero even on runs where BTC's price was fetched successfully moments
+        # earlier for the main 9-asset pass.
+        btc_price = 0
         try:
-            btc_price = float(fetch_binance_klines('BTCUSDT', interval='1d', limit=1)['close'].iloc[-1])
+            with open(OUTPUT_PATH, 'r') as f:
+                btc_price = float(json.load(f).get('assets', {}).get('BTC', {}).get('price', 0) or 0)
         except Exception:
-            btc_price = 0
+            pass
+        if not btc_price:
+            try:
+                btc_price = float(fetch_binance_klines('BTCUSDT', interval='1d', limit=1)['close'].iloc[-1])
+            except Exception:
+                btc_price = 0
         confidence = ml_signal.get('confidence', 0.5)
         big_trade = calculate_trade_size_big(btc_price, confidence)
         small_trade = calculate_trade_size_small(btc_price, confidence)
@@ -4364,7 +4417,14 @@ def run_v6_pipeline():
     # 9. Exit Strategy
     print("\n[V6.9] Generating exit strategy...")
     try:
-        # btc_price is already fetched live in V6.7 above; fall back only if missing.
+        # btc_price already resolved in V6.7 above (reused from market_intelligence.json
+        # or a live fetch) — only re-attempt here if that somehow still left it at 0.
+        if not btc_price:
+            try:
+                with open(OUTPUT_PATH, 'r') as f:
+                    btc_price = float(json.load(f).get('assets', {}).get('BTC', {}).get('price', 0) or 0)
+            except Exception:
+                pass
         if not btc_price:
             try:
                 btc_price = float(fetch_binance_klines('BTCUSDT', interval='1d', limit=1)['close'].iloc[-1])
