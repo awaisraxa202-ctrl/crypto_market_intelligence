@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-09-05T19:41:43.733866",
-  "imbalance": 0.753,
+  "timestamp": "2026-09-05T21:05:39.329873",
+  "imbalance": 0.567,
   "regime": {
     "regime": "LOW_UNCERTAINTY",
     "description": "Low trade policy uncertainty \u2014 fundamentals-driven market",
@@ -15,28 +15,28 @@
   },
   "ml_signal": {
     "bilstm_score": 0.5,
-    "cnn_score": 0.83,
-    "ensemble_score": 0.665,
-    "action": "BUY",
-    "confidence": 0.665,
-    "trade_qualified": true
+    "cnn_score": 0.5,
+    "ensemble_score": 0.5,
+    "action": "HOLD",
+    "confidence": 0.5,
+    "trade_qualified": false
   },
   "big_trade": {
-    "position_size": 0.1149,
-    "risk_pct": 3.67,
-    "target_movement": 3190.7048,
+    "position_size": 0.1097,
+    "risk_pct": 3.5,
+    "target_movement": 3189.668,
     "trade_type": "BIG"
   },
   "small_trade": {
-    "position_size": 0.1044,
-    "risk_pct": 0.83,
-    "target_movement": 797.6762,
+    "position_size": 0.0941,
+    "risk_pct": 0.75,
+    "target_movement": 797.417,
     "trade_type": "SMALL"
   },
   "explanation": {
     "asset": "BTC",
-    "signal": "BUY",
-    "confidence": 0.665,
+    "signal": "HOLD",
+    "confidence": 0.5,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
       "\u2705 order_book: Bullish order book imbalance",
@@ -45,7 +45,7 @@
     ],
     "historical_evidence": "Building historical database. Check back soon.",
     "historical_trades": [],
-    "risk_warning": "\u2705 Moderate confidence. Standard position size recommended.",
+    "risk_warning": "\u26a0\ufe0f Low confidence trade. Reduce position size by 50%.",
     "trader_comment": "No clear directional bias. Patience is key."
   },
   "narrative": {
@@ -176,25 +176,25 @@
   "onchain": {
     "mvrv_zscore": null,
     "miner_reserves": 0,
-    "nvt_ratio": 85.6,
+    "nvt_ratio": 84.93,
     "hashrate_trend": null,
     "exchange_flow_net": null,
     "miner_reserves_trend": "UNKNOWN"
   },
   "exit_strategy": {
-    "entry": 79767.62,
-    "signal": "BUY",
-    "current_price": 80565.2962,
+    "entry": 79741.7,
+    "signal": "HOLD",
+    "current_price": 80539.117,
     "scenarios": []
   },
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.5,
-      "cnn_score": 0.83,
-      "ensemble_score": 0.665,
-      "action": "BUY",
-      "confidence": 0.665,
-      "trade_qualified": true
+      "cnn_score": 0.5,
+      "ensemble_score": 0.5,
+      "action": "HOLD",
+      "confidence": 0.5,
+      "trade_qualified": false
     }
   },
   "order_book_history_depth": 1
