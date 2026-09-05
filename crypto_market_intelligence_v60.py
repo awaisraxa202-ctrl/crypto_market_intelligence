@@ -64,6 +64,7 @@ NOT financial advice. Past performance does NOT predict future results.
 
 import pandas as pd
 import numpy as np
+import math
 import requests
 import json
 import sqlite3
@@ -368,18 +369,30 @@ def fetch_coingecko_global():
         print(f"  ⚠️ CG global: {e}")
         return {}
 
+_COINGECKO_CACHE = {}
+
 def fetch_coingecko_coin(coin_id='ethereum'):
+    """Cached per run. This session added a second caller (build_onchain_summary,
+    looped over all 9 assets) on top of the existing one in fetch_onchain_metrics —
+    without caching, that's ~10 CoinGecko calls in quick succession, which is enough
+    to trip CoinGecko's free-tier rate limit (especially from shared CI runner IPs)
+    and silently blank out NVT/MVRV/miner-revenue for the whole run."""
+    if coin_id in _COINGECKO_CACHE:
+        return _COINGECKO_CACHE[coin_id]
     url = f"https://api.coingecko.com/api/v3/coins/{coin_id}?localization=false&tickers=false&market_data=true"
     try:
+        time.sleep(1.5)   # stay well under the free-tier rate limit
         r = fetch_with_retry(url, timeout=30)
         data = r.json()
-        return {
+        result = {
             'market_cap': data['market_data']['market_cap']['usd'],
             'total_volume': data['market_data']['total_volume']['usd'],
             'circulating_supply': data['market_data']['circulating_supply'],
             'ath': data['market_data']['ath']['usd'],
             'ath_change_pct': data['market_data']['ath_change_percentage']['usd'],
         }
+        _COINGECKO_CACHE[coin_id] = result
+        return result
     except Exception as e:
         print(f"  ⚠️ CG coin {coin_id}: {e}")
         return {}
@@ -524,6 +537,25 @@ def fetch_macro_data():
         macro['vix_level'] = 'UNKNOWN'
         macro['vix_label'] = 'Data unavailable'
     
+    # 3b. Liquidity proxy — 2Y Treasury yield direction (real, not filler).
+    # Falling short-end yields = easier financial conditions = more liquidity.
+    # No dedicated free "liquidity index" API exists, so this is a genuine proxy,
+    # not the fabricated wipe the dashboard used to show.
+    try:
+        ty2 = fetch_yahoo('^IRX')  # 13-week T-bill, closest free liquidity proxy
+        if ty2 is not None and not ty2.empty and len(ty2) >= 5:
+            recent = ty2['close'].iloc[-1]
+            prior = ty2['close'].iloc[-5]
+            macro['liquidity'] = 'EASING' if recent < prior else 'TIGHTENING'
+            macro['liquidity_desc'] = f"Short-end yield {recent:.2f}% ({'falling' if recent < prior else 'rising'} vs 5d ago)"
+        else:
+            macro['liquidity'] = 'UNKNOWN'
+            macro['liquidity_desc'] = 'Data unavailable'
+    except Exception as e:
+        print(f"  ⚠️ Liquidity proxy failed: {e}")
+        macro['liquidity'] = 'UNKNOWN'
+        macro['liquidity_desc'] = 'Data unavailable'
+
     # 4. Overall assessment
     bullish_signals = 0
     if macro.get('fed_trend') == 'EASING':
@@ -1546,16 +1578,68 @@ def calculate_price_targets(price, atr, market_condition='NEUTRAL'):
 
 # ===================== 60-63. SIGNAL HISTORY =====================
 
-def load_signal_history():
+def _safe_load_json(path, default, label):
+    """Load JSON, but never silently destroy real history.
+
+    The old bare `except: return {}` meant a truncated or half-written file
+    (interrupted run, git merge artifact, concurrent write) silently returned an
+    EMPTY store — and the next save would then overwrite the real file with that
+    empty store, permanently losing every recorded signal, prediction and trade.
+    A missing file is normal (first run); a corrupt file is not, so it gets
+    quarantined to <path>.corrupt rather than overwritten."""
+    if not os.path.exists(path):
+        return dict(default)
     try:
-        with open(HISTORY_PATH, 'r') as f:
-            return json.load(f)
-    except:
-        return {'signals': [], 'performance': {}}
+        with open(path, 'r') as f:
+            data = json.load(f)
+        if not isinstance(data, dict):
+            raise ValueError('expected a JSON object')
+        return data
+    except Exception as e:
+        backup = f"{path}.corrupt"
+        try:
+            os.replace(path, backup)
+            print(f"  🚨 {label} at {path} was unreadable ({e}). "
+                  f"Quarantined to {backup} — starting a fresh store. "
+                  f"Previous data is NOT lost, inspect that file.")
+        except Exception as be:
+            print(f"  🚨 {label} unreadable ({e}) and could not be quarantined ({be}).")
+        return dict(default)
+
+
+def _atomic_write_json(path, data):
+    """Write to a temp file then rename. A rename is atomic on POSIX, so a run
+    killed mid-write can never leave a half-written (corrupt) store behind —
+    which is what would trigger the quarantine path in _safe_load_json."""
+    tmp = f"{path}.tmp"
+    with open(tmp, 'w') as f:
+        # allow_nan=False makes json.dump RAISE on NaN/Infinity instead of emitting
+        # them as bare literals. `NaN` is not valid JSON — a browser's JSON.parse
+        # rejects the entire file, so one poisoned number would silently break the
+        # whole dashboard. Failing loudly here is far better than shipping a file
+        # the frontend cannot read.
+        try:
+            json.dump(data, f, indent=2, default=str, allow_nan=False)
+        except ValueError as e:
+            f.close()
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
+            raise ValueError(
+                f"Refusing to write {path}: contains NaN/Infinity ({e}). "
+                f"Existing file left untouched."
+            ) from e
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, path)
+
+
+def load_signal_history():
+    return _safe_load_json(HISTORY_PATH, {'signals': [], 'performance': {}}, 'Signal history')
 
 def save_signal_history(history):
-    with open(HISTORY_PATH, 'w') as f:
-        json.dump(history, f, indent=2, default=str)
+    _atomic_write_json(HISTORY_PATH, history)
 
 def track_signal_performance(asset, signal, price, conviction, trade_plan):
     history = load_signal_history()
@@ -1600,15 +1684,15 @@ def calculate_performance_metrics(signals):
 # ===================== 64-69. SIGNAL DATABASE =====================
 
 def load_signal_database():
-    try:
-        with open(SIGNAL_DB_PATH, 'r') as f:
-            return json.load(f)
-    except:
-        return {'signals': [], 'performance': {}}
+    # NOTE: 'predictions' must be in the default — it holds the self-learning
+    # outcome record. It was missing from the old default, so any read failure
+    # dropped the key entirely and the next save wiped the learning history.
+    return _safe_load_json(SIGNAL_DB_PATH,
+                           {'signals': [], 'performance': {}, 'predictions': []},
+                           'Signal database')
 
 def save_signal_database(db):
-    with open(SIGNAL_DB_PATH, 'w') as f:
-        json.dump(db, f, indent=2, default=str)
+    _atomic_write_json(SIGNAL_DB_PATH, db)
 
 def generate_signal_id(asset, date):
     return f"{asset}_{date.strftime('%Y%m%d_%H%M')}"
@@ -1806,30 +1890,37 @@ PAPER_CONFIG = {
 }
 
 
-def load_paper_account():
+def _is_finite_positive(x):
+    """True only for a real, usable price/level. Rejects None, NaN, inf and <= 0.
+    NaN is truthy in Python, so a plain `if not price` check does NOT catch it."""
     try:
-        with open(PAPER_ACCOUNT_PATH, 'r') as f:
-            acct = json.load(f)
-            acct.setdefault('cash', PAPER_CONFIG['starting_capital'])
-            acct.setdefault('positions', {})
-            acct.setdefault('closed_trades', [])
-            acct.setdefault('equity_curve', [])
-            return acct
-    except Exception:
-        return {
-            'created': datetime.now().isoformat(),
-            'starting_capital': PAPER_CONFIG['starting_capital'],
-            'cash': PAPER_CONFIG['starting_capital'],
-            'positions': {},
-            'closed_trades': [],
-            'equity_curve': [],
-        }
+        v = float(x)
+    except (TypeError, ValueError):
+        return False
+    return math.isfinite(v) and v > 0
+
+
+def load_paper_account():
+    default = {
+        'created': datetime.now().isoformat(),
+        'starting_capital': PAPER_CONFIG['starting_capital'],
+        'cash': PAPER_CONFIG['starting_capital'],
+        'positions': {},
+        'closed_trades': [],
+        'equity_curve': [],
+    }
+    acct = _safe_load_json(PAPER_ACCOUNT_PATH, default, 'Paper account')
+    acct.setdefault('starting_capital', PAPER_CONFIG['starting_capital'])
+    acct.setdefault('cash', PAPER_CONFIG['starting_capital'])
+    acct.setdefault('positions', {})
+    acct.setdefault('closed_trades', [])
+    acct.setdefault('equity_curve', [])
+    return acct
 
 
 def save_paper_account(acct):
     try:
-        with open(PAPER_ACCOUNT_PATH, 'w') as f:
-            json.dump(acct, f, indent=2, default=str)
+        _atomic_write_json(PAPER_ACCOUNT_PATH, acct)
     except Exception as e:
         print(f"  ⚠️ Could not save paper account: {e}")
 
@@ -1963,7 +2054,12 @@ def run_paper_account(all_signals, correlation_matrix=None):
             break
         price = sig.get('price')
         plan = sig.get('trade_plan', {}) or {}
-        if not price or not plan.get('stop_loss'):
+        # Reject non-finite / non-positive prices. A NaN price previously passed the
+        # `not price` check (NaN is truthy), opened a position with NaN quantity, and
+        # poisoned cash and equity — which then serialised as literal `NaN` in the
+        # JSON. That is INVALID JSON, so the dashboard's JSON.parse would reject the
+        # whole file and the account would appear permanently broken.
+        if not _is_finite_positive(price) or not _is_finite_positive(plan.get('stop_loss')):
             continue
 
         # Correlation cap: don't stack capital into assets that move together
@@ -2104,6 +2200,8 @@ def simulate_portfolio(assets_data, price_history=None, start_capital=10000, day
         for asset, pos in list(portfolio['positions'].items()):
             series = price_history.get(asset)
             price_today = float(series.iloc[day]) if series is not None and day < len(series) else pos['entry_price']
+            if not _is_finite_positive(price_today):
+                price_today = pos['entry_price']
 
             sl = pos.get('stop_loss')
             tp2 = pos.get('take_profit_2')
@@ -2784,6 +2882,65 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000, learn
     print(f"  🏷️ Risk Grade: {risk_metrics.get('risk_grade', 'N/A')} | Kelly: {risk_metrics.get('kelly_fraction', 0):.2f}")
     return asset_output, df[['date', 'close']].rename(columns={'close': code})
 
+def quick_position_check():
+    """Lightweight, fast check of open paper positions against live price only.
+    Runs stop-loss and take-profit exits (and DCA is intentionally skipped here —
+    averaging down needs a fresh, full signal re-check, not just a price tick).
+    This is what the free frequent monitor calls; the full run_pipeline() with all
+    indicators still only runs on the normal 2-hour schedule.
+    """
+    acct = load_paper_account()
+    if not acct['positions']:
+        print("No open positions — nothing to check.")
+        return acct
+
+    events = []
+    for code, pos in list(acct['positions'].items()):
+        cfg = ASSETS.get(code)
+        if not cfg:
+            continue
+        try:
+            df = fetch_binance_klines(cfg['binance'], interval='1d', limit=1)
+            price = float(df['close'].iloc[-1]) if df is not None and not df.empty else None
+        except Exception as e:
+            print(f"  ⚠️ Price check failed for {code}: {e}")
+            continue
+        if not price:
+            continue
+
+        long = pos['side'] == 'LONG'
+        sl, tp1, tp2 = pos.get('stop_loss'), pos.get('take_profit_1'), pos.get('take_profit_2')
+
+        if sl and ((long and price <= sl) or (not long and price >= sl)):
+            pnl = _paper_close(acct, code, pos, price, pos['qty'], 'STOP_LOSS')
+            events.append(f"{code} stopped out between full runs ({pnl:+.2f})")
+            del acct['positions'][code]
+            continue
+        if tp1 and not pos.get('tp1_hit') and ((long and price >= tp1) or (not long and price <= tp1)):
+            qty = pos['qty'] * PAPER_CONFIG['tp1_close_fraction']
+            pnl = _paper_close(acct, code, pos, price, qty, 'TAKE_PROFIT_1_PARTIAL')
+            pos['qty'] -= qty
+            pos['tp1_hit'] = True
+            pos['stop_loss'] = pos['avg_entry']
+            events.append(f"{code} TP1 hit between full runs — took 50% off ({pnl:+.2f})")
+            if pos['qty'] <= 0:
+                del acct['positions'][code]
+                continue
+        if tp2 and ((long and price >= tp2) or (not long and price <= tp2)):
+            pnl = _paper_close(acct, code, pos, price, pos['qty'], 'TAKE_PROFIT_2')
+            events.append(f"{code} TP2 hit between full runs — closed ({pnl:+.2f})")
+            del acct['positions'][code]
+
+    if events:
+        for e in events:
+            print(f"  • {e}")
+        acct.setdefault('stats', {})['last_events'] = events
+        save_paper_account(acct)
+    else:
+        print("  No exits triggered this check.")
+    return acct
+
+
 def run_pipeline():
     print("=" * 70)
     print("MARKET CORTEX v5.0 — ULTIMATE EDITION (COMPLETE FINAL)")
@@ -3079,17 +3236,23 @@ def run_pipeline():
     }
     
     def fix_nan(obj):
+        # Catches NaN AND +/-Infinity. The old version only checked `obj != obj`
+        # (NaN), so an infinity — which a near-zero denominator easily produces —
+        # slipped through and serialised as the literal `Infinity`, which is not
+        # valid JSON and would break the dashboard's JSON.parse entirely.
         if isinstance(obj, dict):
             return {k: fix_nan(v) for k, v in obj.items()}
         elif isinstance(obj, list):
             return [fix_nan(i) for i in obj]
-        elif isinstance(obj, float) and (obj != obj):
+        elif isinstance(obj, (np.floating, np.integer)):
+            v = float(obj)
+            return None if not math.isfinite(v) else v
+        elif isinstance(obj, float) and not math.isfinite(obj):
             return None
         return obj
     
     dashboard_data = fix_nan(dashboard_data)
-    with open(OUTPUT_PATH, 'w') as f:
-        json.dump(dashboard_data, f, indent=2, default=str)
+    _atomic_write_json(OUTPUT_PATH, dashboard_data)
     print(f"\n💾 Saved to {OUTPUT_PATH}")
     print("\n" + "=" * 70)
     print("✅ MARKET CORTEX v5.0 ULTIMATE COMPLETE FINAL")
@@ -3851,6 +4014,10 @@ def fetch_economic_calendar():
                             'impact': 'MEDIUM', 'estimated': True})
 
     events.sort(key=lambda e: e['date'])
+    # Only future events belong on a "Upcoming" calendar — a past FOMC date
+    # displayed as "upcoming" is stale, not informative.
+    today_str = date.today().isoformat()
+    events = [e for e in events if e['date'] >= today_str]
     return events
 
 def predict_event_impact(event_type, current_price):
@@ -4259,6 +4426,14 @@ def run_v6_pipeline():
         'btc_price': btc_price
     }
 
+import sys as _sys
+if __name__ == '__main__' and '--check-positions-only' in _sys.argv:
+    print("=" * 50)
+    print("QUICK POSITION CHECK (stop-loss / take-profit only)")
+    print("=" * 50)
+    quick_position_check()
+    _sys.exit(0)
+
 if __name__ == '__main__':
     # Run V6 pipeline with all new features
     results = run_v6_pipeline()
@@ -4285,7 +4460,21 @@ if __name__ == '__main__':
                 'ml_predictions': results.get('ml_predictions', {}),
                 'order_book_history_depth': results.get('order_book_history_depth', 0)
             }
-            json.dump(clean_results, f, indent=2, default=str)
+            # Scrub NaN/Infinity before writing — v6_results.json previously had no
+            # such protection (only market_intelligence.json did), so one non-finite
+            # value here would emit invalid JSON and break the dashboard's V6 panels.
+            def _scrub(o):
+                if isinstance(o, dict):
+                    return {k: _scrub(v) for k, v in o.items()}
+                if isinstance(o, list):
+                    return [_scrub(i) for i in o]
+                if isinstance(o, (np.floating, np.integer)):
+                    v = float(o)
+                    return None if not math.isfinite(v) else v
+                if isinstance(o, float) and not math.isfinite(o):
+                    return None
+                return o
+            json.dump(_scrub(clean_results), f, indent=2, default=str, allow_nan=False)
         print("\n💾 V6 results saved to docs/v6_results.json")
     except Exception as e:
         print(f"  ⚠️ Could not save V6 results: {e}")
