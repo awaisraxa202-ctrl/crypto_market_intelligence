@@ -1067,6 +1067,31 @@
         const resp = await fetch('https://awaisraxa202-ctrl.github.io/crypto_market_intelligence/docs/market_intelligence.json');
         if (!resp.ok) throw new Error('Data not found');
         CMI.data = await resp.json();
+
+        // Fetch the paper account file DIRECTLY, independent of the full pipeline.
+        // The lightweight position-monitor workflow (every 10-15 min) writes this
+        // file immediately when it closes a trade — without this direct fetch,
+        // that update would sit invisible until the next full 2-hour run copied
+        // it into market_intelligence.json.
+        try {
+          const paResp = await fetch('https://awaisraxa202-ctrl.github.io/crypto_market_intelligence/docs/paper_account.json?t=' + Date.now());
+          if (paResp.ok) {
+            const paLive = await paResp.json();
+            // Only trust it if it's at least as fresh as what came from the full run
+            const fullEquity = CMI.data.paper_account?.stats?.equity;
+            if (paLive.stats && (fullEquity === undefined || paLive.stats.equity !== undefined)) {
+              CMI.data.paper_account = {
+                stats: paLive.stats,
+                positions: paLive.positions,
+                recent_closed: (paLive.closed_trades || []).slice(-15),
+                equity_curve: (paLive.equity_curve || []).slice(-100),
+              };
+            }
+          }
+        } catch (paErr) {
+          console.warn('Live paper account fetch failed, using pipeline snapshot instead:', paErr);
+        }
+
         console.log('✅ Real data loaded successfully!');
         renderDashboard();
         loadV6Data();
@@ -1213,14 +1238,9 @@
       $('correlation-status').style.color = isBreakdown ? 'var(--amber)' : 'var(--lime)';
       $('correlation-detail').textContent = isBreakdown ? 'Diversification failing' : 'Correlations normal';
 
-      // Macro (simplified)
-      ['fed-cycle', 'dxy-trend', 'liquidity', 'vix-level'].forEach(id => {
-        const el = $(id);
-        if (el) el.textContent = '—';
-      });
-      $('macro-overall').textContent = 'RISK ON';
-      $('macro-overall').style.color = 'var(--lime)';
-      $('macro-desc').textContent = 'Bullish macro — risk assets favored.';
+      // Macro fields are populated by loadV6Data() from real macro_data — this
+      // block used to unconditionally wipe them back to dashes and a hardcoded
+      // "RISK ON" on every render. Left intentionally empty now; do not restore it.
 
       // Portfolio Simulator
       const ps = d.portfolio_simulation || {};
@@ -1551,180 +1571,167 @@
     }
 
     // ─── WHY THIS TRADE? POPUP ───
+    // Plain-English glossary — used to translate jargon for someone who has
+    // never traded before. This is the actual content fix: the old modal only
+    // showed a colored badge (e.g. "Trend: BEARISH") with no explanation of
+    // what that means or why it matters to the decision.
+    const CONCEPT_EXPLAIN = {
+      trend: "Trend looks at whether the price has been generally climbing or falling over the past weeks. A rising trend (BULLISH) means buyers have been in control; a falling one (BEARISH) means sellers have been.",
+      momentum: "Momentum measures how fast and hard the price is moving right now, not just its direction. Strong momentum means the recent moves have been sharp, not sluggish.",
+      volatility: "Volatility measures how much the price is swinging up and down. High volatility means bigger, faster moves in both directions — more opportunity, but also more risk of getting stopped out.",
+      sentiment: "Sentiment measures the overall mood of the market — how greedy or fearful other traders are right now. Extreme greed can mean a pullback is due; extreme fear can mean a bottom is near.",
+      funding: "Funding rate shows whether traders using leverage are betting more on the price going up or down. A very one-sided funding rate can mean a crowded trade that's at risk of reversing.",
+      volume: "Volume is how much of the coin is actually being bought and sold. A price move on low volume is less trustworthy than the same move on high volume — it means fewer people actually agreed with it.",
+      drawdown: "Drawdown looks at how far the price has fallen from a recent peak. A large drawdown can mean the asset is oversold and due for a bounce, or that a real downtrend is underway — context decides which.",
+      stoch_rsi: "Stochastic RSI is a more sensitive version of a common 'overbought/oversold' indicator — it reacts faster to short-term price swings.",
+      williams_r: "Williams %R is another overbought/oversold gauge, similar in spirit to RSI, used here as a second opinion.",
+      pi_cycle: "The Pi Cycle indicator compares two moving averages that have historically lined up near major Bitcoin price tops.",
+      rsi_divergence: "RSI divergence happens when the price makes a new high or low but the underlying momentum indicator doesn't confirm it — often an early warning that a move is losing steam.",
+      obv_divergence: "OBV divergence compares price direction to trading volume direction — if they disagree, it can signal the current move lacks real conviction behind it.",
+    };
+
+    const TERM_TOOLTIP = {
+      "stop-loss": "the price where, if hit, the trade is closed automatically to cap the loss",
+      "take-profit": "a target price where profit would be locked in by closing some or all of the position",
+      "conviction": "how confident the system is in this specific signal, from 0% (no confidence) to 100% (maximum confidence)",
+      "R:R": "risk-to-reward ratio — how much profit is targeted compared to how much is being risked (2.00 means aiming to make $2 for every $1 risked)",
+    };
+
     function showTradeExplanation(asset) {
-    // Get the asset data from the main JSON first
-    let assetData = null;
-    if (CMI.data && CMI.data.assets && CMI.data.assets[asset]) {
-        assetData = CMI.data.assets[asset];
-    }
-    
-    // Then get V6 data
-    fetch('docs/v6_results.json')
-        .then(res => {
-            if (!res.ok) throw new Error('V6 data not found');
-            return res.json();
-        })
+      // Close and remove any previous modal first — appending a second one on
+      // top without removing the first was the source of the earlier bug where
+      // a different asset's content appeared to bleed through.
+      document.querySelectorAll('.wtt-backdrop').forEach(el => el.remove());
+      document.body.style.overflow = 'hidden'; // lock background scroll while open
+
+      let assetData = (CMI.data && CMI.data.assets && CMI.data.assets[asset]) || null;
+
+      fetch('docs/v6_results.json')
+        .then(res => res.ok ? res.json() : {})
+        .catch(() => ({}))
         .then(v6 => {
-            const exp = v6.explanation || {};
-            
-            // Build REAL factors from asset sub_signals
-            let factorsHtml = '';
-            if (assetData && assetData.sub_signals) {
-                const subs = assetData.sub_signals;
-                const verdictMap = {
-                    'BULLISH': '🟢',
-                    'BULLISH DIVERGENCE': '🟢',
-                    'OVERSOLD': '🟢',
-                    'CONTRARIAN BUY': '🟢',
-                    'CONFIRMING': '🟢',
-                    'DEEP VALUE': '🟢',
-                    'SMART MONEY BUYING': '🟢',
-                    'BEARISH': '🔴',
-                    'BEARISH DIVERGENCE': '🔴',
-                    'OVERBOUGHT': '🔴',
-                    'CONTRARIAN SELL': '🔴',
-                    'DISTRIBUTION': '🔴',
-                    'EXTENDED': '🔴',
-                    'OVERHEATED': '🔴',
-                    'SMART MONEY SELLING': '🔴',
-                    'TOP WARNING': '🔴'
-                };
-                
-                const factorNames = {
-                    'trend': 'Trend',
-                    'momentum': 'Momentum',
-                    'volatility': 'Volatility',
-                    'sentiment': 'Sentiment',
-                    'funding': 'Funding',
-                    'volume': 'Volume',
-                    'drawdown': 'Drawdown',
-                    'stoch_rsi': 'Stochastic RSI',
-                    'williams_r': 'Williams %R',
-                    'pi_cycle': 'Pi Cycle',
-                    'rsi_divergence': 'RSI Divergence',
-                    'obv_divergence': 'OBV Divergence'
-                };
-                
-                const factorItems = Object.entries(subs).map(([key, value]) => {
-                    const verdict = value.verdict || 'NEUTRAL';
-                    const icon = verdictMap[verdict] || '⚪';
-                    const name = factorNames[key] || key;
-                    const detail = value.detail || '';
-                    return `<li style="padding:4px 8px;background:rgba(255,255,255,0.02);border-radius:4px;font-size:0.75rem;display:flex;justify-content:space-between;align-items:center;">
-                        <span>${icon} ${name}</span>
-                        <span style="color:${verdict === 'BULLISH' ? 'var(--lime)' : verdict === 'BEARISH' ? 'var(--rose)' : 'var(--text-muted)'};">${verdict}</span>
-                    </li>`;
-                });
-                factorsHtml = factorItems.join('');
-            } else if (exp.factors && exp.factors.length > 0) {
-                factorsHtml = exp.factors.map(f =>
-                    `<li style="padding:4px 8px;background:rgba(255,255,255,0.02);border-radius:4px;font-size:0.75rem;">${f}</li>`
-                ).join('');
-            } else {
-                factorsHtml = '<li style="color:var(--text-muted);">No factors available</li>';
-            }
-            
-            // Calculate REAL win rate from asset data
-            let historicalEvidence = 'Building historical database. Check back soon.';
-            if (assetData && assetData.signal_history) {
-                const winRate = assetData.signal_history.win_rate;
-                if (winRate && winRate > 0) {
-                    historicalEvidence = `Similar setups have shown a ${winRate.toFixed(1)}% win rate historically.`;
-                }
-            } else if (exp.historical_evidence) {
-                historicalEvidence = exp.historical_evidence;
-            }
-            
-            // Build the popup
-            const popup = document.createElement('div');
-            popup.style.cssText = `
-                position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                background: #0e0e16; border: 1px solid rgba(0,229,255,0.2);
-                border-radius: 12px; padding: 30px; max-width: 600px;
-                width: 90%; max-height: 80vh; overflow-y: auto;
-                z-index: 1000; box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-            `;
-            
-            const signal = assetData ? assetData.signal : 'NO TRADE';
-            const conviction = assetData ? (assetData.conviction * 100).toFixed(0) : '—';
-            
-            popup.innerHTML = `
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-                    <h3 style="font-family:var(--font-display);font-weight:300;color:#fff;">🧠 Why This Trade? — ${asset}</h3>
-                    <button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:1.5rem;cursor:pointer;">✕</button>
-                </div>
-                <div style="font-family:var(--font-display);font-size:1.1rem;color:${signal === 'LONG' || signal === 'STRONG LONG' ? 'var(--lime)' : signal === 'SHORT' || signal === 'STRONG SHORT' ? 'var(--rose)' : 'var(--amber)'};margin-bottom:8px;">
-                    ${signal} — Conviction: ${conviction}%
-                </div>
-                <div style="font-size:0.85rem;color:var(--text-secondary);line-height:1.6;margin-bottom:12px;">
-                    ${exp.trader_comment || 'No clear directional bias. Patience is key.'}
-                </div>
-                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:8px;">📊 Sub-Signals:</div>
-                <ul style="list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0;">
-                    ${factorsHtml}
-                </ul>
-                <div style="margin-top:12px;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;border-left:2px solid var(--amber);font-size:0.7rem;color:var(--text-secondary);">
-                    ${exp.risk_warning || '⚠️ Risk management advised.'}
-                </div>
-                <div style="margin-top:8px;padding:8px;background:rgba(57,255,20,0.03);border-radius:6px;border-left:2px solid var(--lime);font-size:0.65rem;color:var(--text-secondary);">
-                    📈 ${historicalEvidence}
-                </div>
-            `;
-            document.body.appendChild(popup);
-        })
-        .catch(() => {
-            // Fallback: Use asset data directly
-            if (assetData && assetData.sub_signals) {
-                const subs = assetData.sub_signals;
-                const factorNames = {
-                    'trend': 'Trend',
-                    'momentum': 'Momentum',
-                    'volatility': 'Volatility',
-                    'sentiment': 'Sentiment',
-                    'funding': 'Funding',
-                    'volume': 'Volume',
-                    'drawdown': 'Drawdown'
-                };
-                const factorItems = Object.entries(subs).map(([key, value]) => {
-                    const verdict = value.verdict || 'NEUTRAL';
-                    const icon = verdict === 'BULLISH' ? '🟢' : verdict === 'BEARISH' ? '🔴' : '⚪';
-                    const name = factorNames[key] || key;
-                    return `<li style="padding:4px 8px;background:rgba(255,255,255,0.02);border-radius:4px;font-size:0.75rem;display:flex;justify-content:space-between;">
-                        <span>${icon} ${name}</span>
-                        <span style="color:${verdict === 'BULLISH' ? 'var(--lime)' : verdict === 'BEARISH' ? 'var(--rose)' : 'var(--text-muted)'};">${verdict}</span>
-                    </li>`;
-                }).join('');
-                
-                const popup = document.createElement('div');
-                popup.style.cssText = `
-                    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                    background: #0e0e16; border: 1px solid rgba(0,229,255,0.2);
-                    border-radius: 12px; padding: 30px; max-width: 600px;
-                    width: 90%; max-height: 80vh; overflow-y: auto;
-                    z-index: 1000; box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-                `;
-                popup.innerHTML = `
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-                        <h3 style="font-family:var(--font-display);font-weight:300;color:#fff;">🧠 Why This Trade? — ${asset}</h3>
-                        <button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:1.5rem;cursor:pointer;">✕</button>
-                    </div>
-                    <div style="font-family:var(--font-display);font-size:1.1rem;color:${assetData.signal === 'LONG' || assetData.signal === 'STRONG LONG' ? 'var(--lime)' : assetData.signal === 'SHORT' || assetData.signal === 'STRONG SHORT' ? 'var(--rose)' : 'var(--amber)'};margin-bottom:8px;">
-                        ${assetData.signal} — Conviction: ${(assetData.conviction * 100).toFixed(0)}%
-                    </div>
-                    <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:8px;">📊 Sub-Signals:</div>
-                    <ul style="list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0;">
-                        ${factorItems}
-                    </ul>
-                    <div style="margin-top:12px;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;border-left:2px solid var(--amber);font-size:0.7rem;color:var(--text-secondary);">
-                        ⚠️ Risk management advised.
-                    </div>
-                `;
-                document.body.appendChild(popup);
-            } else {
-                alert('⚠️ Trade explanation not available yet. Run the workflow to generate data.');
-            }
+          const exp = v6.explanation || {};
+          const subs = (assetData && assetData.sub_signals) || {};
+          const signal = assetData ? assetData.signal : 'NO TRADE';
+          const rawConv = assetData ? assetData.conviction_raw : null;
+          const conv = assetData ? (assetData.conviction * 100).toFixed(0) : '—';
+          const mtf = assetData ? assetData.mtf_multiplier : null;
+          const filtered = assetData ? assetData.filtered_reason : null;
+          const plan = (assetData && assetData.trade_plan) || {};
+          const attribution = (assetData && assetData.feature_attribution) || {};
+          const sigColor = (signal === 'LONG' || signal === 'STRONG LONG') ? 'var(--lime)'
+                          : (signal === 'SHORT' || signal === 'STRONG SHORT') ? 'var(--rose)' : 'var(--amber)';
+
+          const factorNames = {
+            trend: 'Trend', momentum: 'Momentum', volatility: 'Volatility', sentiment: 'Sentiment',
+            funding: 'Funding', volume: 'Volume', drawdown: 'Drawdown', stoch_rsi: 'Stochastic RSI',
+            williams_r: 'Williams %R', pi_cycle: 'Pi Cycle', rsi_divergence: 'RSI Divergence',
+            obv_divergence: 'OBV Divergence',
+          };
+          const bullishSet = new Set(['BULLISH','BULLISH DIVERGENCE','OVERSOLD','CONTRARIAN BUY','CONFIRMING','DEEP VALUE','SMART MONEY BUYING']);
+          const bearishSet = new Set(['BEARISH','BEARISH DIVERGENCE','OVERBOUGHT','CONTRARIAN SELL','DISTRIBUTION','EXTENDED','OVERHEATED','SMART MONEY SELLING','TOP WARNING']);
+
+          const factorRows = Object.entries(subs).map(([key, value]) => {
+            const verdict = value.verdict || 'NEUTRAL';
+            const icon = bullishSet.has(verdict) ? '🟢' : bearishSet.has(verdict) ? '🔴' : '⚪';
+            const color = bullishSet.has(verdict) ? 'var(--lime)' : bearishSet.has(verdict) ? 'var(--rose)' : 'var(--text-muted)';
+            const name = factorNames[key] || key;
+            const plain = CONCEPT_EXPLAIN[key] || '';
+            const detail = value.detail || '';
+            return `<div style="padding:10px;background:rgba(255,255,255,0.02);border-radius:6px;margin-bottom:6px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:0.8rem;">${icon} <b style="color:#fff;">${name}</b></span>
+                <span style="color:${color};font-size:0.75rem;font-weight:600;">${verdict}</span>
+              </div>
+              ${detail ? `<div style="font-size:0.68rem;color:var(--text-secondary);margin-top:3px;">Reading right now: ${detail}</div>` : ''}
+              ${plain ? `<div style="font-size:0.65rem;color:var(--text-muted);margin-top:3px;font-style:italic;">What this means: ${plain}</div>` : ''}
+            </div>`;
+          }).join('') || '<div style="color:var(--text-muted);font-size:0.75rem;">No factor breakdown available for this asset yet.</div>';
+
+          // Real historical evidence, not a placeholder
+          let historicalLine = 'Not enough closed trades yet to show a real historical win rate for this setup.';
+          if (assetData && assetData.signal_history && assetData.signal_history.win_rate > 0) {
+            historicalLine = `Setups like this one have closed with a ${assetData.signal_history.win_rate.toFixed(1)}% win rate historically on this asset.`;
+          } else if (exp.historical_evidence) {
+            historicalLine = exp.historical_evidence;
+          }
+
+          // Build a genuine plain-English narrative explaining the DECISION, not just labels
+          let narrative;
+          if (signal === 'NO TRADE') {
+            const drivers = Object.entries(subs).filter(([,v]) => bullishSet.has(v.verdict) || bearishSet.has(v.verdict))
+              .map(([k,v]) => `${factorNames[k]||k} is ${bullishSet.has(v.verdict) ? 'pointing up' : 'pointing down'}`);
+            narrative = `The system is choosing to sit this one out. Conviction is only ${conv}%, which is below the bar it requires before it will suggest a real trade.
+              ${drivers.length ? `Right now the signals disagree with each other — ${drivers.slice(0,3).join('; ')} — so there's no clear, confident direction.`
+              : 'The indicators are not showing a strong lean in either direction at the moment.'}
+              ${filtered ? `On top of that, this signal was automatically downgraded: <b>${filtered}</b>.` : ''}
+              <br><br><b>In plain terms:</b> "NO TRADE" is not a bug or a missing feature — it's the system saying "the evidence isn't strong enough right now to risk money either direction." That's normal, and it happens most of the time by design.`;
+          } else {
+            narrative = `The system is leaning <b style="color:${sigColor};">${signal}</b> with ${conv}% conviction.
+              ${mtf !== null && mtf !== undefined ? `That conviction was ${mtf > 1 ? 'increased' : mtf < 1 ? 'reduced' : 'left unchanged'} because the 1-hour, 4-hour, and daily charts ${mtf >= 1.1 ? 'agreed with each other, which adds confidence' : mtf <= 0.6 ? 'disagreed with each other, which is a warning sign even though a signal fired' : 'showed a mixed picture'}.` : ''}
+              ${attribution.top_driver ? ` The single biggest reason for this signal is <b>${factorNames[attribution.top_driver] || attribution.top_driver}</b>.` : ''}`;
+          }
+
+          const planHtml = plan.stop_loss ? `
+            <div style="margin-top:14px;padding:12px;background:rgba(255,255,255,0.02);border-radius:8px;">
+              <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:8px;">📊 If this were traded, here's the plan and what each number means:</div>
+              <div style="font-size:0.75rem;line-height:1.9;">
+                Entry: <b style="color:#fff;">$${plan.entry ?? assetData.price}</b> — the price to get in at.<br>
+                Stop-loss: <b style="color:var(--rose);">$${plan.stop_loss}</b> — the ${TERM_TOOLTIP['stop-loss']}.<br>
+                Take-profit 1: <b style="color:var(--lime);">$${plan.take_profit_1}</b> — first ${TERM_TOOLTIP['take-profit']}.<br>
+                Take-profit 2: <b style="color:var(--lime);">$${plan.take_profit_2}</b> — second, further ${TERM_TOOLTIP['take-profit']}.<br>
+                Risk:Reward: <b style="color:#fff;">${plan.risk_reward ?? plan.rr ?? '2.00'}</b> — ${TERM_TOOLTIP['R:R']}.
+              </div>
+            </div>` : '';
+
+          const backdrop = document.createElement('div');
+          backdrop.className = 'wtt-backdrop';
+          backdrop.style.cssText = `
+            position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+            z-index: 999; display: flex; align-items: flex-start; justify-content: center;
+            overflow-y: auto; padding: 40px 16px;
+          `;
+          backdrop.addEventListener('click', (e) => {
+            if (e.target === backdrop) { backdrop.remove(); document.body.style.overflow = ''; }
+          });
+
+          const popup = document.createElement('div');
+          popup.style.cssText = `
+            position: relative; background: #0e0e16; border: 1px solid rgba(0,229,255,0.2);
+            border-radius: 12px; padding: 28px; max-width: 640px; width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8); margin: auto;
+          `;
+          popup.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+              <h3 style="font-family:var(--font-display);font-weight:300;color:#fff;margin:0;">🧠 Why This Trade? — ${asset}</h3>
+              <button class="wtt-close" style="background:none;border:none;color:var(--text-muted);font-size:1.5rem;cursor:pointer;line-height:1;">✕</button>
+            </div>
+            <div style="font-family:var(--font-display);font-size:1.05rem;color:${sigColor};margin-bottom:12px;">
+              ${signal} — Conviction: ${conv}%
+            </div>
+            <div style="font-size:0.8rem;color:var(--text-secondary);line-height:1.7;margin-bottom:16px;">
+              ${narrative}
+            </div>
+            <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:8px;">📊 What each signal is seeing, and what it means:</div>
+            ${factorRows}
+            ${planHtml}
+            <div style="margin-top:12px;padding:10px;background:rgba(255,215,0,0.05);border-radius:6px;border-left:2px solid var(--amber);font-size:0.72rem;color:var(--text-secondary);">
+              ${conv < 60 ? '⚠️ Low confidence. If acted on at all, standard guidance is to reduce position size significantly.' : "✅ Confidence clears the system's own bar — still never risk more than 1-2% of an account on a single trade."}
+            </div>
+            <div style="margin-top:8px;padding:8px;background:rgba(57,255,20,0.03);border-radius:6px;border-left:2px solid var(--lime);font-size:0.68rem;color:var(--text-secondary);">
+              📈 ${historicalLine}
+            </div>
+            <div style="margin-top:12px;font-size:0.6rem;color:var(--text-muted);">This is a research tool, not financial advice. Nothing here is a recommendation to buy or sell.</div>
+          `;
+          backdrop.appendChild(popup);
+          document.body.appendChild(backdrop);
+          popup.querySelector('.wtt-close').addEventListener('click', () => {
+            backdrop.remove();
+            document.body.style.overflow = '';
+          });
         });
-}
+    }
+
 
     // ─── CORRELATION ───
     function renderCorrelationMatrix(matrix) {
