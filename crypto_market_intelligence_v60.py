@@ -111,6 +111,87 @@ SIGNAL_WEIGHTS = {
     'drawdown': 0.05,
 }
 
+
+WF_WEIGHTS_PATH = 'docs/walk_forward_weights.json'
+
+
+def load_wf_weight_adjustments():
+    return _safe_load_json(WF_WEIGHTS_PATH, {}, 'Walk-forward weight adjustments')
+
+
+def save_wf_weight_adjustment(asset, wf_result):
+    """Persist this asset's walk-forward out-of-sample result so the NEXT run's
+    scoring can use it — real walk-forward feedback across cycles, not just a
+    number that gets computed, printed, and discarded (which is what happened
+    before: wf_validation was calculated but nothing downstream ever read it).
+    """
+    try:
+        if not wf_result or not wf_result.get('validated'):
+            return
+        best = wf_result.get('best_out_sample')
+        strat = (wf_result.get('results') or {}).get(best, {})
+        test_sharpe = strat.get('test_sharpe', 0)
+        oos_alpha = strat.get('out_of_sample_alpha', 0)
+        # A trend-following strategy (SMA/golden cross) doing well OUT of sample
+        # is real evidence trend-following works for THIS asset right now — lean
+        # further into it. Doing badly out-of-sample (especially a big negative
+        # oos_alpha, meaning it looked good in training but failed on new data —
+        # the definition of overfitting) is evidence to lean away from it.
+        is_trend_strat = best in ('sma20_pos', 'sma50_pos', 'golden_pos')
+        if is_trend_strat and test_sharpe > 0.3 and oos_alpha > -0.3:
+            adj = 1.15
+        elif is_trend_strat and (test_sharpe < -0.2 or oos_alpha < -0.5):
+            adj = 0.80
+        else:
+            adj = 1.0
+        data = load_wf_weight_adjustments()
+        data[asset] = {'trend_momentum_multiplier': adj, 'basis': best,
+                       'test_sharpe': round(test_sharpe, 3), 'oos_alpha': round(oos_alpha, 3),
+                       'updated': datetime.now().isoformat()}
+        _atomic_write_json(WF_WEIGHTS_PATH, data)
+    except Exception as e:
+        print(f"  ⚠️ Could not save walk-forward weight adjustment for {asset}: {e}")
+
+
+def get_regime_weights(regime, wf_multiplier=1.0):
+    """Regime-conditional signal weights — trend-following works in trending
+    markets and gets shredded in chop; mean-reversion signals (volatility,
+    drawdown) matter more when price is range-bound. This was previously
+    computed by adjust_weights() but never applied to real scoring — regime
+    detection ran, weights got printed, and the composite score used the
+    static SIGNAL_WEIGHTS regardless. This makes the connection real: the
+    weights actually used to score the asset now shift with detected regime.
+    """
+    r = str(regime or '').upper()
+    w = dict(SIGNAL_WEIGHTS)
+    if 'STRONG_BULL' in r or 'STRONG_BEAR' in r:
+        # Strong, clean trend: lean harder into trend/momentum, less on chop-tools.
+        w['trend'] *= 1.35; w['momentum'] *= 1.25
+        w['volatility'] *= 0.75; w['drawdown'] *= 0.75
+    elif 'BULL' in r or 'BEAR' in r:
+        w['trend'] *= 1.15; w['momentum'] *= 1.10
+        w['volatility'] *= 0.90
+    elif 'CHOPPY' in r or 'RANGE' in r:
+        # No real trend to follow: de-emphasize it, lean on volatility/drawdown
+        # (mean-reversion signals) which are what actually work in chop.
+        w['trend'] *= 0.55; w['momentum'] *= 0.70
+        w['volatility'] *= 1.40; w['drawdown'] *= 1.30; w['sentiment'] *= 1.15
+    elif 'VOLATILE' in r:
+        w['volatility'] *= 1.30; w['momentum'] *= 0.85
+        w['drawdown'] *= 1.20
+
+    # Walk-forward feedback from the PREVIOUS cycle's out-of-sample test on this
+    # specific asset (see save_wf_weight_adjustment). This is genuine cross-cycle
+    # learning: if trend-following just proved itself out-of-sample on this coin,
+    # lean further in; if it just failed out-of-sample, lean away — instead of
+    # walk-forward validation being computed, printed, and thrown away every run.
+    if wf_multiplier and wf_multiplier != 1.0:
+        w['trend'] *= wf_multiplier
+        w['momentum'] *= (1 + (wf_multiplier - 1) * 0.5)  # momentum moves half as much as trend
+
+    total = sum(w.values()) or 1.0
+    return {k: round(v / total, 4) for k, v in w.items()}
+
 RISK_PARAMS = {
     'max_risk_per_trade': 0.02,
     'max_portfolio_risk': 0.06,
@@ -1301,10 +1382,11 @@ def detect_regime_change(historical_regimes, current_regime):
 
 # ===================== 53-56. SIGNAL FACTORY =====================
 
-def build_sub_signals_weighted(latest, asset_name, historical_accuracy=0.5):
+def build_sub_signals_weighted(latest, asset_name, historical_accuracy=0.5, regime=None, wf_multiplier=1.0):
     signals = {}
     votes = []
     price = latest['close']
+    weights = get_regime_weights(regime, wf_multiplier=wf_multiplier)
     
     sma50 = latest.get('sma_50')
     sma200 = latest.get('sma_200')
@@ -1322,8 +1404,8 @@ def build_sub_signals_weighted(latest, asset_name, historical_accuracy=0.5):
             score, verdict, detail = -1.0, 'BEARISH', "Price below both SMA50 and SMA200."
     else:
         score, verdict, detail = 0, 'NEUTRAL', "Insufficient data."
-    signals['trend'] = {'score': score, 'verdict': verdict, 'detail': detail, 'weight': SIGNAL_WEIGHTS['trend']}
-    votes.append(score * SIGNAL_WEIGHTS['trend'])
+    signals['trend'] = {'score': score, 'verdict': verdict, 'detail': detail, 'weight': weights['trend']}
+    votes.append(score * weights['trend'])
     
     rsi = latest.get('rsi_14')
     macd_hist = latest.get('macd_hist')
@@ -1340,8 +1422,8 @@ def build_sub_signals_weighted(latest, asset_name, historical_accuracy=0.5):
             score, verdict, detail = 0, 'NEUTRAL', f"RSI {rsi:.1f}, MACD {macd_hist:.4f}."
     else:
         score, verdict, detail = 0, 'NEUTRAL', "Insufficient data."
-    signals['momentum'] = {'score': score, 'verdict': verdict, 'detail': detail, 'weight': SIGNAL_WEIGHTS['momentum']}
-    votes.append(score * SIGNAL_WEIGHTS['momentum'])
+    signals['momentum'] = {'score': score, 'verdict': verdict, 'detail': detail, 'weight': weights['momentum']}
+    votes.append(score * weights['momentum'])
     
     atr = latest.get('atr_ratio')
     vol = latest.get('volatility_20')
@@ -1355,8 +1437,8 @@ def build_sub_signals_weighted(latest, asset_name, historical_accuracy=0.5):
             score, verdict, detail = 0, 'MODERATE', f"Normal volatility ({vol:.1f}%)."
     else:
         score, verdict, detail = 0, 'UNKNOWN', "Data unavailable."
-    signals['volatility'] = {'score': score, 'verdict': verdict, 'detail': detail, 'weight': SIGNAL_WEIGHTS['volatility']}
-    votes.append(score * SIGNAL_WEIGHTS['volatility'])
+    signals['volatility'] = {'score': score, 'verdict': verdict, 'detail': detail, 'weight': weights['volatility']}
+    votes.append(score * weights['volatility'])
     
     fng = latest.get('fng_value')
     if pd.notna(fng):
@@ -1372,8 +1454,8 @@ def build_sub_signals_weighted(latest, asset_name, historical_accuracy=0.5):
             score, verdict, detail = 0, 'NEUTRAL', f"Fear & Greed: {fng:.0f} (Neutral)."
     else:
         score, verdict, detail = 0, 'NEUTRAL', "Data unavailable."
-    signals['sentiment'] = {'score': score, 'verdict': verdict, 'detail': detail, 'weight': SIGNAL_WEIGHTS['sentiment']}
-    votes.append(score * SIGNAL_WEIGHTS['sentiment'])
+    signals['sentiment'] = {'score': score, 'verdict': verdict, 'detail': detail, 'weight': weights['sentiment']}
+    votes.append(score * weights['sentiment'])
     
     funding = latest.get('funding_rate')
     if pd.notna(funding):
@@ -1385,8 +1467,8 @@ def build_sub_signals_weighted(latest, asset_name, historical_accuracy=0.5):
             score, verdict, detail = 0, 'NEUTRAL', f"Funding {funding*100:.4f}%."
     else:
         score, verdict, detail = 0, 'UNKNOWN', "Data unavailable."
-    signals['funding'] = {'score': score, 'verdict': verdict, 'detail': detail, 'weight': SIGNAL_WEIGHTS['funding']}
-    votes.append(score * SIGNAL_WEIGHTS['funding'])
+    signals['funding'] = {'score': score, 'verdict': verdict, 'detail': detail, 'weight': weights['funding']}
+    votes.append(score * weights['funding'])
     
     vol_ratio = latest.get('volume_ratio')
     if pd.notna(vol_ratio):
@@ -1398,8 +1480,8 @@ def build_sub_signals_weighted(latest, asset_name, historical_accuracy=0.5):
             score, verdict, detail = 0, 'NORMAL', f"Volume {vol_ratio:.1f}x avg."
     else:
         score, verdict, detail = 0, 'UNKNOWN', "Data insufficient."
-    signals['volume'] = {'score': score, 'verdict': verdict, 'detail': detail, 'weight': SIGNAL_WEIGHTS['volume']}
-    votes.append(score * SIGNAL_WEIGHTS['volume'])
+    signals['volume'] = {'score': score, 'verdict': verdict, 'detail': detail, 'weight': weights['volume']}
+    votes.append(score * weights['volume'])
     
     dd = latest.get('drawdown')
     if pd.notna(dd):
@@ -1413,8 +1495,8 @@ def build_sub_signals_weighted(latest, asset_name, historical_accuracy=0.5):
             score, verdict, detail = 0, 'NORMAL', f"Drawdown {abs(dd)*100:.1f}%."
     else:
         score, verdict, detail = 0, 'UNKNOWN', "Data unavailable."
-    signals['drawdown'] = {'score': score, 'verdict': verdict, 'detail': detail, 'weight': SIGNAL_WEIGHTS['drawdown']}
-    votes.append(score * SIGNAL_WEIGHTS['drawdown'])
+    signals['drawdown'] = {'score': score, 'verdict': verdict, 'detail': detail, 'weight': weights['drawdown']}
+    votes.append(score * weights['drawdown'])
     
     composite = sum(votes) / sum(SIGNAL_WEIGHTS.values())
     composite = composite * (0.5 + 0.5 * historical_accuracy)
@@ -1804,6 +1886,7 @@ def update_signal_status(db, asset, current_price):
                     signal['profit_pct'] = ((current_price - entry) / entry) * 100
                     signal['hit_tp2'] = bool(tp2 and current_price >= tp2)
                     signal['exit_target'] = 'TP2' if signal['hit_tp2'] else 'TP1'
+                    signal['trade_outcome'] = 'SUCCESSFUL' + (' (ran to TP2)' if signal['hit_tp2'] else ' (hit TP1)')
                     signal['holding_days'] = (datetime.now() - datetime.fromisoformat(signal['entry_date'])).days
                     track_prediction_accuracy(signal['asset'], signal['signal'], True)
             elif signal['signal'] in ['STRONG SHORT', 'SHORT']:
@@ -1826,6 +1909,7 @@ def update_signal_status(db, asset, current_price):
                     signal['profit_pct'] = ((entry - current_price) / entry) * 100
                     signal['hit_tp2'] = bool(tp2 and current_price <= tp2)
                     signal['exit_target'] = 'TP2' if signal['hit_tp2'] else 'TP1'
+                    signal['trade_outcome'] = 'SUCCESSFUL' + (' (ran to TP2)' if signal['hit_tp2'] else ' (hit TP1)')
                     signal['holding_days'] = (datetime.now() - datetime.fromisoformat(signal['entry_date'])).days
                     track_prediction_accuracy(signal['asset'], signal['signal'], True)
     
@@ -1951,6 +2035,10 @@ PAPER_CONFIG = {
     'dca_trigger_drawdown': 0.05,  # add when position is 5% underwater
     'dca_size_multiplier': 0.75,   # each tranche smaller than the last
     'dca_min_conviction': 0.15,    # only average down if signal still holds
+    'time_exit_multiplier': 3,     # close a trade if open 3x its expected duration
+    'default_swing_expected_days': 20,   # fallback if a swing trade has no time estimate
+    'trail_fraction': 0.5,         # after TP1, trail the stop this fraction of risk_distance behind price
+    'slippage_pct': 0.0008,        # 0.08% — modeled on both entries and exits
 }
 
 
@@ -1989,6 +2077,12 @@ def save_paper_account(acct):
         print(f"  ⚠️ Could not save paper account: {e}")
 
 
+# TP1 = success. Per explicit decision: hitting the first take-profit target is a
+# successful trade in every stat, badge, and label across the project — running
+# further to TP2 is a bonus, not a requirement to count as a win.
+SUCCESS_REASONS = {'TAKE_PROFIT_1_PARTIAL', 'TAKE_PROFIT_2'}
+
+
 def _paper_close(acct, code, pos, price, qty, reason):
     """Close `qty` units of a position, bank the proceeds, record the trade."""
     fee = PAPER_CONFIG['fee_pct']
@@ -2006,6 +2100,7 @@ def _paper_close(acct, code, pos, price, qty, reason):
         'trade_type': pos.get('trade_type', 'SWING_DAILY'),
         'side': pos['side'],
         'reason': reason,
+        'successful': reason in SUCCESS_REASONS,
         'entry_price': round(pos['avg_entry'], 6),
         'exit_price': round(price, 6),
         'qty': round(qty, 8),
@@ -2053,32 +2148,72 @@ def run_paper_account(all_signals, correlation_matrix=None):
         tp1 = pos.get('take_profit_1') or plan.get('take_profit_1')
         tp2 = pos.get('take_profit_2') or plan.get('take_profit_2')
         long = pos['side'] == 'LONG'
+        slip = PAPER_CONFIG['slippage_pct']
 
-        # Stop loss — full exit
+        # Stop loss — full exit. Slippage makes the fill slightly worse than the
+        # exact stop price, same direction a real exchange would move against you.
         if sl and ((long and price <= sl) or (not long and price >= sl)):
-            pnl = _paper_close(acct, code, pos, price, pos['qty'], 'STOP_LOSS')
+            fill = sl * (1 - slip) if long else sl * (1 + slip)
+            pnl = _paper_close(acct, code, pos, fill, pos['qty'], 'STOP_LOSS')
             events.append(f"{code} stopped out ({pnl:+.2f})")
             del acct['positions'][code]
             continue
 
-        # TP1 — partial exit, then move stop to breakeven
+        # TP1 — partial exit, then TRAIL the stop instead of a flat breakeven.
+        # A flat breakeven stop gives back 100% of an unrealized gain if price
+        # pulls back even slightly after TP1; trailing locks in progress instead.
         if tp1 and not pos.get('tp1_hit') and ((long and price >= tp1) or (not long and price <= tp1)):
             qty = pos['qty'] * PAPER_CONFIG['tp1_close_fraction']
-            pnl = _paper_close(acct, code, pos, price, qty, 'TAKE_PROFIT_1_PARTIAL')
+            fill = tp1 * (1 - slip) if long else tp1 * (1 + slip)
+            pnl = _paper_close(acct, code, pos, fill, qty, 'TAKE_PROFIT_1_PARTIAL')
             pos['qty'] -= qty
             pos['tp1_hit'] = True
-            pos['stop_loss'] = pos['avg_entry']       # breakeven stop on the runner
-            events.append(f"{code} TP1 hit — took {int(PAPER_CONFIG['tp1_close_fraction']*100)}% off ({pnl:+.2f}), stop to breakeven")
+            pos['stop_loss'] = pos['avg_entry']       # starts at breakeven, trails from here
+            events.append(f"{code} TP1 hit — SUCCESSFUL trade, took {int(PAPER_CONFIG['tp1_close_fraction']*100)}% off ({pnl:+.2f}), stop to breakeven")
             if pos['qty'] <= 0:
                 del acct['positions'][code]
                 continue
 
+        # Trailing stop on the runner (after TP1): ratchet the stop up (LONG) or
+        # down (SHORT) as price makes new progress, by trail_fraction of the
+        # original risk distance. Never loosens — only tightens toward price.
+        if pos.get('tp1_hit') and pos.get('risk_distance'):
+            trail_dist = pos['risk_distance'] * PAPER_CONFIG['trail_fraction']
+            if long:
+                new_stop = price - trail_dist
+                if new_stop > pos['stop_loss']:
+                    pos['stop_loss'] = new_stop
+            else:
+                new_stop = price + trail_dist
+                if new_stop < pos['stop_loss']:
+                    pos['stop_loss'] = new_stop
+
         # TP2 — close the remainder
         if tp2 and ((long and price >= tp2) or (not long and price <= tp2)):
-            pnl = _paper_close(acct, code, pos, price, pos['qty'], 'TAKE_PROFIT_2')
+            fill = tp2 * (1 - slip) if long else tp2 * (1 + slip)
+            pnl = _paper_close(acct, code, pos, fill, pos['qty'], 'TAKE_PROFIT_2')
             events.append(f"{code} TP2 hit — closed ({pnl:+.2f})")
             del acct['positions'][code]
             continue
+
+        # ---------- TIME EXIT: the thesis has gone stale ----------
+        # A trade expected to resolve in ~10 hours that's still open after 30+
+        # hours has outlived the setup it was based on. Without this it sits
+        # tying up capital and margin until it randomly hits stop or target,
+        # which pollutes both the paper account's stats and the learning signal.
+        opened = pos.get('opened')
+        if opened:
+            held_hours = (datetime.now() - datetime.fromisoformat(opened)).total_seconds() / 3600
+            expected_hours = pos.get('expected_hours')
+            if not expected_hours:
+                expected_hours = PAPER_CONFIG['default_swing_expected_days'] * 24
+            max_hours = expected_hours * PAPER_CONFIG['time_exit_multiplier']
+            if held_hours >= max_hours:
+                fill = price * (1 - slip) if long else price * (1 + slip)
+                pnl = _paper_close(acct, code, pos, fill, pos['qty'], 'TIME_EXIT')
+                events.append(f"{code} time-exited after {held_hours:.0f}h (expected ~{expected_hours:.0f}h) ({pnl:+.2f})")
+                del acct['positions'][code]
+                continue
 
         # ---------- 3: DCA / averaging down ----------
         drawdown = ((pos['avg_entry'] - price) / pos['avg_entry']) if long \
@@ -2221,6 +2356,7 @@ def run_paper_account(all_signals, correlation_matrix=None):
             'take_profit_2': plan.get('take_profit_2'),
             'risk_distance': risk_distance,
             'entry_conviction': sig.get('conviction'),
+            'expected_hours': (plan.get('expected_days_to_tp1') * 24) if plan.get('expected_days_to_tp1') else None,
             'tp1_hit': False,
         }
         events.append(f"{code} OPENED {acct['positions'][code]['side']} {qty:.6f} @ {price:.4f}")
@@ -2851,8 +2987,142 @@ def _rsi(close, period=14):
     return (100 - (100 / (1 + rs))).fillna(50)
 
 
-def generate_intraday_trade(code, symbol):
-    """4h-timeframe trade with targets at real nearby support/resistance."""
+def estimate_liquidation_clusters(price, atr, funding_rate=None):
+    """Liquidation-cluster PROXY, not a live feed.
+
+    Binance's public forceOrders endpoint (fetch_liquidation_data, used
+    elsewhere) returns near-empty data for retail access in practice — that's
+    why the dashboard has shown "Liquidation data unavailable". A true
+    liquidation-heatmap feed (Coinglass, etc.) needs a paid/keyed API this
+    project doesn't have. This instead ESTIMATES where clusters of leveraged
+    positions are likely to sit, using two things that are actually real and
+    free: round psychological price levels (where retail commonly places
+    stops/entries) and extreme funding rate (a real signal of how much
+    leveraged long/short interest currently exists). Labelled as an estimate
+    everywhere it's surfaced — never presented as a real liquidation feed.
+    """
+    if not price or price <= 0:
+        return {'clusters': [], 'method': 'unavailable'}
+
+    magnitude = 10 ** (len(str(int(price))) - 2)
+    base = round(price / magnitude) * magnitude
+    candidates = sorted(set([
+        base, base + magnitude, base - magnitude,
+        base + magnitude / 2, base - magnitude / 2,
+    ]))
+
+    funding_skew = 0.0
+    if funding_rate is not None:
+        # Very positive funding = crowded longs = downside liquidation cluster
+        # more likely; very negative = crowded shorts = upside cluster more likely.
+        funding_skew = max(-1.0, min(1.0, float(funding_rate) * 500))
+
+    clusters = []
+    for lvl in candidates:
+        dist_pct = abs(lvl - price) / price
+        if dist_pct > 0.06:
+            continue
+        direction = 'ABOVE' if lvl > price else 'BELOW' if lvl < price else 'AT'
+        weight = 1.0 - dist_pct / 0.06
+        if direction == 'BELOW' and funding_skew > 0.3:
+            weight *= (1 + funding_skew)
+        if direction == 'ABOVE' and funding_skew < -0.3:
+            weight *= (1 + abs(funding_skew))
+        clusters.append({'level': round(lvl, 2), 'direction': direction,
+                         'distance_pct': round(dist_pct * 100, 2), 'weight': round(weight, 2)})
+
+    clusters.sort(key=lambda c: c['weight'], reverse=True)
+    nearest_above = next((c for c in clusters if c['direction'] == 'ABOVE'), None)
+    nearest_below = next((c for c in clusters if c['direction'] == 'BELOW'), None)
+    return {
+        'clusters': clusters[:6], 'nearest_above': nearest_above, 'nearest_below': nearest_below,
+        'funding_skew': round(funding_skew, 3), 'method': 'proxy_round_levels_plus_funding',
+    }
+
+
+def fetch_cvd(symbol, minutes=180):
+    """Cumulative Volume Delta from real trade prints (Binance aggTrades).
+
+    Unlike order-book imbalance (a one-second snapshot of resting orders that
+    can be pulled the instant before a fetch), CVD measures actual EXECUTED
+    volume classified by aggressor side over a real window. `m=True` on an agg
+    trade means the buyer was the maker — i.e. a seller aggressively hit the
+    bid — so we count that as sell-side volume, and the reverse for m=False.
+    A rising CVD while price is flat/falling is genuine buying pressure not yet
+    reflected in price; a real institutional short-term signal, not a proxy.
+    """
+    try:
+        url = "https://api.binance.com/api/v3/aggTrades"
+        r = fetch_with_retry(url, params={'symbol': symbol, 'limit': 1000}, timeout=20)
+        trades = r.json()
+        if not isinstance(trades, list) or not trades:
+            return {'cvd': None, 'cvd_normalized': None, 'trend': 'UNKNOWN', 'sample_trades': 0}
+
+        buy_vol = 0.0
+        sell_vol = 0.0
+        deltas = []
+        for t in trades:
+            qty = float(t.get('q', 0))
+            is_buyer_maker = t.get('m', False)
+            if is_buyer_maker:
+                sell_vol += qty
+                deltas.append(-qty)
+            else:
+                buy_vol += qty
+                deltas.append(qty)
+
+        cvd = buy_vol - sell_vol
+        total_vol = buy_vol + sell_vol
+        cvd_normalized = round(cvd / total_vol, 4) if total_vol > 0 else 0.0
+
+        # trend of the cumulative series within the sample — is buying pressure
+        # accelerating (second half more skewed than first half)?
+        half = len(deltas) // 2
+        first_half_delta = sum(deltas[:half]) if half else 0
+        second_half_delta = sum(deltas[half:]) if half else 0
+        if second_half_delta > first_half_delta * 1.15 and cvd_normalized > 0.05:
+            trend = 'ACCELERATING_BUY'
+        elif second_half_delta < first_half_delta * 1.15 and cvd_normalized < -0.05:
+            trend = 'ACCELERATING_SELL'
+        elif cvd_normalized > 0.1:
+            trend = 'NET_BUY'
+        elif cvd_normalized < -0.1:
+            trend = 'NET_SELL'
+        else:
+            trend = 'BALANCED'
+
+        return {
+            'cvd': round(cvd, 4), 'cvd_normalized': cvd_normalized, 'trend': trend,
+            'buy_volume': round(buy_vol, 4), 'sell_volume': round(sell_vol, 4),
+            'sample_trades': len(trades),
+        }
+    except Exception as e:
+        print(f"  ⚠️ CVD {symbol}: {e}")
+        return {'cvd': None, 'cvd_normalized': None, 'trend': 'UNAVAILABLE', 'sample_trades': 0}
+
+
+def prepare_4h_df(df):
+    """Add all indicators the intraday engine needs, in place. Shared by the live
+    path and the backtest so both use IDENTICAL math — a backtest that scores
+    differently than the live engine would validate a different strategy."""
+    cfg = INTRADAY_CONFIG
+    df = df.copy()
+    close = df['close']
+    df['ema20'] = close.ewm(span=20, adjust=False).mean()
+    df['ema50'] = close.ewm(span=50, adjust=False).mean()
+    df['rsi'] = _rsi(close)
+    df['atr'] = _atr(df, cfg['atr_period'])
+    df['vol_ma20'] = df['volume'].rolling(20).mean()
+    return df
+
+
+def score_4h_bar(df_upto):
+    """Pure scoring on a DataFrame that ends at 'now' — no fetching, no side
+    effects. df_upto must already have ema20/ema50/rsi/atr/vol_ma20 (see
+    prepare_4h_df) and must NOT contain any bar after the decision point — the
+    backtest enforces this by slicing df.iloc[:i+1] before calling this.
+    Returns the same trade dict shape whether called live or in backtest.
+    """
     cfg = INTRADAY_CONFIG
     out = {
         'timeframe': cfg['interval'], 'signal': 'NO TRADE', 'conviction': 0.0,
@@ -2860,107 +3130,331 @@ def generate_intraday_trade(code, symbol):
         'target_source': None, 'expected_hours': None, 'risk_reward': None,
         'reason': 'insufficient data', 'levels': {},
     }
+    if df_upto is None or len(df_upto) < 60 or 'high' not in df_upto.columns:
+        return out
+
+    close = df_upto['close']
+    price = float(close.iloc[-1])
+    latest = df_upto.iloc[-1]
+    atr = float(latest['atr'])
+    if not (math.isfinite(atr) and atr > 0):
+        return out
+
+    trend_up = latest['ema20'] > latest['ema50'] and price > latest['ema20']
+    trend_dn = latest['ema20'] < latest['ema50'] and price < latest['ema20']
+    rsi = float(latest['rsi'])
+    vol_ma_last = latest.get('vol_ma20')
+    vol_ok = bool(latest['volume'] >= 0.7 * float(vol_ma_last)) if pd.notna(vol_ma_last) else True
+    ema_slope = float(df_upto['ema20'].iloc[-1] - df_upto['ema20'].iloc[-4]) if len(df_upto) >= 4 else 0.0
+
+    sr = find_support_resistance(df_upto, window=cfg['sr_window'])
+    res = sr.get('nearest_resistance')
+    sup = sr.get('nearest_support')
+    out['levels'] = {'support': sup, 'resistance': res, 'atr_4h': round(atr, 6), 'rsi_4h': round(rsi, 1)}
+
+    # ── MODE 1: TREND-FOLLOWING (works when EMAs are cleanly stacked) ──
+    score = 0.0
+    if trend_up: score += 0.40
+    if trend_dn: score -= 0.40
+    if 45 <= rsi <= 68: score += 0.20 if trend_up else 0.0
+    if 32 <= rsi <= 55: score -= 0.20 if trend_dn else 0.0
+    if rsi > 75: score -= 0.25
+    if rsi < 25: score += 0.25
+    score += 0.15 if ema_slope > 0 else -0.15
+    if not vol_ok: score *= 0.6
+    mode = 'TREND'
+
+    # ── MODE 2: MEAN-REVERSION (range trading) ──
+    # BUGFIX / DESIGN GAP: the engine above is trend-only. In a choppy or ranging
+    # market EMA20 and EMA50 chop across each other, so trend_up and trend_dn are
+    # BOTH false and the only remaining term is the +/-0.15 slope — mathematically
+    # incapable of reaching the 0.35 threshold. That meant the intraday engine
+    # could essentially NEVER fire in chop, which is exactly the condition it is
+    # most useful in: real intraday traders make money buying support and selling
+    # resistance inside a range. This adds that second mode.
+    # "Ranging" can't just mean "no EMA stack". Near the TOP of an oscillating
+    # range the short EMAs legitimately look bullish (EMA20 > EMA50, price above
+    # both) even though price is at resistance and about to turn — so the strict
+    # test never let mean-reversion evaluate the sell side. Converged EMAs
+    # (separation small relative to ATR) is the honest definition of "no real
+    # trend", and it catches both ends of a range.
+    ema_separation = abs(float(latest['ema20']) - float(latest['ema50']))
+    ranging = (not trend_up and not trend_dn) or (ema_separation < atr * 1.0)
+    if ranging and sup and res and res > sup:
+        band = res - sup
+        if band > 0:
+            pos_in_range = (price - sup) / band          # 0 = at support, 1 = at resistance
+            mr_score = 0.0
+            # Near the bottom of the range with non-extended RSI -> buy the support
+            if pos_in_range <= 0.30 and rsi < 45:
+                mr_score = 0.40 + (0.30 - pos_in_range) * 0.8
+                if rsi < 32: mr_score += 0.12          # genuinely oversold, better edge
+            # Near the top of the range with non-depressed RSI -> sell the resistance
+            elif pos_in_range >= 0.70 and rsi > 55:
+                mr_score = -(0.40 + (pos_in_range - 0.70) * 0.8)
+                if rsi > 68: mr_score -= 0.12
+            # Require the range to be worth trading at all
+            if abs(mr_score) > 0 and (band / price) < cfg['min_target_pct']:
+                mr_score = 0.0
+            if not vol_ok:
+                mr_score *= 0.7
+            if abs(mr_score) > abs(score):
+                score = mr_score
+                mode = 'MEAN_REVERSION'
+            out['levels']['range_position'] = round(pos_in_range, 3)
+
+    out['mode'] = mode
+    direction = 'LONG' if score >= 0.35 else 'SHORT' if score <= -0.35 else None
+    if direction is None:
+        out['reason'] = f"4h signals not aligned (score {score:+.2f})"
+        out['conviction'] = round(abs(score), 2)
+        return out
+
+    # In MEAN_REVERSION mode the stop must sit BEYOND the level, not exactly on
+    # it — price routinely wicks a fraction through support/resistance before the
+    # level actually holds. A stop placed exactly at the level gets taken out by
+    # noise on trades that would have worked. Buffer it by 0.25 ATR.
+    mr_buffer = atr * 0.25 if mode == 'MEAN_REVERSION' else 0.0
+
+    if direction == 'LONG':
+        tgt = res if (res and price < res) else None
+        stop = (sup - mr_buffer if (sup and sup < price) else price - atr * cfg['stop_atr_mult'])
+        stop = max(stop, price - atr * 1.5)
+        if tgt is None or (tgt - price) / price > cfg['max_target_pct']:
+            # In a range wider than the intraday cap, the correct partial target
+            # is the MIDDLE of the range — that's the standard range-trade exit,
+            # and it keeps R:R sane. Falling back to a tiny ATR target here (the
+            # old behaviour) produced a target closer than the stop, so R:R came
+            # out under 1 and every mean-reversion trade was rejected.
+            if mode == 'MEAN_REVERSION' and sup and res and res > sup:
+                mid = sup + (res - sup) * 0.5
+                if mid > price:
+                    tgt = mid; src = 'range midpoint (range wider than intraday cap)'
+                else:
+                    tgt = price + atr * 1.5; src = 'ATR x1.5'
+            else:
+                tgt = price + atr * 1.5; src = 'ATR x1.5 (no near resistance)'
+        else:
+            src = 'nearest 4h resistance'
+        if (tgt - price) / price < cfg['min_target_pct']:
+            tgt = price * (1 + cfg['min_target_pct']); src += ' (min-dist floor)'
+        rr = (tgt - price) / max(price - stop, 1e-9)
+    else:
+        tgt = sup if (sup and price > sup) else None
+        stop = (res + mr_buffer if (res and res > price) else price + atr * cfg['stop_atr_mult'])
+        stop = min(stop, price + atr * 1.5)
+        if tgt is None or (price - tgt) / price > cfg['max_target_pct']:
+            if mode == 'MEAN_REVERSION' and sup and res and res > sup:
+                mid = sup + (res - sup) * 0.5
+                if mid < price:
+                    tgt = mid; src = 'range midpoint (range wider than intraday cap)'
+                else:
+                    tgt = price - atr * 1.5; src = 'ATR x1.5'
+            else:
+                tgt = price - atr * 1.5; src = 'ATR x1.5 (no near support)'
+        else:
+            src = 'nearest 4h support'
+        if (price - tgt) / price < cfg['min_target_pct']:
+            tgt = price * (1 - cfg['min_target_pct']); src += ' (min-dist floor)'
+        rr = (price - tgt) / max(stop - price, 1e-9)
+
+    conviction = round(min(1.0, abs(score)), 2)
+    if rr < cfg['min_rr']:
+        out.update({'signal': 'NO TRADE', 'conviction': conviction,
+                    'reason': f"R:R {rr:.2f} below {cfg['min_rr']} minimum"})
+        out['levels']['proposed'] = {'entry': price, 'stop': round(stop, 6), 'target': round(tgt, 6)}
+        return out
+    if conviction < cfg['min_conviction']:
+        out.update({'signal': 'NO TRADE', 'conviction': conviction,
+                    'reason': f"conviction {conviction:.2f} below {cfg['min_conviction']}"})
+        return out
+
+    dist = abs(tgt - price)
+    bars = max(1, dist / (atr * 0.6))
+    hours = int(round(bars * 4))
+
+    out.update({
+        'signal': direction, 'conviction': conviction,
+        'entry': round(price, 6), 'stop_loss': round(stop, 6), 'take_profit': round(tgt, 6),
+        'target_source': src, 'risk_reward': round(rr, 2),
+        'move_pct': round(dist / price * 100, 2),
+        'move_abs': round(dist, 4),
+        'expected_hours': hours,
+        'expected_label': f"~{hours}h" if hours < 48 else f"~{hours/24:.1f}d",
+        'mode': mode,
+        'reason': (f"4h {direction} ({'range/mean-reversion' if mode == 'MEAN_REVERSION' else 'trend-following'}): "
+                   f"RSI {rsi:.0f}"
+                   + (f", price {out['levels'].get('range_position', 0)*100:.0f}% up the range" if mode == 'MEAN_REVERSION'
+                      else f", EMA20 {'>' if trend_up else '<'} EMA50")
+                   + f", target at {src}"),
+    })
+    return out
+
+
+def generate_intraday_trade(code, symbol):
+    """Live wrapper: fetch fresh 4h data, prepare it, score the latest bar,
+    then adjust conviction using real executed-order-flow (CVD) — live-only,
+    since it needs real-time trade prints the backtest can't reconstruct
+    without downloading the full historical tape."""
+    cfg = INTRADAY_CONFIG
     try:
         df = fetch_binance_klines_interval(symbol, interval=cfg['interval'], limit=cfg['bars'])
         if df is None or df.empty or len(df) < 60 or 'high' not in df.columns:
-            return out
+            return {'timeframe': cfg['interval'], 'signal': 'NO TRADE', 'conviction': 0.0,
+                    'reason': 'insufficient data', 'levels': {}}
+        df = prepare_4h_df(df)
+        trade = score_4h_bar(df)
 
-        close = df['close']
-        price = float(close.iloc[-1])
-        df = df.copy()
-        df['ema20'] = close.ewm(span=20, adjust=False).mean()
-        df['ema50'] = close.ewm(span=50, adjust=False).mean()
-        df['rsi'] = _rsi(close)
-        df['atr'] = _atr(df, cfg['atr_period'])
-        vol_ma = df['volume'].rolling(20).mean()
-        latest = df.iloc[-1]
-        atr = float(latest['atr'])
-        if not (math.isfinite(atr) and atr > 0):
-            return out
+        cvd = fetch_cvd(symbol)
+        trade['cvd'] = cvd
 
-        # ── direction from 4h structure ──
-        trend_up = latest['ema20'] > latest['ema50'] and price > latest['ema20']
-        trend_dn = latest['ema20'] < latest['ema50'] and price < latest['ema20']
-        rsi = float(latest['rsi'])
-        vol_ok = bool(latest['volume'] >= 0.7 * float(vol_ma.iloc[-1])) if pd.notna(vol_ma.iloc[-1]) else True
-        ema_slope = float(df['ema20'].iloc[-1] - df['ema20'].iloc[-4])
-
-        score = 0.0
-        if trend_up: score += 0.40
-        if trend_dn: score -= 0.40
-        if 45 <= rsi <= 68: score += 0.20 if trend_up else 0.0
-        if 32 <= rsi <= 55: score -= 0.20 if trend_dn else 0.0
-        if rsi > 75: score -= 0.25      # overbought — fade longs
-        if rsi < 25: score += 0.25      # oversold — fade shorts
-        score += 0.15 if ema_slope > 0 else -0.15
-        if not vol_ok: score *= 0.6
-
-        # ── real 4h support / resistance ──
-        sr = find_support_resistance(df, window=cfg['sr_window'])
-        res = sr.get('nearest_resistance')
-        sup = sr.get('nearest_support')
-        out['levels'] = {'support': sup, 'resistance': res, 'atr_4h': round(atr, 6), 'rsi_4h': round(rsi, 1)}
-
-        direction = 'LONG' if score >= 0.35 else 'SHORT' if score <= -0.35 else None
-        if direction is None:
-            out['reason'] = f"4h signals not aligned (score {score:+.2f})"
-            out['conviction'] = round(abs(score), 2)
-            return out
-
-        # ── target = nearest level in trade direction, bounded to intraday scale ──
-        if direction == 'LONG':
-            tgt = res if (res and price < res) else None
-            stop = (sup if (sup and sup < price) else price - atr * cfg['stop_atr_mult'])
-            stop = max(stop, price - atr * 1.5)            # never wider than 1.5 ATR
-            if tgt is None or (tgt - price) / price > cfg['max_target_pct']:
-                tgt = price + atr * 1.5; src = 'ATR x1.5 (no near resistance)'
-            else:
-                src = 'nearest 4h resistance'
-            if (tgt - price) / price < cfg['min_target_pct']:
-                tgt = price * (1 + cfg['min_target_pct']); src += ' (min-dist floor)'
-            rr = (tgt - price) / max(price - stop, 1e-9)
-        else:
-            tgt = sup if (sup and price > sup) else None
-            stop = (res if (res and res > price) else price + atr * cfg['stop_atr_mult'])
-            stop = min(stop, price + atr * 1.5)
-            if tgt is None or (price - tgt) / price > cfg['max_target_pct']:
-                tgt = price - atr * 1.5; src = 'ATR x1.5 (no near support)'
-            else:
-                src = 'nearest 4h support'
-            if (price - tgt) / price < cfg['min_target_pct']:
-                tgt = price * (1 - cfg['min_target_pct']); src += ' (min-dist floor)'
-            rr = (price - tgt) / max(stop - price, 1e-9)
-
-        conviction = round(min(1.0, abs(score)), 2)
-        if rr < cfg['min_rr']:
-            out.update({'signal': 'NO TRADE', 'conviction': conviction,
-                        'reason': f"R:R {rr:.2f} below {cfg['min_rr']} minimum"})
-            out['levels']['proposed'] = {'entry': price, 'stop': round(stop, 6), 'target': round(tgt, 6)}
-            return out
-        if conviction < cfg['min_conviction']:
-            out.update({'signal': 'NO TRADE', 'conviction': conviction,
-                        'reason': f"conviction {conviction:.2f} below {cfg['min_conviction']}"})
-            return out
-
-        dist = abs(tgt - price)
-        bars = max(1, dist / (atr * 0.6))
-        hours = int(round(bars * 4))
-
-        out.update({
-            'signal': direction, 'conviction': conviction,
-            'entry': round(price, 6), 'stop_loss': round(stop, 6), 'take_profit': round(tgt, 6),
-            'target_source': src, 'risk_reward': round(rr, 2),
-            'move_pct': round(dist / price * 100, 2),
-            'move_abs': round(dist, 4),
-            'expected_hours': hours,
-            'expected_label': f"~{hours}h" if hours < 48 else f"~{hours/24:.1f}d",
-            'reason': f"4h {direction}: EMA20 {'>' if trend_up else '<'} EMA50, RSI {rsi:.0f}, target at {src}",
-        })
-        return out
+        # Liquidation-cluster proxy: if a cluster sits closer than the technical
+        # target and in the same direction, it's a more realistic magnet — real
+        # price action tends to accelerate toward liquidation-heavy zones.
+        try:
+            funding = fetch_funding_rate(symbol)
+            fr_val = float(funding['funding_rate'].iloc[-1]) if funding is not None and not funding.empty else None
+        except Exception:
+            fr_val = None
+        liq = estimate_liquidation_clusters(trade.get('entry') or float(df['close'].iloc[-1]), None, fr_val)
+        trade['liquidation_estimate'] = liq
+        if trade.get('signal') == 'LONG' and liq.get('nearest_above'):
+            cluster = liq['nearest_above']
+            if cluster['level'] < trade.get('take_profit', float('inf')) and cluster['weight'] > 0.5:
+                trade['take_profit'] = cluster['level']
+                trade['target_source'] = f"liquidation cluster estimate ({cluster['distance_pct']}% away)"
+        elif trade.get('signal') == 'SHORT' and liq.get('nearest_below'):
+            cluster = liq['nearest_below']
+            if cluster['level'] > trade.get('take_profit', float('-inf')) and cluster['weight'] > 0.5:
+                trade['take_profit'] = cluster['level']
+                trade['target_source'] = f"liquidation cluster estimate ({cluster['distance_pct']}% away)"
+        if trade.get('signal') in ('LONG', 'SHORT') and cvd.get('cvd_normalized') is not None:
+            agrees = ((trade['signal'] == 'LONG' and cvd['cvd_normalized'] > 0.05) or
+                      (trade['signal'] == 'SHORT' and cvd['cvd_normalized'] < -0.05))
+            conflicts = ((trade['signal'] == 'LONG' and cvd['cvd_normalized'] < -0.15) or
+                        (trade['signal'] == 'SHORT' and cvd['cvd_normalized'] > 0.15))
+            if agrees:
+                trade['conviction'] = round(min(1.0, trade['conviction'] * 1.15), 2)
+                trade['reason'] += f" | real order flow agrees (CVD {cvd['trend']})"
+            elif conflicts:
+                # Real executed sell pressure against a LONG (or buy pressure
+                # against a SHORT) is a genuine warning the price chart alone
+                # can't see — cut conviction rather than ignore it.
+                trade['conviction'] = round(trade['conviction'] * 0.6, 2)
+                trade['reason'] += f" | ⚠️ real order flow conflicts (CVD {cvd['trend']})"
+                if trade['conviction'] < cfg['min_conviction']:
+                    trade['signal'] = 'NO TRADE'
+                    trade['reason'] = f"Filtered by real order flow: {trade['reason']}"
+        return trade
     except Exception as e:
-        out['reason'] = f"intraday engine error: {e}"
-        return out
+        return {'timeframe': cfg['interval'], 'signal': 'NO TRADE', 'conviction': 0.0,
+                'reason': f"intraday engine error: {e}", 'levels': {}}
 
+
+def backtest_intraday_engine(symbol, bars=1000, time_exit_multiplier=3):
+    """Real walk-forward backtest of the EXACT live scoring logic (score_4h_bar),
+    over up to ~1000 historical 4h bars (~5-6 months). No lookahead: at bar i,
+    only df.iloc[:i+1] is visible when a decision is made — the same information
+    the live engine would have had at that moment. Walks forward bar by bar
+    checking the open trade's stop/target/time-exit against the NEXT bar's real
+    high/low. This exists specifically so the intraday engine has a measured win
+    rate and profit factor before being trusted, instead of trusting it on faith.
+    """
+    result = {
+        'symbol': symbol, 'bars_used': 0, 'total_trades': 0, 'wins': 0, 'losses': 0,
+        'time_exits': 0, 'win_rate': None, 'profit_factor': None, 'avg_r': None,
+        'total_r': 0.0, 'gross_r_win': 0.0, 'gross_r_loss': 0.0, 'trades': [], 'error': None,
+    }
+    try:
+        df = fetch_binance_klines_interval(symbol, interval=INTRADAY_CONFIG['interval'], limit=bars)
+        if df is None or df.empty or len(df) < 120 or 'high' not in df.columns:
+            result['error'] = 'insufficient historical data'
+            return result
+        df = prepare_4h_df(df).reset_index(drop=True)
+        result['bars_used'] = len(df)
+
+        open_trade = None
+        min_lookback = 60
+        for i in range(min_lookback, len(df) - 1):
+            bar_next = df.iloc[i + 1]
+
+            if open_trade:
+                held = i - open_trade['open_idx']
+                hi, lo = float(bar_next['high']), float(bar_next['low'])
+                exit_price, reason = None, None
+                if open_trade['side'] == 'LONG':
+                    if lo <= open_trade['stop']:
+                        exit_price, reason = open_trade['stop'], 'STOP'
+                    elif hi >= open_trade['target']:
+                        exit_price, reason = open_trade['target'], 'TARGET'
+                else:
+                    if hi >= open_trade['stop']:
+                        exit_price, reason = open_trade['stop'], 'STOP'
+                    elif lo <= open_trade['target']:
+                        exit_price, reason = open_trade['target'], 'TARGET'
+                max_hold_bars = max(1, round((open_trade['expected_hours'] / 4) * time_exit_multiplier))
+                if exit_price is None and held >= max_hold_bars:
+                    exit_price, reason = float(bar_next['close']), 'TIME_EXIT'
+
+                if exit_price is not None:
+                    risk = abs(open_trade['entry'] - open_trade['stop'])
+                    pnl = (exit_price - open_trade['entry']) if open_trade['side'] == 'LONG' else (open_trade['entry'] - exit_price)
+                    r_multiple = pnl / risk if risk > 0 else 0.0
+                    win = reason == 'TARGET'
+                    result['total_trades'] += 1
+                    result['total_r'] += r_multiple
+                    # Accumulate gross win/loss over ALL trades, not just the
+                    # capped sample kept for display — profit factor must reflect
+                    # the full backtest, not the first 40 trades.
+                    if r_multiple > 0: result['gross_r_win'] += r_multiple
+                    else: result['gross_r_loss'] += abs(r_multiple)
+                    if win:
+                        result['wins'] += 1
+                    elif reason == 'TIME_EXIT':
+                        result['time_exits'] += 1
+                        if r_multiple > 0: result['wins'] += 1
+                        else: result['losses'] += 1
+                    else:
+                        result['losses'] += 1
+                    if len(result['trades']) < 40:
+                        result['trades'].append({
+                            'side': open_trade['side'], 'entry': round(open_trade['entry'], 4),
+                            'exit': round(exit_price, 4), 'reason': reason,
+                            'r_multiple': round(r_multiple, 2), 'held_bars': held,
+                        })
+                    open_trade = None
+                continue
+
+            trade = score_4h_bar(df.iloc[:i + 1])
+            if trade.get('signal') in ('LONG', 'SHORT'):
+                open_trade = {
+                    'side': trade['signal'], 'entry': trade['entry'], 'stop': trade['stop_loss'],
+                    'target': trade['take_profit'], 'expected_hours': trade.get('expected_hours', 12),
+                    'open_idx': i,
+                }
+
+        wins, losses = result['wins'], result['losses']
+        closed = wins + losses
+        if closed > 0:
+            result['win_rate'] = round(wins / closed * 100, 1)
+            result['avg_r'] = round(result['total_r'] / closed, 3)
+            result['profit_factor'] = (round(result['gross_r_win'] / result['gross_r_loss'], 2)
+                                       if result['gross_r_loss'] > 0 else None)
+        result['total_r'] = round(result['total_r'], 2)
+        result['gross_r_win'] = round(result['gross_r_win'], 2)
+        result['gross_r_loss'] = round(result['gross_r_loss'], 2)
+        # Scrub numpy scalars to native Python floats. json.dump's default=str
+        # would otherwise silently turn these numbers into STRINGS in the saved
+        # file (since np.float64 isn't natively serializable), breaking every
+        # numeric comparison the dashboard JS does against them.
+        for t in result['trades']:
+            for k in ('entry', 'exit', 'r_multiple'):
+                if k in t:
+                    t[k] = float(t[k])
+        return result
+    except Exception as e:
+        result['error'] = str(e)
+        return result
 
 def process_asset(code, config, fng_df, macro_data, account_capital=10000, learned_adjustment=0.0):
     print(f"\n{'='*60}")
@@ -2996,7 +3490,9 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000, learn
     regime_shift = detect_regime_shift(df)
     strategy_info = REGIME_STRATEGY.get(current_regime, REGIME_STRATEGY['CHOPPY'])
     position_info = calculate_dynamic_position_size(df, len(df) - 1, account_capital=account_capital)
-    narrative = build_sub_signals_weighted(latest, config['name'])
+    _wf_saved = load_wf_weight_adjustments().get(code, {})
+    _wf_mult = _wf_saved.get('trend_momentum_multiplier', 1.0)
+    narrative = build_sub_signals_weighted(latest, config['name'], regime=latest.get('regime'), wf_multiplier=_wf_mult)
 
     # ─── ACCURACY: apply multi-timeframe confirmation to conviction ───
     # multi_timeframe_analysis returns a `strength` multiplier (STRONG 1.2 /
@@ -3041,6 +3537,7 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000, learn
     trade_plan = generate_trade_plan(code, narrative['signal'], narrative['conviction'], latest['close'], sr_levels, latest.get('atr_14', latest['close'] * 0.02), position_info, regime=narrative.get('regime') or latest.get('regime'))
     history = track_signal_performance(code, narrative['signal'], latest['close'], narrative['conviction'], trade_plan)
     wf_validation = walk_forward_validation(df)
+    save_wf_weight_adjustment(code, wf_validation)  # feeds NEXT cycle's weights for this asset
     returns = df['return'].dropna().tail(100).tolist()
     risk_metrics = calculate_risk_metrics(returns)
     exchange_flow = fetch_exchange_flow(code)
@@ -3272,24 +3769,46 @@ def quick_position_check():
 
         long = pos['side'] == 'LONG'
         sl, tp1, tp2 = pos.get('stop_loss'), pos.get('take_profit_1'), pos.get('take_profit_2')
+        slip = PAPER_CONFIG['slippage_pct']
 
         if sl and ((long and price <= sl) or (not long and price >= sl)):
-            pnl = _paper_close(acct, code, pos, price, pos['qty'], 'STOP_LOSS')
+            fill = sl * (1 - slip) if long else sl * (1 + slip)
+            pnl = _paper_close(acct, code, pos, fill, pos['qty'], 'STOP_LOSS')
             events.append(f"{code} stopped out between full runs ({pnl:+.2f})")
             del acct['positions'][code]
             continue
         if tp1 and not pos.get('tp1_hit') and ((long and price >= tp1) or (not long and price <= tp1)):
             qty = pos['qty'] * PAPER_CONFIG['tp1_close_fraction']
-            pnl = _paper_close(acct, code, pos, price, qty, 'TAKE_PROFIT_1_PARTIAL')
+            fill = tp1 * (1 - slip) if long else tp1 * (1 + slip)
+            pnl = _paper_close(acct, code, pos, fill, qty, 'TAKE_PROFIT_1_PARTIAL')
             pos['qty'] -= qty
             pos['tp1_hit'] = True
             pos['stop_loss'] = pos['avg_entry']
-            events.append(f"{code} TP1 hit between full runs — took 50% off ({pnl:+.2f})")
+            events.append(f"{code} TP1 hit between full runs — SUCCESSFUL, took 50% off ({pnl:+.2f})")
             if pos['qty'] <= 0:
                 del acct['positions'][code]
                 continue
+        # Trailing stop, same rule as the full-cycle account.
+        if pos.get('tp1_hit') and pos.get('risk_distance'):
+            trail_dist = pos['risk_distance'] * PAPER_CONFIG['trail_fraction']
+            new_stop = (price - trail_dist) if long else (price + trail_dist)
+            if (long and new_stop > pos['stop_loss']) or (not long and new_stop < pos['stop_loss']):
+                pos['stop_loss'] = new_stop
+        # Time exit, checked here too since this runs far more often than the
+        # full pipeline and is exactly what should catch a stale 4h trade fast.
+        opened = pos.get('opened')
+        if opened:
+            held_hours = (datetime.now() - datetime.fromisoformat(opened)).total_seconds() / 3600
+            expected_hours = pos.get('expected_hours') or (PAPER_CONFIG['default_swing_expected_days'] * 24)
+            if held_hours >= expected_hours * PAPER_CONFIG['time_exit_multiplier']:
+                fill = price * (1 - slip) if long else price * (1 + slip)
+                pnl = _paper_close(acct, code, pos, fill, pos['qty'], 'TIME_EXIT')
+                events.append(f"{code} time-exited between full runs after {held_hours:.0f}h ({pnl:+.2f})")
+                del acct['positions'][code]
+                continue
         if tp2 and ((long and price >= tp2) or (not long and price <= tp2)):
-            pnl = _paper_close(acct, code, pos, price, pos['qty'], 'TAKE_PROFIT_2')
+            fill = tp2 * (1 - slip) if long else tp2 * (1 + slip)
+            pnl = _paper_close(acct, code, pos, fill, pos['qty'], 'TAKE_PROFIT_2')
             events.append(f"{code} TP2 hit between full runs — closed ({pnl:+.2f})")
             del acct['positions'][code]
 
@@ -4816,6 +5335,26 @@ def run_v6_pipeline():
     # 11. Online Learning
     print("\n[V6.11] Running online learning...")
     learning_result = online_learning()
+
+    # Backtest the 4h intraday engine against real history. This runs every time
+    # (each 4h bar has closed, so the backtest reflects genuinely fresh data) but
+    # is capped to BTC + ETH to keep runtime reasonable — every asset uses the
+    # identical scoring logic (score_4h_bar), so BTC/ETH results are a fair,
+    # honest signal of how the strategy performs before it's trusted on any coin.
+    print("\n[V6.12] Backtesting 4h intraday engine (BTC, ETH — ~5-6 months)...")
+    backtest_results = {}
+    for _sym, _code in [('BTCUSDT', 'BTC'), ('ETHUSDT', 'ETH')]:
+        try:
+            bt = backtest_intraday_engine(_sym, bars=1000)
+            backtest_results[_code] = bt
+            if bt.get('total_trades'):
+                print(f"  {_code}: {bt['total_trades']} trades | win rate {bt['win_rate']}% | "
+                      f"profit factor {bt['profit_factor']} | avg R {bt['avg_r']}")
+            else:
+                print(f"  {_code}: no trades generated in backtest window ({bt.get('error', 'n/a')})")
+        except Exception as e:
+            print(f"  ⚠️ Backtest failed for {_code}: {e}")
+            backtest_results[_code] = {'error': str(e)}
     _acc = learning_result.get('accuracy')
     print(f"  Accuracy: {_acc:.1%}" if _acc is not None else f"  Accuracy: n/a ({learning_result.get('status','UNKNOWN')})")
     print(f"  Threshold Adjustment: {learning_result.get('threshold_adjustment', '0.00')}")
@@ -4845,7 +5384,8 @@ def run_v6_pipeline():
         'event_risk': event_risk,
         'ml_predictions': ml_predictions,
         'order_book_history_depth': len(ORDER_BOOK_HISTORY),
-        'btc_price': btc_price
+        'btc_price': btc_price,
+        'backtest_results': backtest_results
     }
 
 import sys as _sys
@@ -4880,7 +5420,8 @@ if __name__ == '__main__':
                 'onchain': results.get('onchain', {}),
                 'exit_strategy': results.get('exit_strategy', {}),
                 'ml_predictions': results.get('ml_predictions', {}),
-                'order_book_history_depth': results.get('order_book_history_depth', 0)
+                'order_book_history_depth': results.get('order_book_history_depth', 0),
+                'backtest_results': results.get('backtest_results', {})
             }
             # Scrub NaN/Infinity before writing — v6_results.json previously had no
             # such protection (only market_intelligence.json did), so one non-finite
