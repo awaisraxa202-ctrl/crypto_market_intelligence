@@ -458,6 +458,11 @@
     </div>
 
     <!-- ─── V6.0: MARKET NARRATIVE ─── -->
+    <div style="display:flex;justify-content:flex-end;padding:0 4px 8px;">
+      <button id="plain-toggle" style="background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.3);color:var(--accent);border-radius:20px;padding:7px 16px;font-family:var(--font-mono);font-size:0.62rem;cursor:pointer;">
+        🔰 Explain in plain English
+      </button>
+    </div>
     <div class="section-header">
       <h2><span class="num">📰</span>Market Narrative</h2>
       <span class="desc">Daily briefing · Trader's take</span>
@@ -511,9 +516,16 @@
       <div class="card reveal stagger-4"><div class="card-glow"></div><div class="card-label">Correlation</div><div class="card-value" id="correlation-status">—</div><div class="card-detail" id="correlation-detail">Loading...</div></div>
     </div>
 
+    <!-- ─── ASSET NODES ─── -->
+    <div class="section-header" id="assets">
+      <h2><span class="num">02</span>Asset Signal Nodes</h2>
+      <span class="desc">Expand for trade plan · risk metrics · price targets · Why This Trade?</span>
+    </div>
+    <div class="card-grid" id="asset-grid"></div>
+
     <!-- ─── MACRO REGIME ─── -->
     <div class="section-header">
-      <h2><span class="num">02</span>Macro Regime</h2>
+      <h2><span class="num">03</span>Macro Regime</h2>
       <span class="desc">Fed · DXY · Liquidity · VIX</span>
     </div>
     <div class="card-grid card-grid-4" id="macro-grid">
@@ -546,6 +558,8 @@
         <div class="card-value" id="pa-pf">—</div><div class="card-detail" id="pa-avg">—</div></div>
     </div>
     <div class="card-grid card-grid-2" style="margin-top:10px;">
+      <div class="card reveal" style="grid-column:1/-1;"><div class="card-glow"></div><div class="card-label">Accuracy by Trade Type</div>
+        <div id="pa-by-type" style="font-size:0.66rem;color:var(--text-secondary);margin-top:8px;">Loading...</div></div>
       <div class="card reveal"><div class="card-glow"></div><div class="card-label">Open Positions Detail</div>
         <div id="pa-positions" style="font-size:0.62rem;color:var(--text-secondary);margin-top:8px;">Loading...</div></div>
       <div class="card reveal"><div class="card-glow"></div><div class="card-label">Recent Activity</div>
@@ -591,13 +605,6 @@
         <div style="grid-column:1/-1;color:var(--text-secondary);font-size:0.7rem;">Loading calendar...</div>
       </div>
     </div>
-
-    <!-- ─── ASSET NODES ─── -->
-    <div class="section-header" id="assets">
-      <h2><span class="num">03</span>Asset Signal Nodes</h2>
-      <span class="desc">Expand for trade plan · risk metrics · price targets · Why This Trade?</span>
-    </div>
-    <div class="card-grid" id="asset-grid"></div>
 
     <!-- ─── PORTFOLIO SIMULATOR ─── -->
     <div class="section-header" id="portfolio">
@@ -1177,6 +1184,21 @@
         $('pa-avg').textContent = (pst.avg_win !== null && pst.avg_win !== undefined)
           ? `Avg win $${pst.avg_win} · avg loss $${pst.avg_loss}` : 'Awaiting closed trades';
       }
+      // Per-type breakdown — this is how you see the system's real accuracy on
+      // fast 4h trades vs slow daily swings, separately.
+      const bt = pst.by_type || {};
+      const typeEl = $('pa-by-type');
+      if (typeEl) {
+        const row = (label, t) => t ? `
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border-subtle);">
+            <span><b style="color:#fff;">${label}</b></span>
+            <span>open <b style="color:#fff;">${t.open ?? 0}</b> · closed <b style="color:#fff;">${t.closed ?? 0}</b> ·
+              ${t.win_rate !== null && t.win_rate !== undefined ? `<b style="color:${t.win_rate >= 50 ? 'var(--lime)' : 'var(--rose)'};">${t.win_rate}%</b> win` : '<span style="color:var(--text-muted);">no results yet</span>'}
+              ${t.net_pnl ? ` · <b style="color:${t.net_pnl >= 0 ? 'var(--lime)' : 'var(--rose)'};">${t.net_pnl >= 0 ? '+' : ''}$${t.net_pnl}</b>` : ''}</span>
+          </div>` : '';
+        typeEl.innerHTML = row('⚡ Intraday (4h)', bt.INTRADAY_4H) + row('📊 Swing (daily)', bt.SWING_DAILY)
+          || 'No trades yet.';
+      }
       const posEl = $('pa-positions');
       if (posEl) {
         const ps = pa.positions || {};
@@ -1184,7 +1206,7 @@
         posEl.innerHTML = keys.length ? keys.map(k => {
           const p = ps[k];
           return `<div style="padding:4px 0;border-bottom:1px solid var(--border-subtle);">
-            <b style="color:#fff;">${k}</b> ${p.side} · ${Number(p.qty).toFixed(6)} @ ${Number(p.avg_entry).toFixed(4)}
+            <b style="color:#fff;">${p.asset || k}</b> <span style="color:${p.trade_type === 'INTRADAY_4H' ? 'var(--accent)' : 'var(--text-muted)'};font-size:0.55rem;">${p.trade_type === 'INTRADAY_4H' ? '⚡4h' : '📊daily'}</span> ${p.side} · ${Number(p.qty).toFixed(6)} @ ${Number(p.avg_entry).toFixed(4)}
             ${p.tranches > 1 ? `<span style="color:var(--amber);"> · DCA x${p.tranches}</span>` : ''}
             ${p.tp1_hit ? '<span style="color:var(--lime);"> · TP1 taken, stop at breakeven</span>' : ''}
           </div>`;
@@ -1281,10 +1303,17 @@
       // Signal Performance
       const sp = d.signal_performance || {};
       $('signal-total').textContent = sp.total_signals || 0;
-      $('signal-winrate').textContent = sp.win_rate ? sp.win_rate.toFixed(1) + '%' : '—';
-      $('signal-winrate').style.color = sp.win_rate > 55 ? 'var(--lime)' : sp.win_rate > 40 ? 'var(--amber)' : 'var(--rose)';
-      $('signal-winrate-detail').textContent = sp.win_count + ' wins · ' + sp.loss_count + ' losses';
-      $('signal-profit').textContent = sp.total_profit_pct ? sp.total_profit_pct.toFixed(1) + '%' : '—';
+      // Show "awaiting data" rather than a red 0% when nothing has closed yet —
+      // a fresh system with no completed trades has no win rate, and painting it
+      // red made a brand-new system look like it had failed 30 times.
+      const hasClosed = (sp.closed_signals || 0) > 0;
+      $('signal-winrate').textContent = hasClosed ? (sp.win_rate || 0).toFixed(1) + '%' : 'AWAITING';
+      $('signal-winrate').style.color = !hasClosed ? 'var(--text-muted)'
+        : sp.win_rate > 55 ? 'var(--lime)' : sp.win_rate > 40 ? 'var(--amber)' : 'var(--rose)';
+      $('signal-winrate-detail').textContent = hasClosed
+        ? `${sp.win_count} wins · ${sp.loss_count} losses`
+        : `No trades closed yet${sp.excluded_pre_fix ? ` · ${sp.excluded_pre_fix} pre-fix signals excluded` : ''}`;
+      $('signal-profit').textContent = hasClosed && sp.total_profit_pct ? sp.total_profit_pct.toFixed(1) + '%' : '—';
       $('signal-profit').style.color = sp.total_profit_pct > 0 ? 'var(--lime)' : sp.total_profit_pct < 0 ? 'var(--rose)' : 'var(--text)';
       $('signal-profit-detail').textContent = 'Avg win: ' + (sp.avg_profit_pct || 0).toFixed(1) + '% · Avg loss: ' + (sp.avg_loss_pct || 0).toFixed(1) + '%';
       $('signal-active').textContent = sp.active_signals || 0;
@@ -1368,6 +1397,9 @@
         // ─── V6 Data: BIG/SMALL Trade Sizes ───
         const bigTrade = a.big_trade || {};
         const smallTrade = a.small_trade || {};
+        const it = a.intraday_trade || {};
+        const itLive = it.signal === 'LONG' || it.signal === 'SHORT';
+        const itColor = it.signal === 'LONG' ? 'var(--lime)' : it.signal === 'SHORT' ? 'var(--rose)' : 'var(--amber)';
         const sr = a.support_resistance || {};
         const whale = a.whale_activity || {};
         const mc = a.monte_carlo || {};
@@ -1452,7 +1484,7 @@
 
             ${tradePlan.entry_price ? `
               <div class="trade-plan-box">
-                <div style="font-family:var(--font-mono);font-size:0.35rem;color:var(--text-muted);margin-bottom:2px;">📊 TRADE PLAN</div>
+                <div style="font-family:var(--font-mono);font-size:0.35rem;color:var(--text-muted);margin-bottom:2px;">📊 SWING TRADE · DAILY TIMEFRAME · weeks to resolve</div>
                 <div class="row"><span class="label">Entry</span><span class="value accent">$${tradePlan.entry_price || 0}</span></div>
                 <div class="row"><span class="label">Stop</span><span class="value rose">$${tradePlan.stop_loss || 0}</span></div>
                 <div class="row"><span class="label">TP1</span><span class="value lime">$${tradePlan.take_profit_1 || 0}</span></div>
@@ -1471,6 +1503,24 @@
                 <button onclick="showTradeExplanation('${code}')">💡 Why This Trade?</button>
               </div>
             ` : ''}
+
+            <div class="trade-plan" style="border-color:${itLive ? itColor : 'var(--border-subtle)'};margin-top:8px;">
+              <div style="font-family:var(--font-mono);font-size:0.35rem;color:var(--text-muted);margin-bottom:2px;">⚡ INTRADAY TRADE · 4H TIMEFRAME · hours to a few days</div>
+              ${itLive ? `
+                <div class="row"><span class="label">Signal</span><span class="value" style="color:${itColor};font-weight:600;">${it.signal} · ${((it.conviction||0)*100).toFixed(0)}% conv</span></div>
+                <div class="row"><span class="label">Entry</span><span class="value accent">$${it.entry}</span></div>
+                <div class="row"><span class="label">Stop</span><span class="value rose">$${it.stop_loss}</span></div>
+                <div class="row"><span class="label">Target</span><span class="value lime">$${it.take_profit}</span></div>
+                <div class="row"><span class="label">Move</span><span class="value">${it.move_pct}% ($${Number(it.move_abs).toLocaleString()})</span></div>
+                <div class="row"><span class="label">R:R</span><span class="value">${it.risk_reward}</span></div>
+                <div class="row"><span class="label">Expected time</span><span class="value" style="color:var(--accent);">${it.expected_label || '—'}</span></div>
+                <div style="font-size:0.42rem;color:var(--text-muted);margin-top:2px;">Target at ${it.target_source}. ${it.reason || ''}</div>
+              ` : `
+                <div class="row"><span class="label">Signal</span><span class="value" style="color:var(--amber);">NO TRADE</span></div>
+                <div style="font-size:0.45rem;color:var(--text-secondary);margin-top:3px;">${it.reason || 'No 4h setup right now.'}</div>
+                ${it.levels && (it.levels.support || it.levels.resistance) ? `<div style="font-size:0.42rem;color:var(--text-muted);margin-top:2px;">4h levels — S: ${it.levels.support ?? '—'} · R: ${it.levels.resistance ?? '—'} · RSI ${it.levels.rsi_4h ?? '—'}</div>` : ''}
+              `}
+            </div>
           </div>
           <div class="asset-node-expand"><div class="asset-node-expand-inner">${renderDetail(a)}</div></div>
         `;
@@ -1764,6 +1814,90 @@
         });
     }
 
+
+    // ─── PLAIN ENGLISH MODE ───
+    // Translates the dashboard's jargon into everyday language for someone with
+    // no trading background. Reads the SAME live data — it never invents numbers.
+    const PLAIN = {
+      'NO TRADE': "Sit this one out — the signals don't agree strongly enough to justify risking money.",
+      'LONG': "The system leans toward the price going UP.",
+      'STRONG LONG': "The system leans strongly toward the price going UP.",
+      'SHORT': "The system leans toward the price going DOWN.",
+      'STRONG SHORT': "The system leans strongly toward the price going DOWN.",
+    };
+    function plainRegime(r) {
+      r = String(r || '').toUpperCase();
+      if (r.includes('STRONG_BULL')) return "prices have been climbing strongly";
+      if (r.includes('BULL')) return "prices have been drifting upward";
+      if (r.includes('STRONG_BEAR')) return "prices have been falling hard";
+      if (r.includes('BEAR')) return "prices have been drifting downward";
+      if (r.includes('CHOPPY')) return "prices are bouncing around with no clear direction";
+      if (r.includes('RANGE')) return "prices are stuck moving sideways in a band";
+      if (r.includes('VOLATILE')) return "prices are swinging wildly";
+      return "the market direction is unclear";
+    }
+    function buildPlainEnglish() {
+      const d = CMI.data || {};
+      const assets = d.assets || {};
+      const pa = (d.paper_account || {}).stats || {};
+      const sl = d.self_learning || {};
+      const tradeable = Object.entries(assets).filter(([,a]) => a.signal && a.signal !== 'NO TRADE');
+      const fng = (d.fear_greed || {});
+
+      let html = `<div style="font-size:0.82rem;line-height:1.85;color:var(--text-secondary);">`;
+      html += `<p><b style="color:#fff;">What this page is:</b> an automated research tool that studies 9 cryptocurrencies every 2 hours and says whether any of them look worth trading. It uses fake money only — it never buys or sells anything real.</p>`;
+
+      html += `<p><b style="color:#fff;">What it's saying right now:</b> `;
+      if (tradeable.length === 0) {
+        html += `It does not want to trade anything at the moment. All 9 coins were checked and none had a strong enough case. <b>That's normal</b> — a system that always has an opinion is a worse system. It's designed to wait.`;
+      } else {
+        html += `It sees ${tradeable.length} possible trade${tradeable.length>1?'s':''}: ` +
+          tradeable.map(([c,a]) => `<b style="color:var(--accent);">${c}</b> (${(PLAIN[a.signal]||a.signal).toLowerCase()})`).join(', ') + '.';
+      }
+      html += `</p>`;
+
+      const btc = assets.BTC;
+      if (btc) {
+        html += `<p><b style="color:#fff;">Bitcoin example:</b> Right now Bitcoin is $${Number(btc.price).toLocaleString()}, and ${plainRegime(btc.regime)}. The system's confidence is only <b>${((btc.conviction||0)*100).toFixed(0)}%</b>, which is well below the ${'60'}% it needs before suggesting a real position. So it says: ${PLAIN[btc.signal] || btc.signal}</p>`;
+      }
+
+      html += `<p><b style="color:#fff;">Why you see "gated" everywhere:</b> The system has two trade sizes — a BIG one (needs 60% confidence) and a SMALL one (needs 40%). Right now confidence is in single digits across the board, so <i>both</i> are switched off. "Gated" means the safety rule is doing its job, not that something is broken.</p>`;
+
+      html += `<p><b style="color:#fff;">The practice account:</b> It started with $10,000 of pretend money and currently holds <b>$${(pa.equity ?? 10000).toLocaleString()}</b>. It has completed <b>${pa.closed_trades ?? 0}</b> trades so far.</p>`;
+
+      html += `<p><b style="color:#fff;">Is it learning?</b> ${
+        (sl.status === 'WARMING_UP' || !sl.recent_accuracy)
+        ? `Not yet. It needs <b>${sl.predictions_needed || 11}</b> completed trades before it starts adjusting itself, and it has <b>${sl.sample_size ?? 0}</b>. Until then it honestly shows "warming up" instead of making up a number.`
+        : `Yes — over its last ${sl.sample_size} completed trades it was right <b>${(sl.recent_accuracy*100).toFixed(0)}%</b> of the time, and it has adjusted how picky it is accordingly.`
+      }</p>`;
+
+      html += `<p><b style="color:#fff;">Fear &amp; Greed (${fng.value ?? '—'}):</b> a mood score for the whole crypto market, 0 = everyone panicking, 100 = everyone euphoric. Currently <b>${fng.label || '—'}</b>. Extreme readings often come right before a reversal.</p>`;
+
+      html += `<p style="color:var(--text-muted);font-size:0.72rem;margin-top:14px;">⚠️ This is a research and learning tool, not financial advice. It has no proven track record yet. Never risk money you can't afford to lose.</p>`;
+      html += `</div>`;
+      return html;
+    }
+    (function initPlainToggle() {
+      const btn = document.getElementById('plain-toggle');
+      if (!btn) return;
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.plain-backdrop').forEach(e => e.remove());
+        const bd = document.createElement('div');
+        bd.className = 'plain-backdrop';
+        bd.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:999;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:40px 16px;';
+        bd.addEventListener('click', e => { if (e.target === bd) { bd.remove(); document.body.style.overflow=''; } });
+        const box = document.createElement('div');
+        box.style.cssText = 'background:#0e0e16;border:1px solid rgba(0,229,255,0.25);border-radius:12px;padding:26px;max-width:640px;width:100%;margin:auto;';
+        box.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <h3 style="font-family:var(--font-display);font-weight:300;color:#fff;margin:0;">🔰 In Plain English</h3>
+            <button class="pe-close" style="background:none;border:none;color:var(--text-muted);font-size:1.5rem;cursor:pointer;line-height:1;">✕</button>
+          </div>` + buildPlainEnglish();
+        bd.appendChild(box);
+        document.body.appendChild(bd);
+        document.body.style.overflow = 'hidden';
+        box.querySelector('.pe-close').addEventListener('click', () => { bd.remove(); document.body.style.overflow=''; });
+      });
+    })();
 
     // ─── CORRELATION ───
     function renderCorrelationMatrix(matrix) {
