@@ -199,7 +199,10 @@ def fetch_binance_klines_interval(symbol, interval='1h', limit=200):
         df['date'] = pd.to_datetime(df['open_time'], unit='ms')
         for col in ['open','high','low','close','volume']:
             df[col] = df[col].astype(float)
-        return df[['date','close']]
+        # Return full OHLCV — the intraday trade engine needs high/low for
+        # real support/resistance and ATR. Existing callers only read 'close',
+        # so the extra columns are harmless to them.
+        return df[['date','open','high','low','close','volume']]
     except Exception as e:
         print(f"  ⚠️ Binance {interval} {symbol}: {e}")
         return pd.DataFrame()
@@ -1662,14 +1665,49 @@ def track_signal_performance(asset, signal, price, conviction, trade_plan):
     save_signal_history(history)
     return history
 
+# Signals generated before this date came from code with two confirmed bugs:
+# a broken multi-timeframe RSI (bullish alignment was mathematically impossible)
+# and a win/loss asymmetry (wins only booked at TP2 while losses booked at the
+# stop, making losses ~4x easier). Their outcomes describe the old broken logic,
+# not the current system, so they are excluded from performance stats rather than
+# deleted — the raw records stay in signal_history.json for audit.
+LOGIC_FIX_DATE = '2026-09-06'
+
+
+def _is_valid_era(signal):
+    try:
+        return str(signal.get('entry_date', ''))[:10] >= LOGIC_FIX_DATE
+    except Exception:
+        return False
+
+
 def calculate_performance_metrics(signals):
-    if len(signals) < 5:
-        return {'win_rate': 0, 'total_signals': len(signals)}
+    """Real measured win rate from closed outcomes.
+
+    BUGFIX: this previously returned `0.45 + avg_conviction * 0.3` — a FORMULA,
+    not a measurement. It reported a plausible-looking "48.3% win rate" for assets
+    with zero actual wins, because it never looked at a single closed trade. It now
+    counts real CLOSED_WIN vs CLOSED_LOSS records, and returns None (displayed as
+    "no closed trades yet") rather than inventing a number when there is no
+    evidence. Only post-logic-fix signals count — see LOGIC_FIX_DATE.
+    """
     total = len(signals)
-    avg_conviction = sum(s.get('conviction', 0.5) for s in signals) / total if total > 0 else 0
-    estimated_win_rate = 0.45 + avg_conviction * 0.3
+    valid = [s for s in signals if _is_valid_era(s)]
+    closed = [s for s in valid if str(s.get('status', '')).startswith('CLOSED')]
+    wins = [s for s in closed if s.get('status') == 'CLOSED_WIN']
+    losses = [s for s in closed if s.get('status') == 'CLOSED_LOSS']
+    avg_conviction = (sum(s.get('conviction', 0.5) for s in signals) / total) if total else 0
+
+    measured_win_rate = round(len(wins) / len(closed) * 100, 1) if closed else None
+
     return {
-        'win_rate': round(estimated_win_rate * 100, 1),
+        'win_rate': measured_win_rate,
+        'win_rate_basis': f"{len(wins)}W/{len(losses)}L from {len(closed)} closed trades"
+                          if closed else "No closed trades yet (post-fix)",
+        'closed_trades': len(closed),
+        'wins': len(wins),
+        'losses': len(losses),
+        'excluded_pre_fix': total - len(valid),
         'total_signals': total,
         'avg_conviction': round(avg_conviction, 2),
         'signal_distribution': {
@@ -1707,6 +1745,8 @@ def add_signal_to_database(asset, signal, price, conviction, trade_plan):
     entry = {
         'id': signal_id,
         'asset': asset,
+        'base_asset': str(asset).split('@')[0],
+        'timeframe': trade_plan.get('timeframe', '1d'),
         'signal': signal,
         'entry_price': price,
         'conviction': conviction,
@@ -1729,7 +1769,11 @@ def add_signal_to_database(asset, signal, price, conviction, trade_plan):
 
 def update_signal_status(db, asset, current_price):
     for signal in db['signals']:
-        if signal['asset'] == asset and signal['status'] == 'ACTIVE':
+        # Match on the underlying asset so "BTC@4h" intraday records get checked
+        # against BTC's price too — otherwise 4h trades would never resolve and
+        # the learning engine would only ever see the slow swing trades.
+        _base = signal.get('base_asset') or str(signal.get('asset', '')).split('@')[0]
+        if _base == asset and signal['status'] == 'ACTIVE':
             entry = signal['entry_price']
             sl = signal['stop_loss']
             tp1 = signal['take_profit_1']
@@ -1747,11 +1791,19 @@ def update_signal_status(db, asset, current_price):
                         signal['asset'], entry, current_price, signal['signal'],
                         datetime.fromisoformat(signal['entry_date']), datetime.now()
                     )
-                elif tp2 and current_price >= tp2:
+                elif tp1 and current_price >= tp1:
+                    # BUGFIX: a win was previously only recorded at TP2. The
+                    # dashboard's R:R (2.00) is computed from TP1, but the win
+                    # condition used TP2 — so a loss needed a ~6% move while a win
+                    # needed ~24%, making losses ~4x easier to trigger. That
+                    # asymmetry is what produced "0 wins / 30 losses". A win is now
+                    # booked at TP1, matching the advertised risk/reward.
                     signal['status'] = 'CLOSED_WIN'
                     signal['exit_price'] = current_price
                     signal['exit_date'] = datetime.now().isoformat()
                     signal['profit_pct'] = ((current_price - entry) / entry) * 100
+                    signal['hit_tp2'] = bool(tp2 and current_price >= tp2)
+                    signal['exit_target'] = 'TP2' if signal['hit_tp2'] else 'TP1'
                     signal['holding_days'] = (datetime.now() - datetime.fromisoformat(signal['entry_date'])).days
                     track_prediction_accuracy(signal['asset'], signal['signal'], True)
             elif signal['signal'] in ['STRONG SHORT', 'SHORT']:
@@ -1766,11 +1818,14 @@ def update_signal_status(db, asset, current_price):
                         signal['asset'], entry, current_price, signal['signal'],
                         datetime.fromisoformat(signal['entry_date']), datetime.now()
                     )
-                elif tp2 and current_price <= tp2:
+                elif tp1 and current_price <= tp1:
+                    # Same TP1-vs-TP2 asymmetry fix as the LONG branch above.
                     signal['status'] = 'CLOSED_WIN'
                     signal['exit_price'] = current_price
                     signal['exit_date'] = datetime.now().isoformat()
                     signal['profit_pct'] = ((entry - current_price) / entry) * 100
+                    signal['hit_tp2'] = bool(tp2 and current_price <= tp2)
+                    signal['exit_target'] = 'TP2' if signal['hit_tp2'] else 'TP1'
                     signal['holding_days'] = (datetime.now() - datetime.fromisoformat(signal['entry_date'])).days
                     track_prediction_accuracy(signal['asset'], signal['signal'], True)
     
@@ -1779,7 +1834,13 @@ def update_signal_status(db, asset, current_price):
     return db
 
 def update_signal_performance(db):
-    signals = db['signals']
+    # Only count signals generated AFTER the logic fixes. The pre-fix records
+    # (the "0 wins / 30 losses" seen on the dashboard) were produced by code where
+    # a win required a ~24% move while a loss required only ~6% — that record
+    # measures the old bug, not the system's actual skill. Raw signals are kept
+    # in the file for audit; they're just excluded from the headline stats.
+    all_signals = db['signals']
+    signals = [s for s in all_signals if _is_valid_era(s)]
     closed = [s for s in signals if s['status'] in ['CLOSED_WIN', 'CLOSED_LOSS']]
     active = [s for s in signals if s['status'] == 'ACTIVE']
     
@@ -1791,6 +1852,7 @@ def update_signal_performance(db):
         
         db['performance'] = {
             'total_signals': len(signals),
+            'excluded_pre_fix': len(all_signals) - len(signals),
             'active_signals': len(active),
             'closed_signals': len(closed),
             'win_count': len(wins),
@@ -1808,6 +1870,7 @@ def update_signal_performance(db):
             'total_signals': len(signals),
             'active_signals': len(active),
             'closed_signals': 0,
+            'excluded_pre_fix': len(all_signals) - len(signals),
             'win_count': 0,
             'loss_count': 0,
             'win_rate': 0,
@@ -1880,7 +1943,8 @@ def backtest_simple(df, position_col, fee=FEE):
 PAPER_CONFIG = {
     'starting_capital': 10000.0,
     'fee_pct': 0.002,              # matches FEE used in backtests
-    'max_open_positions': 5,
+    'max_open_positions': 5,           # swing slots
+    'max_intraday_positions': 5,       # separate 4h slots
     'max_correlated_exposure': 0.40,   # cap total capital in one correlated bloc
     'tp1_close_fraction': 0.5,     # take half off at TP1
     'dca_max_tranches': 3,         # initial entry + up to 2 add-ons
@@ -1938,7 +2002,8 @@ def _paper_close(acct, code, pos, price, qty, reason):
     acct['cash'] += proceeds if pos['side'] == 'LONG' else (qty * pos['avg_entry']) + pnl - (qty * price * fee)
     cost_basis = qty * pos['avg_entry']
     acct['closed_trades'].append({
-        'asset': code,
+        'asset': pos.get('asset', str(code).split('@')[0]),
+        'trade_type': pos.get('trade_type', 'SWING_DAILY'),
         'side': pos['side'],
         'reason': reason,
         'entry_price': round(pos['avg_entry'], 6),
@@ -1976,7 +2041,8 @@ def run_paper_account(all_signals, correlation_matrix=None):
     # ---------- 1 & 2: manage existing positions ----------
     for code in list(acct['positions'].keys()):
         pos = acct['positions'][code]
-        sig = all_signals.get(code)
+        base = pos.get('asset', code.split('@')[0])
+        sig = all_signals.get(base)
         if not sig:
             continue
         price = sig.get('price')
@@ -2019,7 +2085,8 @@ def run_paper_account(all_signals, correlation_matrix=None):
                    else ((price - pos['avg_entry']) / pos['avg_entry'])
         still_valid = (sig.get('signal') in (['STRONG LONG', 'LONG'] if long else ['STRONG SHORT', 'SHORT'])
                        and sig.get('conviction', 0) >= PAPER_CONFIG['dca_min_conviction'])
-        if (drawdown >= PAPER_CONFIG['dca_trigger_drawdown']
+        if (pos.get('trade_type') != 'INTRADAY_4H'
+                and drawdown >= PAPER_CONFIG['dca_trigger_drawdown']
                 and pos.get('tranches', 1) < PAPER_CONFIG['dca_max_tranches']
                 and not pos.get('tp1_hit')
                 and still_valid):
@@ -2040,14 +2107,65 @@ def run_paper_account(all_signals, correlation_matrix=None):
 
     # ---------- 4: new entries ----------
     equity_now = acct['cash'] + sum(
-        p['qty'] * (all_signals.get(c, {}).get('price') or p['avg_entry'])
+        p['qty'] * (all_signals.get(p.get('asset', c.split('@')[0]), {}).get('price') or p['avg_entry'])
         for c, p in acct['positions'].items())
 
+    # SWING candidates (daily timeframe) keyed by asset code
     ranked = sorted(
         [(c, s) for c, s in all_signals.items()
          if c not in acct['positions']
          and s.get('signal') in ('STRONG LONG', 'LONG', 'STRONG SHORT', 'SHORT')],
         key=lambda kv: kv[1].get('conviction', 0), reverse=True)
+
+    # INTRADAY candidates (4h timeframe) keyed "CODE@4h" — a separate position
+    # slot per asset so a swing and an intraday trade can coexist on the same coin.
+    intraday_ranked = []
+    for c, s_ in all_signals.items():
+        it = s_.get('intraday_trade') or {}
+        key = f"{c}@4h"
+        if key in acct['positions']:
+            continue
+        if it.get('signal') in ('LONG', 'SHORT') and it.get('entry') and it.get('stop_loss') and it.get('take_profit'):
+            intraday_ranked.append((key, c, it))
+    intraday_ranked.sort(key=lambda t: t[2].get('conviction', 0), reverse=True)
+
+    for key, code, it in intraday_ranked:
+        if sum(1 for k in acct['positions'] if k.endswith('@4h')) >= PAPER_CONFIG.get('max_intraday_positions', 5):
+            break
+        price = float(it['entry'])
+        if not _is_finite_positive(price) or not _is_finite_positive(it['stop_loss']):
+            continue
+        risk_distance = abs(price - float(it['stop_loss']))
+        if risk_distance <= 0:
+            continue
+        # Smaller risk per intraday trade — these are numerous and fast.
+        risk_amount = equity_now * min(0.01, max(0.0025, it.get('conviction', 0.3) * 0.015))
+        qty = risk_amount / risk_distance
+        notional = qty * price
+        if notional > acct['cash'] * 0.15:
+            notional = acct['cash'] * 0.15
+            qty = notional / price
+        if notional <= 0 or acct['cash'] < notional * (1 + fee):
+            continue
+        acct['cash'] -= notional * (1 + fee)
+        acct['positions'][key] = {
+            'asset': code,
+            'trade_type': 'INTRADAY_4H',
+            'side': it['signal'],
+            'qty': qty,
+            'avg_entry': price,
+            'opened': datetime.now().isoformat(),
+            'tranches': 1,
+            'last_tranche_notional': notional,
+            'stop_loss': float(it['stop_loss']),
+            'take_profit_1': float(it['take_profit']),   # single target: full exit at TP
+            'take_profit_2': float(it['take_profit']),
+            'risk_distance': risk_distance,
+            'entry_conviction': it.get('conviction'),
+            'expected_hours': it.get('expected_hours'),
+            'tp1_hit': True,   # no partial-exit stage for intraday; TP closes fully
+        }
+        events.append(f"{code} ⚡4h OPENED {it['signal']} {qty:.6f} @ {price:.4f} → {it['take_profit']} ({it.get('expected_label','')})")
 
     for code, sig in ranked:
         if len(acct['positions']) >= PAPER_CONFIG['max_open_positions']:
@@ -2066,10 +2184,11 @@ def run_paper_account(all_signals, correlation_matrix=None):
         if correlation_matrix:
             correlated_notional = 0.0
             for held in acct['positions']:
-                rho = (correlation_matrix.get(code, {}) or {}).get(held)
+                hp = acct['positions'][held]
+                held_asset = hp.get('asset', held.split('@')[0])
+                rho = (correlation_matrix.get(code, {}) or {}).get(held_asset)
                 if rho is not None and abs(rho) >= 0.7:
-                    hp = acct['positions'][held]
-                    correlated_notional += hp['qty'] * (all_signals.get(held, {}).get('price') or hp['avg_entry'])
+                    correlated_notional += hp['qty'] * (all_signals.get(held_asset, {}).get('price') or hp['avg_entry'])
             if equity_now and (correlated_notional / equity_now) >= PAPER_CONFIG['max_correlated_exposure']:
                 events.append(f"{code} skipped — correlated exposure cap")
                 continue
@@ -2089,6 +2208,8 @@ def run_paper_account(all_signals, correlation_matrix=None):
 
         acct['cash'] -= notional * (1 + fee)
         acct['positions'][code] = {
+            'asset': code,
+            'trade_type': 'SWING_DAILY',
             'side': 'LONG' if sig['signal'] in ('STRONG LONG', 'LONG') else 'SHORT',
             'qty': qty,
             'avg_entry': price,
@@ -2106,7 +2227,7 @@ def run_paper_account(all_signals, correlation_matrix=None):
 
     # ---------- snapshot ----------
     equity = acct['cash'] + sum(
-        p['qty'] * (all_signals.get(c, {}).get('price') or p['avg_entry'])
+        p['qty'] * (all_signals.get(p.get('asset', c.split('@')[0]), {}).get('price') or p['avg_entry'])
         for c, p in acct['positions'].items())
     acct['equity_curve'].append({'ts': datetime.now().isoformat(), 'equity': round(equity, 2)})
     acct['equity_curve'] = acct['equity_curve'][-500:]
@@ -2116,7 +2237,20 @@ def run_paper_account(all_signals, correlation_matrix=None):
     losses = [t for t in closed if t['pnl'] <= 0]
     gross_win = sum(t['pnl'] for t in wins)
     gross_loss = abs(sum(t['pnl'] for t in losses))
+    def _type_stats(ttype):
+        cl = [t for t in closed if t.get('trade_type', 'SWING_DAILY') == ttype]
+        w = [t for t in cl if t['pnl'] > 0]; l = [t for t in cl if t['pnl'] <= 0]
+        gw = sum(t['pnl'] for t in w); gl = abs(sum(t['pnl'] for t in l))
+        return {
+            'closed': len(cl), 'wins': len(w), 'losses': len(l),
+            'win_rate': round(len(w) / len(cl) * 100, 1) if cl else None,
+            'profit_factor': round(gw / gl, 2) if gl else None,
+            'net_pnl': round(gw - gl, 2),
+            'open': sum(1 for p in acct['positions'].values() if p.get('trade_type', 'SWING_DAILY') == ttype),
+            'avg_holding_days': round(sum(t.get('holding_days', 0) for t in cl) / len(cl), 1) if cl else None,
+        }
     acct['stats'] = {
+        'by_type': {'SWING_DAILY': _type_stats('SWING_DAILY'), 'INTRADAY_4H': _type_stats('INTRADAY_4H')},
         'equity': round(equity, 2),
         'cash': round(acct['cash'], 2),
         'open_positions': len(acct['positions']),
@@ -2679,6 +2813,155 @@ def fetch_network_activity(symbol='BTC'):
 
 # ===================== 85-86. MAIN PIPELINE =====================
 
+# ===================== INTRADAY (4H) TRADE ENGINE =====================
+# The SWING trade uses daily candles with ATR-multiple targets that can sit
+# 10-25% away — those take weeks to resolve, so the learning engine gets almost
+# no outcomes. This is a genuinely different trade: built on 4-hour candles,
+# with targets at the NEAREST 4h support/resistance (typically 1-3% away — on
+# BTC that's roughly $1-2k), so trades resolve in hours-to-days and the system
+# accumulates real win/loss data quickly. Separate timeframe, separate levels,
+# separate conviction, separate stats.
+
+INTRADAY_CONFIG = {
+    'interval': '4h',
+    'bars': 200,                 # ~33 days of 4h candles
+    'sr_window': 5,              # swing-point lookback on 4h
+    'atr_period': 14,
+    'min_target_pct': 0.006,     # don't chase a target closer than 0.6%
+    'max_target_pct': 0.045,     # cap at 4.5% — beyond that it's a swing trade
+    'stop_atr_mult': 1.0,
+    'min_rr': 1.2,
+    'min_conviction': 0.35,      # lower bar than swing: these are small, fast, and the point is data
+}
+
+
+def _atr(df, period=14):
+    hl = df['high'] - df['low']
+    hc = (df['high'] - df['close'].shift()).abs()
+    lc = (df['low'] - df['close'].shift()).abs()
+    tr = pd.concat([hl, hc, lc], axis=1).max(axis=1)
+    return tr.ewm(alpha=1/period, adjust=False).mean()
+
+
+def _rsi(close, period=14):
+    delta = close.diff()
+    gain = delta.clip(lower=0).ewm(alpha=1/period, adjust=False).mean()
+    loss = (-delta.clip(upper=0)).ewm(alpha=1/period, adjust=False).mean()
+    rs = gain / loss.replace(0, np.nan)
+    return (100 - (100 / (1 + rs))).fillna(50)
+
+
+def generate_intraday_trade(code, symbol):
+    """4h-timeframe trade with targets at real nearby support/resistance."""
+    cfg = INTRADAY_CONFIG
+    out = {
+        'timeframe': cfg['interval'], 'signal': 'NO TRADE', 'conviction': 0.0,
+        'entry': None, 'stop_loss': None, 'take_profit': None,
+        'target_source': None, 'expected_hours': None, 'risk_reward': None,
+        'reason': 'insufficient data', 'levels': {},
+    }
+    try:
+        df = fetch_binance_klines_interval(symbol, interval=cfg['interval'], limit=cfg['bars'])
+        if df is None or df.empty or len(df) < 60 or 'high' not in df.columns:
+            return out
+
+        close = df['close']
+        price = float(close.iloc[-1])
+        df = df.copy()
+        df['ema20'] = close.ewm(span=20, adjust=False).mean()
+        df['ema50'] = close.ewm(span=50, adjust=False).mean()
+        df['rsi'] = _rsi(close)
+        df['atr'] = _atr(df, cfg['atr_period'])
+        vol_ma = df['volume'].rolling(20).mean()
+        latest = df.iloc[-1]
+        atr = float(latest['atr'])
+        if not (math.isfinite(atr) and atr > 0):
+            return out
+
+        # ── direction from 4h structure ──
+        trend_up = latest['ema20'] > latest['ema50'] and price > latest['ema20']
+        trend_dn = latest['ema20'] < latest['ema50'] and price < latest['ema20']
+        rsi = float(latest['rsi'])
+        vol_ok = bool(latest['volume'] >= 0.7 * float(vol_ma.iloc[-1])) if pd.notna(vol_ma.iloc[-1]) else True
+        ema_slope = float(df['ema20'].iloc[-1] - df['ema20'].iloc[-4])
+
+        score = 0.0
+        if trend_up: score += 0.40
+        if trend_dn: score -= 0.40
+        if 45 <= rsi <= 68: score += 0.20 if trend_up else 0.0
+        if 32 <= rsi <= 55: score -= 0.20 if trend_dn else 0.0
+        if rsi > 75: score -= 0.25      # overbought — fade longs
+        if rsi < 25: score += 0.25      # oversold — fade shorts
+        score += 0.15 if ema_slope > 0 else -0.15
+        if not vol_ok: score *= 0.6
+
+        # ── real 4h support / resistance ──
+        sr = find_support_resistance(df, window=cfg['sr_window'])
+        res = sr.get('nearest_resistance')
+        sup = sr.get('nearest_support')
+        out['levels'] = {'support': sup, 'resistance': res, 'atr_4h': round(atr, 6), 'rsi_4h': round(rsi, 1)}
+
+        direction = 'LONG' if score >= 0.35 else 'SHORT' if score <= -0.35 else None
+        if direction is None:
+            out['reason'] = f"4h signals not aligned (score {score:+.2f})"
+            out['conviction'] = round(abs(score), 2)
+            return out
+
+        # ── target = nearest level in trade direction, bounded to intraday scale ──
+        if direction == 'LONG':
+            tgt = res if (res and price < res) else None
+            stop = (sup if (sup and sup < price) else price - atr * cfg['stop_atr_mult'])
+            stop = max(stop, price - atr * 1.5)            # never wider than 1.5 ATR
+            if tgt is None or (tgt - price) / price > cfg['max_target_pct']:
+                tgt = price + atr * 1.5; src = 'ATR x1.5 (no near resistance)'
+            else:
+                src = 'nearest 4h resistance'
+            if (tgt - price) / price < cfg['min_target_pct']:
+                tgt = price * (1 + cfg['min_target_pct']); src += ' (min-dist floor)'
+            rr = (tgt - price) / max(price - stop, 1e-9)
+        else:
+            tgt = sup if (sup and price > sup) else None
+            stop = (res if (res and res > price) else price + atr * cfg['stop_atr_mult'])
+            stop = min(stop, price + atr * 1.5)
+            if tgt is None or (price - tgt) / price > cfg['max_target_pct']:
+                tgt = price - atr * 1.5; src = 'ATR x1.5 (no near support)'
+            else:
+                src = 'nearest 4h support'
+            if (price - tgt) / price < cfg['min_target_pct']:
+                tgt = price * (1 - cfg['min_target_pct']); src += ' (min-dist floor)'
+            rr = (price - tgt) / max(stop - price, 1e-9)
+
+        conviction = round(min(1.0, abs(score)), 2)
+        if rr < cfg['min_rr']:
+            out.update({'signal': 'NO TRADE', 'conviction': conviction,
+                        'reason': f"R:R {rr:.2f} below {cfg['min_rr']} minimum"})
+            out['levels']['proposed'] = {'entry': price, 'stop': round(stop, 6), 'target': round(tgt, 6)}
+            return out
+        if conviction < cfg['min_conviction']:
+            out.update({'signal': 'NO TRADE', 'conviction': conviction,
+                        'reason': f"conviction {conviction:.2f} below {cfg['min_conviction']}"})
+            return out
+
+        dist = abs(tgt - price)
+        bars = max(1, dist / (atr * 0.6))
+        hours = int(round(bars * 4))
+
+        out.update({
+            'signal': direction, 'conviction': conviction,
+            'entry': round(price, 6), 'stop_loss': round(stop, 6), 'take_profit': round(tgt, 6),
+            'target_source': src, 'risk_reward': round(rr, 2),
+            'move_pct': round(dist / price * 100, 2),
+            'move_abs': round(dist, 4),
+            'expected_hours': hours,
+            'expected_label': f"~{hours}h" if hours < 48 else f"~{hours/24:.1f}d",
+            'reason': f"4h {direction}: EMA20 {'>' if trend_up else '<'} EMA50, RSI {rsi:.0f}, target at {src}",
+        })
+        return out
+    except Exception as e:
+        out['reason'] = f"intraday engine error: {e}"
+        return out
+
+
 def process_asset(code, config, fng_df, macro_data, account_capital=10000, learned_adjustment=0.0):
     print(f"\n{'='*60}")
     print(f"Processing {config['name']} ({code})")
@@ -2763,6 +3046,16 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000, learn
     exchange_flow = fetch_exchange_flow(code)
     network_activity = fetch_network_activity(code)
 
+    # ─── 4h intraday trade (fast-resolving, feeds the learning engine) ───
+    try:
+        _intraday = generate_intraday_trade(code, config['binance'])
+        if _intraday.get('signal') != 'NO TRADE':
+            print(f"  ⚡ 4h {_intraday['signal']} {code}: entry {_intraday['entry']} → {_intraday['take_profit']} "
+                  f"({_intraday['move_pct']}%, {_intraday['expected_label']}, R:R {_intraday['risk_reward']})")
+    except Exception as _e:
+        print(f"  ⚠️ Intraday engine failed for {code}: {_e}")
+        _intraday = {'timeframe': '4h', 'signal': 'NO TRADE', 'conviction': 0, 'reason': str(_e)}
+
     # ─── Previously-dead V5 analytics, now actually computed ───
     try:
         # validate_strategies builds its position columns on its OWN copy, so pass a
@@ -2830,6 +3123,16 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000, learn
     # Add signal to database
     if narrative['signal'] in ['STRONG LONG', 'LONG', 'STRONG SHORT', 'SHORT']:
         add_signal_to_database(code, narrative['signal'], latest['close'], narrative['conviction'], trade_plan)
+    try:
+        if _intraday.get('signal') in ('LONG', 'SHORT') and _intraday.get('take_profit'):
+            add_signal_to_database(
+                f"{code}@4h", _intraday['signal'], _intraday['entry'], _intraday['conviction'],
+                {'stop_loss': _intraday['stop_loss'],
+                 'take_profit_1': _intraday['take_profit'],
+                 'take_profit_2': _intraday['take_profit'],
+                 'timeframe': '4h'})
+    except Exception as _e:
+        print(f"  ⚠️ could not record 4h signal for {code}: {_e}")
     
     # Update signal status for existing signals
     signal_db = load_signal_database()
@@ -2901,6 +3204,8 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000, learn
         ),
         # ─── RECOMMENDED SIZE via select_trade_size (previously never called) ───
         'recommended_trade_size': select_trade_size(latest['close'], narrative['conviction']),
+        # ─── INTRADAY (4h) TRADE — separate timeframe, separate levels, separate stats ───
+        'intraday_trade': _intraday,
         # ─── PER-ASSET BIG/SMALL TRADE SIZING ───
         # Only show a live position size when there's an actual tradeable signal
         # and conviction clears the bar. The bar itself shifts slightly based on
@@ -2952,7 +3257,8 @@ def quick_position_check():
 
     events = []
     for code, pos in list(acct['positions'].items()):
-        cfg = ASSETS.get(code)
+        base = pos.get('asset', str(code).split('@')[0])
+        cfg = ASSETS.get(base)
         if not cfg:
             continue
         try:
