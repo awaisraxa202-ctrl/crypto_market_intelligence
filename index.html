@@ -831,12 +831,34 @@
     // ──────────────────────────────────────────────────────────────
     // REVEAL
     // ──────────────────────────────────────────────────────────────
+    // Cards start at opacity:0 (.reveal) and only become visible when this
+    // observer adds .visible. BUG FIXED: this was only ever called from the
+    // first-visit disclaimer click. Returning visitors (localStorage already
+    // set) went through the auto-load path which called loadData() but never
+    // initReveal(), so every card loaded its data and then stayed invisible —
+    // headers showed, cards were blank space. Now: single shared observer,
+    // safe to call repeatedly, and re-run after dynamic render so cards added
+    // by renderDashboard/loadV6Data are observed too. Fallback reveals
+    // everything if IntersectionObserver is unavailable or throws.
+    let _revealObs = null;
     function initReveal() {
-      const obs = new IntersectionObserver(entries => {
-        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-      }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
-      document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+      try {
+        if (!_revealObs) {
+          _revealObs = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+          }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+        }
+        document.querySelectorAll('.reveal:not(.visible)').forEach(el => _revealObs.observe(el));
+      } catch (err) {
+        console.warn('IntersectionObserver unavailable — revealing all cards directly', err);
+        document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+      }
     }
+    // Safety net: if for any reason a card is still hidden a few seconds after
+    // load (observer never fired, element off-screen at init, etc.), show it.
+    setTimeout(() => {
+      document.querySelectorAll('.reveal:not(.visible)').forEach(el => el.classList.add('visible'));
+    }, 4000);
 
     // ──────────────────────────────────────────────────────────────
     // HUD CLOCK
@@ -1095,6 +1117,8 @@
         console.log('✅ Real data loaded successfully!');
         renderDashboard();
         loadV6Data();
+        // Re-observe: renderDashboard adds new .reveal elements dynamically
+        setTimeout(initReveal, 50);
       } catch (e) {
         console.error('❌ Failed to load data:', e);
         document.getElementById('dashboard-app').innerHTML = `
@@ -1436,6 +1460,14 @@
                 <div class="row"><span class="label">Risk</span><span class="value">$${tradePlan.risk_amount || 0} (${tradePlan.risk_percent || 0}%)</span></div>
                 <div class="row"><span class="label">R:R</span><span class="value">${tradePlan.risk_reward_ratio ? tradePlan.risk_reward_ratio.toFixed(2) : '—'}</span></div>
                 <div class="row"><span class="label">MTF</span><span class="value" style="color:${mtf.alignment === 'STRONG' ? 'var(--lime)' : mtf.alignment === 'CONFLICT' ? 'var(--amber)' : 'var(--text)'};">${mtf.alignment || 'UNKNOWN'}</span></div>
+                <div class="row"><span class="label">Expected time</span><span class="value" style="color:var(--accent);">${tradePlan.expected_days_to_tp1 ? `~${tradePlan.expected_days_to_tp1}d → TP1 · ~${tradePlan.expected_days_to_tp2}d → TP2` : '—'}</span></div>
+                <div class="row"><span class="label">Horizon</span><span class="value">${tradePlan.time_horizon || '—'}</span></div>
+                ${tradePlan.time_note ? `<div style="font-size:0.42rem;color:var(--text-muted);margin-top:2px;">${tradePlan.time_note}</div>` : ''}
+                <div style="margin-top:6px;padding:6px;background:rgba(255,255,255,0.02);border-radius:5px;font-size:0.5rem;">
+                  <div style="color:var(--text-muted);font-size:0.4rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Two-tier sizing</div>
+                  <div style="display:flex;justify-content:space-between;"><span>BIG (60%+ conv, ~4% move)</span><span style="color:${bigTrade.position_size ? 'var(--lime)' : 'var(--text-muted)'};">${bigTrade.position_size ? bigTrade.position_size.toFixed(4) + ' units · ' + bigTrade.risk_pct + '% risk' : 'gated — conviction ' + ((a.conviction||0)*100).toFixed(0) + '% < 60%'}</span></div>
+                  <div style="display:flex;justify-content:space-between;"><span>SMALL (40%+ conv, ~1% move)</span><span style="color:${smallTrade.position_size ? 'var(--lime)' : 'var(--text-muted)'};">${smallTrade.position_size ? smallTrade.position_size.toFixed(4) + ' units · ' + smallTrade.risk_pct + '% risk' : 'gated — conviction ' + ((a.conviction||0)*100).toFixed(0) + '% < 40%'}</span></div>
+                </div>
                 <button onclick="showTradeExplanation('${code}')">💡 Why This Trade?</button>
               </div>
             ` : ''}
@@ -1837,6 +1869,7 @@
     runBoot();
 
     if (document.getElementById('system-overlay').classList.contains('dismissed')) {
+      setTimeout(initReveal, 400);
       setTimeout(loadData, 400);
     }
   </script>
