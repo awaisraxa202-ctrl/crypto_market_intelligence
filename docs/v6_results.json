@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-09-06T21:52:52.471059",
-  "imbalance": 0.517,
+  "timestamp": "2026-09-06T23:06:31.399707",
+  "imbalance": 0.626,
   "regime": {
     "regime": "LOW_UNCERTAINTY",
     "description": "Low trade policy uncertainty \u2014 fundamentals-driven market",
@@ -15,31 +15,31 @@
   },
   "ml_signal": {
     "bilstm_score": 0.5,
-    "cnn_score": 0.5,
-    "ensemble_score": 0.5,
+    "cnn_score": 0.639,
+    "ensemble_score": 0.57,
     "action": "HOLD",
-    "confidence": 0.5,
+    "confidence": 0.57,
     "trade_qualified": false
   },
   "big_trade": {
-    "position_size": 0.1094,
-    "risk_pct": 3.5,
-    "target_movement": 3199.3752000000004,
+    "position_size": 0.1115,
+    "risk_pct": 3.57,
+    "target_movement": 3202.1672,
     "trade_type": "BIG"
   },
   "small_trade": {
-    "position_size": 0.0938,
-    "risk_pct": 0.75,
-    "target_movement": 799.8438000000001,
+    "position_size": 0.0981,
+    "risk_pct": 0.78,
+    "target_movement": 800.5418,
     "trade_type": "SMALL"
   },
   "explanation": {
     "asset": "BTC",
     "signal": "HOLD",
-    "confidence": 0.5,
+    "confidence": 0.57,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
-      "\u274c order_book: Order book data unavailable",
+      "\u2705 order_book: Bullish order book imbalance",
       "\u274c onchain: NVT ratio normal",
       "\u2705 sentiment: Fear & Greed in buy zone"
     ],
@@ -51,7 +51,7 @@
   "narrative": {
     "date": "September 06, 2026",
     "macro": "Macro Regime: LOW_UNCERTAINTY \u2014 Low trade policy uncertainty \u2014 fundamentals-driven market",
-    "technicals": "Order book is balanced. No clear direction.",
+    "technicals": "Order book shows bullish imbalance. More buy orders than sell orders.",
     "sentiment": "Neutral sentiment. No extremes.",
     "upcoming_events": "Next event: CPI Report on 2026-09-12 (Impact: MEDIUM)",
     "trader_comment": "Market is in a consolidation phase. Watch for breakout."
@@ -60,20 +60,20 @@
     "fed_trend": "UNKNOWN",
     "fed_label": "Data unavailable",
     "dxy": 99.16,
-    "dxy_trend": "RISING",
-    "dxy_label": "RISING (99.16)",
+    "dxy_trend": "FALLING",
+    "dxy_label": "FALLING (99.16)",
     "vix": 14.53,
     "vix_level": "LOW",
     "vix_label": "CALM (14.53)",
     "liquidity": "TIGHTENING",
     "liquidity_desc": "Short-end yield 3.76% (rising vs 5d ago)",
     "fed_impact": "\ud83d\udfe1 NEUTRAL",
-    "dxy_impact": "\ud83d\udd34 BEARISH",
+    "dxy_impact": "\ud83d\udfe2 BULLISH",
     "vix_impact": "\ud83d\udfe2 BULLISH",
-    "overall": "MIXED",
-    "overall_desc": "Mixed macro signals \u2014 selective risk-taking.",
-    "overall_color": "#ffd700",
-    "bullish_signals": 1,
+    "overall": "RISK_ON",
+    "overall_desc": "Bullish macro \u2014 risk assets favored.",
+    "overall_color": "#39ff14",
+    "bullish_signals": 2,
     "total_signals": 3
   },
   "tpu_data": {
@@ -176,24 +176,24 @@
   "onchain": {
     "mvrv_zscore": null,
     "miner_reserves": 0,
-    "nvt_ratio": 86.31,
+    "nvt_ratio": 85.08,
     "hashrate_trend": null,
     "exchange_flow_net": null,
     "miner_reserves_trend": "UNKNOWN"
   },
   "exit_strategy": {
-    "entry": 79984.38,
+    "entry": 80054.18,
     "signal": "HOLD",
-    "current_price": 80784.2238,
+    "current_price": 80854.7218,
     "scenarios": []
   },
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.5,
-      "cnn_score": 0.5,
-      "ensemble_score": 0.5,
+      "cnn_score": 0.639,
+      "ensemble_score": 0.57,
       "action": "HOLD",
-      "confidence": 0.5,
+      "confidence": 0.57,
       "trade_qualified": false
     }
   },
