@@ -104,6 +104,20 @@ Every entry was checked against the actual call graph and exercised in `offline_
 | **Partial exit at TP1** | Working — 50% off, stop to breakeven |
 | **Correlation exposure cap** | Working — 40% max per correlated bloc |
 
+### Accuracy features (built on top of the two trade types)
+
+| Feature | What it does |
+|---|---|
+| **4h engine backtest** | Real walk-forward backtest over ~5-6 months of history, using the IDENTICAL scoring code the live engine uses. Runs automatically every cycle for BTC/ETH. No lookahead bias. |
+| **TP1 = success** | Hitting the first take-profit is booked as a successful trade everywhere — signal history, paper account, dashboard labels. Running to TP2 is a bonus, not a requirement. |
+| **Time-based exits** | A trade still open at 3x its expected duration closes automatically — a stale thesis shouldn't sit tying up capital until it randomly hits stop or target. |
+| **Trailing stop** | After TP1, the stop ratchets behind price instead of sitting at a flat breakeven — locks in more of a winning run. |
+| **Real order flow (CVD)** | Cumulative Volume Delta from actual executed trades (Binance aggTrades), not order-book snapshots. Adjusts intraday conviction up or down based on genuine buy/sell pressure. |
+| **Liquidation cluster estimate** | An honest proxy (round price levels + funding-rate skew) since a real liquidation feed needs a paid API. Labelled as an estimate everywhere it appears. |
+| **Regime-conditional weights** | Signal weights (trend/momentum/volatility/etc) now actually shift with detected regime — trend-following weighted up in strong trends, down in chop — instead of being one static number regardless of market condition. |
+| **Walk-forward feedback** | Each asset's out-of-sample backtest result is saved and used to nudge that asset's trend/momentum weight on the NEXT cycle — genuine learning across runs, not a number computed and discarded. |
+| **Slippage** | Modeled on every simulated fill (0.08%), so paper results aren't more optimistic than live trading would be. |
+
 ### Two trade types
 
 Every coin gets two independent trades on two timeframes:
