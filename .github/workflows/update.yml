@@ -44,7 +44,12 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/market_intelligence.json docs/signal_history.json docs/signal_database.json docs/v6_results.json docs/market_summary.txt crypto_quant.db
+          # paper_account.json was missing here — the full pipeline advances the
+          # account (new entries, DCA, exits) but those changes were never
+          # committed by this workflow, so they were silently discarded each run.
+          for f in docs/market_intelligence.json docs/signal_history.json docs/signal_database.json docs/v6_results.json docs/market_summary.txt docs/paper_account.json crypto_quant.db; do
+            [ -f "$f" ] && git add "$f"
+          done
           git diff --cached --quiet || (git commit -m "Hourly update [$(date -u +%Y-%m-%d_%H-%M)]" && git push)
 
   deploy:
