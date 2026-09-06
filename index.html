@@ -560,6 +560,8 @@
     <div class="card-grid card-grid-2" style="margin-top:10px;">
       <div class="card reveal" style="grid-column:1/-1;"><div class="card-glow"></div><div class="card-label">Accuracy by Trade Type</div>
         <div id="pa-by-type" style="font-size:0.66rem;color:var(--text-secondary);margin-top:8px;">Loading...</div></div>
+      <div class="card reveal" style="grid-column:1/-1;"><div class="card-glow"></div><div class="card-label">4h Strategy Backtest (~5-6 months, real history)</div>
+        <div id="backtest-panel" style="font-size:0.66rem;color:var(--text-secondary);margin-top:8px;">Loading...</div></div>
       <div class="card reveal"><div class="card-glow"></div><div class="card-label">Open Positions Detail</div>
         <div id="pa-positions" style="font-size:0.62rem;color:var(--text-secondary);margin-top:8px;">Loading...</div></div>
       <div class="card reveal"><div class="card-glow"></div><div class="card-label">Recent Activity</div>
@@ -1068,6 +1070,30 @@
                   Hashrate: <b style="color:#fff;">${fmt(o.hashrate_trend)}</b>`;
             }
 
+            // 4h strategy backtest — real measured performance before the live
+            // engine is trusted, using the SAME scoring logic (score_4h_bar) live
+            // trades use, walked forward over real history with no lookahead.
+            const btEl = document.getElementById('backtest-panel');
+            if (btEl) {
+                const bt = v6.backtest_results || {};
+                const rows = Object.entries(bt).map(([coin, r]) => {
+                    if (!r || r.total_trades === undefined) return `<div style="padding:4px 0;">${coin}: ${r?.error || 'no data'}</div>`;
+                    if (!r.total_trades) return `<div style="padding:4px 0;">${coin}: no qualifying trades in the backtest window</div>`;
+                    const wr = r.win_rate ?? 0;
+                    const wrColor = wr >= 50 ? 'var(--lime)' : wr >= 40 ? 'var(--amber)' : 'var(--rose)';
+                    return `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border-subtle);">
+                        <span><b style="color:#fff;">${coin}</b> · ${r.bars_used} 4h bars (~${Math.round(r.bars_used*4/24)}d)</span>
+                        <span>${r.total_trades} trades · <b style="color:${wrColor};">${wr}%</b> win (TP1+) ·
+                          PF <b style="color:#fff;">${r.profit_factor ?? '—'}</b> · avg <b style="color:#fff;">${r.avg_r >= 0 ? '+' : ''}${r.avg_r}R</b></span>
+                    </div>`;
+                }).join('');
+                btEl.innerHTML = rows ? rows + `<div style="font-size:0.55rem;color:var(--text-muted);margin-top:6px;">
+                    "Win" = hit take-profit (including time-based exits that closed in profit). This is the strategy's
+                    real historical performance — not a guarantee of future results. Small sample sizes (under ~30 trades)
+                    are noisy; treat the number as directional, not precise.</div>`
+                  : 'No backtest data yet — runs automatically each cycle.';
+            }
+
             // ML Ensemble Signal (BiLSTM + CNN) — computed all along, never displayed until now
             if (v6.ml_signal) {
                 const ml = v6.ml_signal;
@@ -1311,7 +1337,7 @@
       $('signal-winrate').style.color = !hasClosed ? 'var(--text-muted)'
         : sp.win_rate > 55 ? 'var(--lime)' : sp.win_rate > 40 ? 'var(--amber)' : 'var(--rose)';
       $('signal-winrate-detail').textContent = hasClosed
-        ? `${sp.win_count} wins · ${sp.loss_count} losses`
+        ? `${sp.win_count} successful (TP1+) · ${sp.loss_count} losses`
         : `No trades closed yet${sp.excluded_pre_fix ? ` · ${sp.excluded_pre_fix} pre-fix signals excluded` : ''}`;
       $('signal-profit').textContent = hasClosed && sp.total_profit_pct ? sp.total_profit_pct.toFixed(1) + '%' : '—';
       $('signal-profit').style.color = sp.total_profit_pct > 0 ? 'var(--lime)' : sp.total_profit_pct < 0 ? 'var(--rose)' : 'var(--text)';
@@ -1508,6 +1534,7 @@
               <div style="font-family:var(--font-mono);font-size:0.35rem;color:var(--text-muted);margin-bottom:2px;">⚡ INTRADAY TRADE · 4H TIMEFRAME · hours to a few days</div>
               ${itLive ? `
                 <div class="row"><span class="label">Signal</span><span class="value" style="color:${itColor};font-weight:600;">${it.signal} · ${((it.conviction||0)*100).toFixed(0)}% conv</span></div>
+                <div class="row"><span class="label">Setup type</span><span class="value">${it.mode === 'MEAN_REVERSION' ? '↔️ Range / mean-reversion' : '📈 Trend-following'}</span></div>
                 <div class="row"><span class="label">Entry</span><span class="value accent">$${it.entry}</span></div>
                 <div class="row"><span class="label">Stop</span><span class="value rose">$${it.stop_loss}</span></div>
                 <div class="row"><span class="label">Target</span><span class="value lime">$${it.take_profit}</span></div>
@@ -1518,7 +1545,7 @@
               ` : `
                 <div class="row"><span class="label">Signal</span><span class="value" style="color:var(--amber);">NO TRADE</span></div>
                 <div style="font-size:0.45rem;color:var(--text-secondary);margin-top:3px;">${it.reason || 'No 4h setup right now.'}</div>
-                ${it.levels && (it.levels.support || it.levels.resistance) ? `<div style="font-size:0.42rem;color:var(--text-muted);margin-top:2px;">4h levels — S: ${it.levels.support ?? '—'} · R: ${it.levels.resistance ?? '—'} · RSI ${it.levels.rsi_4h ?? '—'}</div>` : ''}
+                ${it.levels && (it.levels.support || it.levels.resistance) ? `<div style="font-size:0.42rem;color:var(--text-muted);margin-top:2px;">4h levels — S: ${it.levels.support ?? '—'} · R: ${it.levels.resistance ?? '—'} · RSI ${it.levels.rsi_4h ?? '—'}${it.levels.range_position !== undefined ? ` · price ${(it.levels.range_position*100).toFixed(0)}% up the range` : ''}</div>` : ''}
               `}
             </div>
           </div>
