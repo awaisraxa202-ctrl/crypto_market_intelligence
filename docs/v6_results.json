@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-09-06T15:06:24.841307",
-  "imbalance": 0.46,
+  "timestamp": "2026-09-06T16:12:19.481411",
+  "imbalance": 0.567,
   "regime": {
     "regime": "LOW_UNCERTAINTY",
     "description": "Low trade policy uncertainty \u2014 fundamentals-driven market",
@@ -22,15 +22,15 @@
     "trade_qualified": false
   },
   "big_trade": {
-    "position_size": 0.1101,
+    "position_size": 0.1099,
     "risk_pct": 3.5,
-    "target_movement": 3179.7596000000003,
+    "target_movement": 3185.5940000000005,
     "trade_type": "BIG"
   },
   "small_trade": {
-    "position_size": 0.0943,
+    "position_size": 0.0942,
     "risk_pct": 0.75,
-    "target_movement": 794.9399000000001,
+    "target_movement": 796.3985000000001,
     "trade_type": "SMALL"
   },
   "explanation": {
@@ -39,7 +39,7 @@
     "confidence": 0.5,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
-      "\u274c order_book: Order book data unavailable",
+      "\u2705 order_book: Bullish order book imbalance",
       "\u274c onchain: NVT ratio normal",
       "\u2705 sentiment: Fear & Greed in buy zone"
     ],
@@ -51,7 +51,7 @@
   "narrative": {
     "date": "September 06, 2026",
     "macro": "Macro Regime: LOW_UNCERTAINTY \u2014 Low trade policy uncertainty \u2014 fundamentals-driven market",
-    "technicals": "Order book is balanced. No clear direction.",
+    "technicals": "Order book shows bullish imbalance. More buy orders than sell orders.",
     "sentiment": "Neutral sentiment. No extremes.",
     "upcoming_events": "Next event: CPI Report on 2026-09-12 (Impact: MEDIUM)",
     "trader_comment": "Market is in a consolidation phase. Watch for breakout."
@@ -176,15 +176,15 @@
   "onchain": {
     "mvrv_zscore": null,
     "miner_reserves": 0,
-    "nvt_ratio": 77.17,
+    "nvt_ratio": 77.84,
     "hashrate_trend": null,
     "exchange_flow_net": null,
     "miner_reserves_trend": "UNKNOWN"
   },
   "exit_strategy": {
-    "entry": 79493.99,
+    "entry": 79639.85,
     "signal": "HOLD",
-    "current_price": 80288.9299,
+    "current_price": 80436.2485,
     "scenarios": []
   },
   "ml_predictions": {
@@ -197,5 +197,39 @@
       "trade_qualified": false
     }
   },
-  "order_book_history_depth": 1
+  "order_book_history_depth": 1,
+  "backtest_results": {
+    "BTC": {
+      "symbol": "BTCUSDT",
+      "bars_used": 0,
+      "total_trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "time_exits": 0,
+      "win_rate": null,
+      "profit_factor": null,
+      "avg_r": null,
+      "total_r": 0.0,
+      "gross_r_win": 0.0,
+      "gross_r_loss": 0.0,
+      "trades": [],
+      "error": "insufficient historical data"
+    },
+    "ETH": {
+      "symbol": "ETHUSDT",
+      "bars_used": 0,
+      "total_trades": 0,
+      "wins": 0,
+      "losses": 0,
+      "time_exits": 0,
+      "win_rate": null,
+      "profit_factor": null,
+      "avg_r": null,
+      "total_r": 0.0,
+      "gross_r_win": 0.0,
+      "gross_r_loss": 0.0,
+      "trades": [],
+      "error": "insufficient historical data"
+    }
+  }
 }
