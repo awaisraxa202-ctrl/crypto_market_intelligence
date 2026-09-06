@@ -98,10 +98,28 @@ Every entry was checked against the actual call graph and exercised in `offline_
 | Post-mortem on losses | Working (generic template) |
 | Portfolio simulator | Working — real historical walk |
 | Trade ranking | Working |
-| **Persistent paper account** | Working — survives between runs |
+| **Two trade types per coin** | Working — SWING (daily, weeks) + INTRADAY (4h, hours-days) |
+| **Persistent paper account** | Working — survives between runs, tracks both types separately |
 | **DCA / averaging down** | Working — up to 3 tranches |
 | **Partial exit at TP1** | Working — 50% off, stop to breakeven |
 | **Correlation exposure cap** | Working — 40% max per correlated bloc |
+
+### Two trade types
+
+Every coin gets two independent trades on two timeframes:
+
+| | SWING | INTRADAY |
+|---|---|---|
+| Timeframe | Daily candles | 4-hour candles |
+| Targets | ATR multiples (often 10-25% away) | Nearest real 4h support/resistance (typically 1-4%) |
+| Typical BTC move | $10k+ | $1-3k |
+| Resolves in | Weeks | Hours to a few days |
+| Purpose | Capture large moves | Generate frequent outcomes so the learning engine has data |
+| Conviction gate | 40% / 60% | 35% |
+
+Both run in the paper account as separate positions (a swing LONG and a 4h SHORT can
+coexist on the same coin) with separate win-rate and P&L statistics, so the system's
+accuracy on fast trades and slow trades is measured independently.
 
 ### Paper trading account
 
@@ -145,6 +163,8 @@ These are real. Do not mistake them for working features.
 
 **BIG/SMALL trades are frequently invisible.** BIG requires 60% conviction, SMALL requires 40%. In quiet markets most assets sit well below both, so the badges show "gated". That is the risk gate working, not a display bug.
 
+**Scheduled runs drift.** GitHub delays cron-triggered Actions on low-traffic repos, sometimes by hours. The main pipeline can't fix this from inside the workflow file — it's a GitHub platform behavior. See "Free frequent position monitoring" below for the workaround that matters (catching stop-loss/take-profit in between full runs).
+
 ---
 
 ## Setup
@@ -175,6 +195,55 @@ python crypto_market_intelligence_v60.py
 python offline_test.py
 ```
 Mocks all network calls and runs the real pipeline end to end. **Back up `docs/` first — it writes there.**
+
+### Free frequent position monitoring (optional)
+
+GitHub's own cron scheduler delays scheduled Actions on low-traffic repos —
+sometimes by hours. That's fine for the full analysis (it runs on daily data
+anyway), but it means a stop-loss or take-profit on the paper account could sit
+unnoticed for hours. `position-monitor.yml` fixes this for free:
+
+1. It only checks **existing open positions** against live price — fast, cheap,
+   no full indicator run. It does not open new trades or DCA.
+2. It's triggered by `workflow_dispatch`, not GitHub's cron, because an external
+   trigger doesn't suffer the same scheduling delay.
+3. Set up a free trigger at **cron-job.org**:
+   - Create a GitHub Personal Access Token: GitHub -> Settings -> Developer
+     settings -> Fine-grained tokens -> generate one scoped to this repo only,
+     with **Actions: Read and write** permission.
+   - At cron-job.org, create a free account and a new cron job:
+     - URL: `https://api.github.com/repos/awaisraxa202-ctrl/crypto_market_intelligence/actions/workflows/position-monitor.yml/dispatches`
+     - Method: `POST`
+     - Headers: `Authorization: Bearer YOUR_TOKEN`, `Accept: application/vnd.github+json`
+     - Body: `{"ref":"main"}`
+     - Schedule: every 10-15 minutes
+4. That's it — no server, no hosting cost.
+
+### Making the 2-hour update actually happen every 2 hours
+
+The dashboard header says "Every 2h" and `update.yml` has `cron: '0 */2 * * *'`,
+but GitHub does not honour that reliably on low-traffic repos — observed gaps of
+6-8 hours are normal. The fix is the same external-trigger trick, pointed at the
+main workflow:
+
+At cron-job.org, create a **second** cron job:
+
+- URL: `https://api.github.com/repos/awaisraxa202-ctrl/crypto_market_intelligence/actions/workflows/update.yml/dispatches`
+- Method: `POST`
+- Headers: `Authorization: Bearer YOUR_TOKEN`, `Accept: application/vnd.github+json`
+- Body: `{"ref":"main"}`
+- Schedule: **every 2 hours** (e.g. at minute 0 of every 2nd hour)
+
+Use the same Personal Access Token as the position monitor. Leave the `schedule:`
+block in `update.yml` alone — it's a harmless fallback. If GitHub's cron happens
+to fire close to the external trigger you may occasionally get two runs back to
+back; that's wasteful but not harmful, and the second run simply overwrites the
+first with fresher data.
+
+**Free-tier note:** cron-job.org's free plan allows a 1-minute minimum interval,
+so both jobs fit comfortably. The full pipeline takes ~4 minutes per run; at 12
+runs/day that's ~50 minutes/day of Actions time. Public repos get unlimited free
+Actions minutes, so this costs nothing.
 
 ### GitHub Pages
 Settings -> Pages -> Source: **GitHub Actions**. The deploy job checks out `ref: main` so it always publishes the data the run just committed.
