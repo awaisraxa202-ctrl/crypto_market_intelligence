@@ -2531,7 +2531,7 @@ def fmtUSD(n):
 
 # ===================== 82. TRADE PLAN GENERATOR =====================
 
-def generate_trade_plan(asset, signal, conviction, price, sr_levels, atr, position_size_info):
+def generate_trade_plan(asset, signal, conviction, price, sr_levels, atr, position_size_info, regime=None):
     plan = {
         'asset': asset,
         'signal': signal,
@@ -2578,7 +2578,58 @@ def generate_trade_plan(asset, signal, conviction, price, sr_levels, atr, positi
             plan['risk_reward_ratio'] = abs((plan['take_profit_1'] - price) / (price - plan['stop_loss'] + 0.001))
         except:
             plan['risk_reward_ratio'] = 0
-    
+
+    # ─── EXPECTED HOLDING TIME ───
+    # The plan gave price levels but no time horizon. `atr` is the average daily
+    # range — so (distance to target) / ATR is a real, computable estimate of how
+    # many typical trading days price needs to travel that far. This is an
+    # expectation from volatility, not a guarantee; labelled accordingly.
+    try:
+        _atr = float(atr) if atr and math.isfinite(float(atr)) and float(atr) > 0 else None
+        if _atr and plan['take_profit_1'] is not None and plan['take_profit_2'] is not None:
+            d1 = abs(plan['take_profit_1'] - price) / _atr
+            d2 = abs(plan['take_profit_2'] - price) / _atr
+            # Price rarely moves a full ATR in one direction every day. Net daily
+            # progress toward a target depends heavily on regime: in a strong trend
+            # most days push the same way; in chop, price oscillates and net
+            # progress is slow. Without this, every asset showed an identical
+            # estimate because targets are themselves ATR multiples.
+            _regime = str(regime or '').upper()
+            if 'STRONG' in _regime:
+                progress = 0.80
+            elif 'TREND' in _regime:
+                progress = 0.65
+            elif 'VOLATILE' in _regime:
+                progress = 0.55
+            elif 'CHOPPY' in _regime or 'RANGE' in _regime:
+                progress = 0.35
+            else:
+                progress = 0.55
+            # Conviction also matters: a high-conviction setup has more agreeing
+            # forces behind it; low conviction means more hesitation and reversal.
+            progress *= (0.75 + 0.5 * max(0.0, min(1.0, float(conviction or 0))))
+            eta1 = max(1, round(d1 / progress))
+            eta2 = max(eta1 + 1, round(d2 / progress))
+            horizon = ('INTRADAY-SWING' if eta1 <= 2 else
+                       'SHORT SWING' if eta1 <= 5 else
+                       'MULTI-WEEK' if eta1 <= 15 else 'POSITION')
+            plan['expected_days_to_tp1'] = int(eta1)
+            plan['expected_days_to_tp2'] = int(eta2)
+            plan['time_horizon'] = horizon
+            plan['time_note'] = (f"~{eta1}d to TP1, ~{eta2}d to TP2 given ATR ${_atr:,.2f}/day, "
+                                 f"{_regime or 'UNKNOWN'} regime, {int(float(conviction or 0)*100)}% conviction. "
+                                 f"Estimate, not a promise.")
+        else:
+            plan['expected_days_to_tp1'] = None
+            plan['expected_days_to_tp2'] = None
+            plan['time_horizon'] = 'UNKNOWN'
+            plan['time_note'] = 'Insufficient volatility data for a time estimate.'
+    except Exception:
+        plan['expected_days_to_tp1'] = None
+        plan['expected_days_to_tp2'] = None
+        plan['time_horizon'] = 'UNKNOWN'
+        plan['time_note'] = 'Time estimate unavailable.'
+
     return plan
 
 # ===================== 83-84. ON-CHAIN FETCHERS =====================
@@ -2704,7 +2755,7 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000, learn
         _sr = {}
         _support, _resistance = latest['close'] * 0.95, latest['close'] * 1.05
     sr_levels = {'nearest_support': _support, 'nearest_resistance': _resistance}
-    trade_plan = generate_trade_plan(code, narrative['signal'], narrative['conviction'], latest['close'], sr_levels, latest.get('atr_14', latest['close'] * 0.02), position_info)
+    trade_plan = generate_trade_plan(code, narrative['signal'], narrative['conviction'], latest['close'], sr_levels, latest.get('atr_14', latest['close'] * 0.02), position_info, regime=narrative.get('regime') or latest.get('regime'))
     history = track_signal_performance(code, narrative['signal'], latest['close'], narrative['conviction'], trade_plan)
     wf_validation = walk_forward_validation(df)
     returns = df['return'].dropna().tail(100).tolist()
@@ -4543,4 +4594,3 @@ if __name__ == '__main__':
         print("\n💾 V6 results saved to docs/v6_results.json")
     except Exception as e:
         print(f"  ⚠️ Could not save V6 results: {e}")
-        
