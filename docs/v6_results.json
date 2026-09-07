@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-09-06T23:23:37.473476",
-  "imbalance": 0.382,
+  "timestamp": "2026-09-07T01:06:13.319212",
+  "imbalance": 0.797,
   "regime": {
     "regime": "LOW_UNCERTAINTY",
     "description": "Low trade policy uncertainty \u2014 fundamentals-driven market",
@@ -15,43 +15,43 @@
   },
   "ml_signal": {
     "bilstm_score": 0.5,
-    "cnn_score": 0.373,
-    "ensemble_score": 0.436,
-    "action": "HOLD",
-    "confidence": 0.436,
-    "trade_qualified": false
+    "cnn_score": 0.896,
+    "ensemble_score": 0.698,
+    "action": "BUY",
+    "confidence": 0.698,
+    "trade_qualified": true
   },
   "big_trade": {
-    "position_size": 0.1071,
-    "risk_pct": 3.44,
-    "target_movement": 3207.9503999999997,
+    "position_size": 0.1154,
+    "risk_pct": 3.7,
+    "target_movement": 3203.8792,
     "trade_type": "BIG"
   },
   "small_trade": {
-    "position_size": 0.0895,
-    "risk_pct": 0.72,
-    "target_movement": 801.9875999999999,
+    "position_size": 0.106,
+    "risk_pct": 0.85,
+    "target_movement": 800.9698,
     "trade_type": "SMALL"
   },
   "explanation": {
     "asset": "BTC",
-    "signal": "HOLD",
-    "confidence": 0.436,
+    "signal": "BUY",
+    "confidence": 0.698,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
-      "\u274c order_book: Order book data unavailable",
+      "\u2705 order_book: Bullish order book imbalance",
       "\u274c onchain: NVT ratio normal",
       "\u2705 sentiment: Fear & Greed in buy zone"
     ],
     "historical_evidence": "Building historical database. Check back soon.",
     "historical_trades": [],
-    "risk_warning": "\u26a0\ufe0f Low confidence trade. Reduce position size by 50%.",
+    "risk_warning": "\u2705 Moderate confidence. Standard position size recommended.",
     "trader_comment": "No clear directional bias. Patience is key."
   },
   "narrative": {
-    "date": "September 06, 2026",
+    "date": "September 07, 2026",
     "macro": "Macro Regime: LOW_UNCERTAINTY \u2014 Low trade policy uncertainty \u2014 fundamentals-driven market",
-    "technicals": "Order book shows bearish imbalance. More sell orders than buy orders.",
+    "technicals": "Order book shows bullish imbalance. More buy orders than sell orders.",
     "sentiment": "Neutral sentiment. No extremes.",
     "upcoming_events": "Next event: CPI Report on 2026-09-12 (Impact: MEDIUM)",
     "trader_comment": "Market is in a consolidation phase. Watch for breakout."
@@ -59,9 +59,9 @@
   "macro_data": {
     "fed_trend": "UNKNOWN",
     "fed_label": "Data unavailable",
-    "dxy": 99.13,
+    "dxy": 99.1,
     "dxy_trend": "FALLING",
-    "dxy_label": "FALLING (99.13)",
+    "dxy_label": "FALLING (99.10)",
     "vix": 14.53,
     "vix_level": "LOW",
     "vix_label": "CALM (14.53)",
@@ -176,25 +176,25 @@
   "onchain": {
     "mvrv_zscore": null,
     "miner_reserves": 0,
-    "nvt_ratio": 83.7,
+    "nvt_ratio": 79.07,
     "hashrate_trend": null,
     "exchange_flow_net": null,
     "miner_reserves_trend": "UNKNOWN"
   },
   "exit_strategy": {
-    "entry": 80198.76,
-    "signal": "HOLD",
-    "current_price": 81000.7476,
+    "entry": 80096.98,
+    "signal": "BUY",
+    "current_price": 80897.9498,
     "scenarios": []
   },
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.5,
-      "cnn_score": 0.373,
-      "ensemble_score": 0.436,
-      "action": "HOLD",
-      "confidence": 0.436,
-      "trade_qualified": false
+      "cnn_score": 0.896,
+      "ensemble_score": 0.698,
+      "action": "BUY",
+      "confidence": 0.698,
+      "trade_qualified": true
     }
   },
   "order_book_history_depth": 1,
