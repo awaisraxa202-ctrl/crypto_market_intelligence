@@ -286,7 +286,9 @@ def fetch_binance_klines_interval(symbol, interval='1h', limit=200):
         return df[['date','open','high','low','close','volume']]
     except Exception as e:
         print(f"  ⚠️ Binance {interval} {symbol}: {e}")
-        return pd.DataFrame()
+        empty = pd.DataFrame()
+        empty.attrs['fetch_error'] = str(e)   # let callers report the REAL reason
+        return empty
 
 def fetch_yahoo(ticker, period='2y'):
     try:
@@ -3298,6 +3300,12 @@ def generate_intraday_trade(code, symbol):
     without downloading the full historical tape."""
     cfg = INTRADAY_CONFIG
     try:
+        # Small spacing before this asset's burst of Binance calls (klines + CVD
+        # + funding, x9 assets). Confirmed live: the backtest step running near
+        # the end of the pipeline came back with 0 bars — most likely Binance
+        # rate-limiting a CI IP after 30-40+ unspaced calls earlier in the same
+        # run. This costs ~4.5s total across 9 assets but reduces that pressure.
+        time.sleep(0.5)
         df = fetch_binance_klines_interval(symbol, interval=cfg['interval'], limit=cfg['bars'])
         if df is None or df.empty or len(df) < 60 or 'high' not in df.columns:
             return {'timeframe': cfg['interval'], 'signal': 'NO TRADE', 'conviction': 0.0,
@@ -3367,8 +3375,16 @@ def backtest_intraday_engine(symbol, bars=1000, time_exit_multiplier=3):
     }
     try:
         df = fetch_binance_klines_interval(symbol, interval=INTRADAY_CONFIG['interval'], limit=bars)
+        if df is None or df.empty:
+            # This is the step that runs LATE in a long pipeline — by now there
+            # have been 30-40+ prior Binance calls this run (9 assets' daily +
+            # 4h + CVD + funding data). A brief cooldown then a smaller, cheaper
+            # request gives a real chance of recovering instead of just failing.
+            time.sleep(5)
+            df = fetch_binance_klines_interval(symbol, interval=INTRADAY_CONFIG['interval'], limit=max(300, bars // 2))
         if df is None or df.empty or len(df) < 120 or 'high' not in df.columns:
-            result['error'] = 'insufficient historical data'
+            real_reason = df.attrs.get('fetch_error') if df is not None else None
+            result['error'] = f"insufficient historical data{f' (fetch failed: {real_reason})' if real_reason else ' (empty response after retry)'}"
             return result
         df = prepare_4h_df(df).reset_index(drop=True)
         result['bars_used'] = len(df)
@@ -5306,7 +5322,14 @@ def run_v6_pipeline():
                 btc_price = float(fetch_binance_klines('BTCUSDT', interval='1d', limit=1)['close'].iloc[-1])
             except Exception:
                 btc_price = 0
-        exit_strategy = generate_exit_strategy(btc_price, ml_signal.get('action', 'NO TRADE'), btc_price * 1.01, btc_price * 0.02)
+        exit_strategy = generate_exit_strategy(
+            btc_price,
+            # BUGFIX: ml_signal.action uses BUY/SELL/HOLD vocabulary, but
+            # generate_exit_strategy only recognized LONG/SHORT — so `scenarios`
+            # was empty on every single run, regardless of the price fix. Confirmed
+            # live: real entry/current_price, empty scenarios list, every time.
+            {'BUY': 'LONG', 'SELL': 'SHORT'}.get(ml_signal.get('action', 'HOLD'), 'NO TRADE'),
+            btc_price * 1.01, btc_price * 0.02)
         for scenario in exit_strategy.get('scenarios', [])[:3]:
             print(f"  • {scenario.get('condition', '')}: {scenario.get('action', '')}")
     except Exception as e:
