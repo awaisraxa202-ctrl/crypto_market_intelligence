@@ -1,7 +1,7 @@
 {
   "created": "2026-09-05T14:13:29.699758",
   "starting_capital": 10000.0,
-  "cash": 5246.654661876155,
+  "cash": 5283.377398188717,
   "positions": {
     "BNB@4h": {
       "asset": "BNB",
@@ -12,7 +12,7 @@
       "opened": "2026-09-07T13:31:05.852101",
       "tranches": 1,
       "last_tranche_notional": 1500.0,
-      "stop_loss": 740.51,
+      "stop_loss": 742.395,
       "take_profit_1": 750.0,
       "take_profit_2": 750.0,
       "risk_distance": 6.4500000000000455,
@@ -41,15 +41,15 @@
       "asset": "ADA",
       "trade_type": "SWING_DAILY",
       "side": "SHORT",
-      "qty": 4163.265306122451,
-      "avg_entry": 0.2245,
-      "opened": "2026-09-07T13:31:05.852133",
+      "qty": 4677.62526572435,
+      "avg_entry": 0.2222,
+      "opened": "2026-09-07T13:46:26.358218",
       "tranches": 1,
-      "last_tranche_notional": 934.6530612244902,
+      "last_tranche_notional": 1039.3683340439507,
       "stop_loss": 0.2,
       "take_profit_1": 0.27,
       "take_profit_2": 0.32,
-      "risk_distance": 0.024499999999999994,
+      "risk_distance": 0.022199999999999998,
       "entry_conviction": 0.34,
       "expected_hours": 120,
       "tp1_hit": false
@@ -58,21 +58,54 @@
       "asset": "DOGE",
       "trade_type": "SWING_DAILY",
       "side": "SHORT",
-      "qty": 8869.565217391308,
-      "avg_entry": 0.0915,
-      "opened": "2026-09-07T13:31:05.852144",
+      "qty": 9526.906504502811,
+      "avg_entry": 0.0909,
+      "opened": "2026-09-07T13:46:26.358230",
       "tranches": 1,
-      "last_tranche_notional": 811.5652173913046,
+      "last_tranche_notional": 865.9958012593055,
       "stop_loss": 0.08,
       "take_profit_1": 0.11,
       "take_profit_2": 0.13,
-      "risk_distance": 0.011499999999999996,
+      "risk_distance": 0.010899999999999993,
       "entry_conviction": 0.34,
       "expected_hours": 144,
       "tp1_hit": false
     }
   },
-  "closed_trades": [],
+  "closed_trades": [
+    {
+      "asset": "ADA",
+      "trade_type": "SWING_DAILY",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "entry_price": 0.2245,
+      "exit_price": 0.20016,
+      "qty": 4163.26530612,
+      "tranches": 1,
+      "pnl": 101.33,
+      "return_pct": 10.84,
+      "opened": "2026-09-07T13:31:05.852133",
+      "closed": "2026-09-07T13:46:26.354539",
+      "holding_days": 0
+    },
+    {
+      "asset": "DOGE",
+      "trade_type": "SWING_DAILY",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "entry_price": 0.0915,
+      "exit_price": 0.080064,
+      "qty": 8869.56521739,
+      "tranches": 1,
+      "pnl": 101.43,
+      "return_pct": 12.5,
+      "opened": "2026-09-07T13:31:05.852144",
+      "closed": "2026-09-07T13:46:26.356578",
+      "holding_days": 0
+    }
+  ],
   "equity_curve": [
     {
       "ts": "2026-09-06T00:22:44.231388",
@@ -209,19 +242,23 @@
     {
       "ts": "2026-09-07T13:31:05.852154",
       "equity": 9990.73
+    },
+    {
+      "ts": "2026-09-07T13:46:26.358236",
+      "equity": 10176.9
     }
   ],
   "stats": {
     "by_type": {
       "SWING_DAILY": {
-        "closed": 0,
-        "wins": 0,
+        "closed": 2,
+        "wins": 2,
         "losses": 0,
-        "win_rate": null,
+        "win_rate": 100.0,
         "profit_factor": null,
-        "net_pnl": 0,
+        "net_pnl": 202.76,
         "open": 3,
-        "avg_holding_days": null
+        "avg_holding_days": 0.0
       },
       "INTRADAY_4H": {
         "closed": 0,
@@ -234,23 +271,23 @@
         "avg_holding_days": null
       }
     },
-    "equity": 9990.73,
-    "cash": 5246.65,
+    "equity": 10176.9,
+    "cash": 5283.38,
     "open_positions": 4,
-    "total_return_pct": -0.09,
-    "closed_trades": 0,
-    "wins": 0,
+    "total_return_pct": 1.77,
+    "closed_trades": 2,
+    "wins": 2,
     "losses": 0,
-    "win_rate": null,
+    "win_rate": 100.0,
     "profit_factor": null,
-    "avg_win": null,
+    "avg_win": 101.38,
     "avg_loss": null,
     "dca_positions": 0,
     "last_events": [
-      "BNB \u26a14h OPENED LONG 2.008140 @ 746.9600 \u2192 750 (~13h)",
-      "LINK OPENED LONG 113.114754 @ 13.2400",
-      "ADA OPENED SHORT 4163.265306 @ 0.2245",
-      "DOGE OPENED SHORT 8869.565217 @ 0.0915"
+      "ADA stopped out (+101.33)",
+      "DOGE stopped out (+101.43)",
+      "ADA OPENED SHORT 4677.625266 @ 0.2222",
+      "DOGE OPENED SHORT 9526.906505 @ 0.0909"
     ]
   }
 }

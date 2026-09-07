@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-09-07T13:33:52.835238",
-  "imbalance": 0.102,
+  "timestamp": "2026-09-07T13:49:08.826608",
+  "imbalance": 0.764,
   "regime": {
     "regime": "LOW_UNCERTAINTY",
     "description": "Low trade policy uncertainty \u2014 fundamentals-driven market",
@@ -15,31 +15,31 @@
   },
   "ml_signal": {
     "bilstm_score": 0.5,
-    "cnn_score": 0.0,
-    "ensemble_score": 0.25,
-    "action": "SELL",
-    "confidence": 0.75,
+    "cnn_score": 0.846,
+    "ensemble_score": 0.673,
+    "action": "BUY",
+    "confidence": 0.673,
     "trade_qualified": true
   },
   "big_trade": {
-    "position_size": 0.1178,
-    "risk_pct": 3.75,
-    "target_movement": 3184.514,
+    "position_size": 0.1157,
+    "risk_pct": 3.67,
+    "target_movement": 3174.5648,
     "trade_type": "BIG"
   },
   "small_trade": {
-    "position_size": 0.1099,
-    "risk_pct": 0.88,
-    "target_movement": 796.1285,
+    "position_size": 0.1054,
+    "risk_pct": 0.84,
+    "target_movement": 793.6412,
     "trade_type": "SMALL"
   },
   "explanation": {
     "asset": "BTC",
-    "signal": "SELL",
-    "confidence": 0.75,
+    "signal": "BUY",
+    "confidence": 0.673,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
-      "\u274c order_book: Order book data unavailable",
+      "\u2705 order_book: Bullish order book imbalance",
       "\u274c onchain: NVT ratio normal",
       "\u2705 sentiment: Fear & Greed in buy zone"
     ],
@@ -51,7 +51,7 @@
   "narrative": {
     "date": "September 07, 2026",
     "macro": "Macro Regime: LOW_UNCERTAINTY \u2014 Low trade policy uncertainty \u2014 fundamentals-driven market",
-    "technicals": "Order book shows bearish imbalance. More sell orders than buy orders.",
+    "technicals": "Order book shows bullish imbalance. More buy orders than sell orders.",
     "sentiment": "Neutral sentiment. No extremes.",
     "upcoming_events": "Next event: CPI Report on 2026-09-12 (Impact: MEDIUM)",
     "trader_comment": "Market is in a consolidation phase. Watch for breakout."
@@ -59,12 +59,12 @@
   "macro_data": {
     "fed_trend": "UNKNOWN",
     "fed_label": "Data unavailable",
-    "dxy": 98.91,
+    "dxy": 98.93,
     "dxy_trend": "FALLING",
-    "dxy_label": "FALLING (98.91)",
-    "vix": 15.15,
+    "dxy_label": "FALLING (98.93)",
+    "vix": 15.09,
     "vix_level": "MEDIUM",
-    "vix_label": "ELEVATED (15.15)",
+    "vix_label": "ELEVATED (15.09)",
     "liquidity": "TIGHTENING",
     "liquidity_desc": "Short-end yield 3.76% (rising vs 5d ago)",
     "fed_impact": "\ud83d\udfe1 NEUTRAL",
@@ -176,40 +176,45 @@
   "onchain": {
     "mvrv_zscore": null,
     "miner_reserves": 0,
-    "nvt_ratio": 69.88,
+    "nvt_ratio": 69.04,
     "hashrate_trend": null,
     "exchange_flow_net": null,
     "miner_reserves_trend": "UNKNOWN"
   },
   "exit_strategy": {
-    "entry": 79612.85,
-    "signal": "SHORT",
-    "current_price": 80408.97850000001,
+    "entry": 79364.12,
+    "signal": "LONG",
+    "current_price": 80157.7612,
     "scenarios": [
       {
-        "condition": "Price hits TP1 ($77224.46)",
+        "condition": "Price hits TP1 ($81745.04)",
         "action": "Take 50% profit",
         "reason": "Lock in gains, reduce risk"
       },
       {
-        "condition": "Price hits TP2 ($74836.08)",
+        "condition": "Price hits TP2 ($84125.97)",
         "action": "Take remaining 50% profit",
         "reason": "Target hit, complete the trade"
       },
       {
-        "condition": "Price hits SL ($82001.24)",
+        "condition": "Price hits SL ($76983.20)",
         "action": "Exit immediately",
         "reason": "Stop-loss protects capital"
+      },
+      {
+        "condition": "No target hit after 7 days",
+        "action": "Close position",
+        "reason": "Time-based exit, opportunity cost"
       }
     ]
   },
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.5,
-      "cnn_score": 0.0,
-      "ensemble_score": 0.25,
-      "action": "SELL",
-      "confidence": 0.75,
+      "cnn_score": 0.846,
+      "ensemble_score": 0.673,
+      "action": "BUY",
+      "confidence": 0.673,
       "trade_qualified": true
     }
   },
