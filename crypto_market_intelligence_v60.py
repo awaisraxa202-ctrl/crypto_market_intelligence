@@ -266,7 +266,22 @@ def fetch_binance_klines(symbol, interval='1d', limit=1000):
         print(f"  ⚠️ Binance {symbol}: {e}")
         return pd.DataFrame()
 
+# Per-run cache for interval klines. The pipeline fetches the SAME 4h candles
+# twice per asset (once for multi-timeframe analysis, once for the intraday
+# engine) and the same funding rate twice — 18 duplicate Binance calls per run
+# out of ~101 total. Those duplicates push the run closer to Binance's rate
+# limit on a shared GitHub Actions IP, which is what starves the LAST steps to
+# run (the intraday engine and the backtest) of data — exactly the observed
+# "insufficient data" / "bars_used: 0" failures.
+_KLINE_CACHE = {}
+_FUNDING_CACHE = {}
+
+
 def fetch_binance_klines_interval(symbol, interval='1h', limit=200):
+    cache_key = (symbol, interval, limit)
+    if cache_key in _KLINE_CACHE:
+        cached = _KLINE_CACHE[cache_key]
+        return cached.copy() if hasattr(cached, 'copy') else cached
     url = "https://api.binance.com/api/v3/klines"
     params = {'symbol': symbol, 'interval': interval, 'limit': limit}
     try:
@@ -283,7 +298,9 @@ def fetch_binance_klines_interval(symbol, interval='1h', limit=200):
         # Return full OHLCV — the intraday trade engine needs high/low for
         # real support/resistance and ATR. Existing callers only read 'close',
         # so the extra columns are harmless to them.
-        return df[['date','open','high','low','close','volume']]
+        result = df[['date','open','high','low','close','volume']]
+        _KLINE_CACHE[cache_key] = result
+        return result.copy()
     except Exception as e:
         print(f"  ⚠️ Binance {interval} {symbol}: {e}")
         empty = pd.DataFrame()
@@ -370,6 +387,8 @@ def fetch_fear_greed():
         return pd.DataFrame()
 
 def fetch_funding_rate(symbol='ETHUSDT', limit=1000):
+    if (symbol, limit) in _FUNDING_CACHE:
+        return _FUNDING_CACHE[(symbol, limit)].copy()
     url = "https://fapi.binance.com/fapi/v1/fundingRate"
     params = {'symbol': symbol, 'limit': limit}
     try:
@@ -382,7 +401,9 @@ def fetch_funding_rate(symbol='ETHUSDT', limit=1000):
         daily = df.groupby('date_only')['funding_rate'].agg(['mean','max','min','std']).reset_index()
         daily['date'] = pd.to_datetime(daily['date_only'])
         daily = daily.rename(columns={'mean':'funding_rate','max':'funding_max','min':'funding_min','std':'funding_std'})
-        return daily[['date', 'funding_rate', 'funding_max', 'funding_min', 'funding_std']]
+        _fr = daily[['date', 'funding_rate', 'funding_max', 'funding_min', 'funding_std']]
+        _FUNDING_CACHE[(symbol, limit)] = _fr
+        return _fr.copy()
     except Exception as e:
         print(f"  ⚠️ Funding {symbol}: {e}")
         return pd.DataFrame()
@@ -887,13 +908,29 @@ def find_support_resistance(df, window=10):
     recent_highs = df['swing_high'].dropna().tail(5).values
     recent_lows = df['swing_low'].dropna().tail(5).values
     current_price = df['close'].iloc[-1]
-    resistance = [h for h in recent_highs if h > current_price * 0.98]
-    support = [l for l in recent_lows if l < current_price * 1.02]
+    # BUGFIX: the old filters were `h > price*0.98` and `l < price*1.02`. That
+    # 2% tolerance let levels cross to the WRONG SIDE of price — a swing high
+    # 1.7% BELOW the current price passed as "resistance", and a swing low up to
+    # 2% ABOVE price passed as "support". Observed live: price $79,411 with
+    # "resistance" reported at $78,036. Resistance is by definition above price
+    # and support below it; that is not a tolerance question. Also widened the
+    # search from the last 5 swings to the last 12, because after the strict
+    # filter the nearest valid level on the correct side is often further back.
+    recent_highs = df['swing_high'].dropna().tail(12).values
+    recent_lows = df['swing_low'].dropna().tail(12).values
+    resistance = sorted([h for h in recent_highs if h > current_price])
+    support = sorted([l for l in recent_lows if l < current_price], reverse=True)
+
+    # If price has broken out above every recorded swing high there is no
+    # resistance overhead — say so honestly (None) rather than reporting a level
+    # that is actually below price.
     return {
-        'nearest_resistance': round(min(resistance), 4) if len(resistance) > 0 else None,
-        'nearest_support': round(max(support), 4) if len(support) > 0 else None,
+        'nearest_resistance': round(resistance[0], 4) if len(resistance) > 0 else None,
+        'nearest_support': round(support[0], 4) if len(support) > 0 else None,
         'resistance_levels': [round(h, 4) for h in resistance[:3]],
         'support_levels': [round(l, 4) for l in support[:3]],
+        'no_resistance_overhead': len(resistance) == 0,
+        'no_support_below': len(support) == 0,
     }
 
 def whale_activity_proxy(df):
@@ -3305,14 +3342,28 @@ def generate_intraday_trade(code, symbol):
         # the end of the pipeline came back with 0 bars — most likely Binance
         # rate-limiting a CI IP after 30-40+ unspaced calls earlier in the same
         # run. This costs ~4.5s total across 9 assets but reduces that pressure.
-        time.sleep(0.5)
         df = fetch_binance_klines_interval(symbol, interval=cfg['interval'], limit=cfg['bars'])
+        if df is None or df.empty:
+            # Retry once after a cooldown. "insufficient data" was showing on the
+            # live dashboard for every asset and gave no clue why — now the real
+            # underlying fetch error is surfaced instead of a generic message.
+            time.sleep(3)
+            df = fetch_binance_klines_interval(symbol, interval=cfg['interval'], limit=cfg['bars'])
         if df is None or df.empty or len(df) < 60 or 'high' not in df.columns:
+            n = 0 if df is None else len(df)
+            real = df.attrs.get('fetch_error') if df is not None else None
             return {'timeframe': cfg['interval'], 'signal': 'NO TRADE', 'conviction': 0.0,
-                    'reason': 'insufficient data', 'levels': {}}
+                    'reason': (f"4h data unavailable: {real}" if real
+                               else f"only {n} 4h bars returned (need 60) — likely Binance rate limit"),
+                    'levels': {}}
         df = prepare_4h_df(df)
         trade = score_4h_bar(df)
 
+        # Only spend the CVD + funding calls when there's actually a signal to
+        # validate. When all 9 assets are NO TRADE (the common case in chop)
+        # this alone saves 18 Binance calls per run.
+        if trade.get('signal') not in ('LONG', 'SHORT'):
+            return trade
         cvd = fetch_cvd(symbol)
         trade['cvd'] = cvd
 
@@ -3720,6 +3771,15 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000, learn
         # ─── INTRADAY (4h) TRADE — separate timeframe, separate levels, separate stats ───
         'intraday_trade': _intraday,
         # ─── PER-ASSET BIG/SMALL TRADE SIZING ───
+        # BUGFIX: the sizing gates (0.60 BIG / 0.40 SMALL) were built on a
+        # different scale than the signal thresholds (0.50 STRONG LONG /
+        # 0.20 LONG). That created a dead zone: an asset could produce a
+        # genuine LONG signal at conviction 0.20-0.39 and still be shown NO
+        # position size at all — which is why SMALL trades never appeared.
+        # Worse, conviction is multiplied by the MTF factor (0.3-1.2) AFTER
+        # the signal fires, so a valid LONG at 0.35 became 0.105 and was gated
+        # out entirely. The gates now MATCH the signal thresholds: SMALL fires
+        # wherever a LONG/SHORT fires (0.20), BIG at STRONG conviction (0.50).
         # Only show a live position size when there's an actual tradeable signal
         # and conviction clears the bar. The bar itself shifts slightly based on
         # online_learning()'s real recent accuracy (learned_adjustment): the system
@@ -3727,13 +3787,13 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000, learn
         'big_trade': (
             {**calculate_trade_size_big(latest['close'], narrative['conviction']), 'asset': code}
             if narrative['action'] not in ('NO TRADE', 'HOLD')
-            and narrative['conviction'] >= max(0.3, 0.6 - learned_adjustment)
+            and narrative['conviction'] >= max(0.35, 0.50 - learned_adjustment)
             else {'position_size': 0, 'risk_pct': 0, 'target_movement': 0, 'trade_type': 'NO_TRADE', 'asset': code}
         ),
         'small_trade': (
             {**calculate_trade_size_small(latest['close'], narrative['conviction']), 'asset': code}
             if narrative['action'] not in ('NO TRADE', 'HOLD')
-            and narrative['conviction'] >= max(0.15, 0.4 - learned_adjustment)
+            and narrative['conviction'] >= max(0.10, 0.20 - learned_adjustment)
             else {'position_size': 0, 'risk_pct': 0, 'target_movement': 0, 'trade_type': 'NO_TRADE', 'asset': code}
         )
     }
