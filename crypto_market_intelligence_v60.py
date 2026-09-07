@@ -3344,6 +3344,18 @@ def score_4h_bar(df_upto):
     if direction == 'LONG':
         tgt = res if (res and price < res) else None
         stop = (sup - mr_buffer if (sup and sup < price) else price - atr * cfg['stop_atr_mult'])
+        # BUGFIX: `max(stop, price - atr*1.5)` only ever CAPPED how far the stop
+        # could be — it enforced no MINIMUM distance. When a real swing support
+        # sat almost exactly at price (a real, observed case: support $6.20 below
+        # a $77,330 entry), risk_distance collapsed toward zero. In the backtest
+        # that produced a 109 R "win" from a single trade — 68% of that asset's
+        # entire reported profit came from this one degenerate trade, and its
+        # exclusion dropped the profit factor from 3.73 to 1.19. The same
+        # collapsed risk_distance feeds LIVE position sizing (risk_amount /
+        # risk_distance), so uncapped this would also have produced a wildly
+        # oversized real position, not just a bad backtest number. Floor it at
+        # 0.5 ATR, which is still tight for a 4h trade.
+        stop = min(stop, price - atr * 0.5)
         stop = max(stop, price - atr * 1.5)
         if tgt is None or (tgt - price) / price > cfg['max_target_pct']:
             # In a range wider than the intraday cap, the correct partial target
@@ -3367,6 +3379,8 @@ def score_4h_bar(df_upto):
     else:
         tgt = sup if (sup and price > sup) else None
         stop = (res + mr_buffer if (res and res > price) else price + atr * cfg['stop_atr_mult'])
+        # Same minimum-distance floor, mirrored for SHORT.
+        stop = max(stop, price + atr * 0.5)
         stop = min(stop, price + atr * 1.5)
         if tgt is None or (price - tgt) / price > cfg['max_target_pct']:
             if mode == 'MEAN_REVERSION' and sup and res and res > sup:
@@ -5416,8 +5430,20 @@ def run_v6_pipeline():
             except Exception:
                 btc_price = 0
         confidence = ml_signal.get('confidence', 0.5)
-        big_trade = calculate_trade_size_big(btc_price, confidence)
-        small_trade = calculate_trade_size_small(btc_price, confidence)
+        # BUGFIX: this always computed a nonzero position size regardless of
+        # ml_signal['trade_qualified'] — observed live: trade_qualified=false,
+        # action=HOLD, yet big_trade.position_size showed a real 0.1104. That's
+        # a position size displayed for a trade the system itself says isn't
+        # qualified. Gate it the same way the per-asset big/small trades are
+        # gated on conviction, for consistency across the two code paths.
+        if ml_signal.get('trade_qualified') and ml_signal.get('action') in ('BUY', 'SELL'):
+            big_trade = calculate_trade_size_big(btc_price, confidence)
+            small_trade = calculate_trade_size_small(btc_price, confidence)
+        else:
+            big_trade = {'position_size': 0, 'risk_pct': 0, 'target_movement': 0,
+                        'trade_type': 'BIG', 'gated_reason': f"not trade_qualified (action={ml_signal.get('action')})"}
+            small_trade = {'position_size': 0, 'risk_pct': 0, 'target_movement': 0,
+                           'trade_type': 'SMALL', 'gated_reason': f"not trade_qualified (action={ml_signal.get('action')})"}
         print(f"  Big Trade: {big_trade.get('position_size', 0):.4f} shares (Risk: {big_trade.get('risk_pct', 0):.1f}%)")
         print(f"  Small Trade: {small_trade.get('position_size', 0):.4f} shares (Risk: {small_trade.get('risk_pct', 0):.1f}%)")
     except Exception as e:
