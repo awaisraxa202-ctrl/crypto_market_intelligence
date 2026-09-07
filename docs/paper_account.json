@@ -1,25 +1,8 @@
 {
   "created": "2026-09-05T14:13:29.699758",
   "starting_capital": 10000.0,
-  "cash": 5369.926541337088,
+  "cash": 9080.54027296055,
   "positions": {
-    "BNB@4h": {
-      "asset": "BNB",
-      "trade_type": "INTRADAY_4H",
-      "side": "LONG",
-      "qty": 2.0081396594195136,
-      "avg_entry": 746.96,
-      "opened": "2026-09-07T13:31:05.852101",
-      "tranches": 1,
-      "last_tranche_notional": 1500.0,
-      "stop_loss": 742.395,
-      "take_profit_1": 750.0,
-      "take_profit_2": 750.0,
-      "risk_distance": 6.4500000000000455,
-      "entry_conviction": 0.45,
-      "expected_hours": 13,
-      "tp1_hit": true
-    },
     "LINK": {
       "asset": "LINK",
       "trade_type": "SWING_DAILY",
@@ -35,40 +18,6 @@
       "risk_distance": 1.2200000000000006,
       "entry_conviction": 0.46,
       "expected_hours": 120,
-      "tp1_hit": false
-    },
-    "ADA": {
-      "asset": "ADA",
-      "trade_type": "SWING_DAILY",
-      "side": "SHORT",
-      "qty": 5007.1976948145075,
-      "avg_entry": 0.2211,
-      "opened": "2026-09-07T15:04:10.265940",
-      "tranches": 1,
-      "last_tranche_notional": 1107.0914103234875,
-      "stop_loss": 0.2,
-      "take_profit_1": 0.27,
-      "take_profit_2": 0.32,
-      "risk_distance": 0.02109999999999998,
-      "entry_conviction": 0.34,
-      "expected_hours": 120,
-      "tp1_hit": false
-    },
-    "DOGE": {
-      "asset": "DOGE",
-      "trade_type": "SWING_DAILY",
-      "side": "SHORT",
-      "qty": 10062.08298672248,
-      "avg_entry": 0.0905,
-      "opened": "2026-09-07T15:04:10.265959",
-      "tranches": 1,
-      "last_tranche_notional": 910.6185102983844,
-      "stop_loss": 0.08,
-      "take_profit_1": 0.11,
-      "take_profit_2": 0.13,
-      "risk_distance": 0.010499999999999995,
-      "entry_conviction": 0.34,
-      "expected_hours": 144,
       "tp1_hit": false
     }
   },
@@ -135,6 +84,54 @@
       "return_pct": 11.92,
       "opened": "2026-09-07T13:46:26.358230",
       "closed": "2026-09-07T15:04:10.263999",
+      "holding_days": 0
+    },
+    {
+      "asset": "BNB",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "entry_price": 746.96,
+      "exit_price": 741.801084,
+      "qty": 2.00813966,
+      "tranches": 1,
+      "pnl": -10.36,
+      "return_pct": -0.69,
+      "opened": "2026-09-07T13:31:05.852101",
+      "closed": "2026-09-07T17:03:49.224114",
+      "holding_days": 0
+    },
+    {
+      "asset": "ADA",
+      "trade_type": "SWING_DAILY",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "entry_price": 0.2211,
+      "exit_price": 0.20016,
+      "qty": 5007.19769481,
+      "tranches": 1,
+      "pnl": 104.85,
+      "return_pct": 9.47,
+      "opened": "2026-09-07T15:04:10.265940",
+      "closed": "2026-09-07T17:03:49.226499",
+      "holding_days": 0
+    },
+    {
+      "asset": "DOGE",
+      "trade_type": "SWING_DAILY",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "entry_price": 0.0905,
+      "exit_price": 0.080064,
+      "qty": 10062.08298672,
+      "tranches": 1,
+      "pnl": 105.01,
+      "return_pct": 11.53,
+      "opened": "2026-09-07T15:04:10.265959",
+      "closed": "2026-09-07T17:03:49.228674",
       "holding_days": 0
     }
   ],
@@ -282,48 +279,51 @@
     {
       "ts": "2026-09-07T15:04:10.265969",
       "equity": 10353.99
+    },
+    {
+      "ts": "2026-09-07T17:03:49.230745",
+      "equity": 10541.98
     }
   ],
   "stats": {
     "by_type": {
       "SWING_DAILY": {
-        "closed": 4,
-        "wins": 4,
+        "closed": 6,
+        "wins": 6,
         "losses": 0,
         "win_rate": 100.0,
         "profit_factor": null,
-        "net_pnl": 409.08,
-        "open": 3,
+        "net_pnl": 618.94,
+        "open": 1,
         "avg_holding_days": 0.0
       },
       "INTRADAY_4H": {
-        "closed": 0,
+        "closed": 1,
         "wins": 0,
-        "losses": 0,
-        "win_rate": null,
-        "profit_factor": null,
-        "net_pnl": 0,
-        "open": 1,
-        "avg_holding_days": null
+        "losses": 1,
+        "win_rate": 0.0,
+        "profit_factor": 0.0,
+        "net_pnl": -10.36,
+        "open": 0,
+        "avg_holding_days": 0.0
       }
     },
-    "equity": 10353.99,
-    "cash": 5369.93,
-    "open_positions": 4,
-    "total_return_pct": 3.54,
-    "closed_trades": 4,
-    "wins": 4,
-    "losses": 0,
-    "win_rate": 100.0,
-    "profit_factor": null,
-    "avg_win": 102.27,
-    "avg_loss": null,
+    "equity": 10541.98,
+    "cash": 9080.54,
+    "open_positions": 1,
+    "total_return_pct": 5.42,
+    "closed_trades": 7,
+    "wins": 6,
+    "losses": 1,
+    "win_rate": 85.7,
+    "profit_factor": 59.74,
+    "avg_win": 103.16,
+    "avg_loss": -10.36,
     "dca_positions": 0,
     "last_events": [
-      "ADA stopped out (+103.09)",
-      "DOGE stopped out (+103.23)",
-      "ADA OPENED SHORT 5007.197695 @ 0.2211",
-      "DOGE OPENED SHORT 10062.082987 @ 0.0905"
+      "BNB@4h stopped out (-10.36)",
+      "ADA stopped out (+104.85)",
+      "DOGE stopped out (+105.01)"
     ]
   }
 }
