@@ -1463,9 +1463,9 @@
               ${riskMetrics.risk_grade ? `<span class="risk-badge ${riskMetrics.risk_grade === 'A' || riskMetrics.risk_grade === 'B' ? 'safe' : riskMetrics.risk_grade === 'F' ? 'danger' : 'warning'}">Risk: ${riskMetrics.risk_grade}</span>` : ''}
               ${volForecast.regime === 'HIGH' ? `<span class="risk-badge warning">⚠️ High Vol</span>` : ''}
               ${bigTrade.position_size ? `<span class="risk-badge info">BIG: ${bigTrade.position_size.toFixed(4)}</span>`
-                 : `<span class="risk-badge" style="opacity:.55;">BIG: gated (needs 60% conv)</span>`}
+                 : `<span class="risk-badge" style="opacity:.55;">BIG: gated (needs 50% conv)</span>`}
               ${smallTrade.position_size ? `<span class="risk-badge info">SMALL: ${smallTrade.position_size.toFixed(4)}</span>`
-                 : `<span class="risk-badge" style="opacity:.55;">SMALL: gated (needs 40% conv)</span>`}
+                 : `<span class="risk-badge" style="opacity:.55;">SMALL: gated (needs 20% conv)</span>`}
               ${a.mtf_multiplier !== undefined ? `<span class="risk-badge ${a.mtf_multiplier >= 1 ? 'safe' : a.mtf_multiplier <= 0.3 ? 'danger' : 'warning'}">MTF x${a.mtf_multiplier}</span>` : ''}
               ${a.kelly_position_size ? `<span class="risk-badge info">Kelly: ${(a.kelly_position_size * 100).toFixed(1)}%</span>` : ''}
             </div>
@@ -1523,8 +1523,8 @@
                 ${tradePlan.time_note ? `<div style="font-size:0.42rem;color:var(--text-muted);margin-top:2px;">${tradePlan.time_note}</div>` : ''}
                 <div style="margin-top:6px;padding:6px;background:rgba(255,255,255,0.02);border-radius:5px;font-size:0.5rem;">
                   <div style="color:var(--text-muted);font-size:0.4rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Two-tier sizing</div>
-                  <div style="display:flex;justify-content:space-between;"><span>BIG (60%+ conv, ~4% move)</span><span style="color:${bigTrade.position_size ? 'var(--lime)' : 'var(--text-muted)'};">${bigTrade.position_size ? bigTrade.position_size.toFixed(4) + ' units · ' + bigTrade.risk_pct + '% risk' : 'gated — conviction ' + ((a.conviction||0)*100).toFixed(0) + '% < 60%'}</span></div>
-                  <div style="display:flex;justify-content:space-between;"><span>SMALL (40%+ conv, ~1% move)</span><span style="color:${smallTrade.position_size ? 'var(--lime)' : 'var(--text-muted)'};">${smallTrade.position_size ? smallTrade.position_size.toFixed(4) + ' units · ' + smallTrade.risk_pct + '% risk' : 'gated — conviction ' + ((a.conviction||0)*100).toFixed(0) + '% < 40%'}</span></div>
+                  <div style="display:flex;justify-content:space-between;"><span>BIG (50%+ conv, ~4% move)</span><span style="color:${bigTrade.position_size ? 'var(--lime)' : 'var(--text-muted)'};">${bigTrade.position_size ? bigTrade.position_size.toFixed(4) + ' units · ' + bigTrade.risk_pct + '% risk' : 'gated — conviction ' + ((a.conviction||0)*100).toFixed(0) + '% < 50%'}</span></div>
+                  <div style="display:flex;justify-content:space-between;"><span>SMALL (20%+ conv, ~1% move)</span><span style="color:${smallTrade.position_size ? 'var(--lime)' : 'var(--text-muted)'};">${smallTrade.position_size ? smallTrade.position_size.toFixed(4) + ' units · ' + smallTrade.risk_pct + '% risk' : 'gated — conviction ' + ((a.conviction||0)*100).toFixed(0) + '% < 20%'}</span></div>
                 </div>
                 <button onclick="showTradeExplanation('${code}')">💡 Why This Trade?</button>
               </div>
