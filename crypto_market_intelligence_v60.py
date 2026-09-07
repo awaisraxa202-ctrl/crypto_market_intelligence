@@ -277,13 +277,76 @@ _KLINE_CACHE = {}
 _FUNDING_CACHE = {}
 
 
-def fetch_binance_klines_interval(symbol, interval='1h', limit=200):
+_KRAKEN_INTERVAL_MAP = {'1m': 1, '5m': 5, '15m': 15, '30m': 30, '1h': 60,
+                        '4h': 240, '1d': 1440, '1w': 10080}
+
+
+def _kraken_pair(symbol):
+    """Map our Binance-style symbol (BTCUSDT) to a Kraken pair (XBTUSD)."""
+    base = symbol.replace('USDT', '')
+    kraken_base = 'XBT' if base == 'BTC' else base
+    return f"{kraken_base}USD"
+
+
+def _fetch_kraken_ohlc(symbol, interval, limit):
+    """Kraken public OHLC — used when Binance blocks the request (see note in
+    fetch_binance_klines_interval). Kraken has no comparable history of
+    geo/legal-blocking cloud CI IP ranges, so it's a real fallback, not a
+    cosmetic one — but this project's sandbox can't verify it end-to-end
+    (Kraken's domain isn't in the sandbox's egress allowlist), so this is
+    verified by contract/format, not by a live call from here."""
+    if interval not in _KRAKEN_INTERVAL_MAP:
+        return pd.DataFrame()
+    try:
+        pair = _kraken_pair(symbol)
+        url = "https://api.kraken.com/0/public/OHLC"
+        r = fetch_with_retry(url, params={'pair': pair, 'interval': _KRAKEN_INTERVAL_MAP[interval]}, timeout=30)
+        data = r.json()
+        if data.get('error'):
+            raise ValueError(f"Kraken error: {data['error']}")
+        result_key = next((k for k in data.get('result', {}) if k != 'last'), None)
+        if not result_key:
+            return pd.DataFrame()
+        rows = data['result'][result_key][-limit:]
+        df = pd.DataFrame(rows, columns=['time', 'open', 'high', 'low', 'close', 'vwap', 'volume', 'count'])
+        df['date'] = pd.to_datetime(df['time'], unit='s')
+        for col in ['open', 'high', 'low', 'close', 'volume']:
+            df[col] = df[col].astype(float)
+        return df[['date', 'open', 'high', 'low', 'close', 'volume']]
+    except Exception as e:
+        print(f"  ⚠️ Kraken {interval} {symbol}: {e}")
+        return pd.DataFrame()
+
+
+def _fetch_yahoo_interval(yahoo_ticker, interval, limit):
+    """Yahoo Finance as a third fallback layer (only if the caller passed a
+    yahoo ticker via the optional yahoo_ticker parameter chain)."""
+    yahoo_interval_map = {'1h': '60m', '4h': '60m', '1d': '1d'}  # yfinance has no native 4h; resample 60m
+    yf_interval = yahoo_interval_map.get(interval)
+    if not yf_interval:
+        return pd.DataFrame()
+    try:
+        df = fetch_yahoo_ohlcv(yahoo_ticker, period='60d' if interval != '1d' else '2y')
+        if df is None or df.empty:
+            return pd.DataFrame()
+        if interval == '4h':
+            df = df.set_index('date').resample('4h').agg(
+                {'open': 'first', 'high': 'max', 'low': 'min', 'close': 'last', 'volume': 'sum'}
+            ).dropna().reset_index()
+        return df.tail(limit)
+    except Exception as e:
+        print(f"  ⚠️ Yahoo interval fallback failed: {e}")
+        return pd.DataFrame()
+
+
+def fetch_binance_klines_interval(symbol, interval='1h', limit=200, yahoo_ticker=None):
     cache_key = (symbol, interval, limit)
     if cache_key in _KLINE_CACHE:
         cached = _KLINE_CACHE[cache_key]
         return cached.copy() if hasattr(cached, 'copy') else cached
     url = "https://api.binance.com/api/v3/klines"
     params = {'symbol': symbol, 'interval': interval, 'limit': limit}
+    binance_error = None
     try:
         r = fetch_with_retry(url, params=params, timeout=30)
         data = r.json()
@@ -302,10 +365,32 @@ def fetch_binance_klines_interval(symbol, interval='1h', limit=200):
         _KLINE_CACHE[cache_key] = result
         return result.copy()
     except Exception as e:
+        binance_error = str(e)
         print(f"  ⚠️ Binance {interval} {symbol}: {e}")
-        empty = pd.DataFrame()
-        empty.attrs['fetch_error'] = str(e)   # let callers report the REAL reason
-        return empty
+
+    # FALLBACK CHAIN — confirmed live on GitHub Actions: Binance returns
+    # HTTP 451 "Unavailable For Legal Reasons" for klines requests from this
+    # CI's IP range. This is a documented, known issue (Binance geo/legal-
+    # blocks many cloud/CI-hosted IP ranges) — not a rate limit, and not fixed
+    # by retrying the same source. Try Kraken, then Yahoo, before giving up.
+    print(f"  ↪ Trying Kraken fallback for {interval} {symbol}...")
+    result = _fetch_kraken_ohlc(symbol, interval, limit)
+    if not result.empty:
+        result.attrs['source'] = 'Kraken (Binance unavailable)'
+        _KLINE_CACHE[cache_key] = result
+        return result.copy()
+
+    if yahoo_ticker:
+        print(f"  ↪ Trying Yahoo fallback for {interval} {yahoo_ticker}...")
+        result = _fetch_yahoo_interval(yahoo_ticker, interval, limit)
+        if not result.empty:
+            result.attrs['source'] = 'Yahoo (Binance + Kraken unavailable)'
+            _KLINE_CACHE[cache_key] = result
+            return result.copy()
+
+    empty = pd.DataFrame()
+    empty.attrs['fetch_error'] = f"Binance failed ({binance_error}); Kraken and Yahoo fallbacks also unavailable"
+    return empty
 
 def fetch_yahoo(ticker, period='2y'):
     try:
@@ -1609,10 +1694,11 @@ def false_signal_filter(signal, conviction, volume_ratio, volatility):
 # ===================== 57-59. MULTI-TF, VOLATILITY, TARGETS =====================
 
 def multi_timeframe_analysis(symbol, timeframes=['1h', '4h', '1d']):
+    _yahoo = next((cfg['yahoo'] for cfg in ASSETS.values() if cfg['binance'] == symbol), None)
     tf_signals = {}
     tf_data = {}
     for tf in timeframes:
-        df = fetch_binance_klines_interval(symbol, tf, 200)
+        df = fetch_binance_klines_interval(symbol, tf, 200, yahoo_ticker=_yahoo)
         if df.empty:
             continue
         df['sma_20'] = df['close'].rolling(20).mean()
@@ -3331,6 +3417,7 @@ def score_4h_bar(df_upto):
 
 
 def generate_intraday_trade(code, symbol):
+    _yahoo = ASSETS.get(code, {}).get('yahoo')
     """Live wrapper: fetch fresh 4h data, prepare it, score the latest bar,
     then adjust conviction using real executed-order-flow (CVD) — live-only,
     since it needs real-time trade prints the backtest can't reconstruct
@@ -3342,13 +3429,13 @@ def generate_intraday_trade(code, symbol):
         # the end of the pipeline came back with 0 bars — most likely Binance
         # rate-limiting a CI IP after 30-40+ unspaced calls earlier in the same
         # run. This costs ~4.5s total across 9 assets but reduces that pressure.
-        df = fetch_binance_klines_interval(symbol, interval=cfg['interval'], limit=cfg['bars'])
+        df = fetch_binance_klines_interval(symbol, interval=cfg['interval'], limit=cfg['bars'], yahoo_ticker=_yahoo)
         if df is None or df.empty:
             # Retry once after a cooldown. "insufficient data" was showing on the
             # live dashboard for every asset and gave no clue why — now the real
             # underlying fetch error is surfaced instead of a generic message.
             time.sleep(3)
-            df = fetch_binance_klines_interval(symbol, interval=cfg['interval'], limit=cfg['bars'])
+            df = fetch_binance_klines_interval(symbol, interval=cfg['interval'], limit=cfg['bars'], yahoo_ticker=_yahoo)
         if df is None or df.empty or len(df) < 60 or 'high' not in df.columns:
             n = 0 if df is None else len(df)
             real = df.attrs.get('fetch_error') if df is not None else None
@@ -3410,7 +3497,7 @@ def generate_intraday_trade(code, symbol):
                 'reason': f"intraday engine error: {e}", 'levels': {}}
 
 
-def backtest_intraday_engine(symbol, bars=1000, time_exit_multiplier=3):
+def backtest_intraday_engine(symbol, bars=1000, time_exit_multiplier=3, yahoo_ticker=None):
     """Real walk-forward backtest of the EXACT live scoring logic (score_4h_bar),
     over up to ~1000 historical 4h bars (~5-6 months). No lookahead: at bar i,
     only df.iloc[:i+1] is visible when a decision is made — the same information
@@ -3425,14 +3512,14 @@ def backtest_intraday_engine(symbol, bars=1000, time_exit_multiplier=3):
         'total_r': 0.0, 'gross_r_win': 0.0, 'gross_r_loss': 0.0, 'trades': [], 'error': None,
     }
     try:
-        df = fetch_binance_klines_interval(symbol, interval=INTRADAY_CONFIG['interval'], limit=bars)
+        df = fetch_binance_klines_interval(symbol, interval=INTRADAY_CONFIG['interval'], limit=bars, yahoo_ticker=yahoo_ticker)
         if df is None or df.empty:
             # This is the step that runs LATE in a long pipeline — by now there
             # have been 30-40+ prior Binance calls this run (9 assets' daily +
             # 4h + CVD + funding data). A brief cooldown then a smaller, cheaper
             # request gives a real chance of recovering instead of just failing.
             time.sleep(5)
-            df = fetch_binance_klines_interval(symbol, interval=INTRADAY_CONFIG['interval'], limit=max(300, bars // 2))
+            df = fetch_binance_klines_interval(symbol, interval=INTRADAY_CONFIG['interval'], limit=max(300, bars // 2), yahoo_ticker=yahoo_ticker)
         if df is None or df.empty or len(df) < 120 or 'high' not in df.columns:
             real_reason = df.attrs.get('fetch_error') if df is not None else None
             result['error'] = f"insufficient historical data{f' (fetch failed: {real_reason})' if real_reason else ' (empty response after retry)'}"
@@ -5428,7 +5515,7 @@ def run_v6_pipeline():
     backtest_results = {}
     for _sym, _code in [('BTCUSDT', 'BTC'), ('ETHUSDT', 'ETH')]:
         try:
-            bt = backtest_intraday_engine(_sym, bars=1000)
+            bt = backtest_intraday_engine(_sym, bars=1000, yahoo_ticker=ASSETS.get(_code, {}).get('yahoo'))
             backtest_results[_code] = bt
             if bt.get('total_trades'):
                 print(f"  {_code}: {bt['total_trades']} trades | win rate {bt['win_rate']}% | "
