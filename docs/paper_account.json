@@ -1,7 +1,7 @@
 {
   "created": "2026-09-05T14:13:29.699758",
   "starting_capital": 10000.0,
-  "cash": 5465.499464662324,
+  "cash": 4727.16575857486,
   "positions": {
     "LINK": {
       "asset": "LINK",
@@ -20,40 +20,6 @@
       "expected_hours": 120,
       "tp1_hit": false
     },
-    "BNB@4h": {
-      "asset": "BNB",
-      "trade_type": "INTRADAY_4H",
-      "side": "LONG",
-      "qty": 1.780937988966095,
-      "avg_entry": 750.37,
-      "opened": "2026-09-08T12:22:11.134186",
-      "tranches": 1,
-      "last_tranche_notional": 1336.3624387804887,
-      "stop_loss": 746.5899999999999,
-      "take_profit_1": 755.0,
-      "take_profit_2": 755.0,
-      "risk_distance": 9.860000000000014,
-      "entry_conviction": 0.45,
-      "expected_hours": 10,
-      "tp1_hit": true
-    },
-    "SOL@4h": {
-      "asset": "SOL",
-      "trade_type": "INTRADAY_4H",
-      "side": "LONG",
-      "qty": 11.05546844739345,
-      "avg_entry": 102.71,
-      "opened": "2026-09-08T12:22:11.134212",
-      "tranches": 1,
-      "last_tranche_notional": 1135.5071642317812,
-      "stop_loss": 102.90704600000001,
-      "take_profit_1": 104.14,
-      "take_profit_2": 104.14,
-      "risk_distance": 0.8059079999999881,
-      "entry_conviction": 0.36,
-      "expected_hours": 6,
-      "tp1_hit": true
-    },
     "ETH@4h": {
       "asset": "ETH",
       "trade_type": "INTRADAY_4H",
@@ -63,13 +29,47 @@
       "opened": "2026-09-08T15:04:04.734095",
       "tranches": 1,
       "last_tranche_notional": 964.8404374477445,
-      "stop_loss": 2468.991277,
+      "stop_loss": 2491.0006385,
       "take_profit_1": 2500.0,
       "take_profit_2": 2500.0,
       "risk_distance": 15.4987229999997,
       "entry_conviction": 0.45,
       "expected_hours": 4,
       "tp1_hit": true
+    },
+    "LINK@4h": {
+      "asset": "LINK",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "qty": 93.51775612336854,
+      "avg_entry": 12.75871,
+      "opened": "2026-09-08T17:04:10.491957",
+      "tranches": 1,
+      "last_tranche_notional": 1193.1659302287835,
+      "stop_loss": 12.606403,
+      "take_profit_1": 13.0,
+      "take_profit_2": 13.0,
+      "risk_distance": 0.15230700000000041,
+      "entry_conviction": 0.45,
+      "expected_hours": 12,
+      "tp1_hit": true
+    },
+    "BNB": {
+      "asset": "BNB",
+      "trade_type": "SWING_DAILY",
+      "side": "LONG",
+      "qty": 2.682559410785975,
+      "avg_entry": 755.87,
+      "opened": "2026-09-08T17:04:10.491979",
+      "tranches": 1,
+      "last_tranche_notional": 2027.6661818307948,
+      "stop_loss": 710.54,
+      "take_profit_1": 846.54,
+      "take_profit_2": 937.2,
+      "risk_distance": 45.33000000000004,
+      "entry_conviction": 0.48,
+      "expected_hours": 120,
+      "tp1_hit": false
     }
   },
   "closed_trades": [
@@ -376,6 +376,38 @@
       "opened": "2026-09-08T11:03:16.790337",
       "closed": "2026-09-08T12:22:11.131309",
       "holding_days": 0
+    },
+    {
+      "asset": "BNB",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "TAKE_PROFIT_2",
+      "successful": true,
+      "entry_price": 750.37,
+      "exit_price": 754.396,
+      "qty": 1.78093799,
+      "tranches": 1,
+      "pnl": 7.17,
+      "return_pct": 0.54,
+      "opened": "2026-09-08T12:22:11.134186",
+      "closed": "2026-09-08T17:04:10.485658",
+      "holding_days": 0
+    },
+    {
+      "asset": "SOL",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "TAKE_PROFIT_2",
+      "successful": true,
+      "entry_price": 102.71,
+      "exit_price": 104.056688,
+      "qty": 11.05546845,
+      "tranches": 1,
+      "pnl": 14.89,
+      "return_pct": 1.31,
+      "opened": "2026-09-08T12:22:11.134212",
+      "closed": "2026-09-08T17:04:10.488865",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
@@ -594,6 +626,10 @@
     {
       "ts": "2026-09-08T15:04:04.734119",
       "equity": 11461.99
+    },
+    {
+      "ts": "2026-09-08T17:04:10.492000",
+      "equity": 11508.65
     }
   ],
   "stats": {
@@ -605,35 +641,38 @@
         "win_rate": 100.0,
         "profit_factor": null,
         "net_pnl": 1613.96,
-        "open": 1,
+        "open": 2,
         "avg_holding_days": 0.0
       },
       "INTRADAY_4H": {
-        "closed": 4,
-        "wins": 2,
+        "closed": 6,
+        "wins": 4,
         "losses": 2,
-        "win_rate": 50.0,
-        "profit_factor": 0.86,
-        "net_pnl": -1.76,
-        "open": 3,
+        "win_rate": 66.7,
+        "profit_factor": 2.57,
+        "net_pnl": 20.3,
+        "open": 2,
         "avg_holding_days": 0.0
       }
     },
-    "equity": 11461.99,
-    "cash": 5465.5,
+    "equity": 11508.65,
+    "cash": 4727.17,
     "open_positions": 4,
-    "total_return_pct": 14.62,
-    "closed_trades": 19,
-    "wins": 17,
+    "total_return_pct": 15.09,
+    "closed_trades": 21,
+    "wins": 19,
     "losses": 2,
-    "win_rate": 89.5,
-    "profit_factor": 125.69,
-    "avg_win": 95.6,
+    "win_rate": 90.5,
+    "profit_factor": 127.39,
+    "avg_win": 86.69,
     "avg_loss": -6.46,
     "dca_positions": 1,
     "last_events": [
-      "ETH \u26a14h OPENED LONG 0.388345 @ 2484.4900 \u2192 2500 (~4h)",
-      "ADA skipped \u2014 correlated exposure cap"
+      "BNB@4h TP2 hit \u2014 closed (+7.17)",
+      "SOL@4h TP2 hit \u2014 closed (+14.89)",
+      "LINK \u26a14h OPENED LONG 93.517756 @ 12.7587 \u2192 13 (~12h)",
+      "BNB OPENED LONG 2.682559 @ 755.8700",
+      "DOGE skipped \u2014 correlated exposure cap"
     ]
   }
 }
