@@ -1802,11 +1802,21 @@
       "stop_loss": 12.606403,
       "take_profit_1": 13,
       "take_profit_2": 13,
-      "status": "ACTIVE",
-      "exit_price": null,
-      "exit_date": null,
-      "profit_pct": null,
-      "holding_days": null
+      "status": "CLOSED_LOSS",
+      "exit_price": 12.538000106811523,
+      "exit_date": "2026-09-08T20:25:01.263946",
+      "profit_pct": -1.7298762428840941,
+      "holding_days": 0,
+      "post_mortem": {
+        "asset": "LINK@4h",
+        "entry": 12.75871,
+        "exit": 12.538000106811523,
+        "profit_pct": -1.73,
+        "holding_days": 0,
+        "why_it_failed": "Stop-loss was triggered due to unexpected market movement.",
+        "lesson": "Consider wider stop-loss during event weeks.",
+        "improvement": "Stop-loss multiplier increased from 2x to 2.5x ATR."
+      }
     },
     {
       "id": "BNB_20260908_1737",
@@ -1894,11 +1904,21 @@
       "stop_loss": 12.580563,
       "take_profit_1": 13,
       "take_profit_2": 13,
-      "status": "ACTIVE",
-      "exit_price": null,
-      "exit_date": null,
-      "profit_pct": null,
-      "holding_days": null
+      "status": "CLOSED_LOSS",
+      "exit_price": 12.538000106811523,
+      "exit_date": "2026-09-08T20:25:01.267648",
+      "profit_pct": -1.530447520382103,
+      "holding_days": 0,
+      "post_mortem": {
+        "asset": "LINK@4h",
+        "entry": 12.73287,
+        "exit": 12.538000106811523,
+        "profit_pct": -1.53,
+        "holding_days": 0,
+        "why_it_failed": "Stop-loss was triggered due to unexpected market movement.",
+        "lesson": "Consider wider stop-loss during event weeks.",
+        "improvement": "Stop-loss multiplier increased from 2x to 2.5x ATR."
+      }
     },
     {
       "id": "BNB@4h_20260908_1902",
@@ -1945,21 +1965,85 @@
         "lesson": "",
         "improvement": ""
       }
+    },
+    {
+      "id": "ETH@4h_20260908_2023",
+      "asset": "ETH@4h",
+      "base_asset": "ETH",
+      "timeframe": "4h",
+      "signal": "LONG",
+      "entry_price": 2485.69,
+      "conviction": 0.45,
+      "entry_date": "2026-09-08T20:23:12.365296",
+      "stop_loss": 2470.461312,
+      "take_profit_1": 2500,
+      "take_profit_2": 2500,
+      "status": "ACTIVE",
+      "exit_price": null,
+      "exit_date": null,
+      "profit_pct": null,
+      "holding_days": null
+    },
+    {
+      "id": "BNB@4h_20260908_2023",
+      "asset": "BNB@4h",
+      "base_asset": "BNB",
+      "timeframe": "4h",
+      "signal": "LONG",
+      "entry_price": 749.49,
+      "conviction": 0.45,
+      "entry_date": "2026-09-08T20:23:52.811394",
+      "stop_loss": 740.51,
+      "take_profit_1": 750,
+      "take_profit_2": 750,
+      "status": "ACTIVE",
+      "exit_price": null,
+      "exit_date": null,
+      "profit_pct": null,
+      "holding_days": null
+    },
+    {
+      "id": "ADA_20260908_2024",
+      "asset": "ADA",
+      "base_asset": "ADA",
+      "timeframe": "1d",
+      "signal": "SHORT",
+      "entry_price": 0.22131000459194183,
+      "conviction": 0.34,
+      "entry_date": "2026-09-08T20:24:26.602476",
+      "stop_loss": 0.2,
+      "take_profit_1": 0.27,
+      "take_profit_2": 0.32,
+      "status": "CLOSED_LOSS",
+      "exit_price": 0.22131000459194183,
+      "exit_date": "2026-09-08T20:24:26.605931",
+      "profit_pct": 0.0,
+      "holding_days": 0,
+      "post_mortem": {
+        "asset": "ADA",
+        "entry": 0.22131000459194183,
+        "exit": 0.22131000459194183,
+        "profit_pct": 0.0,
+        "holding_days": 0,
+        "why_it_failed": "",
+        "lesson": "",
+        "improvement": ""
+      }
     }
   ],
   "performance": {
-    "total_signals": 43,
+    "total_signals": 46,
     "excluded_pre_fix": 57,
     "active_signals": 10,
-    "closed_signals": 33,
+    "closed_signals": 36,
     "win_count": 10,
-    "loss_count": 23,
-    "win_rate": 30.303030303030305,
-    "total_profit_pct": 9.29,
+    "loss_count": 26,
+    "win_rate": 27.77777777777778,
+    "total_profit_pct": 6.03,
     "avg_profit_pct": 1.15,
-    "avg_loss_pct": 0.1,
+    "avg_loss_pct": 0.21,
     "best_trade": 1.7359076407491834,
-    "worst_trade": -0.9759581623974223,
+    "worst_trade": -1.7298762428840941,
     "avg_holding_days": 0.0
   },
   "predictions": [
@@ -2100,6 +2184,12 @@
       "asset": "LINK@4h",
       "predicted_direction": "LONG",
       "correct": false
+    },
+    {
+      "timestamp": "2026-09-08T20:25:18.121789",
+      "asset": "ADA",
+      "predicted_direction": "SHORT",
+      "correct": true
     }
   ]
 }
