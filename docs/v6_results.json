@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-09-08T20:27:58.563408",
-  "imbalance": 0.789,
+  "timestamp": "2026-09-08T21:06:20.559114",
+  "imbalance": 0.584,
   "regime": {
     "regime": "LOW_UNCERTAINTY",
     "description": "Low trade policy uncertainty \u2014 fundamentals-driven market",
@@ -15,28 +15,30 @@
   },
   "ml_signal": {
     "bilstm_score": 0.5,
-    "cnn_score": 0.884,
-    "ensemble_score": 0.692,
-    "action": "BUY",
-    "confidence": 0.692,
-    "trade_qualified": true
+    "cnn_score": 0.5,
+    "ensemble_score": 0.5,
+    "action": "HOLD",
+    "confidence": 0.5,
+    "trade_qualified": false
   },
   "big_trade": {
-    "position_size": 0.1176,
-    "risk_pct": 3.69,
-    "target_movement": 3140.6068,
-    "trade_type": "BIG"
+    "position_size": 0,
+    "risk_pct": 0,
+    "target_movement": 0,
+    "trade_type": "BIG",
+    "gated_reason": "not trade_qualified (action=HOLD)"
   },
   "small_trade": {
-    "position_size": 0.1077,
-    "risk_pct": 0.85,
-    "target_movement": 785.1517,
-    "trade_type": "SMALL"
+    "position_size": 0,
+    "risk_pct": 0,
+    "target_movement": 0,
+    "trade_type": "SMALL",
+    "gated_reason": "not trade_qualified (action=HOLD)"
   },
   "explanation": {
     "asset": "BTC",
-    "signal": "BUY",
-    "confidence": 0.692,
+    "signal": "HOLD",
+    "confidence": 0.5,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
       "\u2705 order_book: Bullish order book imbalance",
@@ -45,7 +47,7 @@
     ],
     "historical_evidence": "Building historical database. Check back soon.",
     "historical_trades": [],
-    "risk_warning": "\u2705 Moderate confidence. Standard position size recommended.",
+    "risk_warning": "\u26a0\ufe0f Low confidence trade. Reduce position size by 50%.",
     "trader_comment": "No clear directional bias. Patience is key."
   },
   "narrative": {
@@ -62,9 +64,9 @@
     "dxy": 98.86,
     "dxy_trend": "FALLING",
     "dxy_label": "FALLING (98.86)",
-    "vix": 15.74,
+    "vix": 15.72,
     "vix_level": "MEDIUM",
-    "vix_label": "ELEVATED (15.74)",
+    "vix_label": "ELEVATED (15.72)",
     "liquidity": "TIGHTENING",
     "liquidity_desc": "Short-end yield 3.78% (rising vs 5d ago)",
     "fed_impact": "\ud83d\udfe1 NEUTRAL",
@@ -144,29 +146,29 @@
     }
   },
   "etf_data": {
-    "total_net_flow": 2103485368.54,
+    "total_net_flow": 2111305668.03,
     "cumulative_holdings": null,
     "daily_change": -1.75,
     "etfs_tracked": 4,
     "per_etf": {
       "IBIT": {
         "close": 44.39,
-        "dollar_volume": 1797414109.09,
+        "dollar_volume": 1803722638.24,
         "pct_change": -1.86
       },
       "FBTC": {
         "close": 68.22,
-        "dollar_volume": 235007330.11,
+        "dollar_volume": 235844184.86,
         "pct_change": -1.71
       },
       "ARKB": {
         "close": 26.01,
-        "dollar_volume": 32047545.52,
+        "dollar_volume": 32077483.03,
         "pct_change": -1.74
       },
       "BITB": {
         "close": 42.57,
-        "dollar_volume": 39016383.83,
+        "dollar_volume": 39661361.9,
         "pct_change": -1.71
       }
     },
@@ -176,46 +178,25 @@
   "onchain": {
     "mvrv_zscore": null,
     "miner_reserves": 0,
-    "nvt_ratio": 44.13,
+    "nvt_ratio": 43.69,
     "hashrate_trend": null,
     "exchange_flow_net": null,
     "miner_reserves_trend": "UNKNOWN"
   },
   "exit_strategy": {
-    "entry": 78515.17,
-    "signal": "LONG",
-    "current_price": 79300.3217,
-    "scenarios": [
-      {
-        "condition": "Price hits TP1 ($80870.63)",
-        "action": "Take 50% profit",
-        "reason": "Lock in gains, reduce risk"
-      },
-      {
-        "condition": "Price hits TP2 ($83226.08)",
-        "action": "Take remaining 50% profit",
-        "reason": "Target hit, complete the trade"
-      },
-      {
-        "condition": "Price hits SL ($76159.71)",
-        "action": "Exit immediately",
-        "reason": "Stop-loss protects capital"
-      },
-      {
-        "condition": "No target hit after 7 days",
-        "action": "Close position",
-        "reason": "Time-based exit, opportunity cost"
-      }
-    ]
+    "entry": 78478.05,
+    "signal": "NO TRADE",
+    "current_price": 79262.8305,
+    "scenarios": []
   },
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.5,
-      "cnn_score": 0.884,
-      "ensemble_score": 0.692,
-      "action": "BUY",
-      "confidence": 0.692,
-      "trade_qualified": true
+      "cnn_score": 0.5,
+      "ensemble_score": 0.5,
+      "action": "HOLD",
+      "confidence": 0.5,
+      "trade_qualified": false
     }
   },
   "order_book_history_depth": 1,
