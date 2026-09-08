@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-09-08T12:25:08.488533",
-  "imbalance": 0.627,
+  "timestamp": "2026-09-08T13:06:37.019050",
+  "imbalance": 0.101,
   "regime": {
     "regime": "LOW_UNCERTAINTY",
     "description": "Low trade policy uncertainty \u2014 fundamentals-driven market",
@@ -15,45 +15,43 @@
   },
   "ml_signal": {
     "bilstm_score": 0.5,
-    "cnn_score": 0.641,
-    "ensemble_score": 0.571,
-    "action": "HOLD",
-    "confidence": 0.571,
-    "trade_qualified": false
+    "cnn_score": 0.0,
+    "ensemble_score": 0.25,
+    "action": "SELL",
+    "confidence": 0.75,
+    "trade_qualified": true
   },
   "big_trade": {
-    "position_size": 0,
-    "risk_pct": 0,
-    "target_movement": 0,
-    "trade_type": "BIG",
-    "gated_reason": "not trade_qualified (action=HOLD)"
+    "position_size": 0.1195,
+    "risk_pct": 3.75,
+    "target_movement": 3138.006,
+    "trade_type": "BIG"
   },
   "small_trade": {
-    "position_size": 0,
-    "risk_pct": 0,
-    "target_movement": 0,
-    "trade_type": "SMALL",
-    "gated_reason": "not trade_qualified (action=HOLD)"
+    "position_size": 0.1115,
+    "risk_pct": 0.88,
+    "target_movement": 784.5015,
+    "trade_type": "SMALL"
   },
   "explanation": {
     "asset": "BTC",
-    "signal": "HOLD",
-    "confidence": 0.571,
+    "signal": "SELL",
+    "confidence": 0.75,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
-      "\u2705 order_book: Bullish order book imbalance",
+      "\u274c order_book: Order book data unavailable",
       "\u274c onchain: NVT ratio normal",
       "\u2705 sentiment: Fear & Greed in buy zone"
     ],
     "historical_evidence": "Building historical database. Check back soon.",
     "historical_trades": [],
-    "risk_warning": "\u26a0\ufe0f Low confidence trade. Reduce position size by 50%.",
+    "risk_warning": "\u2705 Moderate confidence. Standard position size recommended.",
     "trader_comment": "No clear directional bias. Patience is key."
   },
   "narrative": {
     "date": "September 08, 2026",
     "macro": "Macro Regime: LOW_UNCERTAINTY \u2014 Low trade policy uncertainty \u2014 fundamentals-driven market",
-    "technicals": "Order book shows bullish imbalance. More buy orders than sell orders.",
+    "technicals": "Order book shows bearish imbalance. More sell orders than buy orders.",
     "sentiment": "Neutral sentiment. No extremes.",
     "upcoming_events": "Next event: CPI Report on 2026-09-12 (Impact: MEDIUM)",
     "trader_comment": "Market is in a consolidation phase. Watch for breakout."
@@ -61,14 +59,14 @@
   "macro_data": {
     "fed_trend": "UNKNOWN",
     "fed_label": "Data unavailable",
-    "dxy": 98.96,
+    "dxy": 98.86,
     "dxy_trend": "FALLING",
-    "dxy_label": "FALLING (98.96)",
-    "vix": 15.65,
+    "dxy_label": "FALLING (98.86)",
+    "vix": 15.44,
     "vix_level": "MEDIUM",
-    "vix_label": "ELEVATED (15.65)",
-    "liquidity": "TIGHTENING",
-    "liquidity_desc": "Short-end yield 3.76% (rising vs 5d ago)",
+    "vix_label": "ELEVATED (15.44)",
+    "liquidity": "EASING",
+    "liquidity_desc": "Short-end yield 3.76% (falling vs 5d ago)",
     "fed_impact": "\ud83d\udfe1 NEUTRAL",
     "dxy_impact": "\ud83d\udfe2 BULLISH",
     "vix_impact": "\ud83d\udfe1 NEUTRAL",
@@ -178,25 +176,41 @@
   "onchain": {
     "mvrv_zscore": null,
     "miner_reserves": 0,
-    "nvt_ratio": 53.82,
+    "nvt_ratio": 52.75,
     "hashrate_trend": null,
     "exchange_flow_net": null,
     "miner_reserves_trend": "UNKNOWN"
   },
   "exit_strategy": {
-    "entry": 78221.78,
-    "signal": "NO TRADE",
-    "current_price": 79003.9978,
-    "scenarios": []
+    "entry": 78450.15,
+    "signal": "SHORT",
+    "current_price": 79234.65149999999,
+    "scenarios": [
+      {
+        "condition": "Price hits TP1 ($76096.65)",
+        "action": "Take 50% profit",
+        "reason": "Lock in gains, reduce risk"
+      },
+      {
+        "condition": "Price hits TP2 ($73743.14)",
+        "action": "Take remaining 50% profit",
+        "reason": "Target hit, complete the trade"
+      },
+      {
+        "condition": "Price hits SL ($80803.65)",
+        "action": "Exit immediately",
+        "reason": "Stop-loss protects capital"
+      }
+    ]
   },
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.5,
-      "cnn_score": 0.641,
-      "ensemble_score": 0.571,
-      "action": "HOLD",
-      "confidence": 0.571,
-      "trade_qualified": false
+      "cnn_score": 0.0,
+      "ensemble_score": 0.25,
+      "action": "SELL",
+      "confidence": 0.75,
+      "trade_qualified": true
     }
   },
   "order_book_history_depth": 1,
