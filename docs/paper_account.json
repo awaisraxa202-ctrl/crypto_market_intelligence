@@ -1,7 +1,7 @@
 {
   "created": "2026-09-05T14:13:29.699758",
   "starting_capital": 10000.0,
-  "cash": 6477.1282800195295,
+  "cash": 4543.511793323482,
   "positions": {
     "LINK": {
       "asset": "LINK",
@@ -37,38 +37,72 @@
       "expected_hours": 120,
       "tp1_hit": false
     },
-    "BTC@4h": {
-      "asset": "BTC",
+    "ADA@4h": {
+      "asset": "ADA",
       "trade_type": "INTRADAY_4H",
       "side": "LONG",
-      "qty": 0.014232208123391571,
-      "avg_entry": 78435.8,
-      "opened": "2026-09-09T19:03:33.431937",
+      "qty": 6216.915689066079,
+      "avg_entry": 0.210303,
+      "opened": "2026-09-09T23:04:20.168625",
       "tranches": 1,
-      "last_tranche_notional": 1116.3146299247167,
-      "stop_loss": 78106.23691849998,
-      "take_profit_1": 78500.0,
-      "take_profit_2": 78500.0,
-      "risk_distance": 378.20616300000984,
-      "entry_conviction": 0.4,
-      "expected_hours": 4,
+      "last_tranche_notional": 1307.4360201576635,
+      "stop_loss": 0.207162,
+      "take_profit_1": 0.2155,
+      "take_profit_2": 0.2155,
+      "risk_distance": 0.003140999999999977,
+      "entry_conviction": 0.62,
+      "expected_hours": 6,
+      "tp1_hit": true
+    },
+    "ETH@4h": {
+      "asset": "ETH",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "qty": 0.45302780992319913,
+      "avg_entry": 2452.23,
+      "opened": "2026-09-09T23:04:20.168643",
+      "tranches": 1,
+      "last_tranche_notional": 1110.9283863279666,
+      "stop_loss": 2436.397846,
+      "take_profit_1": 2484.42,
+      "take_profit_2": 2484.42,
+      "risk_distance": 15.832154000000173,
+      "entry_conviction": 0.6,
+      "expected_hours": 7,
+      "tp1_hit": true
+    },
+    "XRP@4h": {
+      "asset": "XRP",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "qty": 680.3579613265246,
+      "avg_entry": 1.38744,
+      "opened": "2026-09-09T23:04:20.168654",
+      "tranches": 1,
+      "last_tranche_notional": 943.9558498628733,
+      "stop_loss": 1.375015,
+      "take_profit_1": 1.4,
+      "take_profit_2": 1.4,
+      "risk_distance": 0.012424999999999908,
+      "entry_conviction": 0.55,
+      "expected_hours": 9,
       "tp1_hit": true
     },
     "SOL@4h": {
       "asset": "SOL",
       "trade_type": "INTRADAY_4H",
       "side": "LONG",
-      "qty": 11.166271482799642,
-      "avg_entry": 102.4,
-      "opened": "2026-09-09T21:03:53.099869",
+      "qty": 7.93666421559948,
+      "avg_entry": 101.06,
+      "opened": "2026-09-09T23:04:20.168663",
       "tranches": 1,
-      "last_tranche_notional": 1143.4261998386835,
-      "stop_loss": 101.535338,
+      "last_tranche_notional": 802.0792856284835,
+      "stop_loss": 99.658026,
       "take_profit_1": 104.02,
       "take_profit_2": 104.02,
-      "risk_distance": 0.8646620000000098,
-      "entry_conviction": 0.43,
-      "expected_hours": 6,
+      "risk_distance": 1.4019739999999956,
+      "entry_conviction": 0.45,
+      "expected_hours": 11,
       "tp1_hit": true
     }
   },
@@ -840,6 +874,38 @@
       "opened": "2026-09-09T17:25:22.062367",
       "closed": "2026-09-09T20:08:46.124557",
       "holding_days": 0
+    },
+    {
+      "asset": "BTC",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "entry_price": 78435.8,
+      "exit_price": 78043.751929,
+      "qty": 0.01423221,
+      "tranches": 1,
+      "pnl": -5.58,
+      "return_pct": -0.5,
+      "opened": "2026-09-09T19:03:33.431937",
+      "closed": "2026-09-09T23:04:20.160057",
+      "holding_days": 0
+    },
+    {
+      "asset": "SOL",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "entry_price": 102.4,
+      "exit_price": 101.45411,
+      "qty": 11.16627148,
+      "tranches": 1,
+      "pnl": -10.56,
+      "return_pct": -0.92,
+      "opened": "2026-09-09T21:03:53.099869",
+      "closed": "2026-09-09T23:04:20.164474",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
@@ -1150,6 +1216,10 @@
     {
       "ts": "2026-09-09T21:03:53.099885",
       "equity": 13090.57
+    },
+    {
+      "ts": "2026-09-09T23:04:20.168675",
+      "equity": 13019.12
     }
   ],
   "stats": {
@@ -1165,30 +1235,35 @@
         "avg_holding_days": 0.0
       },
       "INTRADAY_4H": {
-        "closed": 17,
+        "closed": 19,
         "wins": 10,
-        "losses": 7,
-        "win_rate": 58.8,
-        "profit_factor": 1.09,
-        "net_pnl": 4.17,
-        "open": 2,
+        "losses": 9,
+        "win_rate": 52.6,
+        "profit_factor": 0.81,
+        "net_pnl": -11.97,
+        "open": 4,
         "avg_holding_days": 0.0
       }
     },
-    "equity": 13090.57,
-    "cash": 6477.13,
-    "open_positions": 4,
-    "total_return_pct": 30.91,
-    "closed_trades": 48,
+    "equity": 13019.12,
+    "cash": 4543.51,
+    "open_positions": 6,
+    "total_return_pct": 30.19,
+    "closed_trades": 50,
     "wins": 41,
-    "losses": 7,
-    "win_rate": 85.4,
-    "profit_factor": 75.47,
+    "losses": 9,
+    "win_rate": 82.0,
+    "profit_factor": 56.61,
     "avg_win": 89.13,
-    "avg_loss": -6.92,
+    "avg_loss": -7.17,
     "dca_positions": 1,
     "last_events": [
-      "SOL \u26a14h OPENED LONG 11.166271 @ 102.4000 \u2192 104.02 (~6h)"
+      "BTC@4h stopped out (-5.58)",
+      "SOL@4h stopped out (-10.56)",
+      "ADA \u26a14h OPENED LONG 6216.915689 @ 0.2103 \u2192 0.2155 (~6h)",
+      "ETH \u26a14h OPENED LONG 0.453028 @ 2452.2300 \u2192 2484.42 (~7h)",
+      "XRP \u26a14h OPENED LONG 680.357961 @ 1.3874 \u2192 1.4 (~9h)",
+      "SOL \u26a14h OPENED LONG 7.936664 @ 101.0600 \u2192 104.02 (~11h)"
     ]
   }
 }
