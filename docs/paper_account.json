@@ -1,7 +1,7 @@
 {
   "created": "2026-09-05T14:13:29.699758",
   "starting_capital": 10000.0,
-  "cash": 6364.780078875832,
+  "cash": 8758.500097483164,
   "positions": {
     "LINK": {
       "asset": "LINK",
@@ -36,40 +36,6 @@
       "entry_conviction": 0.48,
       "expected_hours": 120,
       "tp1_hit": false
-    },
-    "BTC@4h": {
-      "asset": "BTC",
-      "trade_type": "INTRADAY_4H",
-      "side": "LONG",
-      "qty": 0.016068968368354242,
-      "avg_entry": 79502.3,
-      "opened": "2026-09-09T13:04:05.990533",
-      "tranches": 1,
-      "last_tranche_notional": 1277.5199439114097,
-      "stop_loss": 79159.930113,
-      "take_profit_1": 79979.3138,
-      "take_profit_2": 79979.3138,
-      "risk_distance": 342.369887000008,
-      "entry_conviction": 0.45,
-      "expected_hours": 5,
-      "tp1_hit": true
-    },
-    "AVAX@4h": {
-      "asset": "AVAX",
-      "trade_type": "INTRADAY_4H",
-      "side": "LONG",
-      "qty": 141.93949554816788,
-      "avg_entry": 7.916,
-      "opened": "2026-09-09T15:03:49.731295",
-      "tranches": 1,
-      "last_tranche_notional": 1123.593046759297,
-      "stop_loss": 7.829,
-      "take_profit_1": 7.95,
-      "take_profit_2": 7.95,
-      "risk_distance": 0.08700000000000063,
-      "entry_conviction": 0.45,
-      "expected_hours": 8,
-      "tp1_hit": true
     }
   },
   "closed_trades": [
@@ -792,6 +758,38 @@
       "opened": "2026-09-09T13:04:05.990590",
       "closed": "2026-09-09T15:03:49.727387",
       "holding_days": 0
+    },
+    {
+      "asset": "BTC",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "entry_price": 79502.3,
+      "exit_price": 79096.602169,
+      "qty": 0.01606897,
+      "tranches": 1,
+      "pnl": -6.52,
+      "return_pct": -0.51,
+      "opened": "2026-09-09T13:04:05.990533",
+      "closed": "2026-09-09T17:03:29.491348",
+      "holding_days": 0
+    },
+    {
+      "asset": "AVAX",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "TAKE_PROFIT_2",
+      "successful": true,
+      "entry_price": 7.916,
+      "exit_price": 7.94364,
+      "qty": 141.93949555,
+      "tranches": 1,
+      "pnl": 3.92,
+      "return_pct": 0.35,
+      "opened": "2026-09-09T15:03:49.731295",
+      "closed": "2026-09-09T17:03:29.495496",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
@@ -1082,6 +1080,10 @@
     {
       "ts": "2026-09-09T15:03:49.731312",
       "equity": 13193.99
+    },
+    {
+      "ts": "2026-09-09T17:03:29.499416",
+      "equity": 13182.14
     }
   ],
   "stats": {
@@ -1097,32 +1099,31 @@
         "avg_holding_days": 0.0
       },
       "INTRADAY_4H": {
-        "closed": 14,
-        "wins": 9,
-        "losses": 5,
-        "win_rate": 64.3,
-        "profit_factor": 1.62,
-        "net_pnl": 18.65,
-        "open": 2,
+        "closed": 16,
+        "wins": 10,
+        "losses": 6,
+        "win_rate": 62.5,
+        "profit_factor": 1.44,
+        "net_pnl": 16.05,
+        "open": 0,
         "avg_holding_days": 0.0
       }
     },
-    "equity": 13193.99,
-    "cash": 6364.78,
-    "open_positions": 4,
-    "total_return_pct": 31.94,
-    "closed_trades": 45,
-    "wins": 40,
-    "losses": 5,
-    "win_rate": 88.9,
-    "profit_factor": 121.6,
-    "avg_win": 91.26,
-    "avg_loss": -6.0,
+    "equity": 13182.14,
+    "cash": 8758.5,
+    "open_positions": 2,
+    "total_return_pct": 31.82,
+    "closed_trades": 47,
+    "wins": 41,
+    "losses": 6,
+    "win_rate": 87.2,
+    "profit_factor": 100.01,
+    "avg_win": 89.13,
+    "avg_loss": -6.09,
     "dca_positions": 1,
     "last_events": [
-      "ADA stopped out (+131.55)",
-      "DOGE stopped out (+131.84)",
-      "AVAX \u26a14h OPENED LONG 141.939496 @ 7.9160 \u2192 7.95 (~8h)"
+      "BTC@4h stopped out (-6.52)",
+      "AVAX@4h TP2 hit \u2014 closed (+3.92)"
     ]
   }
 }

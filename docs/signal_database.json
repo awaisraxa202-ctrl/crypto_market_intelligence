@@ -2656,11 +2656,21 @@
       "stop_loss": 79159.930113,
       "take_profit_1": 79979.3138,
       "take_profit_2": 79979.3138,
-      "status": "ACTIVE",
-      "exit_price": null,
-      "exit_date": null,
-      "profit_pct": null,
-      "holding_days": null
+      "status": "CLOSED_LOSS",
+      "exit_price": 78767.609375,
+      "exit_date": "2026-09-09T17:01:10.150770",
+      "profit_pct": -0.9241124156156525,
+      "holding_days": 0,
+      "post_mortem": {
+        "asset": "BTC@4h",
+        "entry": 79502.3,
+        "exit": 78767.609375,
+        "profit_pct": -0.92,
+        "holding_days": 0,
+        "why_it_failed": "Stop-loss was triggered due to unexpected market movement.",
+        "lesson": "Consider wider stop-loss during event weeks.",
+        "improvement": "Stop-loss multiplier increased from 2x to 2.5x ATR."
+      }
     },
     {
       "id": "ADA_20260909_1303",
@@ -2730,11 +2740,21 @@
       "stop_loss": 78892.255113,
       "take_profit_1": 79500.0,
       "take_profit_2": 79500.0,
-      "status": "ACTIVE",
-      "exit_price": null,
-      "exit_date": null,
-      "profit_pct": null,
-      "holding_days": null
+      "status": "CLOSED_LOSS",
+      "exit_price": 78767.609375,
+      "exit_date": "2026-09-09T17:01:10.155772",
+      "profit_pct": -0.6089456241119859,
+      "holding_days": 0,
+      "post_mortem": {
+        "asset": "BTC@4h",
+        "entry": 79250.2,
+        "exit": 78767.609375,
+        "profit_pct": -0.61,
+        "holding_days": 0,
+        "why_it_failed": "Stop-loss was triggered due to unexpected market movement.",
+        "lesson": "Consider wider stop-loss during event weeks.",
+        "improvement": "Stop-loss multiplier increased from 2x to 2.5x ATR."
+      }
     },
     {
       "id": "AVAX@4h_20260909_1503",
@@ -2758,14 +2778,14 @@
   "performance": {
     "total_signals": 76,
     "excluded_pre_fix": 57,
-    "active_signals": 16,
-    "closed_signals": 60,
+    "active_signals": 14,
+    "closed_signals": 62,
     "win_count": 18,
-    "loss_count": 42,
-    "win_rate": 30.0,
-    "total_profit_pct": 9.8,
+    "loss_count": 44,
+    "win_rate": 29.03225806451613,
+    "total_profit_pct": 8.27,
     "avg_profit_pct": 0.9,
-    "avg_loss_pct": 0.15,
+    "avg_loss_pct": 0.18,
     "best_trade": 1.7359076407491834,
     "worst_trade": -1.7298762428840941,
     "avg_holding_days": 0.0
@@ -3039,6 +3059,18 @@
       "timestamp": "2026-09-09T15:03:49.727935",
       "asset": "DOGE",
       "predicted_direction": "SHORT",
+      "correct": true
+    },
+    {
+      "timestamp": "2026-09-09T17:03:29.491892",
+      "asset": "BTC@4h",
+      "predicted_direction": "LONG",
+      "correct": false
+    },
+    {
+      "timestamp": "2026-09-09T17:03:29.496019",
+      "asset": "AVAX@4h",
+      "predicted_direction": "LONG",
       "correct": true
     }
   ]
