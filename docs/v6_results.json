@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-09-09T06:53:13.391546",
-  "imbalance": 0.479,
+  "timestamp": "2026-09-09T07:06:36.872639",
+  "imbalance": 0.232,
   "regime": {
     "regime": "LOW_UNCERTAINTY",
     "description": "Low trade policy uncertainty \u2014 fundamentals-driven market",
@@ -15,30 +15,28 @@
   },
   "ml_signal": {
     "bilstm_score": 0.5,
-    "cnn_score": 0.5,
-    "ensemble_score": 0.5,
-    "action": "HOLD",
-    "confidence": 0.5,
-    "trade_qualified": false
+    "cnn_score": 0.148,
+    "ensemble_score": 0.324,
+    "action": "SELL",
+    "confidence": 0.6759999999999999,
+    "trade_qualified": true
   },
   "big_trade": {
-    "position_size": 0,
-    "risk_pct": 0,
-    "target_movement": 0,
-    "trade_type": "BIG",
-    "gated_reason": "not trade_qualified (action=HOLD)"
+    "position_size": 0.1161,
+    "risk_pct": 3.68,
+    "target_movement": 3166.1264,
+    "trade_type": "BIG"
   },
   "small_trade": {
-    "position_size": 0,
-    "risk_pct": 0,
-    "target_movement": 0,
-    "trade_type": "SMALL",
-    "gated_reason": "not trade_qualified (action=HOLD)"
+    "position_size": 0.1059,
+    "risk_pct": 0.84,
+    "target_movement": 791.5316,
+    "trade_type": "SMALL"
   },
   "explanation": {
     "asset": "BTC",
-    "signal": "HOLD",
-    "confidence": 0.5,
+    "signal": "SELL",
+    "confidence": 0.6759999999999999,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
       "\u274c order_book: Order book data unavailable",
@@ -47,13 +45,13 @@
     ],
     "historical_evidence": "Building historical database. Check back soon.",
     "historical_trades": [],
-    "risk_warning": "\u26a0\ufe0f Low confidence trade. Reduce position size by 50%.",
+    "risk_warning": "\u2705 Moderate confidence. Standard position size recommended.",
     "trader_comment": "No clear directional bias. Patience is key."
   },
   "narrative": {
     "date": "September 09, 2026",
     "macro": "Macro Regime: LOW_UNCERTAINTY \u2014 Low trade policy uncertainty \u2014 fundamentals-driven market",
-    "technicals": "Order book is balanced. No clear direction.",
+    "technicals": "Order book shows bearish imbalance. More sell orders than buy orders.",
     "sentiment": "Neutral sentiment. No extremes.",
     "upcoming_events": "Next event: CPI Report on 2026-09-12 (Impact: MEDIUM)",
     "trader_comment": "Market is in a consolidation phase. Watch for breakout."
@@ -61,9 +59,9 @@
   "macro_data": {
     "fed_trend": "UNKNOWN",
     "fed_label": "Data unavailable",
-    "dxy": 98.7,
+    "dxy": 98.68,
     "dxy_trend": "FALLING",
-    "dxy_label": "FALLING (98.70)",
+    "dxy_label": "FALLING (98.68)",
     "vix": 15.72,
     "vix_level": "MEDIUM",
     "vix_label": "ELEVATED (15.72)",
@@ -178,25 +176,41 @@
   "onchain": {
     "mvrv_zscore": null,
     "miner_reserves": 0,
-    "nvt_ratio": 43.46,
+    "nvt_ratio": 44.24,
     "hashrate_trend": null,
     "exchange_flow_net": null,
     "miner_reserves_trend": "UNKNOWN"
   },
   "exit_strategy": {
-    "entry": 79164.08,
-    "signal": "NO TRADE",
-    "current_price": 79955.7208,
-    "scenarios": []
+    "entry": 79153.16,
+    "signal": "SHORT",
+    "current_price": 79944.6916,
+    "scenarios": [
+      {
+        "condition": "Price hits TP1 ($76778.57)",
+        "action": "Take 50% profit",
+        "reason": "Lock in gains, reduce risk"
+      },
+      {
+        "condition": "Price hits TP2 ($74403.97)",
+        "action": "Take remaining 50% profit",
+        "reason": "Target hit, complete the trade"
+      },
+      {
+        "condition": "Price hits SL ($81527.75)",
+        "action": "Exit immediately",
+        "reason": "Stop-loss protects capital"
+      }
+    ]
   },
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.5,
-      "cnn_score": 0.5,
-      "ensemble_score": 0.5,
-      "action": "HOLD",
-      "confidence": 0.5,
-      "trade_qualified": false
+      "cnn_score": 0.148,
+      "ensemble_score": 0.324,
+      "action": "SELL",
+      "confidence": 0.6759999999999999,
+      "trade_qualified": true
     }
   },
   "order_book_history_depth": 1,
