@@ -1,55 +1,127 @@
 # Progress Log — Crypto Market Intelligence
 
-Rebuilt from the claude.ai chat "Crypto market intelligence repository issue"
-(234 messages, 2026-08-25 → 2026-09-09) after moving to Claude Code.
+Context rebuilt from the claude.ai chat "Crypto market intelligence repository issue"
+(234 messages, 2026-08-25 → 2026-09-09), then verified against the actual code.
 
-## Fixed and confirmed live (do not re-litigate)
-- Deploy workflow staleness — `deploy` job now checks out `ref: main` (was building stale pre-push snapshot).
-- "Why This Trade?" — was hardcoded "72% win rate" string; now pulls real per-asset `sub_signals` + `signal_history.win_rate`.
-- BIG/SMALL trade sizing — was BTC-only, copy-pasted to all 9 assets; now computed per-asset.
-- Macro regime (Fed/DXY/Liquidity/VIX) — backend now computes and saves `macro_data`; dead frontend stub that force-blanked it and hardcoded "RISK ON" was removed.
-- Support/resistance wrong-side bug — 2% tolerance let resistance land below price; fixed, no tolerance, verified across all 9 assets.
-- SMALL trade permanently gated — signal threshold (0.20) vs sizing gate threshold (0.40) mismatch; aligned.
-- Binance 451 (GitHub Actions IPs geo-blocked) — added Kraken → Yahoo fallback chain for 4h klines. Later found the **daily** klines fetch had no fallback at all (same root cause silently breaking MVRV, explanation history, event-risk range) — fixed same way.
-- blockchain.info also blocks CI IPs — added mempool.space fallback for hashrate/miner reserves.
-- Fake 109x backtest outlier — stop-distance calc had no floor, one trade landed with $6.20 risk distance and inflated profit factor to 3.73 (real: 1.19 on that period). Fixed with 0.5 ATR minimum stop distance. Confirmed same trade now reports r_multiple 2.04.
-- `big_trade`/`small_trade` showing a position size while `trade_qualified: false` — second ungated code path, fixed to match the gated one.
-- Intraday engine was structurally incapable of trading in choppy/ranging markets (trend-only mode). Added range/mean-reversion mode: buffered stop beyond support/resistance (was sitting exactly on it), target at range midpoint (was defaulting closer than stop → auto-rejected), fixed the "is this a range?" detector for the sell side (was always reading bullish near resistance).
-- Duplicate `fetch_fred_data` definition removed (verified byte-identical bodies first, no behavior change).
-- Fed rate / TPU now say `"FRED_API_KEY not configured"` instead of misleading `0` when the key is absent.
+## How to verify anything here yourself
 
-Test suite: 57/57 passing as of last commit in the old chat. 147 functions, 2 harmless dead wrappers.
+```bash
+pip install -r requirements.txt pyflakes
+python3 test_system.py          # 36 regression tests, no network needed
+python3 -m pyflakes crypto_market_intelligence_v60.py
+```
 
-## Verified against the actual repo checkout (2026-09-10) — this repo is BEHIND the chat's last delivered state
-Cross-checked every claimed fix against the real code (grep + read, not assumption). Everything through the
-2026-09-07 22:32 "clean pull, ship it" message is present and confirmed in the code:
-- Support/resistance tolerance bug — fixed, comment at line ~996 matches the chat's diagnosis exactly.
-- Exit-strategy BUY/SELL → LONG/SHORT vocabulary mapping — present (line ~5504).
-- Fake 109x backtest trade / stop-distance floor — present, 0.5 ATR floor at line ~3358, comment cites the exact
-  $77,330/$6.20 case from the chat.
-- Range/mean-reversion intraday mode, buffered stop, range-midpoint target — present.
+Every test corresponds to a bug that really shipped. Previous sessions claimed
+"57/57 tests pass" but the test file was never committed — it existed only in a
+chat sandbox, so none of it was reproducible. `test_system.py` is the real thing.
 
-**NOT present — the final 2026-09-08 06:41 round never got pushed:**
-- `fetch_binance_klines` (the **daily** fetcher, line 250) still has no Kraken/Yahoo fallback — only the 4h
-  fetcher (`fetch_binance_klines_interval`) does. This was the root-cause fix for null MVRV/hashrate/event-risk.
-- No `mempool.space` fallback anywhere — blockchain.info-sourced fields are still exposed to the same CI block.
-- `fetch_fred_data` is still defined **twice** (lines 641 and 659) — the duplicate-removal cleanup didn't land.
-- No `"FRED_API_KEY not configured"` string anywhere — the honest-label fix for Fed rate/TPU didn't land either.
+---
 
-This matches what the user flagged: "the last crypto file that was generated hasn't been pushed yet." Confirmed —
-it's specifically this round, not the DCA/signal-labeling round (which was never implemented in chat either, see below).
+## Session 2026-09-10 — findings and fixes
 
-## Confirmed still true in THIS repo checkout (verified 2026-09-10)
-- DCA re-anchoring bug is real and unfixed — `crypto_market_intelligence_v60.py` line ~2362-2365: on each DCA tranche, stop is re-set to `avg_entry ± risk_distance` using the *new* average entry. Up to 3 tranches (`dca_max_tranches`) means the stop keeps retreating as price falls, so a losing trade structurally struggles to ever register as a loss. This is what produced the suspicious 31/31 swing win rate the user flagged. **Not yet fixed.**
+### 1. SHORT trades had completely inverted risk management (most serious)
+`calculate_dynamic_position_size()` had **no direction parameter**. It always set
+`stop_loss = price - distance` and both take-profits *above* price — hardcoded for
+a LONG. Every SHORT therefore got:
+- a "stop loss" BELOW entry, i.e. in the profit direction
+- "take profits" ABOVE entry, i.e. in the loss direction
 
-## Open items (unresolved as of session handoff)
-1. **DCA fix, proposed not yet implemented**: cap at 1 add max, and/or stop should never widen past its original distance from the *first* entry (not re-anchored each tranche).
-2. **Visually distinguish filtered vs. traded signals** on the dashboard — Signal Performance (all signals incl. filtered) vs Paper Trading Account (only gated ones) currently blend together with wildly different win rates (26-30% vs 82-89%) and no label explaining why.
-3. **Portfolio Simulator stuck at $10,000 / 0%** — confirmed correct behavior, not a bug: every asset is NO TRADE right now, so it opens nothing. No action needed unless user wants this explained better in the UI.
-4. **FRED_API_KEY** — user was about to add this (free key, St. Louis Fed) to unlock Fed rate / TPU. Unknown if done yet — check `market_intelligence.json`/`v6_results.json` for `fed_trend` != "UNKNOWN".
-5. On-chain data (MVRV, hashrate) intermittently null — lower priority, not fully root-caused beyond the fallback fixes above.
+Evidence in `docs/paper_account.json`: all 31 closed `SWING_DAILY` trades are
+SHORTs that exited with `reason: STOP_LOSS` while booking **+$101 to +$132 profit
+each**, every one flagged `successful: false`.
 
-## Three tracker types (for reference, came up in user Q&A)
-- **Portfolio Simulator**: "if I acted on today's signals right now" snapshot, resets every cycle. Not a track record.
-- **Signal Performance**: logbook of every signal ever generated, including filtered/weak ones.
-- **Paper Trading Account**: the real simulated-money account — only opens on signals that clear conviction gates, manages DCA/trailing stops/partial exits.
+Fixed: the function now takes `direction` and mirrors the levels. The call site
+moved to after the signal is finalised, since direction isn't known before that.
+
+**This, not DCA, was the cause of the 31-wins-from-31-swings result.** The prior
+chat attributed it to DCA stop re-anchoring; every closed trade has `tranches: 1`,
+so DCA never fired once. That diagnosis was wrong.
+
+### 2. Sub-dollar assets had meaningless trade levels
+`generate_trade_plan()` rounded every price with `round(x, 2)`. For DOGE at
+$0.095 the stop rounds to $0.10 — identical to entry. Risk distance collapses to
+zero, so risk/reward reported 0 and the displayed stop/targets were nonsense.
+Affected DOGE, ADA and XRP on every run. Fixed with magnitude-aware rounding
+(`_round_price`). Found by a test, not by reading.
+
+### 3. Missing data was silently manufacturing bullish signals
+`predict_bilstm()` did `mvrv = onchain.get('mvrv_zscore', 0) or 0`. Zero satisfies
+the *bullish* branch of both the MVRV and NVT tests, so a failed on-chain fetch
+produced a 0.7 bullish score indistinguishable from a real one. Absent inputs are
+now skipped instead of scored.
+
+### 4. Missing data was producing confident market-regime verdicts
+No `FRED_API_KEY` meant `tpu_value = 0`, which flowed into `detect_market_regime()`
+and returned a definitive "LOW_UNCERTAINTY — fundamentals-driven market". Now
+returns `UNKNOWN_UNCERTAINTY`; `adjust_weights()` already had a safe default branch.
+
+### 5. Fabricated historical win rate
+`historical_win_rate` defaulted to `50`, and the trader comment printed
+"Historical win rate: 50%" as measured fact even with zero historical data. Now
+`None`, and the comment says there are no comparable setups yet.
+
+### 6. Trade counts included non-trades
+951 of 1000 logged rows were `NO TRADE`, yet `total_signals` reported 1000 and
+`avg_conviction` averaged across them (0.06). Now reported separately:
+**49 tradeable signals, 951 NO TRADE readings**, avg conviction **0.37**.
+Also: the rolling 1000-row cap meant NO TRADE noise steadily evicted real signals;
+the two classes are now trimmed independently.
+
+### 7. Filtered vs traded signals are now labelled
+Signal Performance counts *every* generated signal; the Paper Trading Account only
+counts ones it actually opened. Different populations, so the win rates legitimately
+differ. Both are now labelled on the dashboard and in the JSON (`population_label`).
+
+### 8. One broken chart could blank the whole dashboard
+If the Chart.js CDN failed, `renderDashboard` threw, the catch replaced the entire
+page with "Unable to Load Data", and every real number vanished. Chart rendering is
+now isolated (`safeRender`) and guarded on `typeof Chart`.
+
+### 9. `STRONG_SHORT` counter could never be non-zero
+Compared against `'STRONG_SHORT'` (underscore) while the engine emits
+`'STRONG SHORT'` (space).
+
+### 10. Ported the 2026-09-08 round that was never pushed
+- `fetch_binance_klines` (daily) had no fallback while its 4h sibling did — now
+  shares the Binance → Kraken → Yahoo chain. This was starving MVRV, the
+  explanation history, and the event-risk range simultaneously.
+- Added mempool.space fallback for hashrate and miner revenue (blockchain.info
+  blocks CI IPs, same class of block as Binance's HTTP 451).
+- Removed the duplicate `fetch_fred_data` definition.
+- Fed rate / TPU now say `FRED_API_KEY not configured` instead of a misleading `0`.
+
+### 11. Honesty and dead-code cleanup
+- Removed 2 genuinely unreferenced functions (`get_order_book_imbalance`,
+  `build_explanation_json`).
+- `"ALL 42 FEATURES — FULLY WORKING"` banner → accurate description.
+- `"ML models loaded successfully"` loaded no model — it only probes whether
+  tensorflow/sklearn import. `predict_bilstm` is a hand-written rule, not a
+  BiLSTM. Labels corrected; behaviour unchanged.
+- Misleading neutral defaults (`altcoin_season = 50`, `nvt/mvrv/miner = 0`) now
+  `None` so the dashboard shows "—" instead of a real-looking reading.
+- pyflakes: 15 findings → 2 (both intentional `noqa` availability probes).
+
+### 12. Plain-English guide on every dashboard section
+All 11 sections have a "What am I looking at?" panel written for a non-technical
+reader: what the section does, what each number means, and what is normal vs
+worrying. Verified rendering in a real browser.
+
+---
+
+## Open items / decisions for you
+
+1. **`docs/paper_account.json` history is corrupt and I did not touch it.**
+   Those 31 swing trades were produced by the inverted-short bug. Their P&L
+   arithmetic is right but they should never have been opened or closed that way,
+   so every stat derived from them is misleading. Recommend archiving the file and
+   letting the account restart at $10,000 — your call, since it is your track
+   record and deleting it is not reversible.
+2. **`FRED_API_KEY`** — still not configured. Free key from the St. Louis Fed,
+   goes in repo Settings → Secrets → Actions. Until then Fed rate and TPU
+   correctly report "not configured".
+3. **Nothing here is verified against a live run.** These fixes are proven by the
+   test suite and by direct inspection of the committed JSON. The next GitHub
+   Actions run is the real check — particularly whether SHORT signals now produce
+   sane exits.
+4. Zero closed trades exist under the corrected logic, so the system still has no
+   track record. That is a matter of elapsed time, not code.

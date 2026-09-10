@@ -67,7 +67,6 @@ import numpy as np
 import math
 import requests
 import json
-import sqlite3
 import os
 import time
 from datetime import datetime, timedelta
@@ -247,24 +246,18 @@ def fetch_with_retry(url, params=None, headers=None, timeout=30, retries=3):
 
 # ===================== 2-17. DATA FETCHING FUNCTIONS =====================
 
-def fetch_binance_klines(symbol, interval='1d', limit=1000):
-    url = "https://api.binance.com/api/v3/klines"
-    params = {'symbol': symbol, 'interval': interval, 'limit': limit}
-    try:
-        r = fetch_with_retry(url, params=params, timeout=30)
-        data = r.json()
-        df = pd.DataFrame(data, columns=[
-            'open_time','open','high','low','close','volume',
-            'close_time','quote_volume','trades','taker_buy_base',
-            'taker_buy_quote','ignore'
-        ])
-        df['date'] = pd.to_datetime(df['open_time'], unit='ms')
-        for col in ['open','high','low','close','volume']:
-            df[col] = df[col].astype(float)
-        return df[['date','open','high','low','close','volume']]
-    except Exception as e:
-        print(f"  ⚠️ Binance {symbol}: {e}")
-        return pd.DataFrame()
+def fetch_binance_klines(symbol, interval='1d', limit=1000, yahoo_ticker=None):
+    """Daily/period klines.
+
+    Delegates to fetch_binance_klines_interval so this shares the SAME
+    Binance -> Kraken -> Yahoo fallback chain. Before this, only the intraday
+    fetcher had fallbacks, so Binance's HTTP 451 block on CI IPs silently
+    emptied every daily-price consumer at once: the MVRV proxy, the trade
+    explanation history, and the event-risk expected range. One unprotected
+    function, three features dark, all for the same hidden reason.
+    """
+    return fetch_binance_klines_interval(symbol, interval=interval, limit=limit,
+                                         yahoo_ticker=yahoo_ticker)
 
 # Per-run cache for interval klines. The pipeline fetches the SAME 4h candles
 # twice per asset (once for multi-timeframe analysis, once for the intraday
@@ -496,7 +489,7 @@ def fetch_funding_rate(symbol='ETHUSDT', limit=1000):
 def fetch_bybit_funding(symbol='ETHUSDT', limit=200):
     try:
         bybit_symbol = symbol.replace('USDT', 'USDT')
-        url = f"https://api.bybit.com/v5/market/funding/history"
+        url = "https://api.bybit.com/v5/market/funding/history"
         params = {'category': 'linear', 'symbol': bybit_symbol, 'limit': min(limit, 200)}
         r = fetch_with_retry(url, params=params, timeout=30)
         data = r.json()
@@ -656,22 +649,6 @@ def fetch_fred_data(series_id='CPIAUCSL', limit=24):
 
 # ===================== 18. LIQUIDATION DATA =====================
 
-def fetch_fred_data(series_id='CPIAUCSL', limit=24):
-    if not FRED_API_KEY: return pd.DataFrame()
-    url = "https://api.stlouisfed.org/fred/series/observations"
-    params = {'series_id': series_id, 'api_key': FRED_API_KEY, 'file_type': 'json', 'limit': limit, 'sort_order': 'desc'}
-    try:
-        r = fetch_with_retry(url, params=params, timeout=30)
-        data = r.json()
-        if 'observations' in data:
-            df = pd.DataFrame(data['observations'])
-            df['date'] = pd.to_datetime(df['date'])
-            df['value'] = pd.to_numeric(df['value'], errors='coerce')
-            return df[['date', 'value']].dropna().sort_values('date')
-    except Exception as e:
-        print(f"  ⚠️ FRED {series_id}: {e}")
-    return pd.DataFrame()
-
 def fetch_macro_data():
     """Fetch real macro data from FRED and Yahoo"""
     macro = {}
@@ -685,12 +662,17 @@ def fetch_macro_data():
             macro['fed_date'] = fed_data['date'].iloc[-1].strftime('%Y-%m-%d')
             macro['fed_label'] = f"{macro['fed_trend']} ({macro['fed_rate']}%)"
         else:
-            macro['fed_trend'] = 'UNKNOWN'
-            macro['fed_label'] = 'Data unavailable'
+            # Distinguish "you never configured the key" from "the fetch broke".
+            # Both used to read 'Data unavailable', which looks like a bug in the
+            # system when it is actually a 2-minute piece of setup the user owns.
+            macro['fed_trend'] = 'NOT_CONFIGURED' if not FRED_API_KEY else 'UNKNOWN'
+            macro['fed_label'] = ('FRED_API_KEY not configured' if not FRED_API_KEY
+                                  else 'Data unavailable')
     except Exception as e:
         print(f"  ⚠️ Fed data failed: {e}")
-        macro['fed_trend'] = 'UNKNOWN'
-        macro['fed_label'] = 'Data unavailable'
+        macro['fed_trend'] = 'NOT_CONFIGURED' if not FRED_API_KEY else 'UNKNOWN'
+        macro['fed_label'] = ('FRED_API_KEY not configured' if not FRED_API_KEY
+                              else 'Data unavailable')
     
     # 2. DXY (from Yahoo)
     try:
@@ -1391,7 +1373,22 @@ def build_onchain_summary(coin_data, asset_code, total_market_volume, total_mark
 
 # ===================== 46-52. RISK ENGINE + REGIME CHANGE =====================
 
-def calculate_dynamic_position_size(df, idx, base_size=1.0, account_capital=10000):
+def calculate_dynamic_position_size(df, idx, base_size=1.0, account_capital=10000,
+                                    direction='LONG'):
+    """Size a position and place its stop/targets on the correct side of price.
+
+    This function had no `direction` at all: stop_loss was always price - distance
+    and both targets always price + distance, i.e. hardcoded for a LONG. Every
+    SHORT therefore received a fully inverted plan — its "stop" sat BELOW entry
+    (in the profit direction) and its "targets" sat ABOVE entry (in the loss
+    direction).
+
+    The paper account consumed those levels directly, which is why all 31 closed
+    SWING_DAILY shorts exited with reason STOP_LOSS while booking a +$101 to
+    +$132 PROFIT each, and were then flagged successful=False. The stop was
+    acting as a take-profit and being recorded as a stop. Both the win rate and
+    the loss rate were measuring the wrong thing.
+    """
     latest = df.iloc[idx]
     atr_ratio = latest.get('atr_ratio', 0.02)
     normal_atr = 0.02
@@ -1407,6 +1404,8 @@ def calculate_dynamic_position_size(df, idx, base_size=1.0, account_capital=1000
     price = latest['close']
     atr_value = latest.get('atr_14', price * 0.02)
     stop_distance = atr_value * RISK_PARAMS['atr_multiplier_stop']
+    # +1 mirrors the levels for a long, -1 flips them for a short.
+    sign = -1 if str(direction).upper() in ('SHORT', 'STRONG SHORT', 'SELL') else 1
     risk_per_share = stop_distance
     max_risk_amount = account_capital * RISK_PARAMS['max_risk_per_trade']
     max_shares = max_risk_amount / risk_per_share if risk_per_share > 0 else 0
@@ -1416,9 +1415,10 @@ def calculate_dynamic_position_size(df, idx, base_size=1.0, account_capital=1000
         'position_size': round(final_shares, 4),
         'risk_amount': round(final_shares * risk_per_share, 2),
         'risk_percent': round((final_shares * risk_per_share / account_capital) * 100, 2),
-        'stop_loss': round(price - stop_distance, 4),
-        'take_profit_1': round(price + atr_value * RISK_PARAMS['atr_multiplier_target'] * 1.0, 4),
-        'take_profit_2': round(price + atr_value * RISK_PARAMS['atr_multiplier_target'] * 2.0, 4),
+        'stop_loss': round(price - stop_distance * sign, 4),
+        'take_profit_1': round(price + atr_value * RISK_PARAMS['atr_multiplier_target'] * 1.0 * sign, 4),
+        'take_profit_2': round(price + atr_value * RISK_PARAMS['atr_multiplier_target'] * 2.0 * sign, 4),
+        'direction': 'SHORT' if sign < 0 else 'LONG',
     }
 
 def calculate_correlation_risk(portfolio_returns, threshold=0.70):
@@ -1465,7 +1465,6 @@ def detect_regime_shift(df, lookback=20, threshold=0.3):
     if len(set(recent)) > 3 or len(set(earlier)) > 3:
         return {'shift': True, 'message': 'Regime instability detected', 'confidence': 0.7}
     bull_regimes = ['STRONG_BULL', 'BULL_TREND', 'BULL_VOLATILE', 'BULL_CHOPPY']
-    bear_regimes = ['STRONG_BEAR', 'BEAR_TREND', 'BEAR_VOLATILE', 'BEAR_CHOPPY']
     recent_bull = sum(1 for r in recent if r in bull_regimes) / len(recent) if recent else 0
     earlier_bull = sum(1 for r in earlier if r in bull_regimes) / len(earlier) if earlier else 0
     if abs(recent_bull - earlier_bull) > threshold:
@@ -1851,6 +1850,18 @@ def load_signal_history():
 def save_signal_history(history):
     _atomic_write_json(HISTORY_PATH, history)
 
+# Keep plenty of real signals, and only a recent sample of NO TRADE readings.
+MAX_TRADEABLE_HISTORY = 1000
+MAX_NO_TRADE_HISTORY = 200
+
+
+def _is_no_trade(signal_entry):
+    """True when this row is the engine declining to trade, not a signal."""
+    sig = signal_entry.get('signal') if isinstance(signal_entry, dict) else signal_entry
+    return (str(sig).upper().strip() if sig is not None else '') in {
+        'NO TRADE', 'NO_TRADE', 'HOLD', ''}
+
+
 def track_signal_performance(asset, signal, price, conviction, trade_plan):
     history = load_signal_history()
     entry = {
@@ -1863,10 +1874,19 @@ def track_signal_performance(asset, signal, price, conviction, trade_plan):
         'stop_loss': trade_plan.get('stop_loss'),
         'take_profit_1': trade_plan.get('take_profit_1'),
         'take_profit_2': trade_plan.get('take_profit_2'),
+        # Explicit so downstream consumers never have to re-derive it from a
+        # string comparison, and so the dashboard can label the two apart.
+        'tradeable': not _is_no_trade({'signal': signal}),
     }
     history['signals'].append(entry)
-    if len(history['signals']) > 1000:
-        history['signals'] = history['signals'][-1000:]
+    # Trim the two classes independently. A single shared 1000-row cap meant the
+    # ~95% of rows that are NO TRADE readings steadily evicted the real signals —
+    # the very records the performance stats depend on.
+    if len(history['signals']) > (MAX_TRADEABLE_HISTORY + MAX_NO_TRADE_HISTORY):
+        kept_tradeable = [s for s in history['signals'] if not _is_no_trade(s)][-MAX_TRADEABLE_HISTORY:]
+        kept_no_trade = [s for s in history['signals'] if _is_no_trade(s)][-MAX_NO_TRADE_HISTORY:]
+        history['signals'] = sorted(kept_tradeable + kept_no_trade,
+                                    key=lambda s: s.get('timestamp') or '')
     performance = calculate_performance_metrics(history['signals'])
     history['performance'] = performance
     save_signal_history(history)
@@ -1899,11 +1919,20 @@ def calculate_performance_metrics(signals):
     evidence. Only post-logic-fix signals count — see LOGIC_FIX_DATE.
     """
     total = len(signals)
-    valid = [s for s in signals if _is_valid_era(s)]
+    # A "NO TRADE" reading is the engine declining to trade. It is a real
+    # observation worth keeping for audit, but it is NOT a signal, and counting
+    # it as one made every headline number meaningless: 951 of 1000 stored
+    # entries were NO TRADE, so `total_signals: 1000` described mostly non-events
+    # and `avg_conviction` was averaged over rows that by definition have almost
+    # none. Tradeable and non-tradeable rows are now counted separately.
+    tradeable = [s for s in signals if not _is_no_trade(s)]
+    no_trade = total - len(tradeable)
+    valid = [s for s in tradeable if _is_valid_era(s)]
     closed = [s for s in valid if str(s.get('status', '')).startswith('CLOSED')]
     wins = [s for s in closed if s.get('status') == 'CLOSED_WIN']
     losses = [s for s in closed if s.get('status') == 'CLOSED_LOSS']
-    avg_conviction = (sum(s.get('conviction', 0.5) for s in signals) / total) if total else 0
+    avg_conviction = (sum(s.get('conviction', 0) or 0 for s in tradeable) / len(tradeable)) \
+        if tradeable else None
 
     measured_win_rate = round(len(wins) / len(closed) * 100, 1) if closed else None
 
@@ -1914,15 +1943,23 @@ def calculate_performance_metrics(signals):
         'closed_trades': len(closed),
         'wins': len(wins),
         'losses': len(losses),
-        'excluded_pre_fix': total - len(valid),
-        'total_signals': total,
-        'avg_conviction': round(avg_conviction, 2),
+        'excluded_pre_fix': len(tradeable) - len(valid),
+        'tradeable_signals': len(tradeable),
+        'no_trade_readings': no_trade,
+        'total_rows_logged': total,
+        'counts_basis': (f"{len(tradeable)} tradeable signals; {no_trade} NO TRADE readings "
+                         f"logged for audit and excluded from signal stats"),
+        'avg_conviction': round(avg_conviction, 2) if avg_conviction is not None else None,
+        'avg_conviction_basis': 'mean conviction of tradeable signals only',
         'signal_distribution': {
-            'STRONG_LONG': sum(1 for s in signals if s['signal'] == 'STRONG LONG'),
-            'LONG': sum(1 for s in signals if s['signal'] == 'LONG'),
-            'NO_TRADE': sum(1 for s in signals if s['signal'] == 'NO TRADE'),
-            'SHORT': sum(1 for s in signals if s['signal'] == 'SHORT'),
-            'STRONG_SHORT': sum(1 for s in signals if s['signal'] == 'STRONG_SHORT'),
+            'STRONG_LONG': sum(1 for s in signals if s.get('signal') == 'STRONG LONG'),
+            'LONG': sum(1 for s in signals if s.get('signal') == 'LONG'),
+            'NO_TRADE': no_trade,
+            'SHORT': sum(1 for s in signals if s.get('signal') == 'SHORT'),
+            # Was comparing against 'STRONG_SHORT' with an underscore while the
+            # engine emits 'STRONG SHORT' with a space, so this bucket could only
+            # ever report 0 no matter how many strong shorts fired.
+            'STRONG_SHORT': sum(1 for s in signals if s.get('signal') == 'STRONG SHORT'),
         }
     }
 
@@ -2066,6 +2103,15 @@ def update_signal_performance(db):
             'closed_signals': len(closed),
             'win_count': len(wins),
             'loss_count': len(losses),
+            # Names the population these stats describe. This section counts EVERY
+            # signal the engine generated, including ones the paper account never
+            # opened a position on (position caps, correlation limits, available
+            # cash). The paper account measures a smaller, higher-quality subset,
+            # which is why the two win rates legitimately differ and should never
+            # be read as contradicting each other.
+            'population': 'all_generated_signals',
+            'population_label': ('Every signal generated, including ones never traded '
+                                 'by the paper account'),
             'win_rate': (len(wins) / len(closed) * 100) if closed else 0,
             'total_profit_pct': round(total_profit - total_loss, 2),
             'avg_profit_pct': round(total_profit / len(wins), 2) if wins else 0,
@@ -2080,6 +2126,9 @@ def update_signal_performance(db):
             'active_signals': len(active),
             'closed_signals': 0,
             'excluded_pre_fix': len(all_signals) - len(signals),
+            'population': 'all_generated_signals',
+            'population_label': ('Every signal generated, including ones never traded '
+                                 'by the paper account'),
             'win_count': 0,
             'loss_count': 0,
             'win_rate': 0,
@@ -2156,7 +2205,7 @@ PAPER_CONFIG = {
     'max_intraday_positions': 5,       # separate 4h slots
     'max_correlated_exposure': 0.40,   # cap total capital in one correlated bloc
     'tp1_close_fraction': 0.5,     # take half off at TP1
-    'dca_max_tranches': 3,         # initial entry + up to 2 add-ons
+    'dca_max_tranches': 2,         # initial entry + at most 1 add-on (see DCA note)
     'dca_trigger_drawdown': 0.05,  # add when position is 5% underwater
     'dca_size_multiplier': 0.75,   # each tranche smaller than the last
     'dca_min_conviction': 0.15,    # only average down if signal still holds
@@ -2225,7 +2274,13 @@ def _paper_close(acct, code, pos, price, qty, reason):
         'trade_type': pos.get('trade_type', 'SWING_DAILY'),
         'side': pos['side'],
         'reason': reason,
+        # Two different questions, two different fields — they used to be conflated.
+        # `successful` = did it reach its target (reason-based, per the TP1 rule
+        # above). `profitable` = did it actually make money. They can legitimately
+        # disagree: a runner trailed out after TP1 banks cash without reaching TP2.
+        # The account-level win_rate is computed from pnl, so it tracks `profitable`.
         'successful': reason in SUCCESS_REASONS,
+        'profitable': pnl > 0,
         'entry_price': round(pos['avg_entry'], 6),
         'exit_price': round(price, 6),
         'qty': round(qty, 8),
@@ -2359,10 +2414,25 @@ def run_paper_account(all_signals, correlation_matrix=None):
                 pos['tranches'] = pos.get('tranches', 1) + 1
                 pos['last_tranche_notional'] = add_notional
                 acct['cash'] -= add_notional * (1 + fee)
-                # re-anchor the stop to the new average entry using the original risk distance
-                if pos.get('risk_distance'):
-                    pos['stop_loss'] = (pos['avg_entry'] - pos['risk_distance']) if long \
-                                       else (pos['avg_entry'] + pos['risk_distance'])
+                # The stop may TIGHTEN on a DCA add, never widen.
+                #
+                # This used to re-anchor unconditionally to the new (lower)
+                # average entry, so every add-on pushed the stop further down and
+                # handed the trade more room to be wrong. Across several tranches
+                # a position could drift far underwater and still never register
+                # as a loss — it only had to recover to its newer, more forgiving
+                # average rather than its original entry.
+                #
+                # For the record: this did NOT cause the 31-wins-from-31-swings
+                # result. Every closed trade in that history has tranches == 1, so
+                # DCA never fired once. That was the inverted SHORT stop/target
+                # placement in calculate_dynamic_position_size(). This remains a
+                # genuine risk-design flaw worth closing, just not that culprit.
+                if pos.get('risk_distance') and _is_finite_positive(pos.get('stop_loss')):
+                    reanchored = (pos['avg_entry'] - pos['risk_distance']) if long \
+                                 else (pos['avg_entry'] + pos['risk_distance'])
+                    pos['stop_loss'] = max(pos['stop_loss'], reanchored) if long \
+                                       else min(pos['stop_loss'], reanchored)
                 events.append(f"{code} DCA tranche {pos['tranches']} @ {price:.4f} — avg now {pos['avg_entry']:.4f}")
 
     # ---------- 4: new entries ----------
@@ -2926,12 +2996,34 @@ def fmtUSD(n):
 
 # ===================== 82. TRADE PLAN GENERATOR =====================
 
+def _round_price(value, _sig=6):
+    """Round a price to a sensible precision FOR ITS MAGNITUDE.
+
+    A flat round(x, 2) is fine for BTC but destroys sub-dollar assets: DOGE near
+    $0.095 with a stop at $0.0950 rounded to 2 places becomes $0.10 — identical
+    to a $0.0999 entry. Risk distance collapses to zero, which makes the
+    risk/reward ratio 0 and renders the displayed stop and targets meaningless.
+    DOGE, ADA and XRP all trade below $1, so this hit real assets every run.
+    """
+    if value is None:
+        return None
+    try:
+        v = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(v) or v == 0:
+        return v if math.isfinite(v) else None
+    magnitude = math.floor(math.log10(abs(v)))
+    decimals = min(8, max(2, _sig - 1 - magnitude))
+    return round(v, decimals)
+
+
 def generate_trade_plan(asset, signal, conviction, price, sr_levels, atr, position_size_info, regime=None):
     plan = {
         'asset': asset,
         'signal': signal,
         'conviction': conviction,
-        'entry_price': round(price, 2),
+        'entry_price': _round_price(price),
         'entry_type': 'NO_TRADE',
         'stop_loss': None,
         'take_profit_1': None,
@@ -2951,11 +3043,11 @@ def generate_trade_plan(asset, signal, conviction, price, sr_levels, atr, positi
         risk_pct = position_size_info.get('risk_percent', 0)
         
         if stop_loss is not None:
-            plan['stop_loss'] = round(stop_loss, 2)
+            plan['stop_loss'] = _round_price(stop_loss)
         if tp1 is not None:
-            plan['take_profit_1'] = round(tp1, 2)
+            plan['take_profit_1'] = _round_price(tp1)
         if tp2 is not None:
-            plan['take_profit_2'] = round(tp2, 2)
+            plan['take_profit_2'] = _round_price(tp2)
         if pos_size:
             plan['position_size'] = pos_size
         if risk_amt:
@@ -2970,8 +3062,14 @@ def generate_trade_plan(asset, signal, conviction, price, sr_levels, atr, positi
     
     if plan['stop_loss'] is not None and plan['take_profit_1'] is not None and plan['stop_loss'] != 0:
         try:
-            plan['risk_reward_ratio'] = abs((plan['take_profit_1'] - price) / (price - plan['stop_loss'] + 0.001))
-        except:
+            # Guard the denominator instead of adding a fixed 0.001 epsilon to it.
+            # On a low-priced asset (DOGE around $0.09) a real risk distance can be
+            # ~0.005, so a flat 0.001 skewed the ratio by ~20% — and on a SHORT,
+            # where price - stop_loss is negative, it skewed it the wrong way.
+            reward = abs(plan['take_profit_1'] - price)
+            risk = abs(price - plan['stop_loss'])
+            plan['risk_reward_ratio'] = round(reward / risk, 2) if risk > 0 else 0
+        except Exception:
             plan['risk_reward_ratio'] = 0
 
     # ─── EXPECTED HOLDING TIME ───
@@ -3628,10 +3726,10 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000, learn
     print(f"\n{'='*60}")
     print(f"Processing {config['name']} ({code})")
     print(f"{'='*60}")
-    df = fetch_binance_klines(config['binance'])
+    df = fetch_binance_klines(config['binance'], yahoo_ticker=config.get('yahoo'))
     source = 'Binance'
     if df.empty or len(df) < 100:
-        print(f"  ⚠️ Binance failed, trying Yahoo...")
+        print("  ⚠️ Binance failed, trying Yahoo...")
         if config.get('yahoo'):
             df = fetch_yahoo_ohlcv(config['yahoo'])
             source = 'Yahoo'
@@ -3639,7 +3737,7 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000, learn
         print(f"  ❌ No data for {code}")
         return None
     print(f"  Fetched {len(df)} days from {source}")
-    print(f"  🔍 Running multi-timeframe analysis...")
+    print("  🔍 Running multi-timeframe analysis...")
     mtf = multi_timeframe_analysis(config['binance'])
     df = add_features(df)
     df = add_pi_cycle(df)
@@ -3657,7 +3755,6 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000, learn
     regime_change = detect_regime_change(historical_regimes, current_regime)
     regime_shift = detect_regime_shift(df)
     strategy_info = REGIME_STRATEGY.get(current_regime, REGIME_STRATEGY['CHOPPY'])
-    position_info = calculate_dynamic_position_size(df, len(df) - 1, account_capital=account_capital)
     _wf_saved = load_wf_weight_adjustments().get(code, {})
     _wf_mult = _wf_saved.get('trend_momentum_multiplier', 1.0)
     narrative = build_sub_signals_weighted(latest, config['name'], regime=latest.get('regime'), wf_multiplier=_wf_mult)
@@ -3702,6 +3799,11 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000, learn
         _sr = {}
         _support, _resistance = latest['close'] * 0.95, latest['close'] * 1.05
     sr_levels = {'nearest_support': _support, 'nearest_resistance': _resistance}
+    # Size AFTER the signal is final — the stop/target sides depend on direction,
+    # and the signal isn't known until the multi-timeframe and false-signal
+    # filters above have run.
+    position_info = calculate_dynamic_position_size(
+        df, len(df) - 1, account_capital=account_capital, direction=narrative['signal'])
     trade_plan = generate_trade_plan(code, narrative['signal'], narrative['conviction'], latest['close'], sr_levels, latest.get('atr_14', latest['close'] * 0.02), position_info, regime=narrative.get('regime') or latest.get('regime'))
     history = track_signal_performance(code, narrative['signal'], latest['close'], narrative['conviction'], trade_plan)
     wf_validation = walk_forward_validation(df)
@@ -3753,7 +3855,7 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000, learn
             abs(_perf.get('avg_win') or 0),
             abs(_perf.get('avg_loss') or 0) or 1,
         )
-    except Exception as _e:
+    except Exception:
         _kelly = 0
     try:
         _chart = build_chart_data(_strat_df, _strat_val, _best_col) if _best_col else {}
@@ -3782,7 +3884,7 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000, learn
         _vol_ratio = float(latest.get('volume_ratio')) if pd.notna(latest.get('volume_ratio')) else 1.0
         _volat = float(latest.get('atr_pct')) if pd.notna(latest.get('atr_pct')) else 0.5
         _filt = false_signal_filter(narrative['signal'], narrative['conviction'], _vol_ratio, _volat)
-    except Exception as _e:
+    except Exception:
         _filt = {'filter': False, 'reason': 'filter unavailable'}
     
     # Add signal to database
@@ -3936,7 +4038,8 @@ def quick_position_check():
         if not cfg:
             continue
         try:
-            df = fetch_binance_klines(cfg['binance'], interval='1d', limit=1)
+            df = fetch_binance_klines(cfg['binance'], interval='1d', limit=1,
+                                      yahoo_ticker=cfg.get('yahoo'))
             price = float(df['close'].iloc[-1]) if df is not None and not df.empty else None
         except Exception as e:
             print(f"  ⚠️ Price check failed for {code}: {e}")
@@ -4079,8 +4182,10 @@ def run_pipeline():
                 all_liquidations[code] = liq
     print(f"  ✅ Liquidations: {len(all_liquidations)} assets")
     
-    # Altcoin Season Index
-    altcoin_season = 50
+    # Altcoin Season Index — None until actually computed. 50 is the neutral
+    # midpoint of this index, so defaulting to it published a real-looking
+    # "neutral" reading on runs where the inputs were never available.
+    altcoin_season = None
     if 'BTC' in all_prices and len(all_prices['BTC']) > 90:
         btc_prices = all_prices['BTC']
         alt_prices = pd.DataFrame({k: v for k, v in all_prices.items() if k != 'BTC'})
@@ -4090,7 +4195,8 @@ def run_pipeline():
             alt_ret = alt_avg.pct_change(90).iloc[-1] if len(alt_avg) > 90 else 0
             altcoin_season = 50 + (alt_ret - btc_ret) * 500
             altcoin_season = max(0, min(100, altcoin_season))
-    print(f"  ✅ Altcoin Season Index: {altcoin_season:.1f}")
+    print(f"  ✅ Altcoin Season Index: {altcoin_season:.1f}" if altcoin_season is not None
+          else "  ⚠️ Altcoin Season Index: not computable (insufficient BTC history)")
     
     # ─── DERIVATIVES / POSITIONING (previously-dead V5 fetchers, now wired) ───
     derivatives = {}
@@ -4227,7 +4333,7 @@ def run_pipeline():
     market_summary = generate_market_summary(summary_data, market_report, global_risk_metrics, global_data, signal_performance)
     with open('docs/market_summary.txt', 'w') as f:
         f.write(market_summary)
-    print(f"  📄 Market summary saved to docs/market_summary.txt")
+    print("  📄 Market summary saved to docs/market_summary.txt")
     
     print("\n[8/9] Performing ensemble signal combining...")
     ensemble_signals = []
@@ -4461,13 +4567,6 @@ async def stream_order_book(symbol='BTCUSDT', duration_seconds=60):
         print(f"  ⚠️ Order book stream error: {e}")
         return None
 
-def get_order_book_imbalance(symbol='BTCUSDT'):
-    """Get current order book imbalance"""
-    snapshot = fetch_order_book_snapshot(symbol)
-    if snapshot:
-        return calculate_order_book_imbalance(snapshot)
-    return None
-
 def fetch_etf_flow_data():
     """Bitcoin ETF flow PROXY from real spot-ETF price/volume data (yfinance).
 
@@ -4522,10 +4621,17 @@ def fetch_etf_flow_data():
         }
 
 def fetch_trade_policy_uncertainty():
-    """Fetch Trade Policy Uncertainty index from FRED"""
+    """Fetch Trade Policy Uncertainty index from FRED.
+
+    Returns tpu_value=None when unavailable, never 0. A 0 here used to flow into
+    detect_market_regime() and produce a confident "LOW_UNCERTAINTY —
+    fundamentals-driven market" verdict built on data that was never fetched.
+    """
     if not FRED_API_KEY:
-        return {'tpu_value': 0, 'source': 'fallback'}
-    
+        return {'tpu_value': None, 'source': 'not_configured',
+                'label': 'FRED_API_KEY not configured'}
+
+
     try:
         url = "https://api.stlouisfed.org/fred/series/observations"
         params = {
@@ -4546,7 +4652,10 @@ def fetch_trade_policy_uncertainty():
     except Exception as e:
         print(f"  ⚠️ TPU fetch failed: {e}")
     
-    return {'tpu_value': 0, 'source': 'fallback'}
+    return {'tpu_value': None,
+            'source': 'not_configured' if not FRED_API_KEY else 'unavailable',
+            'label': ('FRED_API_KEY not configured' if not FRED_API_KEY
+                      else 'TPU data unavailable')}
 
 def fetch_onchain_metrics(symbol='BTC'):
     """Fetch advanced on-chain metrics"""
@@ -4572,7 +4681,7 @@ def fetch_onchain_metrics(symbol='BTC'):
     # This uses price vs its 200-day mean, z-scored — a real, computable stand-in,
     # labelled as a proxy so it is not mistaken for true MVRV Z-score.
     try:
-        df = fetch_binance_klines('BTCUSDT', interval='1d', limit=365)
+        df = fetch_binance_klines('BTCUSDT', interval='1d', limit=365, yahoo_ticker='BTC-USD')
         if df is not None and not df.empty and len(df) >= 200:
             closes = df['close']
             ma200 = closes.rolling(200).mean()
@@ -4592,19 +4701,72 @@ def fetch_onchain_metrics(symbol='BTC'):
     except Exception as e:
         print(f"  ⚠️ Miner reserves wiring failed: {e}")
 
-    # Hashrate trend from the same blockchain.info source family
+    # Hashrate trend — blockchain.info first, mempool.space as fallback.
     try:
         r = fetch_with_retry("https://blockchain.info/charts/hash-rate?format=json", timeout=30)
         vals = r.json().get('values', [])
         if len(vals) > 1:
             metrics['hashrate_trend'] = 'RISING' if vals[-1]['y'] > vals[-2]['y'] else 'FALLING'
+            metrics['hashrate_source'] = 'blockchain.info'
     except Exception as e:
-        print(f"  ⚠️ Hashrate trend failed: {e}")
+        print(f"  ⚠️ Hashrate trend (blockchain.info) failed: {e}")
+
+    if not metrics.get('hashrate_trend'):
+        print("  ↪ Trying mempool.space fallback for hashrate...")
+        trend = _fetch_mempool_hashrate_trend()
+        if trend:
+            metrics['hashrate_trend'] = trend
+            metrics['hashrate_source'] = 'mempool.space (blockchain.info unavailable)'
 
     return metrics
 
+
+def _mempool_series_trend(values, key):
+    """RISING/FALLING from the last two points of a mempool.space series."""
+    points = [v for v in values if isinstance(v, dict) and v.get(key) is not None]
+    if len(points) < 2:
+        return None
+    try:
+        return 'RISING' if float(points[-1][key]) > float(points[-2][key]) else 'FALLING'
+    except (TypeError, ValueError):
+        return None
+
+
+def _fetch_mempool_hashrate_trend():
+    """blockchain.info blocks many cloud/CI IP ranges, the same class of block
+    Binance applies (see fetch_binance_klines_interval). mempool.space is an
+    independent, un-gated source for the same Bitcoin network stats."""
+    try:
+        r = fetch_with_retry("https://mempool.space/api/v1/mining/hashrate/1m", timeout=30)
+        return _mempool_series_trend(r.json().get('hashrates', []), 'avgHashrate')
+    except Exception as e:
+        print(f"  ⚠️ Hashrate trend (mempool.space) failed: {e}")
+        return None
+
+
+def _fetch_mempool_miner_revenue():
+    """Miner revenue trend via mempool.space block-reward series."""
+    try:
+        r = fetch_with_retry("https://mempool.space/api/v1/mining/blocks/rewards/1m", timeout=30)
+        rows = r.json()
+        if not isinstance(rows, list):
+            return None
+        trend = _mempool_series_trend(rows, 'avgRewards')
+        if not trend:
+            return None
+        return {'value': float(rows[-1]['avgRewards']), 'trend': trend,
+                'source': 'mempool.space (blockchain.info unavailable)'}
+    except Exception as e:
+        print(f"  ⚠️ Miner revenue (mempool.space) failed: {e}")
+        return None
+
+
 def fetch_miner_reserves():
-    """Fetch miner reserve data"""
+    """Fetch miner revenue data (labelled 'reserves' historically).
+
+    Returns trend UNKNOWN only when BOTH sources fail, so an UNKNOWN here means
+    genuinely no data — not simply that blockchain.info geo-blocked the runner.
+    """
     try:
         url = "https://blockchain.info/charts/miner-revenue?format=json"
         r = fetch_with_retry(url, timeout=30)
@@ -4614,12 +4776,19 @@ def fetch_miner_reserves():
             return {
                 'value': latest['y'],
                 'date': latest['x'],
-                'trend': 'RISING' if len(data['values']) > 1 and data['values'][-1]['y'] > data['values'][-2]['y'] else 'FALLING'
+                'trend': 'RISING' if len(data['values']) > 1 and data['values'][-1]['y'] > data['values'][-2]['y'] else 'FALLING',
+                'source': 'blockchain.info'
             }
     except Exception as e:
-        print(f"  ⚠️ Miner reserves failed: {e}")
-    
-    return {'value': 0, 'trend': 'UNKNOWN'}
+        print(f"  ⚠️ Miner reserves (blockchain.info) failed: {e}")
+
+    print("  ↪ Trying mempool.space fallback for miner revenue...")
+    fallback = _fetch_mempool_miner_revenue()
+    if fallback:
+        return fallback
+
+    return {'value': None, 'trend': 'UNKNOWN',
+            'source': 'unavailable (blockchain.info and mempool.space both failed)'}
 
 class MarketMLModels:
     """Container for ML models"""
@@ -4632,37 +4801,54 @@ class MarketMLModels:
         self.feature_importance = {}
     
     def load_models(self):
-        """Load pre-trained ML models (or initialize if not available)"""
+        """Check whether the ML libraries are importable.
+
+        Naming honesty: this loads NO trained model, and there is no trained
+        model file in this project. It only detects whether tensorflow/sklearn
+        are installed. The scoring methods below are transparent, hand-written
+        rules over real indicator values — not neural networks. They are kept
+        because the rules themselves are sound; the labels are corrected so the
+        output is never mistaken for a trained model's prediction.
+        """
         try:
-            import tensorflow as tf
-            from sklearn.ensemble import RandomForestClassifier
+            import tensorflow  # noqa: F401  — availability probe only
+            from sklearn.ensemble import RandomForestClassifier  # noqa: F401
             self.models_loaded = True
-            print("  ✅ ML models loaded successfully")
+            print("  ✅ ML libraries available (scoring uses rule-based heuristics)")
             return True
         except ImportError:
-            print("  ⚠️ ML libraries not installed. Using fallback predictions.")
+            print("  ⚠️ ML libraries not installed. Using the same rule-based heuristics.")
             return False
     
     def predict_bilstm(self, onchain_data, window=60):
-        """BiLSTM prediction from on-chain data"""
+        """Rule-based on-chain score, 0-1 (named 'bilstm' for output compatibility).
+
+        Not a BiLSTM. Deterministic thresholds over real MVRV/NVT/miner values.
+        """
         if not self.models_loaded:
             return self._fallback_prediction(onchain_data)
         
         try:
             score = 0.5
-            mvr = onchain_data.get('mvrv_zscore', 0) or 0
-            nvt = onchain_data.get('nvt_ratio', 0) or 0
-            
-            if mvr < 0.5:
-                score += 0.1
-            elif mvr > 3:
-                score -= 0.1
-            
-            if nvt < 20:
-                score += 0.1
-            elif nvt > 50:
-                score -= 0.1
-            
+            # Missing on-chain data must not move the score. `or 0` used to turn
+            # an absent MVRV/NVT into 0, and 0 falls in the BULLISH branch of both
+            # tests below — so a failed fetch silently produced a 0.7 bullish
+            # reading indistinguishable from a real one. Skip absent inputs.
+            mvr = onchain_data.get('mvrv_zscore')
+            nvt = onchain_data.get('nvt_ratio')
+
+            if mvr is not None:
+                if mvr < 0.5:
+                    score += 0.1
+                elif mvr > 3:
+                    score -= 0.1
+
+            if nvt is not None:
+                if nvt < 20:
+                    score += 0.1
+                elif nvt > 50:
+                    score -= 0.1
+
             miner_trend = onchain_data.get('miner_trend', 'UNKNOWN')
             if miner_trend == 'RISING':
                 score += 0.1
@@ -4834,7 +5020,20 @@ def calculate_shap_importance(sub_signals, composite_score):
         return {'features': [], 'method': 'error'}
 
 def detect_market_regime(tpu_value):
-    """Detect market regime based on Trade Policy Uncertainty"""
+    """Detect market regime based on Trade Policy Uncertainty.
+
+    tpu_value of None means the index was never retrieved. Saying
+    "LOW_UNCERTAINTY" in that case is a claim about the world made from missing
+    data, so report UNKNOWN instead. adjust_weights() falls through to its
+    default weighting for any regime it doesn't recognise, so this degrades
+    safely rather than crashing.
+    """
+    if tpu_value is None:
+        return {
+            'regime': 'UNKNOWN_UNCERTAINTY',
+            'description': 'Trade policy uncertainty unavailable — regime not determined',
+            'dominant_feature': 'UNKNOWN'
+        }
     if tpu_value > 200:
         return {
             'regime': 'HIGH_UNCERTAINTY',
@@ -4994,29 +5193,41 @@ def generate_trade_explanation(asset, signal, confidence, factors, order_book, o
     explanation['factors'] = factor_texts
     
     # ─── REAL HISTORICAL EVIDENCE ───
-    historical_win_rate = 50
+    # None, not 50. This used to default to 50 and the trader comment printed
+    # "Historical win rate: 50%" verbatim even when there was no history to draw
+    # on at all — an invented statistic stated as measured fact, in the one field
+    # a reader is most likely to trust. When there is no evidence, say so.
+    historical_win_rate = None
     if df is not None and len(df) > 60:
         try:
             similar_trades = find_similar_conditions(df, n_matches=10)
             if similar_trades:
                 wins = sum(1 for t in similar_trades if t.get('future_5d_return', 0) > 0)
-                historical_win_rate = (wins / len(similar_trades)) * 100 if similar_trades else 50
+                historical_win_rate = (wins / len(similar_trades)) * 100
                 explanation['historical_trades'] = similar_trades
-                explanation['historical_evidence'] = f"Similar setups have shown a {historical_win_rate:.0f}% win rate historically."
+                explanation['historical_evidence'] = (
+                    f"Similar setups have shown a {historical_win_rate:.0f}% win rate "
+                    f"across {len(similar_trades)} comparable past conditions.")
             else:
                 explanation['historical_evidence'] = "Not enough historical data for this pattern."
         except Exception as e:
-            explanation['historical_evidence'] = f"Historical analysis limited."
+            explanation['historical_evidence'] = f"Historical analysis unavailable ({e})."
     else:
         explanation['historical_evidence'] = "Building historical database. Check back soon."
-    
+
+    explanation['historical_win_rate'] = (round(historical_win_rate, 1)
+                                          if historical_win_rate is not None else None)
+    _wr = (f" Historical win rate: {historical_win_rate:.0f}%."
+           if historical_win_rate is not None else
+           " No comparable historical setups yet, so no win rate to quote.")
+
     # Generate summary
     if signal == 'LONG':
         summary = f"BUY {asset} — {active_count} factors align bullish"
-        trader_comment = f"All indicators point to upside potential. Historical win rate: {historical_win_rate:.0f}%."
+        trader_comment = f"All indicators point to upside potential.{_wr}"
     elif signal == 'SHORT':
         summary = f"SHORT {asset} — {active_count} factors align bearish"
-        trader_comment = f"Bearish signals dominate the current setup. Historical win rate: {historical_win_rate:.0f}%."
+        trader_comment = f"Bearish signals dominate the current setup.{_wr}"
     else:
         summary = f"HOLD {asset} — Mixed signals. Wait for clarity."
         trader_comment = "No clear directional bias. Patience is key."
@@ -5064,7 +5275,7 @@ def fetch_economic_calendar():
     the month; CPI: ~2nd week of the month) and marked estimated=True so that's
     visible rather than presented as confirmed dates.
     """
-    from datetime import date, timedelta
+    from datetime import date
     import calendar as cal
 
     events = []
@@ -5145,7 +5356,7 @@ def generate_market_narrative(asset_data, order_book_data, onchain_data, events)
     
     # Macro analysis
     tpu = fetch_trade_policy_uncertainty()
-    regime = detect_market_regime(tpu.get('tpu_value', 0))
+    regime = detect_market_regime(tpu.get('tpu_value'))
     narrative['macro'] = f"Macro Regime: {regime['regime']} — {regime['description']}"
     
     # Technical analysis
@@ -5265,15 +5476,10 @@ def build_ml_predictions_json(assets_data, order_book_data, onchain_data):
     
     return predictions
 
-def build_explanation_json(asset, signal, factors, confidence):
-    """Build trade explanation for dashboard display"""
-    return generate_trade_explanation(asset, signal, confidence, factors, {}, {})
-
 def run_v6_pipeline():
     """Run the complete V6 pipeline with all new features"""
     print("=" * 70)
-    print("MARKET CORTEX v6.0 — INTELLIGENT TRADER SYSTEM")
-    print("ALL 42 FEATURES — FULLY WORKING")
+    print("MARKET CORTEX v6.0 — RESEARCH SYSTEM (paper trading only)")
     print("Order Book · ML Models · Self-Learning · Two-Tier Trades")
     print("=" * 70)
     
@@ -5289,9 +5495,9 @@ def run_v6_pipeline():
     ob_snapshot = None
     imbalance = None
     etf_data = {'total_net_flow': 0, 'cumulative_holdings': 0, 'daily_change': 0}
-    tpu_data = {'tpu_value': 0, 'source': 'fallback'}
+    tpu_data = {'tpu_value': None, 'source': 'unavailable'}
     regime = {'regime': 'LOW_UNCERTAINTY', 'description': 'Low trade policy uncertainty', 'dominant_feature': 'MINING_COSTS'}
-    onchain = {'nvt_ratio': 0, 'mvrv_zscore': 0, 'miner_reserves': 0}
+    onchain = {'nvt_ratio': None, 'mvrv_zscore': None, 'miner_reserves': None}
     ml_signal = {'action': 'HOLD', 'confidence': 0.5, 'trade_qualified': False}
     big_trade = {'position_size': 0, 'risk_pct': 0, 'target_movement': 0, 'trade_type': 'BIG'}
     small_trade = {'position_size': 0, 'risk_pct': 0, 'target_movement': 0, 'trade_type': 'SMALL'}
@@ -5303,7 +5509,6 @@ def run_v6_pipeline():
     event_risk = {}
     btc_price = 0
     ml_predictions = {}
-    feature_attribution = {}
     
         # 1. Order Book Analysis
     print("\n[V6.1] Fetching order book data...")
@@ -5354,7 +5559,7 @@ def run_v6_pipeline():
     
     # 4. Regime Detection
     print("\n[V6.4] Detecting market regime...")
-    regime = detect_market_regime(tpu_data.get('tpu_value', 0))
+    regime = detect_market_regime(tpu_data.get('tpu_value'))
     print(f"  Regime: {regime['regime']} — {regime['dominant_feature']}")
     # Wire adjust_weights (previously defined but never called) so the regime
     # actually changes how features are weighted, instead of being display-only.
@@ -5391,8 +5596,8 @@ def run_v6_pipeline():
             order_book_data = {'BTC': {'imbalance': imbalance}}
         # Use the REAL computed MVRV proxy, not a hardcoded 0.5 placeholder
         onchain_data = {'BTC': {
-            'mvrv_zscore': onchain.get('mvrv_zscore') if onchain.get('mvrv_zscore') is not None else 0.5,
-            'nvt_ratio': onchain.get('nvt_ratio', 0),
+            'mvrv_zscore': onchain.get('mvrv_zscore'),
+            'nvt_ratio': onchain.get('nvt_ratio'),
             'miner_reserves': onchain.get('miner_reserves'),
         }}
         ml_signal = calculate_ml_signal({}, order_book_data.get('BTC', {}), onchain_data.get('BTC', {}))
@@ -5426,7 +5631,7 @@ def run_v6_pipeline():
             pass
         if not btc_price:
             try:
-                btc_price = float(fetch_binance_klines('BTCUSDT', interval='1d', limit=1)['close'].iloc[-1])
+                btc_price = float(fetch_binance_klines('BTCUSDT', interval='1d', limit=1, yahoo_ticker='BTC-USD')['close'].iloc[-1])
             except Exception:
                 btc_price = 0
         confidence = ml_signal.get('confidence', 0.5)
@@ -5467,7 +5672,7 @@ def run_v6_pipeline():
         # NameError, silently swallowed by the except below, so the historical
         # pattern-matching path of the explanation engine never actually executed.
         try:
-            _btc_df = fetch_binance_klines('BTCUSDT', interval='1d', limit=365)
+            _btc_df = fetch_binance_klines('BTCUSDT', interval='1d', limit=365, yahoo_ticker='BTC-USD')
             if _btc_df is not None and not _btc_df.empty:
                 _btc_df = add_features(_btc_df)
         except Exception as _de:
@@ -5492,7 +5697,7 @@ def run_v6_pipeline():
                 pass
         if not btc_price:
             try:
-                btc_price = float(fetch_binance_klines('BTCUSDT', interval='1d', limit=1)['close'].iloc[-1])
+                btc_price = float(fetch_binance_klines('BTCUSDT', interval='1d', limit=1, yahoo_ticker='BTC-USD')['close'].iloc[-1])
             except Exception:
                 btc_price = 0
         exit_strategy = generate_exit_strategy(
@@ -5516,7 +5721,7 @@ def run_v6_pipeline():
         upcoming_high_impact = next((e for e in events if e.get('impact') == 'HIGH'), events[0] if events else None)
         if upcoming_high_impact:
             try:
-                btc_ref_price = float(fetch_binance_klines('BTCUSDT', interval='1d', limit=1)['close'].iloc[-1])
+                btc_ref_price = float(fetch_binance_klines('BTCUSDT', interval='1d', limit=1, yahoo_ticker='BTC-USD')['close'].iloc[-1])
             except Exception:
                 btc_ref_price = 0
             event_key = 'FOMC' if 'FOMC' in upcoming_high_impact['event'] else \
