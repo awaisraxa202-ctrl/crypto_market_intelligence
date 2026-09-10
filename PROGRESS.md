@@ -20,6 +20,25 @@ Rebuilt from the claude.ai chat "Crypto market intelligence repository issue"
 
 Test suite: 57/57 passing as of last commit in the old chat. 147 functions, 2 harmless dead wrappers.
 
+## Verified against the actual repo checkout (2026-09-10) — this repo is BEHIND the chat's last delivered state
+Cross-checked every claimed fix against the real code (grep + read, not assumption). Everything through the
+2026-09-07 22:32 "clean pull, ship it" message is present and confirmed in the code:
+- Support/resistance tolerance bug — fixed, comment at line ~996 matches the chat's diagnosis exactly.
+- Exit-strategy BUY/SELL → LONG/SHORT vocabulary mapping — present (line ~5504).
+- Fake 109x backtest trade / stop-distance floor — present, 0.5 ATR floor at line ~3358, comment cites the exact
+  $77,330/$6.20 case from the chat.
+- Range/mean-reversion intraday mode, buffered stop, range-midpoint target — present.
+
+**NOT present — the final 2026-09-08 06:41 round never got pushed:**
+- `fetch_binance_klines` (the **daily** fetcher, line 250) still has no Kraken/Yahoo fallback — only the 4h
+  fetcher (`fetch_binance_klines_interval`) does. This was the root-cause fix for null MVRV/hashrate/event-risk.
+- No `mempool.space` fallback anywhere — blockchain.info-sourced fields are still exposed to the same CI block.
+- `fetch_fred_data` is still defined **twice** (lines 641 and 659) — the duplicate-removal cleanup didn't land.
+- No `"FRED_API_KEY not configured"` string anywhere — the honest-label fix for Fed rate/TPU didn't land either.
+
+This matches what the user flagged: "the last crypto file that was generated hasn't been pushed yet." Confirmed —
+it's specifically this round, not the DCA/signal-labeling round (which was never implemented in chat either, see below).
+
 ## Confirmed still true in THIS repo checkout (verified 2026-09-10)
 - DCA re-anchoring bug is real and unfixed — `crypto_market_intelligence_v60.py` line ~2362-2365: on each DCA tranche, stop is re-set to `avg_entry ± risk_distance` using the *new* average entry. Up to 3 tranches (`dca_max_tranches`) means the stop keeps retreating as price falls, so a losing trade structurally struggles to ever register as a loss. This is what produced the suspicious 31/31 swing win rate the user flagged. **Not yet fixed.**
 
