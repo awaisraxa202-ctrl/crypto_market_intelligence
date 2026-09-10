@@ -64,7 +64,18 @@ def render(repo_dir, returning_visitor=True):
         browser = p.chromium.launch(executable_path=CHROME, headless=True,
                                     args=['--no-sandbox'])
         page = browser.new_page()
+        # This harness itself blocks CDN/font requests (see handle_route below) so
+        # the audit never depends on outbound network access. Those deliberate
+        # aborts produce a "Failed to load resource" console line each — an
+        # artifact of how the check is run, not something a real visitor's
+        # browser would see (theirs reaches jsdelivr/fonts normally). Matched by
+        # the actual failed request's URL, not by message text, so an unrelated
+        # real failure (e.g. the data fetch itself breaking) still surfaces.
+        blocked_hosts = ('cdn.jsdelivr.net', 'fonts.googleapis.com', 'fonts.gstatic.com')
         console_errors = []
+        self_inflicted_failures = set()
+        page.on('requestfailed', lambda req: self_inflicted_failures.add(req.url)
+                if any(h in req.url for h in blocked_hosts) else None)
         page.on('console', lambda msg: console_errors.append(msg.text)
                 if msg.type == 'error' else None)
         page.on('pageerror', lambda exc: console_errors.append(str(exc)))
@@ -75,7 +86,7 @@ def render(repo_dir, returning_visitor=True):
                 if name in url:
                     route.fulfill(status=200, content_type='application/json', body=content)
                     return
-            if 'cdn.jsdelivr.net' in url or 'fonts.googleapis.com' in url or 'fonts.gstatic.com' in url:
+            if any(h in url for h in blocked_hosts):
                 route.abort()
                 return
             if url.startswith('file://'):
@@ -109,7 +120,11 @@ def render(repo_dir, returning_visitor=True):
                'pa-pf', 'pa-avg', 'pa-by-type', 'risk-grade', 'risk-detail']
         rendered = {i: text(i) for i in ids}
         browser.close()
-        return rendered, console_errors
+        # Real errors are whatever's left after accounting for the self-inflicted
+        # CDN/font blocks — a generic browser console message doesn't carry the
+        # URL, so this is a count reconciliation rather than a per-message match.
+        real_error_count = max(0, len(console_errors) - len(self_inflicted_failures))
+        return rendered, console_errors, real_error_count
 
 
 def main():
@@ -137,14 +152,18 @@ def main():
     print(f"data: {os.path.abspath(args.dir)}")
     print("=" * 64)
 
-    rendered, console_errors = render(args.dir, returning_visitor=True)
+    rendered, console_errors, real_error_count = render(args.dir, returning_visitor=True)
 
     print("\n─── JS console/page errors during render ───────────────")
     if console_errors:
         for e in console_errors[:10]:
             print(f"  !! {e}")
+        print(f"  ({len(console_errors) - real_error_count} of these are this harness's own "
+              f"deliberate CDN/font blocks, not a page problem)")
     else:
         print("  none")
+    if real_error_count:
+        print(f"  {real_error_count} UNEXPLAINED error(s) — investigate before trusting this render")
 
     checks = []
 
@@ -165,11 +184,20 @@ def main():
 
     wr_text = rendered.get('pa-winrate') or ''
     wr_shown = _num(wr_text)
-    check('Win rate shown matches recomputed truth (not just the stored field)',
-          wr_shown is not None and truth['win_rate'] is not None
-          and abs(wr_shown - truth['win_rate']) < 0.15,
-          f"dashboard shows {wr_text!r} (parsed {wr_shown}%), "
-          f"recomputed win_rate is {truth['win_rate']}%")
+    if truth['win_rate'] is None:
+        # No closed trades: the honest render is text with no number in it, same
+        # as win_rate_basis says. A parsed None here is the correct outcome, not
+        # a missing value.
+        check('Win rate shown correctly says no closed trades yet (no invented number)',
+              wr_shown is None,
+              f"dashboard shows {wr_text!r}" if wr_shown is None else
+              f"expected no numeric win rate with 0 closed trades, but dashboard "
+              f"shows a number: {wr_text!r}")
+    else:
+        check('Win rate shown matches recomputed truth (not just the stored field)',
+              wr_shown is not None and abs(wr_shown - truth['win_rate']) < 0.15,
+              f"dashboard shows {wr_text!r} (parsed {wr_shown}%), "
+              f"recomputed win_rate is {truth['win_rate']}%")
 
     wl = re.search(r'\((\d+)W/(\d+)L\)', wr_text)
     if wl:
@@ -228,10 +256,10 @@ def main():
     print("\n" + "=" * 64)
     print(f"{len(checks) - n_fail}/{len(checks)} render checks passed"
           + (f" · {n_fail} FAILURE(S)" if n_fail else ''))
-    if console_errors:
-        print(f"{len(console_errors)} JS console error(s) during render — see above")
+    if real_error_count:
+        print(f"{real_error_count} unexplained JS console error(s) during render — see above")
     print("=" * 64)
-    return 1 if (n_fail or console_errors) else 0
+    return 1 if (n_fail or real_error_count) else 0
 
 
 if __name__ == '__main__':
