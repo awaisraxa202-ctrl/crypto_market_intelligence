@@ -696,11 +696,24 @@
       const hud = document.getElementById('hud');
       const app = document.getElementById('dashboard-app');
 
+      // Single entry point for both paths (first-time click and returning
+      // visitor). Previously the returning-visitor branch below only toggled
+      // CSS classes and returned — it never called loadData() or initReveal(),
+      // so anyone who had dismissed the disclaimer in an earlier visit saw a
+      // permanently blank dashboard (every field stuck at its placeholder) on
+      // every later visit. Two branches doing almost the same thing is exactly
+      // how that kind of divergence happens; one shared function can't drift.
+      function enterDashboard() {
+        overlay.classList.add('dismissed');
+        hud.classList.add('visible');
+        app.classList.add('visible');
+        setTimeout(initReveal, 400);
+        loadData();
+      }
+
       try {
         if (localStorage.getItem('market-cortex-understood') === 'true') {
-          overlay.classList.add('dismissed');
-          hud.classList.add('visible');
-          app.classList.add('visible');
+          enterDashboard();
           return;
         }
       } catch(e) {}
@@ -711,18 +724,9 @@
 
       btn.addEventListener('click', function() {
         if (!check.checked) return;
-        overlay.classList.add('dismissed');
-        hud.classList.add('visible');
-        app.classList.add('visible');
         try { localStorage.setItem('market-cortex-understood', 'true'); } catch(e) {}
-        setTimeout(initReveal, 400);
-        loadData();
+        enterDashboard();
       });
-
-      if (overlay.classList.contains('dismissed')) {
-        hud.classList.add('visible');
-        app.classList.add('visible');
-      }
     })();
 
     // ──────────────────────────────────────────────────────────────
