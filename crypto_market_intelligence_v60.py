@@ -1404,8 +1404,25 @@ def calculate_dynamic_position_size(df, idx, base_size=1.0, account_capital=1000
     price = latest['close']
     atr_value = latest.get('atr_14', price * 0.02)
     stop_distance = atr_value * RISK_PARAMS['atr_multiplier_stop']
+    target1_distance = atr_value * RISK_PARAMS['atr_multiplier_target'] * 1.0
+    target2_distance = atr_value * RISK_PARAMS['atr_multiplier_target'] * 2.0
     # +1 mirrors the levels for a long, -1 flips them for a short.
     sign = -1 if str(direction).upper() in ('SHORT', 'STRONG SHORT', 'SELL') else 1
+    # High volatility (ATR wide relative to price) can push a level past zero —
+    # a LONG's stop, or a SHORT's target (target uses a 2-4x bigger multiplier
+    # than stop, so it crosses zero at an even lower ATR/price ratio: a SHORT at
+    # 15% ATR/price already prices its TP2 at -20% of price). A non-positive
+    # price is impossible for any real asset, so that exit condition silently
+    # never triggers again — found by a property test, not hand-picked, and real
+    # crypto assets do reach 15%+ ATR/price during genuine volatility spikes,
+    # exactly when a working exit matters most. Capped at 99% of price so every
+    # level stays strictly positive; the position-sizing math below uses this
+    # same capped distance so risk stays consistent with where the stop
+    # actually sits, not the uncapped distance that no longer applies.
+    max_distance = price * 0.99
+    stop_distance = min(stop_distance, max_distance)
+    target1_distance = min(target1_distance, max_distance)
+    target2_distance = min(target2_distance, max_distance)
     risk_per_share = stop_distance
     max_risk_amount = account_capital * RISK_PARAMS['max_risk_per_trade']
     max_shares = max_risk_amount / risk_per_share if risk_per_share > 0 else 0
@@ -1415,9 +1432,16 @@ def calculate_dynamic_position_size(df, idx, base_size=1.0, account_capital=1000
         'position_size': round(final_shares, 4),
         'risk_amount': round(final_shares * risk_per_share, 2),
         'risk_percent': round((final_shares * risk_per_share / account_capital) * 100, 2),
-        'stop_loss': round(price - stop_distance * sign, 4),
-        'take_profit_1': round(price + atr_value * RISK_PARAMS['atr_multiplier_target'] * 1.0 * sign, 4),
-        'take_profit_2': round(price + atr_value * RISK_PARAMS['atr_multiplier_target'] * 2.0 * sign, 4),
+        # _round_price (magnitude-aware — see its docstring) not a flat round(x, 4):
+        # this is the function that actually opens real positions, and a flat
+        # 4-decimal round collapses a sub-cent asset's stop/target to zero
+        # distance from entry, exactly the DOGE/ADA bug _round_price was written
+        # to fix elsewhere. It had never been wired in HERE, where it matters
+        # most — found by a property test throwing a sub-$1 price at this
+        # function, not by any hand-picked example.
+        'stop_loss': _round_price(price - stop_distance * sign),
+        'take_profit_1': _round_price(price + target1_distance * sign),
+        'take_profit_2': _round_price(price + target2_distance * sign),
         'direction': 'SHORT' if sign < 0 else 'LONG',
     }
 
@@ -3082,6 +3106,15 @@ def _round_price(value, _sig=6):
     to a $0.0999 entry. Risk distance collapses to zero, which makes the
     risk/reward ratio 0 and renders the displayed stop and targets meaningless.
     DOGE, ADA and XRP all trade below $1, so this hit real assets every run.
+
+    The decimals cap used to be min(8, ...) — fine for the current 9-asset
+    universe (nothing here trades below DOGE's ~$0.08), but it silently defeats
+    "magnitude-aware" for anything smaller: a $0.000000375 price only got 8
+    decimal places, i.e. 2 significant figures, not the promised 6. 15 stays
+    comfortably inside a float's ~15-17 significant decimal digits of real
+    precision — raising it doesn't manufacture false precision, it just stops
+    truncating real precision the calculation actually has for a genuinely
+    tiny price, should this project's asset list ever include one.
     """
     if value is None:
         return None
@@ -3092,7 +3125,7 @@ def _round_price(value, _sig=6):
     if not math.isfinite(v) or v == 0:
         return v if math.isfinite(v) else None
     magnitude = math.floor(math.log10(abs(v)))
-    decimals = min(8, max(2, _sig - 1 - magnitude))
+    decimals = min(15, max(2, _sig - 1 - magnitude))
     return round(v, decimals)
 
 

@@ -24,6 +24,15 @@ Categories:
     SANITY       every displayed number is finite and in a possible range
     LOGIC        trading invariants that cannot be violated by correct code
     CONSISTENCY  the same fact agrees across files and against recomputation
+    ORACLE       checked against a SECOND, independently-written implementation
+                 — not the same function called twice. CONSISTENCY re-runs
+                 compute_paper_account_stats and compares to itself; that
+                 proves the stored numbers match what the function currently
+                 produces, but if the function's own formula were wrong, both
+                 sides would agree and be wrong together. These checks are
+                 written from scratch, deliberately not sharing code with what
+                 they're checking, so a formula bug in the original shows up
+                 as a disagreement instead of matching itself.
     WIRING       every value the dashboard reads exists in the data
 """
 import argparse
@@ -466,6 +475,99 @@ def check_consistency(a, mi, pa, sh, cmi):
                 warn_only=True)
 
 
+def _oracle_win_rate(closed_trades, logic_fix_date):
+    """Independently-written win-rate recomputation. Deliberately does NOT call
+    compute_paper_account_stats or _is_corrupted_short_stopout — a fresh
+    reading of the same rule ("a SHORT can't profit from its own stop-loss"),
+    written from the plain English description, not copied from the
+    production code. If the production function had a logic bug, this
+    wouldn't inherit it, and the two would disagree instead of agreeing."""
+    usable = []
+    for t in closed_trades:
+        opened = str(t.get('opened') or '')[:10]
+        if opened < logic_fix_date:
+            continue  # pre-fix era, excluded on both sides by the same date rule
+        is_short = t.get('side') == 'SHORT'
+        hit_stop = t.get('reason') == 'STOP_LOSS'
+        made_money = (t.get('pnl') or 0) > 0
+        if is_short and hit_stop and made_money:
+            continue  # the exact impossible combination — excluded, not counted
+        usable.append(t)
+    wins = sum(1 for t in usable if (t.get('pnl') or 0) > 0)
+    losses = len(usable) - wins
+    gross_win = sum(t['pnl'] for t in usable if t['pnl'] > 0)
+    gross_loss = sum(-t['pnl'] for t in usable if t['pnl'] <= 0)
+    return {
+        'closed_trades': len(usable),
+        'wins': wins,
+        'losses': losses,
+        'win_rate': round(wins / len(usable) * 100, 1) if usable else None,
+        'profit_factor': round(gross_win / gross_loss, 2) if gross_loss else None,
+    }
+
+
+def _oracle_position_ratio_ok(pos, risk_params):
+    """Independently re-derives whether an open position's TP1/TP2 distances
+    keep the multiplier ratio (target/stop) RISK_PARAMS specifies, using only
+    the position's own stored levels — no shared code with
+    calculate_dynamic_position_size. Skips positions where the zero-crossing
+    safety clamp could plausibly be active (stop distance already close to
+    entry price) since the clamp deliberately breaks the clean ratio there;
+    that's a different, already-covered invariant, not this one.
+
+    SWING_DAILY only: INTRADAY_4H positions come from generate_intraday_trade,
+    a completely different code path with a single technical/liquidation-
+    cluster target (TP1 == TP2 there by design), not this ATR-multiplier
+    formula at all. Applying this ratio to them isn't a stricter check, it's
+    checking the wrong formula against the wrong position type.
+    """
+    if pos.get('trade_type') != 'SWING_DAILY':
+        return None
+    entry, stop, tp1, tp2 = (pos.get('avg_entry'), pos.get('stop_loss'),
+                             pos.get('take_profit_1'), pos.get('take_profit_2'))
+    if not all(_finite(x) for x in (entry, stop, tp1, tp2)) or entry <= 0:
+        return None  # nothing usable to check
+    stop_dist = abs(entry - stop)
+    if stop_dist <= 0 or stop_dist > entry * 0.1:
+        return None  # zero-distance or inside the clamp's plausible range — skip
+    tp1_dist, tp2_dist = abs(entry - tp1), abs(entry - tp2)
+    expected_1 = risk_params['atr_multiplier_target'] / risk_params['atr_multiplier_stop']
+    expected_2 = expected_1 * 2
+    ok_1 = math.isclose(tp1_dist / stop_dist, expected_1, rel_tol=2e-3)
+    ok_2 = math.isclose(tp2_dist / stop_dist, expected_2, rel_tol=2e-3)
+    return ok_1 and ok_2, tp1_dist / stop_dist, tp2_dist / stop_dist
+
+
+def check_oracle(a, pa, cmi):
+    stats = pa.get('stats') or {}
+    oracle_stats = _oracle_win_rate(pa.get('closed_trades') or [], cmi.LOGIC_FIX_DATE)
+    for field in ('closed_trades', 'wins', 'losses', 'win_rate', 'profit_factor'):
+        a.check('ORACLE', f"independently-recomputed {field} matches production",
+                oracle_stats[field] == stats.get(field),
+                ok_detail=f"both give {field}={oracle_stats[field]}",
+                bad_detail=f"production says {field}={stats.get(field)}, an independent "
+                           f"re-implementation of the same rule says {oracle_stats[field]}")
+
+    bad_ratios = []
+    checked = 0
+    for code, pos in (pa.get('positions') or {}).items():
+        result = _oracle_position_ratio_ok(pos, cmi.RISK_PARAMS)
+        if result is None:
+            continue
+        checked += 1
+        ok, r1, r2 = result
+        if not ok:
+            bad_ratios.append(f"{code} TP1/stop={r1:.3f} TP2/stop={r2:.3f} "
+                             f"(expected {cmi.RISK_PARAMS['atr_multiplier_target'] / cmi.RISK_PARAMS['atr_multiplier_stop']:.3f}/"
+                             f"{cmi.RISK_PARAMS['atr_multiplier_target'] / cmi.RISK_PARAMS['atr_multiplier_stop'] * 2:.3f})")
+    a.check('ORACLE', 'open positions keep the configured target/stop ratio',
+            not bad_ratios,
+            ok_detail=f"{checked} position(s) independently re-derived and matched"
+                      if checked else "no positions in the checkable (unclamped) range",
+            bad_detail=f"ratio drift — the position sizing formula may not match its own "
+                       f"configured multipliers: {'; '.join(bad_ratios)}")
+
+
 def check_wiring(a, mi, html):
     """Every value the dashboard reads must exist in the data it reads from."""
     if not html:
@@ -534,6 +636,7 @@ def main():
     check_sanity(a, mi, pa)
     check_logic(a, pa, cmi)
     check_consistency(a, mi, pa, sh, cmi)
+    check_oracle(a, pa, cmi)
     check_wiring(a, mi, html)
     return a.report()
 

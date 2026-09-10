@@ -14,6 +14,8 @@ import re
 import sys
 import unittest
 
+from hypothesis import given, settings, strategies as st
+
 _spec = importlib.util.spec_from_file_location("cmi", "crypto_market_intelligence_v60.py")
 cmi = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(cmi)
@@ -21,12 +23,12 @@ _spec.loader.exec_module(cmi)
 import pandas as pd
 
 
-def _frame(price=100.0, atr=2.0, rows=40, regime='CHOPPY'):
+def _frame(price=100.0, atr=2.0, rows=40, regime='CHOPPY', drawdown=0.0):
     return pd.DataFrame({
         'close': [price] * rows,
         'atr_14': [atr] * rows,
         'atr_ratio': [atr / price] * rows,
-        'drawdown': [0.0] * rows,
+        'drawdown': [drawdown] * rows,
         'regime': [regime] * rows,
     })
 
@@ -63,6 +65,134 @@ class TestDirectionalLevels(unittest.TestCase):
         lo = cmi.calculate_dynamic_position_size(_frame(), 39, direction='LONG')
         sh = cmi.calculate_dynamic_position_size(_frame(), 39, direction='SHORT')
         self.assertAlmostEqual(abs(100.0 - lo['stop_loss']), abs(100.0 - sh['stop_loss']), places=6)
+
+
+class TestPositionSizingProperties(unittest.TestCase):
+    """Property-based: the fixed tests above check the formula against a
+    handful of numbers a person chose (price=100, ATR=2). This throws hundreds
+    of randomized prices, volatilities, regimes and drawdowns at the same
+    formula and checks the invariant holds on EVERY one — including the
+    extreme, oddly-shaped inputs (a sub-cent DOGE-like price, a deep drawdown)
+    that a person doesn't think to hand-pick but that real crypto markets
+    actually produce. It does not, and cannot, check that 2x/4x ATR is the
+    RIGHT multiplier — only that whatever multiplier is configured gets
+    applied correctly and consistently on every input.
+
+    atr_frac (ATR as a fraction of price) is floored at 1e-3: real observed
+    atr_ratio on these 9 assets runs close to 0.02 (2%), so 0.1% is already a
+    generous 20x margin below anything live data produces. Below that floor,
+    _round_price's 6-significant-figure precision and the raw ATR magnitude
+    converge, and a stop/target distance can round away to indistinguishable
+    from zero — a real rounding-precision limit, not a formula bug, and not a
+    condition any of these 9 assets' actual volatility has ever approached.
+    """
+
+    @given(
+        price=st.floats(min_value=1e-6, max_value=200_000, allow_nan=False, allow_infinity=False),
+        atr_frac=st.floats(min_value=1e-3, max_value=0.5, allow_nan=False, allow_infinity=False),
+        direction=st.sampled_from(['LONG', 'SHORT', 'STRONG LONG', 'STRONG SHORT']),
+        regime=st.sampled_from(list(cmi.REGIME_STRATEGY.keys())),
+        drawdown=st.floats(min_value=-0.9, max_value=0.0, allow_nan=False, allow_infinity=False),
+    )
+    @settings(max_examples=300, deadline=None)
+    def test_stop_and_targets_always_on_correct_side(self, price, atr_frac, direction, regime, drawdown):
+        df = _frame(price=price, atr=price * atr_frac, regime=regime, drawdown=drawdown)
+        r = cmi.calculate_dynamic_position_size(df, len(df) - 1, direction=direction)
+        long = direction.upper() not in ('SHORT', 'STRONG SHORT', 'SELL')
+        if long:
+            self.assertLessEqual(r['stop_loss'], price)
+            self.assertGreaterEqual(r['take_profit_1'], price)
+            self.assertGreaterEqual(r['take_profit_2'], r['take_profit_1'])
+        else:
+            self.assertGreaterEqual(r['stop_loss'], price)
+            self.assertLessEqual(r['take_profit_1'], price)
+            self.assertLessEqual(r['take_profit_2'], r['take_profit_1'])
+
+    @given(
+        price=st.floats(min_value=1e-6, max_value=200_000, allow_nan=False, allow_infinity=False),
+        atr_frac=st.floats(min_value=1e-3, max_value=0.5, allow_nan=False, allow_infinity=False),
+        direction=st.sampled_from(['LONG', 'SHORT']),
+        regime=st.sampled_from(list(cmi.REGIME_STRATEGY.keys())),
+    )
+    @settings(max_examples=300, deadline=None)
+    def test_outputs_always_finite_and_non_negative(self, price, atr_frac, direction, regime):
+        df = _frame(price=price, atr=price * atr_frac, regime=regime)
+        r = cmi.calculate_dynamic_position_size(df, len(df) - 1, direction=direction)
+        for key in ('size_multiplier', 'position_size', 'risk_amount', 'risk_percent'):
+            self.assertTrue(math.isfinite(r[key]), f"{key}={r[key]} is not finite")
+            self.assertGreaterEqual(r[key], 0, f"{key}={r[key]} is negative")
+        for key in ('stop_loss', 'take_profit_1', 'take_profit_2'):
+            self.assertTrue(math.isfinite(r[key]), f"{key}={r[key]} is not finite")
+            self.assertGreater(r[key], 0, f"{key}={r[key]} is not a positive price")
+
+    @given(
+        price=st.floats(min_value=1e-6, max_value=200_000, allow_nan=False, allow_infinity=False),
+        atr_frac=st.floats(min_value=1e-3, max_value=0.5, allow_nan=False, allow_infinity=False),
+        regime=st.sampled_from(list(cmi.REGIME_STRATEGY.keys())),
+        drawdown=st.floats(min_value=-0.9, max_value=0.0, allow_nan=False, allow_infinity=False),
+    )
+    @settings(max_examples=300, deadline=None)
+    def test_risk_distance_symmetric_long_vs_short(self, price, atr_frac, regime, drawdown):
+        df = _frame(price=price, atr=price * atr_frac, regime=regime, drawdown=drawdown)
+        idx = len(df) - 1
+        lo = cmi.calculate_dynamic_position_size(df, idx, direction='LONG')
+        sh = cmi.calculate_dynamic_position_size(df, idx, direction='SHORT')
+        # delta scaled to _round_price's 6-significant-figure precision, not
+        # exact equality — LONG and SHORT are each independently rounded, so a
+        # ~1e-6 relative gap between them is expected rounding, not asymmetry.
+        self.assertAlmostEqual(abs(price - lo['stop_loss']), abs(price - sh['stop_loss']),
+                               delta=max(price * 2e-5, 1e-9))
+        self.assertAlmostEqual(abs(price - lo['take_profit_1']), abs(price - sh['take_profit_1']),
+                               delta=max(price * 2e-5, 1e-9))
+
+    @given(
+        price=st.floats(min_value=1e-6, max_value=200_000, allow_nan=False, allow_infinity=False),
+        atr_frac=st.floats(min_value=1e-2, max_value=0.1, allow_nan=False, allow_infinity=False),
+        direction=st.sampled_from(['LONG', 'SHORT']),
+        regime=st.sampled_from(list(cmi.REGIME_STRATEGY.keys())),
+    )
+    @settings(max_examples=300, deadline=None)
+    def test_target_distance_ratios_match_configured_multipliers(self, price, atr_frac, direction, regime):
+        """TP1 distance must be exactly 2x the stop distance, TP2 exactly 4x —
+        that ratio is fixed by RISK_PARAMS regardless of ATR or regime, PROVIDED
+        the zero-crossing safety clamp (see calculate_dynamic_position_size) isn't
+        active. A bug that changes one multiplier but not the other, or applies
+        the wrong one on one side, shows up here as a ratio drift even if every
+        individual level still happens to land on the correct SIDE of price.
+
+        Floored at atr_frac=1% (not 0.1% like the other tests): the stop/target
+        DISTANCE is derived by subtracting two independently-6-sig-fig-rounded
+        PRICES, so as the distance shrinks relative to price the fixed rounding
+        granularity eats a growing share of it — a display-rounding artifact on
+        this ratio check, confirmed harmless to real risk sizing because
+        risk_per_share/position_size are computed from the unrounded atr_value
+        earlier in the function, before any rounding happens. Real observed
+        atr_ratio here (~2%) stays 2x above this floor regardless.
+
+        Capped at atr_frac=10% (not 50%): the clamp starts changing TP2's
+        distance at ~12.4% ATR/price (it hits the 99%-of-price ceiling before
+        the stop or TP1 do, since it uses the largest multiplier) — an
+        intentional, different invariant covered by the correct-side and
+        finite/non-negative tests above, which deliberately DO span into that
+        region. This test is only about the clean, unclamped ratio."""
+        df = _frame(price=price, atr=price * atr_frac, regime=regime)
+        r = cmi.calculate_dynamic_position_size(df, len(df) - 1, direction=direction)
+        stop_dist = abs(price - r['stop_loss'])
+        tp1_dist = abs(price - r['take_profit_1'])
+        tp2_dist = abs(price - r['take_profit_2'])
+        if stop_dist == 0:
+            return  # degenerate ATR case, nothing to compare a ratio against
+        expected_ratio_1 = cmi.RISK_PARAMS['atr_multiplier_target'] / cmi.RISK_PARAMS['atr_multiplier_stop']
+        expected_ratio_2 = expected_ratio_1 * 2
+        # rel_tol, not decimal places: each distance is independently rounded to
+        # 6 significant figures by _round_price, so their RATIO can legitimately
+        # carry a somewhat larger error than either rounding alone — this is
+        # expected precision loss, not a formula bug, and unrelated to the much
+        # larger (~0.3%) drift a flat round(x, 4) produced on sub-$1 prices.
+        self.assertTrue(math.isclose(tp1_dist / stop_dist, expected_ratio_1, rel_tol=1e-3),
+                        f"{tp1_dist / stop_dist} vs {expected_ratio_1}")
+        self.assertTrue(math.isclose(tp2_dist / stop_dist, expected_ratio_2, rel_tol=1e-3),
+                        f"{tp2_dist / stop_dist} vs {expected_ratio_2}")
 
 
 class TestMarketRegimeMissingData(unittest.TestCase):
