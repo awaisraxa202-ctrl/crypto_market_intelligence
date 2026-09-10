@@ -1,25 +1,8 @@
 {
   "created": "2026-09-05T14:13:29.699758",
   "starting_capital": 10000.0,
-  "cash": 6727.560522199198,
+  "cash": 7358.434908743376,
   "positions": {
-    "BTC@4h": {
-      "asset": "BTC",
-      "trade_type": "INTRADAY_4H",
-      "side": "LONG",
-      "qty": 0.025167548447300035,
-      "avg_entry": 76921.1,
-      "opened": "2026-09-10T13:04:01.825831",
-      "tranches": 1,
-      "last_tranche_notional": 1935.915510869611,
-      "stop_loss": 76500.181585,
-      "take_profit_1": 77000.0,
-      "take_profit_2": 77000.0,
-      "risk_distance": 420.91841500000737,
-      "entry_conviction": 0.68,
-      "expected_hours": 18,
-      "tp1_hit": true
-    },
     "DOGE@4h": {
       "asset": "DOGE",
       "trade_type": "INTRADAY_4H",
@@ -29,7 +12,7 @@
       "opened": "2026-09-10T13:04:01.825847",
       "tranches": 1,
       "last_tranche_notional": 1644.9474095859084,
-      "stop_loss": 0.083026,
+      "stop_loss": 0.08303350000000001,
       "take_profit_1": 0.0876,
       "take_profit_2": 0.0876,
       "risk_distance": 0.0009330000000000033,
@@ -46,7 +29,7 @@
       "opened": "2026-09-10T13:04:01.825858",
       "tranches": 1,
       "last_tranche_notional": 1397.7118139251465,
-      "stop_loss": 11.518313,
+      "stop_loss": 11.541461499999999,
       "take_profit_1": 11.9442,
       "take_profit_2": 11.9442,
       "risk_distance": 0.15707700000000102,
@@ -63,12 +46,29 @@
       "opened": "2026-09-10T13:04:01.825868",
       "tranches": 1,
       "last_tranche_notional": 1187.635728292197,
-      "stop_loss": 0.206987,
+      "stop_loss": 0.20912550000000002,
       "take_profit_1": 0.2153,
       "take_profit_2": 0.2153,
       "risk_distance": 0.002949000000000007,
       "entry_conviction": 0.43,
       "expected_hours": 6,
+      "tp1_hit": true
+    },
+    "ETH@4h": {
+      "asset": "ETH",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "qty": 0.5327178369356373,
+      "avg_entry": 2438.45,
+      "opened": "2026-09-10T15:04:09.871393",
+      "tranches": 1,
+      "last_tranche_notional": 1299.0058094757048,
+      "stop_loss": 2422.45509,
+      "take_profit_1": 2450.0,
+      "take_profit_2": 2450.0,
+      "risk_distance": 15.99490999999989,
+      "entry_conviction": 0.56,
+      "expected_hours": 13,
       "tp1_hit": true
     }
   },
@@ -1128,6 +1128,22 @@
       "opened": "2026-09-10T12:27:29.503236",
       "closed": "2026-09-10T13:04:01.820707",
       "holding_days": 0
+    },
+    {
+      "asset": "BTC",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "TAKE_PROFIT_2",
+      "successful": true,
+      "entry_price": 76921.1,
+      "exit_price": 76938.4,
+      "qty": 0.02516755,
+      "tranches": 1,
+      "pnl": 0.44,
+      "return_pct": 0.02,
+      "opened": "2026-09-10T13:04:01.825831",
+      "closed": "2026-09-10T15:04:09.865558",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
@@ -1486,6 +1502,10 @@
     {
       "ts": "2026-09-10T13:04:01.825879",
       "equity": 12894.77
+    },
+    {
+      "ts": "2026-09-10T15:04:09.871411",
+      "equity": 12875.99
     }
   ],
   "stats": {
@@ -1501,38 +1521,31 @@
         "avg_holding_days": 0.1
       },
       "INTRADAY_4H": {
-        "closed": 33,
-        "wins": 15,
+        "closed": 34,
+        "wins": 16,
         "losses": 18,
-        "win_rate": 45.5,
+        "win_rate": 47.1,
         "profit_factor": 0.83,
-        "net_pnl": -20.56,
+        "net_pnl": -20.12,
         "open": 4,
         "avg_holding_days": 0.0
       }
     },
-    "equity": 12894.77,
-    "cash": 6727.56,
+    "equity": 12875.99,
+    "cash": 7358.43,
     "open_positions": 4,
-    "total_return_pct": 28.95,
-    "closed_trades": 66,
-    "wins": 46,
+    "total_return_pct": 28.76,
+    "closed_trades": 67,
+    "wins": 47,
     "losses": 20,
-    "win_rate": 69.7,
-    "profit_factor": 7.51,
-    "avg_win": 80.47,
+    "win_rate": 70.1,
+    "profit_factor": 7.52,
+    "avg_win": 78.77,
     "avg_loss": -24.63,
     "dca_positions": 0,
     "last_events": [
-      "BNB stopped out (-123.13)",
-      "BNB@4h stopped out (-10.05)",
-      "ADA@4h stopped out (-6.14)",
-      "DOGE@4h stopped out (-4.46)",
-      "ETH@4h stopped out (-6.62)",
-      "BTC \u26a14h OPENED LONG 0.025168 @ 76921.1000 \u2192 77000 (~18h)",
-      "DOGE \u26a14h OPENED LONG 19592.270151 @ 0.0840 \u2192 0.0876 (~13h)",
-      "LINK \u26a14h OPENED LONG 119.714358 @ 11.6754 \u2192 11.9442 (~6h)",
-      "ADA \u26a14h OPENED LONG 5657.132308 @ 0.2099 \u2192 0.2153 (~6h)"
+      "BTC@4h TP2 hit \u2014 closed (+0.44)",
+      "ETH \u26a14h OPENED LONG 0.532718 @ 2438.4500 \u2192 2450.0 (~13h)"
     ]
   }
 }
