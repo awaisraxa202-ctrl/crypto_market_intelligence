@@ -547,6 +547,7 @@
       <h2><span class="num">💼</span>Paper Trading Account</h2>
       <span class="desc">Persistent · DCA · partial exits · real track record</span>
     </div>
+    <div id="pa-corrupted-note" style="display:none;background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.3);border-radius:8px;padding:8px 12px;margin:4px 0 10px;font-size:0.68rem;color:var(--rose,#ff4d6d);"></div>
     <div class="card-grid card-grid-4" style="margin-top:4px;">
       <div class="card reveal"><div class="card-glow"></div><div class="card-label">Equity</div>
         <div class="card-value" id="pa-equity">—</div><div class="card-detail" id="pa-return">—</div></div>
@@ -630,7 +631,7 @@
       <span class="desc">Historical signal tracking · Win Rate · Profit</span>
     </div>
     <div class="card-grid card-grid-4">
-      <div class="card reveal stagger-1"><div class="card-glow"></div><div class="card-label">Total Signals</div><div class="card-value" id="signal-total">—</div><div class="card-detail">All signals ever generated</div></div>
+      <div class="card reveal stagger-1"><div class="card-glow"></div><div class="card-label">Signals Generated</div><div class="card-value" id="signal-total">—</div><div class="card-detail" id="signal-total-detail">Not all of these were traded</div></div>
       <div class="card reveal stagger-2"><div class="card-glow"></div><div class="card-label">Win Rate</div><div class="card-value" id="signal-winrate">—</div><div class="card-detail" id="signal-winrate-detail">Closed signals</div></div>
       <div class="card reveal stagger-3"><div class="card-glow"></div><div class="card-label">Total Profit</div><div class="card-value" id="signal-profit">—</div><div class="card-detail" id="signal-profit-detail">Net profit %</div></div>
       <div class="card reveal stagger-4"><div class="card-glow"></div><div class="card-label">Active Signals</div><div class="card-value" id="signal-active">—</div><div class="card-detail">Currently open trades</div></div>
@@ -1201,9 +1202,20 @@
           rEl.style.color = ret > 0 ? 'var(--lime)' : ret < 0 ? 'var(--rose)' : 'var(--text-secondary)';
         }
         $('pa-closed').textContent = pst.closed_trades ?? 0;
-        $('pa-winrate').textContent = pst.win_rate !== null && pst.win_rate !== undefined
+        const excludedTotal = (pst.excluded_pre_fix || 0) + (pst.excluded_corrupted || 0);
+        $('pa-winrate').textContent = (pst.win_rate !== null && pst.win_rate !== undefined
           ? `${pst.win_rate}% win rate (${pst.wins}W/${pst.losses}L)`
-          : 'No closed trades yet';
+          : 'No closed trades yet') +
+          (excludedTotal ? ` · ${excludedTotal} bugged/pre-fix trade${excludedTotal>1?'s':''} excluded` : '');
+        const cpEl = $('pa-corrupted-note');
+        if (cpEl) {
+          if (pst.corrupted_trades_pnl) {
+            cpEl.textContent = `⚠️ $${pst.corrupted_trades_pnl.toLocaleString()} of the account balance came from ${pst.excluded_corrupted} trade(s) closed under a now-fixed bug (inverted SHORT stop/target) — not genuine trading results. Excluded from the win rate above.`;
+            cpEl.style.display = 'block';
+          } else {
+            cpEl.style.display = 'none';
+          }
+        }
         $('pa-open').textContent = pst.open_positions ?? 0;
         $('pa-dca').textContent = pst.dca_positions ? `${pst.dca_positions} averaged down` : 'No DCA active';
         $('pa-pf').textContent = pst.profit_factor ?? '—';
@@ -1324,11 +1336,22 @@
       $('portfolio-risk').style.color = getRiskGradeColor(pRisk);
 
       // Render portfolio chart
-      renderPortfolioChart(ps.history || []);
+      // Charts depend on a third-party CDN. If that CDN is blocked, slow, or the
+      // canvas is missing, an exception here used to propagate to loadData's
+      // catch and replace the ENTIRE dashboard with "Unable to Load Data" — every
+      // real number on the page hidden because one decorative chart failed.
+      safeRender('portfolio chart', () => renderPortfolioChart(ps.history || []));
 
       // Signal Performance
       const sp = d.signal_performance || {};
       $('signal-total').textContent = sp.total_signals || 0;
+      // Name the population on the card itself. This count is every signal the
+      // engine produced — the paper account only opened positions on a subset, so
+      // the two win rates on this page describe different groups of trades and
+      // are not meant to match.
+      if ($('signal-total-detail')) {
+        $('signal-total-detail').textContent = sp.population_label || 'Not all of these were traded';
+      }
       // Show "awaiting data" rather than a red 0% when nothing has closed yet —
       // a fresh system with no completed trades has no win rate, and painting it
       // red made a brand-new system look like it had failed 30 times.
@@ -1349,11 +1372,22 @@
       renderCorrelationMatrix((d.cross_asset || {}).correlation_matrix || {});
       renderFundingHeatmap((d.cross_asset || {}).funding_heatmap || {});
       renderLiquidations((d.cross_asset || {}).liquidations || {});
-      renderRegimeChart((d.market_report || {}).regime_distribution || {});
+      safeRender('regime chart', () => renderRegimeChart((d.market_report || {}).regime_distribution || {}));
     }
 
     // ─── PORTFOLIO CHART ───
+    // Run one non-critical render step in isolation. A failure is logged and the
+    // rest of the dashboard still renders.
+    function safeRender(label, fn) {
+      try { fn(); }
+      catch (e) { console.warn(`[dashboard] ${label} failed to render:`, e && e.message); }
+    }
+
     function renderPortfolioChart(history) {
+      if (typeof Chart === 'undefined') {
+        console.warn('[dashboard] Chart.js unavailable — skipping chart, data below is unaffected');
+        return;
+      }
       const ctx = document.getElementById('portfolio-chart');
       if (!ctx) return;
       if (CMI.charts.portfolio) CMI.charts.portfolio.destroy();
@@ -1926,6 +1960,115 @@
       });
     })();
 
+    // ─── PER-SECTION PLAIN ENGLISH GUIDE ───
+    // Every section gets a "What am I looking at?" panel written for someone with
+    // no trading background: what the section does, what the numbers mean, and
+    // what would count as normal vs worrying. Keyed by the section's heading text.
+    const SECTION_GUIDE = {
+      'Market Narrative': [
+        ['What this is', "A short written summary of what the system noticed today, in sentences instead of numbers. Think of it as the tool explaining its own thinking out loud."],
+        ['How to read it', "It describes the general mood of the market, what the price charts are doing, and any big events coming up. It is a summary of the same data shown in the sections below — not a separate opinion."]
+      ],
+      'Market Pulse': [
+        ['What this is', "The overall temperature of the crypto market right now, before looking at any individual coin."],
+        ['Market Mood / Fear &amp; Greed', "A 0-100 score of how the crowd feels. 0 means everyone is panicking and selling, 100 means everyone is excited and buying. Extremes in either direction often come shortly before the market turns the other way."],
+        ['Risk Grade', "A letter grade for how dangerous conditions are for trading right now. Closer to A means calmer, closer to F means wild price swings where losses happen faster."],
+        ['Ensemble Signal', "Several separate methods each vote on direction, and this is the combined verdict. Agreement between methods matters more than any single one."],
+        ['Order Book Imbalance', "At this instant, are there more people queued up to buy or to sell? Above 0.5 leans buying, below 0.5 leans selling. It is a snapshot of the moment, not a prediction."],
+        ['Profit Factor / Risk of Ruin', "Profit Factor is money won divided by money lost — above 1.0 means winning overall. Risk of Ruin estimates the chance of losing the whole account if you kept trading this way. High Risk of Ruin is the system warning you, and it is doing its job when it flags that."]
+      ],
+      'Asset Signal Nodes': [
+        ['What this is', "One card per cryptocurrency, showing what the system currently thinks about that specific coin."],
+        ['The signal word', "LONG means it leans toward the price rising. SHORT means it leans toward the price falling. NO TRADE means the evidence is not strong enough to justify risking money — and this is the most common answer by design."],
+        ['Conviction %', "How confident the system is, out of 100%. Low conviction is not a malfunction; a tool that always has a strong opinion is a worse tool. Most of the time it should be unsure."],
+        ['Entry / Stop / Target', "If it did take the trade: the price it would buy or sell at, the price where it would admit it was wrong and get out (stop), and the price where it would take the profit (target). For a LONG the stop sits below the entry; for a SHORT it sits above."],
+        ['&quot;Gated&quot;', "The trade passed the signal test but failed the safety test for position size, so no money would be committed. That is the risk rules working, not an error."]
+      ],
+      'Macro Regime': [
+        ['What this is', "The big-picture economic backdrop — interest rates, the US dollar, and market stress — because crypto tends to move with these."],
+        ['How to read it', "Broadly, higher interest rates and a stronger dollar tend to pull money out of risky assets like crypto; the reverse tends to push money in."],
+        ['If it says &quot;not configured&quot;', "Some of these numbers come from a free US Federal Reserve data service that needs an API key. If the key has not been added, the field says so plainly rather than showing a fake zero. Nothing is broken — that piece of data simply is not connected yet."]
+      ],
+      'Paper Trading Account': [
+        ['What this is', "The system's actual practice account, using pretend money. It started with $10,000 and it is the closest thing here to a real track record."],
+        ['How it differs from the other sections', "This one only opens a position when a signal is strong enough to pass every safety rule. It then manages that position over time — moving the stop, taking partial profits, closing it out. It carries over between runs, so its history accumulates."],
+        ['Equity', "What the account would be worth today if every open position were closed right now, cash included."],
+        ['Win Rate here vs elsewhere', "This win rate covers only the trades the account actually took. The Signal Performance section counts every signal the system produced, including ones this account never traded. Different groups of trades, so different percentages — they are not supposed to match."],
+        ['Backtest panel', "A replay of the strategy against several months of real past price data. It answers 'how would these rules have done historically', which is useful but never a promise about the future."]
+      ],
+      'Signal Intelligence': [
+        ['What this is', "The supporting evidence behind the signals — the inputs, rather than the conclusions."],
+        ['Top Trade Opportunities', "The coins currently ranked most attractive. If everything is NO TRADE, this list will be thin or empty, which is expected in a quiet market."],
+        ['Self-Learning State', "The system tracks whether its past calls turned out right and slowly becomes more or less picky as a result. It needs a minimum number of finished trades before it will adjust anything — until then it honestly reports 'warming up' rather than inventing an accuracy number."],
+        ['ETF Activity', "Whether large institutional Bitcoin funds are seeing money flow in or out. Big inflows suggest large buyers are active."],
+        ['On-Chain Metrics', "Health statistics from the Bitcoin network itself, like how much computing power is securing it. Blank fields mean that data source was unreachable this run, not that the value is zero."]
+      ],
+      'Economic Calendar': [
+        ['What this is', "Scheduled events that reliably move markets — interest rate decisions, inflation reports, jobs numbers."],
+        ['Why it matters', "Prices often swing hard right after these announcements. Knowing one is imminent is a reason to expect turbulence, and entries around them carry extra risk."],
+        ['Estimated dates', "Entries marked as estimates are the expected timing based on the usual schedule, not a confirmed announcement. They are labelled so you never mistake one for the other."]
+      ],
+      'Portfolio Simulator': [
+        ['What this is', "A single what-if snapshot: 'if I acted on today's signals right now, using real past prices, what would happen to $10,000?'"],
+        ['Why it often sits at exactly $10,000', "Because when every coin says NO TRADE, there is nothing for it to buy, so nothing changes. That is the correct result for a quiet market, not a frozen or broken page."],
+        ['How it differs from the Paper Trading Account', "This one starts over from scratch every cycle and only reflects today. The Paper Trading Account keeps its positions and history running over time. This is a snapshot; that is a track record."]
+      ],
+      'Signal Performance': [
+        ['What this is', "The logbook of every trading signal the system has ever produced, and how each one eventually turned out."],
+        ['Signals Generated', "The count of real signals — LONG or SHORT calls. The many 'NO TRADE' readings, where the system chose to stay out, are recorded separately for auditing and deliberately excluded from this number, since declining to trade is not a trade."],
+        ['Why this win rate is lower than the practice account', "This counts everything, including weaker signals the practice account never acted on. Those weaker ones lose more often, so this percentage is lower. Both numbers are honest; they simply measure different groups."],
+        ['&quot;Awaiting&quot;', "No signals have finished yet, so there is no win rate to report. The system shows this rather than displaying 0%, which would wrongly suggest it had tried and failed."]
+      ],
+      'Cross-Asset Analytics': [
+        ['What this is', "How the different coins behave relative to one another."],
+        ['Correlation Matrix', "How closely two coins move together, from -1 to +1. Near +1 means they rise and fall almost as one. This matters because holding five coins that all move identically is really one big bet, not five diversified ones — the system caps that exposure deliberately."],
+        ['Funding Rate', "A recurring fee paid between traders betting on the price rising and those betting on it falling. When it is high, the crowd is heavily leaning one way, which sometimes precedes a sharp reversal."],
+        ['Liquidations', "Traders who borrowed money and were forcibly closed out when the price moved against them. Large spikes usually mark moments of panic."]
+      ],
+      'Understanding the System': [
+        ['What this is', "A glossary of the terms used across this page."],
+        ['The honest summary', "This is a research and educational tool. It analyses real market data with real indicators and reports what it finds, including when it finds nothing worth acting on. It trades only pretend money, it has no proven profitable record, and it is not financial advice."]
+      ]
+    };
+
+    (function initSectionGuides() {
+      document.querySelectorAll('.section-header').forEach(header => {
+        const h2 = header.querySelector('h2');
+        if (!h2) return;
+        const numEl = h2.querySelector('.num');
+        // Heading text without the leading number/emoji badge.
+        const title = h2.textContent.replace(numEl ? numEl.textContent : '', '').trim();
+        const entries = SECTION_GUIDE[title];
+        if (!entries) return;
+
+        const wrap = document.createElement('div');
+        wrap.style.cssText = 'margin:-4px 0 14px 0;';
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.setAttribute('aria-expanded', 'false');
+        btn.style.cssText = 'background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.22);color:var(--accent);border-radius:16px;padding:5px 13px;font-family:var(--font-mono);font-size:0.58rem;cursor:pointer;letter-spacing:0.04em;';
+        btn.textContent = '🔰 What am I looking at?';
+
+        const panel = document.createElement('div');
+        panel.hidden = true;
+        panel.style.cssText = 'margin-top:10px;padding:16px 18px;border:1px solid rgba(0,229,255,0.16);border-left:3px solid var(--accent);border-radius:8px;background:rgba(0,229,255,0.03);font-size:0.76rem;line-height:1.75;color:var(--text-secondary);';
+        panel.innerHTML = entries
+          .map(([label, text]) => `<p style="margin:0 0 10px 0;"><b style="color:#fff;">${label}:</b> ${text}</p>`)
+          .join('') + `<p style="margin:12px 0 0 0;color:var(--text-muted);font-size:0.68rem;">Research and educational tool · pretend money only · not financial advice</p>`;
+
+        btn.addEventListener('click', () => {
+          panel.hidden = !panel.hidden;
+          btn.setAttribute('aria-expanded', String(!panel.hidden));
+          btn.textContent = panel.hidden ? '🔰 What am I looking at?' : '🔰 Hide explanation';
+        });
+
+        wrap.appendChild(btn);
+        wrap.appendChild(panel);
+        header.insertAdjacentElement('afterend', wrap);
+      });
+    })();
+
     // ─── CORRELATION ───
     function renderCorrelationMatrix(matrix) {
       const container = $('corr-matrix');
@@ -2003,6 +2146,10 @@
 
     // ─── REGIME CHART ───
     function renderRegimeChart(dist) {
+      if (typeof Chart === 'undefined') {
+        console.warn('[dashboard] Chart.js unavailable — skipping regime chart');
+        return;
+      }
       const ctx = document.getElementById('regime-chart');
       if (!ctx) return;
       const labels = Object.keys(dist);
