@@ -2563,15 +2563,30 @@ def run_paper_account(all_signals, correlation_matrix=None):
     acct['equity_curve'].append({'ts': datetime.now().isoformat(), 'equity': round(equity, 2)})
     acct['equity_curve'] = acct['equity_curve'][-500:]
 
-    # Same population problem calculate_performance_metrics() had: closed_trades
-    # includes SWING_DAILY SHORTs opened before LOGIC_FIX_DATE under the inverted
-    # stop/target bug (see calculate_dynamic_position_size docstring) — those closed
-    # STOP_LOSS while booking positive pnl, which inflated win_rate/profit_factor
-    # with results the current logic can't reproduce. Headline stats now count only
-    # trades opened post-fix; the raw pre-fix rows stay in closed_trades for audit.
+    # Same population problem calculate_performance_metrics() had, plus one more:
+    # LOGIC_FIX_DATE alone doesn't catch it, because the SHORT direction/stop-target
+    # inversion (calculate_dynamic_position_size) was fixed on a different date than
+    # LOGIC_FIX_DATE and every SHORT trade currently on the books was opened before
+    # that fix shipped. So instead of guessing a second cutoff date, corrupted rows
+    # are detected by symptom, scoped to SHORT only: a SHORT closed with reason==
+    # 'STOP_LOSS' can never legitimately carry a positive pnl (a stop is where you
+    # accept a loss), and that combination is only reachable when the SHORT's stop/
+    # target levels were built on the wrong side of price. (LONGs are excluded from
+    # this check — a LONG can legitimately show a small positive pnl on a STOP_LOSS
+    # exit once its stop has been moved to breakeven-or-better after a TP1 partial;
+    # that's correct trailing-stop behavior, not the bug.) On the live ledger this
+    # symptom currently matches all 31 closed SHORTs (+$3,601.88 fake profit), while
+    # the 38 LONGs — never touched by that bug — net -$392.93. The entire account
+    # gain is currently manufactured by this bug, not by trading skill.
+    def _is_corrupted(t):
+        return t.get('side') == 'SHORT' and t.get('reason') == 'STOP_LOSS' and t.get('pnl', 0) > 0
     all_closed = acct['closed_trades']
-    closed = [t for t in all_closed if str(t.get('opened', ''))[:10] >= LOGIC_FIX_DATE]
-    excluded_pre_fix = len(all_closed) - len(closed)
+    dated = [t for t in all_closed if str(t.get('opened', ''))[:10] >= LOGIC_FIX_DATE]
+    corrupted = [t for t in dated if _is_corrupted(t)]
+    closed = [t for t in dated if not _is_corrupted(t)]
+    excluded_pre_fix = len(all_closed) - len(dated)
+    excluded_corrupted = len(corrupted)
+    corrupted_pnl = round(sum(t['pnl'] for t in corrupted), 2)
     wins = [t for t in closed if t['pnl'] > 0]
     losses = [t for t in closed if t['pnl'] <= 0]
     gross_win = sum(t['pnl'] for t in wins)
@@ -2596,10 +2611,13 @@ def run_paper_account(all_signals, correlation_matrix=None):
         'total_return_pct': round(((equity - acct['starting_capital']) / acct['starting_capital']) * 100, 2),
         'closed_trades': len(closed),
         'excluded_pre_fix': excluded_pre_fix,
+        'excluded_corrupted': excluded_corrupted,
+        'corrupted_trades_pnl': corrupted_pnl,
         'wins': len(wins),
         'losses': len(losses),
         'win_rate': round(len(wins) / len(closed) * 100, 1) if closed else None,
-        'win_rate_basis': (f"{len(wins)}W/{len(losses)}L from {len(closed)} closed trades (post-fix)"
+        'win_rate_basis': (f"{len(wins)}W/{len(losses)}L from {len(closed)} closed trades "
+                           f"(excl. {excluded_pre_fix} pre-fix + {excluded_corrupted} corrupted)"
                            if closed else "No closed trades yet (post-fix)"),
         'profit_factor': round(gross_win / gross_loss, 2) if gross_loss else None,
         'avg_win': round(gross_win / len(wins), 2) if wins else None,

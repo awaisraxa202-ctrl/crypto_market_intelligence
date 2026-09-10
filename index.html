@@ -547,6 +547,7 @@
       <h2><span class="num">💼</span>Paper Trading Account</h2>
       <span class="desc">Persistent · DCA · partial exits · real track record</span>
     </div>
+    <div id="pa-corrupted-note" style="display:none;background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.3);border-radius:8px;padding:8px 12px;margin:4px 0 10px;font-size:0.68rem;color:var(--rose,#ff4d6d);"></div>
     <div class="card-grid card-grid-4" style="margin-top:4px;">
       <div class="card reveal"><div class="card-glow"></div><div class="card-label">Equity</div>
         <div class="card-value" id="pa-equity">—</div><div class="card-detail" id="pa-return">—</div></div>
@@ -1201,10 +1202,20 @@
           rEl.style.color = ret > 0 ? 'var(--lime)' : ret < 0 ? 'var(--rose)' : 'var(--text-secondary)';
         }
         $('pa-closed').textContent = pst.closed_trades ?? 0;
+        const excludedTotal = (pst.excluded_pre_fix || 0) + (pst.excluded_corrupted || 0);
         $('pa-winrate').textContent = (pst.win_rate !== null && pst.win_rate !== undefined
           ? `${pst.win_rate}% win rate (${pst.wins}W/${pst.losses}L)`
           : 'No closed trades yet') +
-          (pst.excluded_pre_fix ? ` · ${pst.excluded_pre_fix} pre-fix trade${pst.excluded_pre_fix>1?'s':''} excluded` : '');
+          (excludedTotal ? ` · ${excludedTotal} bugged/pre-fix trade${excludedTotal>1?'s':''} excluded` : '');
+        const cpEl = $('pa-corrupted-note');
+        if (cpEl) {
+          if (pst.corrupted_trades_pnl) {
+            cpEl.textContent = `⚠️ $${pst.corrupted_trades_pnl.toLocaleString()} of the account balance came from ${pst.excluded_corrupted} trade(s) closed under a now-fixed bug (inverted SHORT stop/target) — not genuine trading results. Excluded from the win rate above.`;
+            cpEl.style.display = 'block';
+          } else {
+            cpEl.style.display = 'none';
+          }
+        }
         $('pa-open').textContent = pst.open_positions ?? 0;
         $('pa-dca').textContent = pst.dca_positions ? `${pst.dca_positions} averaged down` : 'No DCA active';
         $('pa-pf').textContent = pst.profit_factor ?? '—';
