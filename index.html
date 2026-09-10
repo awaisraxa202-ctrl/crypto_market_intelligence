@@ -1201,9 +1201,10 @@
           rEl.style.color = ret > 0 ? 'var(--lime)' : ret < 0 ? 'var(--rose)' : 'var(--text-secondary)';
         }
         $('pa-closed').textContent = pst.closed_trades ?? 0;
-        $('pa-winrate').textContent = pst.win_rate !== null && pst.win_rate !== undefined
+        $('pa-winrate').textContent = (pst.win_rate !== null && pst.win_rate !== undefined
           ? `${pst.win_rate}% win rate (${pst.wins}W/${pst.losses}L)`
-          : 'No closed trades yet';
+          : 'No closed trades yet') +
+          (pst.excluded_pre_fix ? ` · ${pst.excluded_pre_fix} pre-fix trade${pst.excluded_pre_fix>1?'s':''} excluded` : '');
         $('pa-open').textContent = pst.open_positions ?? 0;
         $('pa-dca').textContent = pst.dca_positions ? `${pst.dca_positions} averaged down` : 'No DCA active';
         $('pa-pf').textContent = pst.profit_factor ?? '—';

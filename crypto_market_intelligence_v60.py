@@ -2563,7 +2563,15 @@ def run_paper_account(all_signals, correlation_matrix=None):
     acct['equity_curve'].append({'ts': datetime.now().isoformat(), 'equity': round(equity, 2)})
     acct['equity_curve'] = acct['equity_curve'][-500:]
 
-    closed = acct['closed_trades']
+    # Same population problem calculate_performance_metrics() had: closed_trades
+    # includes SWING_DAILY SHORTs opened before LOGIC_FIX_DATE under the inverted
+    # stop/target bug (see calculate_dynamic_position_size docstring) — those closed
+    # STOP_LOSS while booking positive pnl, which inflated win_rate/profit_factor
+    # with results the current logic can't reproduce. Headline stats now count only
+    # trades opened post-fix; the raw pre-fix rows stay in closed_trades for audit.
+    all_closed = acct['closed_trades']
+    closed = [t for t in all_closed if str(t.get('opened', ''))[:10] >= LOGIC_FIX_DATE]
+    excluded_pre_fix = len(all_closed) - len(closed)
     wins = [t for t in closed if t['pnl'] > 0]
     losses = [t for t in closed if t['pnl'] <= 0]
     gross_win = sum(t['pnl'] for t in wins)
@@ -2587,9 +2595,12 @@ def run_paper_account(all_signals, correlation_matrix=None):
         'open_positions': len(acct['positions']),
         'total_return_pct': round(((equity - acct['starting_capital']) / acct['starting_capital']) * 100, 2),
         'closed_trades': len(closed),
+        'excluded_pre_fix': excluded_pre_fix,
         'wins': len(wins),
         'losses': len(losses),
         'win_rate': round(len(wins) / len(closed) * 100, 1) if closed else None,
+        'win_rate_basis': (f"{len(wins)}W/{len(losses)}L from {len(closed)} closed trades (post-fix)"
+                           if closed else "No closed trades yet (post-fix)"),
         'profit_factor': round(gross_win / gross_loss, 2) if gross_loss else None,
         'avg_win': round(gross_win / len(wins), 2) if wins else None,
         'avg_loss': round(-gross_loss / len(losses), 2) if losses else None,
