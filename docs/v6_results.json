@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-09-10T09:05:21.282481",
-  "imbalance": 0.884,
+  "timestamp": "2026-09-10T11:06:40.861861",
+  "imbalance": 0.143,
   "regime": {
     "regime": "LOW_UNCERTAINTY",
     "description": "Low trade policy uncertainty \u2014 fundamentals-driven market",
@@ -15,114 +15,43 @@
   },
   "ml_signal": {
     "bilstm_score": 0.5,
-    "cnn_score": 1.0,
-    "ensemble_score": 0.75,
-    "action": "BUY",
-    "confidence": 0.75,
+    "cnn_score": 0.015,
+    "ensemble_score": 0.258,
+    "action": "SELL",
+    "confidence": 0.742,
     "trade_qualified": true
   },
   "big_trade": {
-    "position_size": 0.12,
-    "risk_pct": 3.75,
-    "target_movement": 3125.0404,
+    "position_size": 0.1202,
+    "risk_pct": 3.74,
+    "target_movement": 3112.7508000000003,
     "trade_type": "BIG"
   },
   "small_trade": {
-    "position_size": 0.112,
-    "risk_pct": 0.88,
-    "target_movement": 781.2601,
+    "position_size": 0.1119,
+    "risk_pct": 0.87,
+    "target_movement": 778.1877000000001,
     "trade_type": "SMALL"
   },
   "explanation": {
     "asset": "BTC",
-    "signal": "BUY",
-    "confidence": 0.75,
+    "signal": "SELL",
+    "confidence": 0.742,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
-      "\u2705 order_book: Bullish order book imbalance",
+      "\u274c order_book: Order book data unavailable",
       "\u274c onchain: NVT ratio normal",
       "\u2705 sentiment: Fear & Greed in buy zone"
     ],
-    "historical_evidence": "Similar setups have shown a 30% win rate historically.",
-    "historical_trades": [
-      {
-        "date": "2026-07-28",
-        "similarity": 96.3,
-        "future_5d_return": -0.54,
-        "rsi": 44.1,
-        "price_vs_sma50": 0.009
-      },
-      {
-        "date": "2026-05-16",
-        "similarity": 96.2,
-        "future_5d_return": -0.68,
-        "rsi": 48.1,
-        "price_vs_sma50": 0.0392
-      },
-      {
-        "date": "2026-07-29",
-        "similarity": 95.9,
-        "future_5d_return": -0.73,
-        "rsi": 45.9,
-        "price_vs_sma50": 0.0094
-      },
-      {
-        "date": "2026-05-17",
-        "similarity": 95.6,
-        "future_5d_return": -2.48,
-        "rsi": 46.3,
-        "price_vs_sma50": 0.027
-      },
-      {
-        "date": "2026-08-03",
-        "similarity": 95.5,
-        "future_5d_return": 2.27,
-        "rsi": 41.7,
-        "price_vs_sma50": 0.0025
-      },
-      {
-        "date": "2026-08-05",
-        "similarity": 95.4,
-        "future_5d_return": -1.08,
-        "rsi": 42.6,
-        "price_vs_sma50": 0.0216
-      },
-      {
-        "date": "2026-08-04",
-        "similarity": 95.3,
-        "future_5d_return": 1.24,
-        "rsi": 37.4,
-        "price_vs_sma50": 0.0125
-      },
-      {
-        "date": "2026-08-06",
-        "similarity": 95.3,
-        "future_5d_return": -1.12,
-        "rsi": 45.8,
-        "price_vs_sma50": 0.0163
-      },
-      {
-        "date": "2025-12-27",
-        "similarity": 95.2,
-        "future_5d_return": 1.09,
-        "rsi": 41.0,
-        "price_vs_sma50": -0.0359
-      },
-      {
-        "date": "2026-01-19",
-        "similarity": 95.2,
-        "future_5d_return": -3.68,
-        "rsi": 45.6,
-        "price_vs_sma50": 0.0254
-      }
-    ],
+    "historical_evidence": "Building historical database. Check back soon.",
+    "historical_trades": [],
     "risk_warning": "\u2705 Moderate confidence. Standard position size recommended.",
     "trader_comment": "No clear directional bias. Patience is key."
   },
   "narrative": {
     "date": "September 10, 2026",
     "macro": "Macro Regime: LOW_UNCERTAINTY \u2014 Low trade policy uncertainty \u2014 fundamentals-driven market",
-    "technicals": "Order book shows bullish imbalance. More buy orders than sell orders.",
+    "technicals": "Order book shows bearish imbalance. More sell orders than buy orders.",
     "sentiment": "Neutral sentiment. No extremes.",
     "upcoming_events": "Next event: CPI Report on 2026-09-12 (Impact: MEDIUM)",
     "trader_comment": "Market is in a consolidation phase. Watch for breakout."
@@ -130,12 +59,12 @@
   "macro_data": {
     "fed_trend": "UNKNOWN",
     "fed_label": "Data unavailable",
-    "dxy": 98.78,
+    "dxy": 98.9,
     "dxy_trend": "RISING",
-    "dxy_label": "RISING (98.78)",
-    "vix": 16.5,
+    "dxy_label": "RISING (98.90)",
+    "vix": 16.53,
     "vix_level": "MEDIUM",
-    "vix_label": "ELEVATED (16.50)",
+    "vix_label": "ELEVATED (16.53)",
     "liquidity": "TIGHTENING",
     "liquidity_desc": "Short-end yield 3.81% (rising vs 5d ago)",
     "fed_impact": "\ud83d\udfe1 NEUTRAL",
@@ -203,8 +132,8 @@
   ],
   "event_risk": {
     "expected_move": "\u00b14.0%",
-    "expected_range_low": 75050.85,
-    "expected_range_high": 81305.09,
+    "expected_range_low": null,
+    "expected_range_high": null,
     "direction": "UNCERTAIN",
     "recommendation": "Reduce position size by 50% before event",
     "event": {
@@ -245,48 +174,42 @@
     "source": "yfinance spot BTC ETFs (proxy, not true creation/redemption flow)"
   },
   "onchain": {
-    "mvrv_zscore": 1.976,
+    "mvrv_zscore": null,
     "miner_reserves": 0,
-    "nvt_ratio": 47.61,
+    "nvt_ratio": 48.47,
     "hashrate_trend": null,
     "exchange_flow_net": null,
-    "mvrv_is_proxy": true,
     "miner_reserves_trend": "UNKNOWN"
   },
   "exit_strategy": {
-    "entry": 78126.01,
-    "signal": "LONG",
-    "current_price": 78907.2701,
+    "entry": 77818.77,
+    "signal": "SHORT",
+    "current_price": 78596.9577,
     "scenarios": [
       {
-        "condition": "Price hits TP1 ($80469.79)",
+        "condition": "Price hits TP1 ($75484.21)",
         "action": "Take 50% profit",
         "reason": "Lock in gains, reduce risk"
       },
       {
-        "condition": "Price hits TP2 ($82813.57)",
+        "condition": "Price hits TP2 ($73149.64)",
         "action": "Take remaining 50% profit",
         "reason": "Target hit, complete the trade"
       },
       {
-        "condition": "Price hits SL ($75782.23)",
+        "condition": "Price hits SL ($80153.33)",
         "action": "Exit immediately",
         "reason": "Stop-loss protects capital"
-      },
-      {
-        "condition": "No target hit after 7 days",
-        "action": "Close position",
-        "reason": "Time-based exit, opportunity cost"
       }
     ]
   },
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.5,
-      "cnn_score": 1.0,
-      "ensemble_score": 0.75,
-      "action": "BUY",
-      "confidence": 0.75,
+      "cnn_score": 0.015,
+      "ensemble_score": 0.258,
+      "action": "SELL",
+      "confidence": 0.742,
       "trade_qualified": true
     }
   },
@@ -294,334 +217,334 @@
   "backtest_results": {
     "BTC": {
       "symbol": "BTCUSDT",
-      "bars_used": 1000,
-      "total_trades": 59,
-      "wins": 24,
-      "losses": 35,
-      "time_exits": 2,
-      "win_rate": 40.7,
-      "profit_factor": 1.45,
-      "avg_r": 0.268,
-      "total_r": 15.79,
-      "gross_r_win": 50.79,
-      "gross_r_loss": 35.0,
+      "bars_used": 721,
+      "total_trades": 49,
+      "wins": 16,
+      "losses": 33,
+      "time_exits": 3,
+      "win_rate": 32.7,
+      "profit_factor": 0.89,
+      "avg_r": -0.071,
+      "total_r": -3.5,
+      "gross_r_win": 29.5,
+      "gross_r_loss": 33.0,
       "trades": [
         {
-          "side": "LONG",
-          "entry": 70892.03,
-          "exit": 71941.42,
-          "reason": "TARGET",
-          "r_multiple": 2.47,
-          "held_bars": 5
-        },
-        {
-          "side": "LONG",
-          "entry": 76039.05,
-          "exit": 74536.3238,
-          "reason": "STOP",
-          "r_multiple": -1.0,
-          "held_bars": 8
-        },
-        {
-          "side": "LONG",
-          "entry": 73801.79,
-          "exit": 74910.0,
-          "reason": "TARGET",
-          "r_multiple": 2.42,
-          "held_bars": 1
-        },
-        {
-          "side": "LONG",
-          "entry": 77679.07,
-          "exit": 77232.6903,
-          "reason": "STOP",
-          "r_multiple": -1.0,
-          "held_bars": 3
-        },
-        {
-          "side": "LONG",
-          "entry": 77590.03,
-          "exit": 77212.3447,
-          "reason": "STOP",
-          "r_multiple": -1.0,
-          "held_bars": 1
-        },
-        {
-          "side": "LONG",
-          "entry": 80527.92,
-          "exit": 81649.99,
-          "reason": "TARGET",
-          "r_multiple": 1.3,
-          "held_bars": 7
-        },
-        {
           "side": "SHORT",
-          "entry": 82210.07,
-          "exit": 79666.05,
+          "entry": 77556.6,
+          "exit": 76652.5,
           "reason": "TARGET",
-          "r_multiple": 5.04,
-          "held_bars": 15
-        },
-        {
-          "side": "LONG",
-          "entry": 78827.21,
-          "exit": 80500.0,
-          "reason": "TARGET",
-          "r_multiple": 3.17,
-          "held_bars": 5
-        },
-        {
-          "side": "SHORT",
-          "entry": 81301.23,
-          "exit": 80639.99,
-          "reason": "TARGET",
-          "r_multiple": 1.47,
-          "held_bars": 3
-        },
-        {
-          "side": "LONG",
-          "entry": 80628.53,
-          "exit": 80207.2571,
-          "reason": "STOP",
-          "r_multiple": -1.0,
-          "held_bars": 1
-        },
-        {
-          "side": "SHORT",
-          "entry": 77282.64,
-          "exit": 77646.0899,
-          "reason": "STOP",
-          "r_multiple": -1.0,
-          "held_bars": 1
-        },
-        {
-          "side": "SHORT",
-          "entry": 77189.1,
-          "exit": 77552.8344,
-          "reason": "STOP",
-          "r_multiple": -1.0,
-          "held_bars": 1
-        },
-        {
-          "side": "SHORT",
-          "entry": 77408.06,
-          "exit": 76707.61,
-          "reason": "TARGET",
-          "r_multiple": 2.02,
-          "held_bars": 1
-        },
-        {
-          "side": "SHORT",
-          "entry": 77320.06,
-          "exit": 76719.47,
-          "reason": "TARGET",
-          "r_multiple": 1.58,
-          "held_bars": 1
-        },
-        {
-          "side": "SHORT",
-          "entry": 77401.12,
-          "exit": 77783.4287,
-          "reason": "STOP",
-          "r_multiple": -1.0,
-          "held_bars": 1
-        },
-        {
-          "side": "SHORT",
-          "entry": 77628.82,
-          "exit": 76719.47,
-          "reason": "TARGET",
-          "r_multiple": 2.49,
+          "r_multiple": 2.54,
           "held_bars": 2
         },
         {
           "side": "LONG",
-          "entry": 74449.3,
-          "exit": 74048.4727,
+          "entry": 74337.1,
+          "exit": 73943.0557,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
         },
         {
           "side": "SHORT",
-          "entry": 73930.14,
-          "exit": 73655.21,
+          "entry": 73811.4,
+          "exit": 73545.1,
           "reason": "TIME_EXIT",
           "r_multiple": 0.74,
           "held_bars": 5
         },
         {
           "side": "SHORT",
-          "entry": 73655.21,
-          "exit": 73963.7257,
+          "entry": 73545.1,
+          "exit": 73842.2637,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
         },
         {
           "side": "SHORT",
-          "entry": 73674.39,
-          "exit": 73216.0,
+          "entry": 73570.0,
+          "exit": 73128.58,
           "reason": "TARGET",
-          "r_multiple": 1.52,
+          "r_multiple": 1.5,
           "held_bars": 1
         },
         {
           "side": "LONG",
-          "entry": 62621.96,
-          "exit": 61063.6057,
+          "entry": 62615.0,
+          "exit": 60940.9529,
           "reason": "STOP",
           "r_multiple": -1.0,
-          "held_bars": 12
+          "held_bars": 13
         },
         {
           "side": "SHORT",
-          "entry": 63605.68,
-          "exit": 64142.1037,
+          "entry": 63557.2,
+          "exit": 64088.8631,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 4
         },
         {
           "side": "SHORT",
-          "entry": 63593.02,
-          "exit": 64115.362,
+          "entry": 63551.7,
+          "exit": 64060.4713,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 5
         },
         {
           "side": "SHORT",
-          "entry": 64296.15,
-          "exit": 64690.5274,
+          "entry": 64253.4,
+          "exit": 64639.2811,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
         },
         {
           "side": "SHORT",
-          "entry": 62950.79,
-          "exit": 63810.01,
-          "reason": "STOP",
-          "r_multiple": -1.0,
-          "held_bars": 8
-        },
-        {
-          "side": "SHORT",
-          "entry": 63655.21,
-          "exit": 64045.5242,
-          "reason": "STOP",
-          "r_multiple": -1.0,
-          "held_bars": 1
-        },
-        {
-          "side": "SHORT",
-          "entry": 64657.22,
-          "exit": 63866.66,
-          "reason": "TARGET",
-          "r_multiple": 2.22,
-          "held_bars": 2
-        },
-        {
-          "side": "SHORT",
-          "entry": 61911.04,
-          "exit": 60471.9442,
-          "reason": "TARGET",
-          "r_multiple": 1.24,
-          "held_bars": 1
-        },
-        {
-          "side": "SHORT",
-          "entry": 61358.01,
-          "exit": 62011.8899,
-          "reason": "STOP",
-          "r_multiple": -1.0,
-          "held_bars": 5
-        },
-        {
-          "side": "SHORT",
-          "entry": 62024.02,
-          "exit": 62456.5047,
-          "reason": "STOP",
-          "r_multiple": -1.0,
-          "held_bars": 2
-        },
-        {
-          "side": "SHORT",
-          "entry": 62943.29,
-          "exit": 63306.0952,
-          "reason": "STOP",
-          "r_multiple": -1.0,
-          "held_bars": 1
-        },
-        {
-          "side": "SHORT",
-          "entry": 63144.01,
-          "exit": 63497.8272,
+          "entry": 64404.0,
+          "exit": 64795.8168,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 5
         },
         {
           "side": "LONG",
-          "entry": 62786.34,
-          "exit": 63448.0,
-          "reason": "TARGET",
-          "r_multiple": 1.59,
-          "held_bars": 1
-        },
-        {
-          "side": "LONG",
-          "entry": 62618.01,
-          "exit": 62299.8305,
+          "entry": 65816.4,
+          "exit": 64631.3608,
           "reason": "STOP",
           "r_multiple": -1.0,
-          "held_bars": 1
-        },
-        {
-          "side": "LONG",
-          "entry": 62572.89,
-          "exit": 63550.0,
-          "reason": "TARGET",
-          "r_multiple": 3.16,
-          "held_bars": 2
-        },
-        {
-          "side": "LONG",
-          "entry": 62828.11,
-          "exit": 64254.0,
-          "reason": "TARGET",
-          "r_multiple": 2.94,
-          "held_bars": 2
-        },
-        {
-          "side": "LONG",
-          "entry": 64002.75,
-          "exit": 64386.7665,
-          "reason": "TARGET",
-          "r_multiple": 1.22,
-          "held_bars": 2
+          "held_bars": 4
         },
         {
           "side": "SHORT",
-          "entry": 64182.0,
-          "exit": 64434.2159,
+          "entry": 62866.4,
+          "exit": 63712.1,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 7
+        },
+        {
+          "side": "SHORT",
+          "entry": 63410.9,
+          "exit": 63808.8925,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 2
         },
         {
           "side": "SHORT",
-          "entry": 64557.0,
-          "exit": 64783.6095,
+          "entry": 64590.8,
+          "exit": 63850.7,
+          "reason": "TARGET",
+          "r_multiple": 2.14,
+          "held_bars": 2
+        },
+        {
+          "side": "SHORT",
+          "entry": 61817.5,
+          "exit": 60387.6083,
+          "reason": "TARGET",
+          "r_multiple": 1.23,
+          "held_bars": 1
+        },
+        {
+          "side": "SHORT",
+          "entry": 61286.6,
+          "exit": 61879.0356,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 1
+        },
+        {
+          "side": "SHORT",
+          "entry": 61399.8,
+          "exit": 61888.9358,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 3
+        },
+        {
+          "side": "SHORT",
+          "entry": 62883.2,
+          "exit": 63237.9883,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 1
+        },
+        {
+          "side": "SHORT",
+          "entry": 63085.8,
+          "exit": 63432.8749,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 5
+        },
+        {
+          "side": "LONG",
+          "entry": 62815.2,
+          "exit": 63398.5,
+          "reason": "TARGET",
+          "r_multiple": 1.43,
+          "held_bars": 2
+        },
+        {
+          "side": "LONG",
+          "entry": 62567.4,
+          "exit": 62260.836,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 1
+        },
+        {
+          "side": "LONG",
+          "entry": 62253.5,
+          "exit": 63490.7,
+          "reason": "TARGET",
+          "r_multiple": 2.59,
+          "held_bars": 3
+        },
+        {
+          "side": "LONG",
+          "entry": 62777.9,
+          "exit": 64201.5,
+          "reason": "TARGET",
+          "r_multiple": 2.62,
+          "held_bars": 2
+        },
+        {
+          "side": "LONG",
+          "entry": 63975.7,
+          "exit": 64359.5542,
+          "reason": "TARGET",
+          "r_multiple": 1.25,
+          "held_bars": 2
+        },
+        {
+          "side": "SHORT",
+          "entry": 64127.1,
+          "exit": 64372.245,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 2
         },
         {
+          "side": "SHORT",
+          "entry": 64310.2,
+          "exit": 64524.1507,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 1
+        },
+        {
+          "side": "SHORT",
+          "entry": 65336.6,
+          "exit": 65554.7148,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 1
+        },
+        {
           "side": "LONG",
-          "entry": 64984.0,
-          "exit": 64724.6326,
+          "entry": 64902.9,
+          "exit": 64648.2851,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 1
+        },
+        {
+          "side": "LONG",
+          "entry": 64860.0,
+          "exit": 65249.16,
+          "reason": "TARGET",
+          "r_multiple": 2.09,
+          "held_bars": 1
+        },
+        {
+          "side": "LONG",
+          "entry": 65071.8,
+          "exit": 64884.8,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 1
+        },
+        {
+          "side": "LONG",
+          "entry": 63975.7,
+          "exit": 63717.9485,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 4
+        },
+        {
+          "side": "LONG",
+          "entry": 63558.1,
+          "exit": 63341.7401,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 5
+        },
+        {
+          "side": "SHORT",
+          "entry": 63059.1,
+          "exit": 63212.0252,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 3
+        },
+        {
+          "side": "SHORT",
+          "entry": 63049.1,
+          "exit": 63184.0285,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 1
+        },
+        {
+          "side": "SHORT",
+          "entry": 64138.7,
+          "exit": 64497.9828,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 1
+        },
+        {
+          "side": "SHORT",
+          "entry": 64122.2,
+          "exit": 64504.1632,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 2
+        },
+        {
+          "side": "SHORT",
+          "entry": 64803.0,
+          "exit": 65246.0951,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 5
+        },
+        {
+          "side": "LONG",
+          "entry": 76935.9,
+          "exit": 77689.5,
+          "reason": "TARGET",
+          "r_multiple": 1.34,
+          "held_bars": 1
+        },
+        {
+          "side": "LONG",
+          "entry": 77637.0,
+          "exit": 78127.1,
+          "reason": "TIME_EXIT",
+          "r_multiple": 1.0,
+          "held_bars": 5
+        },
+        {
+          "side": "LONG",
+          "entry": 78808.3,
+          "exit": 78443.4747,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
@@ -631,337 +554,337 @@
     },
     "ETH": {
       "symbol": "ETHUSDT",
-      "bars_used": 1000,
-      "total_trades": 57,
-      "wins": 27,
-      "losses": 30,
-      "time_exits": 7,
-      "win_rate": 47.4,
-      "profit_factor": 1.93,
-      "avg_r": 0.457,
-      "total_r": 26.03,
-      "gross_r_win": 54.07,
-      "gross_r_loss": 28.03,
+      "bars_used": 721,
+      "total_trades": 44,
+      "wins": 19,
+      "losses": 25,
+      "time_exits": 4,
+      "win_rate": 43.2,
+      "profit_factor": 1.48,
+      "avg_r": 0.251,
+      "total_r": 11.05,
+      "gross_r_win": 33.83,
+      "gross_r_loss": 22.79,
       "trades": [
         {
           "side": "LONG",
-          "entry": 2180.26,
-          "exit": 2251.39,
+          "entry": 2091.14,
+          "exit": 2122.8,
           "reason": "TARGET",
-          "r_multiple": 1.22,
-          "held_bars": 6
-        },
-        {
-          "side": "LONG",
-          "entry": 2209.28,
-          "exit": 2251.39,
-          "reason": "TARGET",
-          "r_multiple": 1.43,
+          "r_multiple": 2.3,
           "held_bars": 1
         },
         {
           "side": "LONG",
-          "entry": 2341.52,
-          "exit": 2317.56,
+          "entry": 2021.81,
+          "exit": 2006.6797,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
         },
         {
-          "side": "LONG",
-          "entry": 2339.01,
-          "exit": 2317.56,
-          "reason": "STOP",
-          "r_multiple": -1.0,
-          "held_bars": 3
-        },
-        {
-          "side": "LONG",
-          "entry": 2334.16,
-          "exit": 2364.0,
-          "reason": "TARGET",
-          "r_multiple": 1.57,
-          "held_bars": 1
-        },
-        {
-          "side": "LONG",
-          "entry": 2316.03,
-          "exit": 2297.2887,
-          "reason": "STOP",
-          "r_multiple": -1.0,
-          "held_bars": 2
-        },
-        {
-          "side": "LONG",
-          "entry": 2299.65,
-          "exit": 2275.8566,
-          "reason": "STOP",
-          "r_multiple": -1.0,
-          "held_bars": 1
-        },
-        {
-          "side": "LONG",
-          "entry": 2286.56,
-          "exit": 2327.14,
+          "side": "SHORT",
+          "entry": 1656.18,
+          "exit": 1652.68,
           "reason": "TIME_EXIT",
-          "r_multiple": 2.16,
-          "held_bars": 10
-        },
-        {
-          "side": "LONG",
-          "entry": 2308.09,
-          "exit": 2332.88,
-          "reason": "TARGET",
-          "r_multiple": 1.84,
-          "held_bars": 3
-        },
-        {
-          "side": "LONG",
-          "entry": 2348.05,
-          "exit": 2400.78,
-          "reason": "TARGET",
-          "r_multiple": 1.49,
-          "held_bars": 2
-        },
-        {
-          "side": "SHORT",
-          "entry": 2394.85,
-          "exit": 2308.97,
-          "reason": "TARGET",
-          "r_multiple": 6.51,
-          "held_bars": 2
-        },
-        {
-          "side": "SHORT",
-          "entry": 2385.12,
-          "exit": 2402.917,
-          "reason": "STOP",
-          "r_multiple": -1.0,
-          "held_bars": 13
-        },
-        {
-          "side": "LONG",
-          "entry": 2278.76,
-          "exit": 2314.21,
-          "reason": "TARGET",
-          "r_multiple": 2.17,
-          "held_bars": 3
-        },
-        {
-          "side": "LONG",
-          "entry": 2261.85,
-          "exit": 2321.22,
-          "reason": "TARGET",
-          "r_multiple": 3.6,
-          "held_bars": 4
-        },
-        {
-          "side": "SHORT",
-          "entry": 2129.74,
-          "exit": 2143.8997,
-          "reason": "STOP",
-          "r_multiple": -1.0,
-          "held_bars": 1
-        },
-        {
-          "side": "SHORT",
-          "entry": 2136.75,
-          "exit": 2150.6687,
-          "reason": "STOP",
-          "r_multiple": -1.0,
-          "held_bars": 2
-        },
-        {
-          "side": "SHORT",
-          "entry": 2135.06,
-          "exit": 2110.5,
-          "reason": "TARGET",
-          "r_multiple": 1.81,
-          "held_bars": 1
-        },
-        {
-          "side": "SHORT",
-          "entry": 2132.65,
-          "exit": 2130.78,
-          "reason": "TIME_EXIT",
-          "r_multiple": 0.13,
-          "held_bars": 4
-        },
-        {
-          "side": "LONG",
-          "entry": 2093.12,
-          "exit": 2126.58,
-          "reason": "TARGET",
-          "r_multiple": 2.44,
-          "held_bars": 1
-        },
-        {
-          "side": "LONG",
-          "entry": 2024.84,
-          "exit": 2009.5844,
-          "reason": "STOP",
-          "r_multiple": -1.0,
-          "held_bars": 1
-        },
-        {
-          "side": "SHORT",
-          "entry": 1657.33,
-          "exit": 1654.41,
-          "reason": "TIME_EXIT",
-          "r_multiple": 0.07,
+          "r_multiple": 0.09,
           "held_bars": 8
         },
         {
           "side": "SHORT",
-          "entry": 1682.15,
-          "exit": 1695.2833,
+          "entry": 1681.43,
+          "exit": 1694.4781,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
         },
         {
+          "side": "SHORT",
+          "entry": 1680.87,
+          "exit": 1658.59,
+          "reason": "TARGET",
+          "r_multiple": 1.87,
+          "held_bars": 2
+        },
+        {
           "side": "LONG",
-          "entry": 1782.44,
-          "exit": 1730.1683,
+          "entry": 1781.23,
+          "exit": 1729.6435,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 6
         },
         {
           "side": "LONG",
-          "entry": 1741.08,
-          "exit": 1728.19,
+          "entry": 1739.0,
+          "exit": 1727.88,
           "reason": "TIME_EXIT",
-          "r_multiple": -0.32,
-          "held_bars": 11
+          "r_multiple": -0.28,
+          "held_bars": 12
         },
         {
           "side": "LONG",
-          "entry": 1683.01,
-          "exit": 1669.4105,
+          "entry": 1681.08,
+          "exit": 1667.696,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
         },
         {
           "side": "SHORT",
-          "entry": 1584.0,
-          "exit": 1600.7183,
-          "reason": "STOP",
-          "r_multiple": -1.0,
-          "held_bars": 1
-        },
-        {
-          "side": "SHORT",
-          "entry": 1578.51,
-          "exit": 1582.87,
-          "reason": "TIME_EXIT",
-          "r_multiple": -0.26,
+          "entry": 1573.47,
+          "exit": 1554.45,
+          "reason": "TARGET",
+          "r_multiple": 1.29,
           "held_bars": 3
         },
         {
           "side": "SHORT",
-          "entry": 1582.87,
-          "exit": 1556.73,
-          "reason": "TARGET",
-          "r_multiple": 1.82,
-          "held_bars": 2
-        },
-        {
-          "side": "SHORT",
-          "entry": 1584.78,
-          "exit": 1599.1496,
+          "entry": 1581.81,
+          "exit": 1595.8059,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 3
         },
         {
           "side": "SHORT",
-          "entry": 1587.18,
-          "exit": 1562.26,
+          "entry": 1585.11,
+          "exit": 1560.05,
           "reason": "TARGET",
-          "r_multiple": 1.65,
+          "r_multiple": 1.23,
           "held_bars": 2
         },
         {
           "side": "SHORT",
-          "entry": 1620.09,
-          "exit": 1635.4088,
+          "entry": 1618.94,
+          "exit": 1633.9563,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
         },
         {
           "side": "SHORT",
-          "entry": 1639.47,
-          "exit": 1658.2866,
+          "entry": 1638.38,
+          "exit": 1654.9815,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 2
         },
         {
+          "side": "SHORT",
+          "entry": 1716.72,
+          "exit": 1752.9888,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 3
+        },
+        {
           "side": "LONG",
-          "entry": 1759.64,
-          "exit": 1795.81,
+          "entry": 1758.47,
+          "exit": 1793.97,
           "reason": "TARGET",
-          "r_multiple": 2.79,
+          "r_multiple": 2.82,
           "held_bars": 1
         },
         {
           "side": "LONG",
-          "entry": 1771.24,
-          "exit": 1795.81,
+          "entry": 1769.66,
+          "exit": 1793.97,
           "reason": "TARGET",
-          "r_multiple": 1.59,
+          "r_multiple": 1.56,
           "held_bars": 1
         },
         {
           "side": "LONG",
-          "entry": 1730.7,
-          "exit": 1785.0,
+          "entry": 1728.75,
+          "exit": 1783.52,
           "reason": "TARGET",
-          "r_multiple": 3.68,
+          "r_multiple": 3.78,
           "held_bars": 7
         },
         {
-          "side": "SHORT",
-          "entry": 1926.75,
-          "exit": 1939.2413,
-          "reason": "STOP",
-          "r_multiple": -1.0,
-          "held_bars": 1
+          "side": "LONG",
+          "entry": 1857.14,
+          "exit": 1886.28,
+          "reason": "TARGET",
+          "r_multiple": 1.26,
+          "held_bars": 7
         },
         {
           "side": "LONG",
-          "entry": 1880.67,
-          "exit": 1856.0132,
+          "entry": 1879.15,
+          "exit": 1855.4231,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 2
         },
         {
           "side": "LONG",
-          "entry": 1861.81,
-          "exit": 1856.02,
+          "entry": 1860.42,
+          "exit": 1854.48,
           "reason": "TIME_EXIT",
-          "r_multiple": -0.45,
+          "r_multiple": -0.46,
           "held_bars": 3
         },
         {
           "side": "LONG",
-          "entry": 1856.02,
-          "exit": 1877.33,
+          "entry": 1854.48,
+          "exit": 1875.82,
           "reason": "TARGET",
-          "r_multiple": 1.98,
+          "r_multiple": 2.0,
+          "held_bars": 3
+        },
+        {
+          "side": "LONG",
+          "entry": 1883.97,
+          "exit": 1927.34,
+          "reason": "TARGET",
+          "r_multiple": 1.93,
+          "held_bars": 2
+        },
+        {
+          "side": "SHORT",
+          "entry": 1953.47,
+          "exit": 1963.9703,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 1
+        },
+        {
+          "side": "LONG",
+          "entry": 1879.37,
+          "exit": 1927.34,
+          "reason": "TARGET",
+          "r_multiple": 1.93,
           "held_bars": 4
         },
         {
           "side": "LONG",
-          "entry": 1885.87,
-          "exit": 1929.0,
+          "entry": 1919.88,
+          "exit": 1905.4947,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 1
+        },
+        {
+          "side": "LONG",
+          "entry": 1921.1,
+          "exit": 1905.9859,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 1
+        },
+        {
+          "side": "LONG",
+          "entry": 1888.75,
+          "exit": 1874.9746,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 1
+        },
+        {
+          "side": "LONG",
+          "entry": 1860.5,
+          "exit": 1846.617,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 6
+        },
+        {
+          "side": "LONG",
+          "entry": 1856.45,
+          "exit": 1844.6605,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 1
+        },
+        {
+          "side": "SHORT",
+          "entry": 1915.32,
+          "exit": 1897.33,
           "reason": "TARGET",
-          "r_multiple": 1.81,
-          "held_bars": 2
+          "r_multiple": 1.39,
+          "held_bars": 1
+        },
+        {
+          "side": "LONG",
+          "entry": 1907.52,
+          "exit": 1896.1149,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 1
+        },
+        {
+          "side": "LONG",
+          "entry": 1908.12,
+          "exit": 1896.8861,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 1
+        },
+        {
+          "side": "SHORT",
+          "entry": 1913.77,
+          "exit": 1902.07,
+          "reason": "TARGET",
+          "r_multiple": 1.36,
+          "held_bars": 1
+        },
+        {
+          "side": "LONG",
+          "entry": 1877.55,
+          "exit": 1865.3092,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 5
+        },
+        {
+          "side": "SHORT",
+          "entry": 1880.83,
+          "exit": 1881.19,
+          "reason": "TIME_EXIT",
+          "r_multiple": -0.04,
+          "held_bars": 4
+        },
+        {
+          "side": "SHORT",
+          "entry": 1881.04,
+          "exit": 1886.9494,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 3
+        },
+        {
+          "side": "LONG",
+          "entry": 2454.22,
+          "exit": 2527.85,
+          "reason": "TARGET",
+          "r_multiple": 1.41,
+          "held_bars": 1
+        },
+        {
+          "side": "LONG",
+          "entry": 2449.96,
+          "exit": 2486.94,
+          "reason": "TARGET",
+          "r_multiple": 1.66,
+          "held_bars": 1
+        },
+        {
+          "side": "LONG",
+          "entry": 2416.95,
+          "exit": 2439.99,
+          "reason": "TARGET",
+          "r_multiple": 1.28,
+          "held_bars": 1
+        },
+        {
+          "side": "LONG",
+          "entry": 2417.85,
+          "exit": 2400.5683,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 1
         }
       ],
       "error": null
