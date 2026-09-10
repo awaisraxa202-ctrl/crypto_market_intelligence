@@ -318,6 +318,30 @@ class TestPaperAccountCorruptedTradesExcluded(unittest.TestCase):
         self.assertEqual(stats['closed_trades'], 0)
 
 
+class TestTargetMustClearRoundTripCosts(unittest.TestCase):
+    """A target closer to entry than the round trip costs cannot make money. The
+    trade hits it exactly as designed, books a loss, and is recorded as a win.
+    Live evidence: BNB 4h LONG entry 749.62, target 750.00 (0.05% of move against
+    a ~0.48% round trip) closed TAKE_PROFIT_2 at -$0.30 and successful=True."""
+
+    def test_floor_exceeds_actual_round_trip_cost(self):
+        floor = cmi.min_profitable_move_pct()
+        actual_cost = cmi.PAPER_CONFIG['fee_pct'] * 2 + cmi.PAPER_CONFIG['slippage_pct']
+        self.assertGreater(floor, actual_cost,
+                           "floor must clear costs, not merely tie them")
+
+    def test_the_real_bnb_trade_would_now_be_rejected(self):
+        entry, target = 749.62, 750.00
+        self.assertLess(abs(target - entry), entry * cmi.min_profitable_move_pct())
+
+    def test_a_normal_target_still_passes(self):
+        entry, target = 749.62, 749.62 * 1.02   # a 2% move
+        self.assertGreaterEqual(abs(target - entry), entry * cmi.min_profitable_move_pct())
+
+    def test_margin_is_configurable_and_monotonic(self):
+        self.assertLess(cmi.min_profitable_move_pct(1.0), cmi.min_profitable_move_pct(2.0))
+
+
 class TestIntradayStopNotTrailedWithoutBreakeven(unittest.TestCase):
     """Intraday positions are created with tp1_hit=True purely to skip the
     partial-exit branch (single target: take_profit_1 == take_profit_2). Gating the
