@@ -246,6 +246,78 @@ class TestPaperCloseAccounting(unittest.TestCase):
         self.assertFalse(t['successful'])         # but did not reach a target
 
 
+class TestPaperAccountCorruptedTradesExcluded(unittest.TestCase):
+    """The inverted-SHORT bug left 31 closed SHORTs on the live ledger that hit
+    reason=='STOP_LOSS' with a positive pnl — impossible under correct logic, since
+    a stop is by definition the exit you take when you're wrong. Headline win_rate/
+    wins/losses/profit_factor must exclude these; equity/cash must not be touched
+    (that money already moved in the simulation, it isn't rewritten)."""
+
+    def _base_acct(self):
+        today = cmi.datetime.now().isoformat()
+        return {
+            'starting_capital': 10000.0, 'cash': 10000.0, 'positions': {},
+            'closed_trades': [], 'equity_curve': [],
+        }
+
+    def _trade(self, side, reason, pnl, opened=None, trade_type='SWING_DAILY'):
+        return {
+            'asset': 'ADA', 'trade_type': trade_type, 'side': side, 'reason': reason,
+            'successful': reason in cmi.SUCCESS_REASONS, 'profitable': pnl > 0,
+            'entry_price': 0.22, 'exit_price': 0.20, 'qty': 100.0, 'tranches': 1,
+            'pnl': pnl, 'return_pct': 0.0,
+            'opened': opened or cmi.datetime.now().isoformat(),
+            'closed': cmi.datetime.now().isoformat(), 'holding_days': 1,
+        }
+
+    def test_short_stoploss_with_positive_pnl_is_corrupted(self):
+        self.assertTrue(cmi._is_corrupted_short_stopout(
+            self._trade('SHORT', 'STOP_LOSS', 101.33)))
+
+    def test_short_stoploss_with_negative_pnl_is_clean(self):
+        self.assertFalse(cmi._is_corrupted_short_stopout(
+            self._trade('SHORT', 'STOP_LOSS', -50.0)))
+
+    def test_long_stoploss_with_small_positive_pnl_is_not_flagged(self):
+        # Legitimate: stop trailed to breakeven-or-better after a TP1 partial.
+        self.assertFalse(cmi._is_corrupted_short_stopout(
+            self._trade('LONG', 'STOP_LOSS', 2.82)))
+
+    def test_corrupted_short_excluded_from_win_rate(self):
+        acct = self._base_acct()
+        acct['closed_trades'] = [
+            self._trade('SHORT', 'STOP_LOSS', 101.33),   # corrupted — bug
+            self._trade('LONG', 'STOP_LOSS', -50.0),     # genuine loss
+            self._trade('LONG', 'TAKE_PROFIT_1_PARTIAL', 20.0),  # genuine win
+        ]
+        stats = cmi.compute_paper_account_stats(acct, equity=10071.33)
+        self.assertEqual(stats['closed_trades'], 2)
+        self.assertEqual(stats['excluded_corrupted'], 1)
+        self.assertEqual(stats['corrupted_trades_pnl'], 101.33)
+        self.assertEqual(stats['wins'], 1)
+        self.assertEqual(stats['losses'], 1)
+
+    def test_pre_fix_trades_excluded_by_date(self):
+        acct = self._base_acct()
+        acct['closed_trades'] = [
+            self._trade('LONG', 'TAKE_PROFIT_2', 30.0, opened='2026-08-01T00:00:00'),
+        ]
+        stats = cmi.compute_paper_account_stats(acct, equity=10030.0)
+        self.assertEqual(stats['closed_trades'], 0)
+        self.assertEqual(stats['excluded_pre_fix'], 1)
+
+    def test_equity_and_cash_untouched_by_exclusion(self):
+        # Corrupted trades stay OUT of win_rate but the cash they already banked
+        # in the simulation is not rewritten — only the headline stat is filtered.
+        acct = self._base_acct()
+        acct['cash'] = 10101.33
+        acct['closed_trades'] = [self._trade('SHORT', 'STOP_LOSS', 101.33)]
+        stats = cmi.compute_paper_account_stats(acct, equity=10101.33)
+        self.assertEqual(stats['cash'], 10101.33)
+        self.assertEqual(stats['equity'], 10101.33)
+        self.assertEqual(stats['closed_trades'], 0)
+
+
 class TestDcaStopNeverWidens(unittest.TestCase):
     """DCA may tighten a stop, never widen it."""
 

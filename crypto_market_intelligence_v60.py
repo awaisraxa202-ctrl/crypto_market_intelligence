@@ -2563,27 +2563,43 @@ def run_paper_account(all_signals, correlation_matrix=None):
     acct['equity_curve'].append({'ts': datetime.now().isoformat(), 'equity': round(equity, 2)})
     acct['equity_curve'] = acct['equity_curve'][-500:]
 
-    # Same population problem calculate_performance_metrics() had, plus one more:
-    # LOGIC_FIX_DATE alone doesn't catch it, because the SHORT direction/stop-target
-    # inversion (calculate_dynamic_position_size) was fixed on a different date than
-    # LOGIC_FIX_DATE and every SHORT trade currently on the books was opened before
-    # that fix shipped. So instead of guessing a second cutoff date, corrupted rows
-    # are detected by symptom, scoped to SHORT only: a SHORT closed with reason==
-    # 'STOP_LOSS' can never legitimately carry a positive pnl (a stop is where you
-    # accept a loss), and that combination is only reachable when the SHORT's stop/
-    # target levels were built on the wrong side of price. (LONGs are excluded from
-    # this check — a LONG can legitimately show a small positive pnl on a STOP_LOSS
-    # exit once its stop has been moved to breakeven-or-better after a TP1 partial;
-    # that's correct trailing-stop behavior, not the bug.) On the live ledger this
-    # symptom currently matches all 31 closed SHORTs (+$3,601.88 fake profit), while
-    # the 38 LONGs — never touched by that bug — net -$392.93. The entire account
-    # gain is currently manufactured by this bug, not by trading skill.
-    def _is_corrupted(t):
-        return t.get('side') == 'SHORT' and t.get('reason') == 'STOP_LOSS' and t.get('pnl', 0) > 0
+    acct['stats'] = compute_paper_account_stats(acct, equity, events)
+    save_paper_account(acct)
+    return acct
+
+
+def _is_corrupted_short_stopout(t):
+    """A SHORT closed with reason=='STOP_LOSS' can never legitimately carry a
+    positive pnl (a stop is where you accept a loss). That combination is only
+    reachable when the SHORT's stop/target levels were built on the wrong side
+    of price — see calculate_dynamic_position_size's docstring for the bug.
+
+    Deliberately scoped to SHORT only: a LONG can legitimately show a small
+    positive pnl on a STOP_LOSS exit once its stop has trailed to breakeven-or-
+    better after a TP1 partial fill — that's correct trailing-stop behavior,
+    not the bug. Applying this symmetrically to both sides was tried and wrongly
+    flagged real LONG breakeven-stop exits as corrupted.
+    """
+    return t.get('side') == 'SHORT' and t.get('reason') == 'STOP_LOSS' and t.get('pnl', 0) > 0
+
+
+def compute_paper_account_stats(acct, equity, events=None):
+    """Headline stats for the paper account, excluding two kinds of unusable rows:
+
+    - pre-LOGIC_FIX_DATE trades (same population problem calculate_performance_metrics
+      has — see LOGIC_FIX_DATE comment)
+    - trades matching _is_corrupted_short_stopout, which LOGIC_FIX_DATE alone can't
+      catch: the SHORT direction/stop-target inversion was fixed on a different date,
+      and every SHORT trade on the books when this was written was opened before
+      that fix shipped, so the date filter alone let all of them through.
+
+    Raw rows stay in acct['closed_trades'] for audit; only the headline win_rate/
+    wins/losses/profit_factor here are filtered.
+    """
     all_closed = acct['closed_trades']
     dated = [t for t in all_closed if str(t.get('opened', ''))[:10] >= LOGIC_FIX_DATE]
-    corrupted = [t for t in dated if _is_corrupted(t)]
-    closed = [t for t in dated if not _is_corrupted(t)]
+    corrupted = [t for t in dated if _is_corrupted_short_stopout(t)]
+    closed = [t for t in dated if not _is_corrupted_short_stopout(t)]
     excluded_pre_fix = len(all_closed) - len(dated)
     excluded_corrupted = len(corrupted)
     corrupted_pnl = round(sum(t['pnl'] for t in corrupted), 2)
@@ -2603,7 +2619,7 @@ def run_paper_account(all_signals, correlation_matrix=None):
             'open': sum(1 for p in acct['positions'].values() if p.get('trade_type', 'SWING_DAILY') == ttype),
             'avg_holding_days': round(sum(t.get('holding_days', 0) for t in cl) / len(cl), 1) if cl else None,
         }
-    acct['stats'] = {
+    return {
         'by_type': {'SWING_DAILY': _type_stats('SWING_DAILY'), 'INTRADAY_4H': _type_stats('INTRADAY_4H')},
         'equity': round(equity, 2),
         'cash': round(acct['cash'], 2),
@@ -2623,10 +2639,8 @@ def run_paper_account(all_signals, correlation_matrix=None):
         'avg_win': round(gross_win / len(wins), 2) if wins else None,
         'avg_loss': round(-gross_loss / len(losses), 2) if losses else None,
         'dca_positions': sum(1 for p in acct['positions'].values() if p.get('tranches', 1) > 1),
-        'last_events': events[-12:],
+        'last_events': (events or [])[-12:],
     }
-    save_paper_account(acct)
-    return acct
 
 
 def simulate_portfolio(assets_data, price_history=None, start_capital=10000, days=30):
@@ -4061,6 +4075,7 @@ def quick_position_check():
         return acct
 
     events = []
+    last_prices = {}
     for code, pos in list(acct['positions'].items()):
         base = pos.get('asset', str(code).split('@')[0])
         cfg = ASSETS.get(base)
@@ -4075,6 +4090,7 @@ def quick_position_check():
             continue
         if not price:
             continue
+        last_prices[base] = price
 
         long = pos['side'] == 'LONG'
         sl, tp1, tp2 = pos.get('stop_loss'), pos.get('take_profit_1'), pos.get('take_profit_2')
@@ -4124,7 +4140,15 @@ def quick_position_check():
     if events:
         for e in events:
             print(f"  • {e}")
-        acct.setdefault('stats', {})['last_events'] = events
+        # Closed trades (and cash) just changed — stats must be recomputed here too,
+        # not just patched with the event log, or win_rate/equity/closed_trades stay
+        # stale on the dashboard until the next full 2-hour run picks it up.
+        equity = acct['cash'] + sum(
+            p['qty'] * (last_prices.get(p.get('asset', c.split('@')[0])) or p['avg_entry'])
+            for c, p in acct['positions'].items())
+        acct['equity_curve'].append({'ts': datetime.now().isoformat(), 'equity': round(equity, 2)})
+        acct['equity_curve'] = acct['equity_curve'][-500:]
+        acct['stats'] = compute_paper_account_stats(acct, equity, events)
         save_paper_account(acct)
     else:
         print("  No exits triggered this check.")
