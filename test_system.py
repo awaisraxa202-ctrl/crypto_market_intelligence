@@ -318,6 +318,37 @@ class TestPaperAccountCorruptedTradesExcluded(unittest.TestCase):
         self.assertEqual(stats['closed_trades'], 0)
 
 
+class TestIntradayStopNotTrailedWithoutBreakeven(unittest.TestCase):
+    """Intraday positions are created with tp1_hit=True purely to skip the
+    partial-exit branch (single target: take_profit_1 == take_profit_2). Gating the
+    trailing stop on tp1_hit therefore enrolled them in a trail designed around a
+    breakeven floor they never received — their stops crept from the original risk
+    distance toward entry from the first cycle while still sitting BELOW entry.
+    Live evidence: BTC@4h entry 77106.2 with a 'trailed' stop at 77091.77."""
+
+    def test_intraday_open_does_not_claim_breakeven(self):
+        src = open('crypto_market_intelligence_v60.py').read()
+        # The intraday creation site must not imply a breakeven floor.
+        self.assertIn("'stop_moved_to_breakeven': False,", src)
+
+    def test_trailing_gated_on_breakeven_not_tp1_hit(self):
+        src = open('crypto_market_intelligence_v60.py').read()
+        # Both trailing blocks (full cycle + position monitor) must gate on the
+        # breakeven flag. If either reverts to tp1_hit, intraday stops silently
+        # start trailing again.
+        self.assertEqual(
+            src.count("if pos.get('stop_moved_to_breakeven') and pos.get('risk_distance'):"), 2)
+        self.assertEqual(
+            src.count("if pos.get('tp1_hit') and pos.get('risk_distance'):"), 0)
+
+    def test_breakeven_flag_set_wherever_stop_moves_to_entry(self):
+        src = open('crypto_market_intelligence_v60.py').read()
+        # Every place that moves the stop to avg_entry must also raise the flag,
+        # or that position would never trail afterward.
+        self.assertEqual(src.count("pos['stop_loss'] = pos['avg_entry']"),
+                         src.count("pos['stop_moved_to_breakeven'] = True"))
+
+
 class TestDcaStopNeverWidens(unittest.TestCase):
     """DCA may tighten a stop, never widen it."""
 
