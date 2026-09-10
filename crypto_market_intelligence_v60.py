@@ -2349,6 +2349,7 @@ def run_paper_account(all_signals, correlation_matrix=None):
             pos['qty'] -= qty
             pos['tp1_hit'] = True
             pos['stop_loss'] = pos['avg_entry']       # starts at breakeven, trails from here
+            pos['stop_moved_to_breakeven'] = True
             events.append(f"{code} TP1 hit — SUCCESSFUL trade, took {int(PAPER_CONFIG['tp1_close_fraction']*100)}% off ({pnl:+.2f}), stop to breakeven")
             if pos['qty'] <= 0:
                 del acct['positions'][code]
@@ -2357,7 +2358,16 @@ def run_paper_account(all_signals, correlation_matrix=None):
         # Trailing stop on the runner (after TP1): ratchet the stop up (LONG) or
         # down (SHORT) as price makes new progress, by trail_fraction of the
         # original risk distance. Never loosens — only tightens toward price.
-        if pos.get('tp1_hit') and pos.get('risk_distance'):
+        #
+        # Gated on stop_moved_to_breakeven, NOT tp1_hit. Intraday positions are
+        # created with tp1_hit=True purely to skip the partial-exit branch (they
+        # have a single target), so gating on tp1_hit silently enrolled them in a
+        # trail designed around a breakeven floor they never got — their stops
+        # crept from the original risk distance toward entry from the first cycle,
+        # while still sitting BELOW entry, so "trailing" implied a lock-in that
+        # did not exist. Only a position whose stop actually moved to breakeven
+        # trails from here.
+        if pos.get('stop_moved_to_breakeven') and pos.get('risk_distance'):
             trail_dist = pos['risk_distance'] * PAPER_CONFIG['trail_fraction']
             if long:
                 new_stop = price - trail_dist
@@ -2493,7 +2503,13 @@ def run_paper_account(all_signals, correlation_matrix=None):
             'risk_distance': risk_distance,
             'entry_conviction': it.get('conviction'),
             'expected_hours': it.get('expected_hours'),
-            'tp1_hit': True,   # no partial-exit stage for intraday; TP closes fully
+            # Skips the partial-exit branch only — take_profit_1 == take_profit_2
+            # here, so a TP1 partial would fire at the same price as the full TP2
+            # close. It does NOT mean a target was reached or a breakeven floor
+            # exists, which is why the trailing stop is gated on
+            # stop_moved_to_breakeven instead of this flag.
+            'tp1_hit': True,
+            'stop_moved_to_breakeven': False,
         }
         events.append(f"{code} ⚡4h OPENED {it['signal']} {qty:.6f} @ {price:.4f} → {it['take_profit']} ({it.get('expected_label','')})")
 
@@ -4109,12 +4125,15 @@ def quick_position_check():
             pos['qty'] -= qty
             pos['tp1_hit'] = True
             pos['stop_loss'] = pos['avg_entry']
+            pos['stop_moved_to_breakeven'] = True
             events.append(f"{code} TP1 hit between full runs — SUCCESSFUL, took 50% off ({pnl:+.2f})")
             if pos['qty'] <= 0:
                 del acct['positions'][code]
                 continue
-        # Trailing stop, same rule as the full-cycle account.
-        if pos.get('tp1_hit') and pos.get('risk_distance'):
+        # Trailing stop, same rule as the full-cycle account — including the
+        # stop_moved_to_breakeven gate (see the full-cycle version for why it is
+        # not gated on tp1_hit).
+        if pos.get('stop_moved_to_breakeven') and pos.get('risk_distance'):
             trail_dist = pos['risk_distance'] * PAPER_CONFIG['trail_fraction']
             new_stop = (price - trail_dist) if long else (price + trail_dist)
             if (long and new_stop > pos['stop_loss']) or (not long and new_stop < pos['stop_loss']):
