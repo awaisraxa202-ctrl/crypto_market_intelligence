@@ -1,26 +1,8 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 6134.749794730001,
+  "cash": 4675.34261794749,
   "positions": {
-    "ETH@4h": {
-      "asset": "ETH",
-      "trade_type": "INTRADAY_4H",
-      "side": "LONG",
-      "qty": 0.610232376488967,
-      "avg_entry": 2458.08,
-      "opened": "2026-09-10T21:41:49.186102",
-      "tranches": 1,
-      "last_tranche_notional": 1500.0,
-      "stop_loss": 2442.516098,
-      "take_profit_1": 2498.97,
-      "take_profit_2": 2498.97,
-      "risk_distance": 15.563901999999871,
-      "entry_conviction": 0.41,
-      "expected_hours": 9,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
     "LINK@4h": {
       "asset": "LINK",
       "trade_type": "INTRADAY_4H",
@@ -56,9 +38,81 @@
       "expected_hours": 10,
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
+    },
+    "BTC@4h": {
+      "asset": "BTC",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "qty": 0.014897377448140785,
+      "avg_entry": 76735.8,
+      "opened": "2026-09-10T23:10:28.045109",
+      "tranches": 1,
+      "last_tranche_notional": 1143.1621763850417,
+      "stop_loss": 76362.033036,
+      "take_profit_1": 78917.3,
+      "take_profit_2": 78917.3,
+      "risk_distance": 373.76696400000947,
+      "entry_conviction": 0.52,
+      "expected_hours": 19,
+      "tp1_hit": true,
+      "stop_moved_to_breakeven": false
+    },
+    "XRP@4h": {
+      "asset": "XRP",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "qty": 726.918541645927,
+      "avg_entry": 1.33625,
+      "opened": "2026-09-10T23:10:28.045126",
+      "tranches": 1,
+      "last_tranche_notional": 971.3449012743699,
+      "stop_loss": 1.320164,
+      "take_profit_1": 1.35,
+      "take_profit_2": 1.35,
+      "risk_distance": 0.016086000000000045,
+      "entry_conviction": 0.47,
+      "expected_hours": 11,
+      "tp1_hit": true,
+      "stop_moved_to_breakeven": false
+    },
+    "ETH@4h": {
+      "asset": "ETH",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "qty": 0.338100953903845,
+      "avg_entry": 2441.14,
+      "opened": "2026-09-10T23:10:28.045137",
+      "tranches": 1,
+      "last_tranche_notional": 825.3517626128321,
+      "stop_loss": 2424.98717,
+      "take_profit_1": 2498.97,
+      "take_profit_2": 2498.97,
+      "risk_distance": 16.152829999999994,
+      "entry_conviction": 0.45,
+      "expected_hours": 12,
+      "tp1_hit": true,
+      "stop_moved_to_breakeven": false
     }
   },
-  "closed_trades": [],
+  "closed_trades": [
+    {
+      "asset": "ETH",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 2458.08,
+      "exit_price": 2440.562085,
+      "qty": 0.61023238,
+      "tranches": 1,
+      "pnl": -10.69,
+      "return_pct": -0.71,
+      "opened": "2026-09-10T21:41:49.186102",
+      "closed": "2026-09-10T23:10:28.044167",
+      "holding_days": 0
+    }
+  ],
   "equity_curve": [
     {
       "ts": "2026-09-10T21:41:49.186131",
@@ -67,6 +121,10 @@
     {
       "ts": "2026-09-10T21:51:30.086044",
       "equity": 9996.01
+    },
+    {
+      "ts": "2026-09-10T23:10:28.045151",
+      "equity": 9952.46
     }
   ],
   "stats": {
@@ -82,34 +140,37 @@
         "avg_holding_days": null
       },
       "INTRADAY_4H": {
-        "closed": 0,
+        "closed": 1,
         "wins": 0,
-        "losses": 0,
-        "win_rate": null,
-        "profit_factor": null,
-        "net_pnl": 0,
-        "open": 3,
-        "avg_holding_days": null
+        "losses": 1,
+        "win_rate": 0.0,
+        "profit_factor": 0.0,
+        "net_pnl": -10.69,
+        "open": 5,
+        "avg_holding_days": 0.0
       }
     },
-    "equity": 9996.01,
-    "cash": 6134.75,
-    "open_positions": 3,
-    "total_return_pct": -0.04,
-    "closed_trades": 0,
+    "equity": 9952.46,
+    "cash": 4675.34,
+    "open_positions": 5,
+    "total_return_pct": -0.48,
+    "closed_trades": 1,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
     "wins": 0,
-    "losses": 0,
-    "win_rate": null,
-    "win_rate_basis": "No closed trades yet (post-fix)",
-    "profit_factor": null,
+    "losses": 1,
+    "win_rate": 0.0,
+    "win_rate_basis": "0W/1L from 1 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 0.0,
     "avg_win": null,
-    "avg_loss": null,
+    "avg_loss": -10.69,
     "dca_positions": 0,
     "last_events": [
-      "BNB \u26a14h OPENED LONG 1.516361 @ 714.2000 \u2192 729.23 (~10h)"
+      "ETH@4h stopped out (-10.69)",
+      "BTC \u26a14h OPENED LONG 0.014897 @ 76735.8000 \u2192 78917.3 (~19h)",
+      "XRP \u26a14h OPENED LONG 726.918542 @ 1.3362 \u2192 1.35 (~11h)",
+      "ETH \u26a14h OPENED LONG 0.338101 @ 2441.1400 \u2192 2498.97 (~12h)"
     ]
   }
 }
