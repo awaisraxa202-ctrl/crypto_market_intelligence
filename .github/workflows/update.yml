@@ -50,7 +50,18 @@ jobs:
           for f in docs/market_intelligence.json docs/signal_history.json docs/signal_database.json docs/v6_results.json docs/market_summary.txt docs/paper_account.json crypto_quant.db; do
             [ -f "$f" ] && git add "$f"
           done
-          git diff --cached --quiet || (git commit -m "Hourly update [$(date -u +%Y-%m-%d_%H-%M)]" && git push)
+          # position-monitor.yml has always rebased before pushing for this exact
+          # reason; this workflow never did. Confirmed on 2026-09-10: a scheduled
+          # run's 5-minute engine pass completed fine, then its plain `git push`
+          # was rejected as non-fast-forward against a push that landed on main
+          # while it was running — the whole cycle's freshly computed data was
+          # silently dropped, not just delayed. The shared concurrency group only
+          # serializes GitHub Actions runs against each other; it does nothing
+          # for a push made outside Actions (a maintainer, a hotfix, this exact
+          # session). Same fix as the other workflow: rebase immediately before
+          # the push, right after committing, so a moved main is reconciled
+          # instead of silently losing the run's output.
+          git diff --cached --quiet || (git commit -m "Hourly update [$(date -u +%Y-%m-%d_%H-%M)]" && git pull --rebase origin main && git push)
 
   deploy:
     needs: update
