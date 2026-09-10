@@ -10,6 +10,7 @@ Network is never touched; anything that would fetch is fed synthetic frames.
 """
 import importlib.util
 import math
+import re
 import sys
 import unittest
 
@@ -316,6 +317,37 @@ class TestPaperAccountCorruptedTradesExcluded(unittest.TestCase):
         self.assertEqual(stats['cash'], 10101.33)
         self.assertEqual(stats['equity'], 10101.33)
         self.assertEqual(stats['closed_trades'], 0)
+
+
+class TestReturningVisitorLoadsData(unittest.TestCase):
+    """Found by actually rendering the page in a headless browser as a returning
+    visitor (localStorage already set from an earlier visit) — the disclaimer-skip
+    branch toggled CSS classes and returned without ever calling loadData() or
+    initReveal(). Anyone who had dismissed the disclaimer once got a permanently
+    blank dashboard on every later visit. Static source checks below pin the fix
+    in place; audit_dashboard_render.py is the full browser-level proof."""
+
+    def test_single_shared_entry_function(self):
+        src = open('index.html').read()
+        self.assertIn('function enterDashboard()', src,
+                     "both the first-visit and returning-visitor paths must "
+                     "call one shared function, not duplicate logic that can diverge")
+
+    def test_returning_visitor_branch_calls_it(self):
+        src = open('index.html').read()
+        m = re.search(
+            r"if\s*\(localStorage\.getItem\('market-cortex-understood'\)\s*===\s*'true'\)\s*\{(.*?)\}",
+            src, re.S)
+        self.assertIsNotNone(m, "could not find the returning-visitor branch at all")
+        self.assertIn('enterDashboard()', m.group(1),
+                     "returning-visitor branch does not call the function that loads data")
+
+    def test_click_handler_calls_it(self):
+        src = open('index.html').read()
+        m = re.search(r"btn\.addEventListener\('click',\s*function\s*\(\)\s*\{(.*?)\}\);",
+                     src, re.S)
+        self.assertIsNotNone(m)
+        self.assertIn('enterDashboard()', m.group(1))
 
 
 class TestTargetMustClearRoundTripCosts(unittest.TestCase):
