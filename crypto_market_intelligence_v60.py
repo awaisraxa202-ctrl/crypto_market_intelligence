@@ -2226,6 +2226,18 @@ def _is_finite_positive(x):
     return math.isfinite(v) and v > 0
 
 
+def min_profitable_move_pct(margin=1.5):
+    """Smallest price move, as a fraction of entry, that can still net a profit.
+
+    A round trip costs an entry fee, an exit fee, and exit slippage. A target
+    closer than that is mathematically incapable of making money — the trade
+    "succeeds", books a loss, and is recorded as a win. `margin` demands the
+    move actually clear costs rather than merely tie them.
+    """
+    round_trip = PAPER_CONFIG['fee_pct'] * 2 + PAPER_CONFIG['slippage_pct']
+    return round_trip * margin
+
+
 def load_paper_account():
     default = {
         'created': datetime.now().isoformat(),
@@ -2477,6 +2489,13 @@ def run_paper_account(all_signals, correlation_matrix=None):
             continue
         risk_distance = abs(price - float(it['stop_loss']))
         if risk_distance <= 0:
+            continue
+        # Backstop for a target too close to pay for itself, whatever set it.
+        # Without this a trade can hit its target exactly as designed and still
+        # book a loss once fees and slippage are taken out.
+        if abs(float(it['take_profit']) - price) < price * min_profitable_move_pct():
+            events.append(f"{code} ⚡4h SKIPPED — target {it['take_profit']} is inside "
+                          f"round-trip costs from entry {price:.4f}")
             continue
         # Smaller risk per intraday trade — these are numerous and fast.
         risk_amount = equity_now * min(0.01, max(0.0025, it.get('conviction', 0.3) * 0.015))
@@ -3635,14 +3654,26 @@ def generate_intraday_trade(code, symbol):
             fr_val = None
         liq = estimate_liquidation_clusters(trade.get('entry') or float(df['close'].iloc[-1]), None, fr_val)
         trade['liquidation_estimate'] = liq
+        # A nearer cluster is only a better target if the trade can still PAY after
+        # costs. Pulling the target in without this floor produced BNB 4h LONG
+        # entry 749.62 / target 750.00 — 0.05% of move to cover a ~0.48% round
+        # trip. It hit its target exactly as designed and booked -$0.30. A "win"
+        # that loses money is worse than no trade, so keep the technical target
+        # when the cluster is too close to clear costs.
+        _entry_px = trade.get('entry') or float(df['close'].iloc[-1])
+        _floor = _entry_px * min_profitable_move_pct()
         if trade.get('signal') == 'LONG' and liq.get('nearest_above'):
             cluster = liq['nearest_above']
-            if cluster['level'] < trade.get('take_profit', float('inf')) and cluster['weight'] > 0.5:
+            if (cluster['level'] < trade.get('take_profit', float('inf'))
+                    and cluster['weight'] > 0.5
+                    and cluster['level'] - _entry_px >= _floor):
                 trade['take_profit'] = cluster['level']
                 trade['target_source'] = f"liquidation cluster estimate ({cluster['distance_pct']}% away)"
         elif trade.get('signal') == 'SHORT' and liq.get('nearest_below'):
             cluster = liq['nearest_below']
-            if cluster['level'] > trade.get('take_profit', float('-inf')) and cluster['weight'] > 0.5:
+            if (cluster['level'] > trade.get('take_profit', float('-inf'))
+                    and cluster['weight'] > 0.5
+                    and _entry_px - cluster['level'] >= _floor):
                 trade['take_profit'] = cluster['level']
                 trade['target_source'] = f"liquidation cluster estimate ({cluster['distance_pct']}% away)"
         if trade.get('signal') in ('LONG', 'SHORT') and cvd.get('cvd_normalized') is not None:
