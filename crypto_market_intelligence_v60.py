@@ -69,6 +69,7 @@ import requests
 import json
 import os
 import time
+import fcntl
 from datetime import datetime, timedelta
 from collections import defaultdict
 import warnings
@@ -2262,7 +2263,29 @@ def min_profitable_move_pct(margin=1.5):
     return round_trip * margin
 
 
+# load_paper_account() -> [caller mutates the dict] -> save_paper_account() is a
+# read-modify-write cycle with nothing between the two calls stopping a second
+# writer from doing the exact same thing to the exact same file. Confirmed by a
+# direct stress test (two processes, same starting state, both append a
+# different trade, race to save): the second writer's save silently overwrote
+# the first's — valid JSON throughout, just quietly missing a trade, no crash,
+# no error, nothing that would ever surface on its own. GitHub Actions'
+# concurrency group keeps position-monitor.yml and update.yml from truly
+# overlapping today, but that is a scheduling guarantee about those two
+# workflows specifically, not a property of these functions — a manual local
+# run, a third workflow, or a future architecture change would hit this with
+# nothing in the code to stop it. An flock held for the load-to-save span
+# closes the gap at the level it actually needs closing: the file itself,
+# not whichever callers happen to exist today.
+_PAPER_ACCOUNT_LOCK_HANDLE = {}
+
+
 def load_paper_account():
+    lock_path = PAPER_ACCOUNT_PATH + '.lock'
+    lock_file = open(lock_path, 'w')
+    fcntl.flock(lock_file, fcntl.LOCK_EX)   # blocks here if another writer holds it
+    _PAPER_ACCOUNT_LOCK_HANDLE['file'] = lock_file
+
     default = {
         'created': datetime.now().isoformat(),
         'starting_capital': PAPER_CONFIG['starting_capital'],
@@ -2285,6 +2308,14 @@ def save_paper_account(acct):
         _atomic_write_json(PAPER_ACCOUNT_PATH, acct)
     except Exception as e:
         print(f"  ⚠️ Could not save paper account: {e}")
+    finally:
+        # Release even if the write above failed — an unreleased lock would
+        # hang every future writer forever, which is worse than the race this
+        # exists to prevent.
+        lock_file = _PAPER_ACCOUNT_LOCK_HANDLE.pop('file', None)
+        if lock_file:
+            fcntl.flock(lock_file, fcntl.LOCK_UN)
+            lock_file.close()
 
 
 # TP1 = success. Per explicit decision: hitting the first take-profit target is a
@@ -2486,6 +2517,23 @@ def run_paper_account(all_signals, correlation_matrix=None):
         p['qty'] * (all_signals.get(p.get('asset', c.split('@')[0]), {}).get('price') or p['avg_entry'])
         for c, p in acct['positions'].items())
 
+    # Portfolio-level risk cap. RISK_PARAMS['max_portfolio_risk'] (6%) was defined
+    # from the start and never once referenced anywhere in this file — every
+    # trade was capped individually (2% swing, ~1% intraday) but nothing summed
+    # them, so 5 open swings at 2% each is already 10% of equity at risk
+    # simultaneously, with no code aware that number even exists, let alone
+    # enforcing it. Same "computed and never wired up" pattern this file has
+    # shipped before (regime weights, walk-forward feedback) — this instance
+    # just happens to be a risk cap rather than a scoring input. Tracked as a
+    # running total so it also gates entries opened earlier in this SAME cycle,
+    # not only positions carried over from the last one.
+    open_risk = sum(
+        max(0.0, (p['avg_entry'] - p['stop_loss']) if p.get('side') == 'LONG'
+                 else (p['stop_loss'] - p['avg_entry'])) * p['qty']
+        for p in acct['positions'].values()
+        if _is_finite_positive(p.get('avg_entry')) and _is_finite_positive(p.get('qty'))
+        and _is_finite_positive(p.get('stop_loss')))
+
     # SWING candidates (daily timeframe) keyed by asset code
     ranked = sorted(
         [(c, s) for c, s in all_signals.items()
@@ -2530,6 +2578,12 @@ def run_paper_account(all_signals, correlation_matrix=None):
             qty = notional / price
         if notional <= 0 or acct['cash'] < notional * (1 + fee):
             continue
+        this_risk = qty * risk_distance
+        if equity_now and (open_risk + this_risk) / equity_now > RISK_PARAMS['max_portfolio_risk']:
+            events.append(f"{code} ⚡4h skipped — portfolio risk cap "
+                          f"({(open_risk / equity_now * 100):.1f}% already at risk)")
+            continue
+        open_risk += this_risk
         acct['cash'] -= notional * (1 + fee)
         acct['positions'][key] = {
             'asset': code,
@@ -2594,6 +2648,13 @@ def run_paper_account(all_signals, correlation_matrix=None):
             qty = notional / price
         if notional <= 0 or acct['cash'] < notional * (1 + fee):
             continue
+
+        this_risk = qty * risk_distance
+        if equity_now and (open_risk + this_risk) / equity_now > RISK_PARAMS['max_portfolio_risk']:
+            events.append(f"{code} skipped — portfolio risk cap "
+                          f"({(open_risk / equity_now * 100):.1f}% already at risk)")
+            continue
+        open_risk += this_risk
 
         acct['cash'] -= notional * (1 + fee)
         acct['positions'][code] = {
