@@ -221,7 +221,6 @@ DISCORD_WEBHOOK = os.environ.get('DISCORD_WEBHOOK', '')
 TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 TELEGRAM_CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID', '')
 
-DB_PATH = 'crypto_quant.db'
 OUTPUT_PATH = 'docs/market_intelligence.json'
 HISTORY_PATH = 'docs/signal_history.json'
 SIGNAL_DB_PATH = 'docs/signal_database.json'
@@ -3332,10 +3331,21 @@ def fetch_network_activity(symbol='BTC'):
         data = r.json()
         stats = data.get('data', {})
         if stats:
+            # active_addresses/hashrate defaulted to 0 on a missing key — same
+            # class of bug as everywhere else in this file that used to turn
+            # "the API didn't send this field" into a fake confident number.
+            # Neither field is actually displayed anywhere on the dashboard
+            # today (only `signal` is, and that's driven by transactions_24h,
+            # which does come through), so this was never shown to a viewer —
+            # but it's still wrong data sitting in the JSON, and blockchair's
+            # /stats endpoint may not carry these two fields at all (address
+            # counts in particular look like they belong to a different
+            # blockchair endpoint entirely). None here is honest either way:
+            # "not present" rather than a fabricated zero.
             return {
-                'active_addresses': stats.get('addresses_count', 0),
+                'active_addresses': stats.get('addresses_count'),
                 'transactions_24h': stats.get('transactions_24h', 0),
-                'hashrate': stats.get('hashrate', 0),
+                'hashrate': stats.get('hashrate'),
                 'signal': 'HEALTHY' if stats.get('transactions_24h', 0) > 100000 else 'WARNING',
             }
     except Exception as e:

@@ -47,7 +47,7 @@ jobs:
           # paper_account.json was missing here — the full pipeline advances the
           # account (new entries, DCA, exits) but those changes were never
           # committed by this workflow, so they were silently discarded each run.
-          for f in docs/market_intelligence.json docs/signal_history.json docs/signal_database.json docs/v6_results.json docs/market_summary.txt docs/paper_account.json crypto_quant.db; do
+          for f in docs/market_intelligence.json docs/signal_history.json docs/signal_database.json docs/v6_results.json docs/market_summary.txt docs/paper_account.json; do
             [ -f "$f" ] && git add "$f"
           done
           # position-monitor.yml has always rebased before pushing for this exact
