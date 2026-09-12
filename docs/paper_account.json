@@ -1,26 +1,8 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 7245.998416760225,
+  "cash": 8737.304904698905,
   "positions": {
-    "BNB@4h": {
-      "asset": "BNB",
-      "trade_type": "INTRADAY_4H",
-      "side": "LONG",
-      "qty": 2.0483882766870556,
-      "avg_entry": 734.93,
-      "opened": "2026-09-12T09:03:36.612075",
-      "tranches": 1,
-      "last_tranche_notional": 1505.4219961856177,
-      "stop_loss": 730.08203,
-      "take_profit_1": 741.01,
-      "take_profit_2": 741.01,
-      "risk_distance": 4.847969999999918,
-      "entry_conviction": 0.45,
-      "expected_hours": 4,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
     "XRP@4h": {
       "asset": "XRP",
       "trade_type": "INTRADAY_4H",
@@ -158,6 +140,23 @@
       "return_pct": 2.76,
       "opened": "2026-09-10T23:10:28.045109",
       "closed": "2026-09-11T14:00:49.149682",
+      "holding_days": 0
+    },
+    {
+      "asset": "BNB",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 734.93,
+      "exit_price": 729.497964,
+      "qty": 2.04838828,
+      "tranches": 1,
+      "pnl": -11.13,
+      "return_pct": -0.74,
+      "opened": "2026-09-12T09:03:36.612075",
+      "closed": "2026-09-12T18:45:30.159198",
       "holding_days": 0
     }
   ],
@@ -325,6 +324,10 @@
     {
       "ts": "2026-09-12T17:57:51.576684",
       "equity": 10022.93
+    },
+    {
+      "ts": "2026-09-12T18:45:33.373870",
+      "equity": 10011.87
     }
   ],
   "stats": {
@@ -340,34 +343,34 @@
         "avg_holding_days": null
       },
       "INTRADAY_4H": {
-        "closed": 7,
+        "closed": 8,
         "wins": 5,
-        "losses": 2,
-        "win_rate": 71.4,
-        "profit_factor": 3.16,
-        "net_pnl": 67.62,
-        "open": 2,
+        "losses": 3,
+        "win_rate": 62.5,
+        "profit_factor": 2.33,
+        "net_pnl": 56.49,
+        "open": 1,
         "avg_holding_days": 0.0
       }
     },
-    "equity": 10022.93,
-    "cash": 7246.0,
-    "open_positions": 2,
-    "total_return_pct": 0.23,
-    "closed_trades": 7,
+    "equity": 10011.87,
+    "cash": 8737.3,
+    "open_positions": 1,
+    "total_return_pct": 0.12,
+    "closed_trades": 8,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
     "wins": 5,
-    "losses": 2,
-    "win_rate": 71.4,
-    "win_rate_basis": "5W/2L from 7 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 3.16,
+    "losses": 3,
+    "win_rate": 62.5,
+    "win_rate_basis": "5W/3L from 8 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 2.33,
     "avg_win": 19.79,
-    "avg_loss": -15.68,
+    "avg_loss": -14.16,
     "dca_positions": 0,
     "last_events": [
-      "BTC \u26a14h SKIPPED \u2014 target 76706.98 is inside round-trip costs from entry 77170.0000"
+      "BNB@4h stopped out between full runs (-11.13)"
     ]
   }
 }
