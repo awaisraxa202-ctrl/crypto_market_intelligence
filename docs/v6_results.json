@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-09-13T03:06:46.689723",
-  "imbalance": 0.359,
+  "timestamp": "2026-09-13T05:06:23.281880",
+  "imbalance": 0.543,
   "regime": {
     "regime": "UNKNOWN_UNCERTAINTY",
     "description": "Trade policy uncertainty unavailable \u2014 regime not determined",
@@ -15,10 +15,10 @@
   },
   "ml_signal": {
     "bilstm_score": 0.5,
-    "cnn_score": 0.338,
-    "ensemble_score": 0.419,
+    "cnn_score": 0.5,
+    "ensemble_score": 0.5,
     "action": "HOLD",
-    "confidence": 0.419,
+    "confidence": 0.5,
     "trade_qualified": false
   },
   "big_trade": {
@@ -38,7 +38,7 @@
   "explanation": {
     "asset": "BTC",
     "signal": "HOLD",
-    "confidence": 0.419,
+    "confidence": 0.5,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
       "\u274c order_book: Order book data unavailable",
@@ -48,6 +48,13 @@
     "historical_evidence": "Similar setups have shown a 20% win rate across 10 comparable past conditions.",
     "historical_trades": [
       {
+        "date": "2026-05-17",
+        "similarity": 97.9,
+        "future_5d_return": -2.52,
+        "rsi": 46.2,
+        "price_vs_sma50": 0.0264
+      },
+      {
         "date": "2026-05-16",
         "similarity": 97.8,
         "future_5d_return": -0.73,
@@ -55,22 +62,15 @@
         "price_vs_sma50": 0.0389
       },
       {
-        "date": "2026-05-17",
-        "similarity": 97.8,
-        "future_5d_return": -2.52,
-        "rsi": 46.2,
-        "price_vs_sma50": 0.0264
-      },
-      {
         "date": "2026-01-23",
-        "similarity": 96.9,
+        "similarity": 97.1,
         "future_5d_return": -0.37,
         "rsi": 46.9,
         "price_vs_sma50": -0.0074
       },
       {
         "date": "2026-08-02",
-        "similarity": 96.7,
+        "similarity": 96.6,
         "future_5d_return": 2.18,
         "rsi": 44.6,
         "price_vs_sma50": 0.0024
@@ -83,25 +83,32 @@
         "price_vs_sma50": 0.0035
       },
       {
-        "date": "2026-08-12",
-        "similarity": 96.5,
-        "future_5d_return": 1.67,
-        "rsi": 46.6,
-        "price_vs_sma50": 0.0012
-      },
-      {
         "date": "2026-01-22",
-        "similarity": 96.3,
+        "similarity": 96.5,
         "future_5d_return": -0.37,
         "rsi": 45.4,
         "price_vs_sma50": -0.0085
       },
       {
         "date": "2026-01-24",
-        "similarity": 96.3,
+        "similarity": 96.5,
         "future_5d_return": -5.12,
         "rsi": 46.1,
         "price_vs_sma50": -0.012
+      },
+      {
+        "date": "2026-08-12",
+        "similarity": 96.4,
+        "future_5d_return": 1.67,
+        "rsi": 46.6,
+        "price_vs_sma50": 0.0012
+      },
+      {
+        "date": "2026-01-21",
+        "similarity": 96.0,
+        "future_5d_return": -1.26,
+        "rsi": 44.5,
+        "price_vs_sma50": -0.0102
       },
       {
         "date": "2026-07-29",
@@ -109,13 +116,6 @@
         "future_5d_return": -0.69,
         "rsi": 45.7,
         "price_vs_sma50": 0.009
-      },
-      {
-        "date": "2026-09-08",
-        "similarity": 95.9,
-        "future_5d_return": -1.51,
-        "rsi": 49.8,
-        "price_vs_sma50": 0.1214
       }
     ],
     "risk_warning": "\u26a0\ufe0f Low confidence trade. Reduce position size by 50%.",
@@ -125,7 +125,7 @@
   "narrative": {
     "date": "September 13, 2026",
     "macro": "Macro Regime: UNKNOWN_UNCERTAINTY \u2014 Trade policy uncertainty unavailable \u2014 regime not determined",
-    "technicals": "Order book shows bearish imbalance. More sell orders than buy orders.",
+    "technicals": "Order book is balanced. No clear direction.",
     "sentiment": "Neutral sentiment. No extremes.",
     "upcoming_events": "Next event: FOMC Meeting on 2026-09-18 (Impact: HIGH)",
     "trader_comment": "Market is in a consolidation phase. Watch for breakout."
@@ -201,8 +201,8 @@
   ],
   "event_risk": {
     "expected_move": "\u00b14.0%",
-    "expected_range_low": 74176.32,
-    "expected_range_high": 80357.68,
+    "expected_range_low": 74113.34,
+    "expected_range_high": 80289.46,
     "direction": "UNCERTAIN",
     "recommendation": "Reduce position size by 50% before event",
     "event": {
@@ -243,28 +243,28 @@
     "source": "yfinance spot BTC ETFs (proxy, not true creation/redemption flow)"
   },
   "onchain": {
-    "mvrv_zscore": 1.765,
-    "miner_reserves": 313944466.0,
-    "nvt_ratio": 101.34,
+    "mvrv_zscore": 1.757,
+    "miner_reserves": 313861447.0,
+    "nvt_ratio": 102.57,
     "hashrate_trend": "FALLING",
     "exchange_flow_net": null,
     "mvrv_is_proxy": true,
-    "miner_reserves_trend": "RISING",
+    "miner_reserves_trend": "FALLING",
     "hashrate_source": "mempool.space (blockchain.info unavailable)"
   },
   "exit_strategy": {
-    "entry": 77259.2,
+    "entry": 77191.1,
     "signal": "NO TRADE",
-    "current_price": 78031.792,
+    "current_price": 77963.01100000001,
     "scenarios": []
   },
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.5,
-      "cnn_score": 0.338,
-      "ensemble_score": 0.419,
+      "cnn_score": 0.5,
+      "ensemble_score": 0.5,
       "action": "HOLD",
-      "confidence": 0.419,
+      "confidence": 0.5,
       "trade_qualified": false
     }
   },
@@ -287,7 +287,7 @@
         {
           "side": "LONG",
           "entry": 74337.1,
-          "exit": 73944.6783,
+          "exit": 73942.4864,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
@@ -303,7 +303,7 @@
         {
           "side": "SHORT",
           "entry": 73545.1,
-          "exit": 73841.9459,
+          "exit": 73842.3752,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
@@ -313,13 +313,13 @@
           "entry": 73570.0,
           "exit": 73128.58,
           "reason": "TARGET",
-          "r_multiple": 1.51,
+          "r_multiple": 1.5,
           "held_bars": 1
         },
         {
           "side": "LONG",
           "entry": 62615.0,
-          "exit": 60940.9605,
+          "exit": 60940.9502,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 13
@@ -327,7 +327,7 @@
         {
           "side": "SHORT",
           "entry": 63557.2,
-          "exit": 64088.8609,
+          "exit": 64088.8639,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 4
@@ -335,7 +335,7 @@
         {
           "side": "SHORT",
           "entry": 63551.7,
-          "exit": 64060.4706,
+          "exit": 64060.4716,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 5
@@ -343,7 +343,7 @@
         {
           "side": "SHORT",
           "entry": 64253.4,
-          "exit": 64639.2801,
+          "exit": 64639.2814,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
@@ -351,7 +351,7 @@
         {
           "side": "SHORT",
           "entry": 64404.0,
-          "exit": 64795.8164,
+          "exit": 64795.817,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 5
@@ -359,7 +359,7 @@
         {
           "side": "LONG",
           "entry": 65816.4,
-          "exit": 64631.3615,
+          "exit": 64631.3605,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 4
@@ -375,7 +375,7 @@
         {
           "side": "SHORT",
           "entry": 63410.9,
-          "exit": 63808.8924,
+          "exit": 63808.8925,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 2
@@ -610,29 +610,21 @@
     "ETH": {
       "symbol": "ETHUSDT",
       "bars_used": 721,
-      "total_trades": 45,
-      "wins": 20,
+      "total_trades": 44,
+      "wins": 19,
       "losses": 25,
       "time_exits": 4,
-      "win_rate": 44.4,
-      "profit_factor": 1.64,
-      "avg_r": 0.325,
-      "total_r": 14.64,
-      "gross_r_win": 37.43,
+      "win_rate": 43.2,
+      "profit_factor": 1.54,
+      "avg_r": 0.28,
+      "total_r": 12.32,
+      "gross_r_win": 35.11,
       "gross_r_loss": 22.79,
       "trades": [
         {
           "side": "LONG",
-          "entry": 2091.14,
-          "exit": 2122.8,
-          "reason": "TARGET",
-          "r_multiple": 2.32,
-          "held_bars": 1
-        },
-        {
-          "side": "LONG",
           "entry": 2021.81,
-          "exit": 2006.7284,
+          "exit": 2006.6268,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
@@ -937,6 +929,14 @@
           "side": "LONG",
           "entry": 2417.85,
           "exit": 2400.5683,
+          "reason": "STOP",
+          "r_multiple": -1.0,
+          "held_bars": 1
+        },
+        {
+          "side": "LONG",
+          "entry": 2413.13,
+          "exit": 2396.065,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
