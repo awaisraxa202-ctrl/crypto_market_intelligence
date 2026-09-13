@@ -3331,21 +3331,20 @@ def fetch_network_activity(symbol='BTC'):
         data = r.json()
         stats = data.get('data', {})
         if stats:
-            # active_addresses/hashrate defaulted to 0 on a missing key — same
-            # class of bug as everywhere else in this file that used to turn
-            # "the API didn't send this field" into a fake confident number.
-            # Neither field is actually displayed anywhere on the dashboard
-            # today (only `signal` is, and that's driven by transactions_24h,
-            # which does come through), so this was never shown to a viewer —
-            # but it's still wrong data sitting in the JSON, and blockchair's
-            # /stats endpoint may not carry these two fields at all (address
-            # counts in particular look like they belong to a different
-            # blockchair endpoint entirely). None here is honest either way:
-            # "not present" rather than a fabricated zero.
+            # hashrate: blockchair's /stats response has carried this under
+            # `hashrate_24h` (not a bare `hashrate` key) since at least their
+            # v2 API — try both so this doesn't silently stay None on a key
+            # name mismatch. active_addresses has no equivalent fix: Blockchair's
+            # free /stats endpoint does not expose a per-network address count at
+            # all (that data lives behind a separate, paid dashboard endpoint),
+            # so this field structurally cannot be populated from this API tier
+            # — that's a real, permanent data-source gap, not a bug to patch.
+            # Neither field is displayed on the dashboard today; None stays
+            # honest either way: "not present" rather than a fabricated zero.
             return {
                 'active_addresses': stats.get('addresses_count'),
                 'transactions_24h': stats.get('transactions_24h', 0),
-                'hashrate': stats.get('hashrate'),
+                'hashrate': stats.get('hashrate_24h', stats.get('hashrate')),
                 'signal': 'HEALTHY' if stats.get('transactions_24h', 0) > 100000 else 'WARNING',
             }
     except Exception as e:
@@ -4866,12 +4865,17 @@ def fetch_trade_policy_uncertainty():
 
 def fetch_onchain_metrics(symbol='BTC'):
     """Fetch advanced on-chain metrics"""
+    # No exchange_flow_net key here: a real net exchange in/outflow figure needs
+    # paid wallet-tracking on-chain data this project doesn't have access to.
+    # It used to sit in this dict permanently set to None — never computed by
+    # any code below, never displayed anywhere — which reads as "temporarily
+    # unavailable this run" when the honest state is "not implemented." Removed
+    # rather than left as a placeholder that promises a value that never comes.
     metrics = {
         'mvrv_zscore': None,
         'miner_reserves': None,
         'nvt_ratio': None,
         'hashrate_trend': None,
-        'exchange_flow_net': None
     }
     
     try:
