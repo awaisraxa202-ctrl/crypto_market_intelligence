@@ -61,7 +61,25 @@ jobs:
           # session). Same fix as the other workflow: rebase immediately before
           # the push, right after committing, so a moved main is reconciled
           # instead of silently losing the run's output.
-          git diff --cached --quiet || (git commit -m "Hourly update [$(date -u +%Y-%m-%d_%H-%M)]" && git pull --rebase origin main && git push)
+          if ! git diff --cached --quiet; then
+            git commit -m "Hourly update [$(date -u +%Y-%m-%d_%H-%M)]"
+            # Rebase-then-push handles a real non-fast-forward conflict, but
+            # not a transient GitHub-side error on an already-up-to-date
+            # branch (seen twice on position-monitor.yml on 2026-09-13, 16
+            # minutes apart: "remote: Internal Server Error" with no real
+            # conflict) — retry with backoff before dropping a whole cycle's
+            # freshly computed data over something a second attempt fixes.
+            for attempt in 1 2 3 4 5; do
+              git pull --rebase origin main
+              if git push; then
+                exit 0
+              fi
+              echo "Push attempt $attempt failed."
+              [ "$attempt" -lt 5 ] && sleep $((attempt * 5))
+            done
+            echo "::error::git push failed after 5 attempts"
+            exit 1
+          fi
 
   deploy:
     needs: update

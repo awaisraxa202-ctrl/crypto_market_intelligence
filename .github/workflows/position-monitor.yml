@@ -58,6 +58,19 @@ jobs:
           fi
           git commit -m "Position check $(date -u +%H:%M)"
           # The main 2-hour pipeline also pushes to main; pull-rebase avoids a
-          # rejected push if both happen to run close together.
-          git pull --rebase origin main
-          git push
+          # rejected push if both happen to run close together. That handles a
+          # real non-fast-forward conflict, but not a transient GitHub-side
+          # error on an already-up-to-date branch (seen twice on 2026-09-13,
+          # 16 minutes apart: "remote: Internal Server Error" with no real
+          # conflict at all) — retry with backoff before failing the whole
+          # job over something a second attempt fixes on its own.
+          for attempt in 1 2 3 4 5; do
+            git pull --rebase origin main
+            if git push; then
+              exit 0
+            fi
+            echo "Push attempt $attempt failed."
+            [ "$attempt" -lt 5 ] && sleep $((attempt * 5))
+          done
+          echo "::error::git push failed after 5 attempts"
+          exit 1
