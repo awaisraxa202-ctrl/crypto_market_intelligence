@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-09-13T01:06:35.527911",
-  "imbalance": 0.479,
+  "timestamp": "2026-09-13T01:39:14.121465",
+  "imbalance": 0.389,
   "regime": {
     "regime": "UNKNOWN_UNCERTAINTY",
     "description": "Trade policy uncertainty unavailable \u2014 regime not determined",
@@ -15,10 +15,10 @@
   },
   "ml_signal": {
     "bilstm_score": 0.5,
-    "cnn_score": 0.5,
-    "ensemble_score": 0.5,
+    "cnn_score": 0.384,
+    "ensemble_score": 0.442,
     "action": "HOLD",
-    "confidence": 0.5,
+    "confidence": 0.442,
     "trade_qualified": false
   },
   "big_trade": {
@@ -38,7 +38,7 @@
   "explanation": {
     "asset": "BTC",
     "signal": "HOLD",
-    "confidence": 0.5,
+    "confidence": 0.442,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
       "\u274c order_book: Order book data unavailable",
@@ -83,18 +83,18 @@
         "price_vs_sma50": 0.0035
       },
       {
+        "date": "2026-01-22",
+        "similarity": 96.5,
+        "future_5d_return": -0.37,
+        "rsi": 45.4,
+        "price_vs_sma50": -0.0085
+      },
+      {
         "date": "2026-01-24",
         "similarity": 96.5,
         "future_5d_return": -5.12,
         "rsi": 46.1,
         "price_vs_sma50": -0.012
-      },
-      {
-        "date": "2026-01-22",
-        "similarity": 96.4,
-        "future_5d_return": -0.37,
-        "rsi": 45.4,
-        "price_vs_sma50": -0.0085
       },
       {
         "date": "2026-08-12",
@@ -105,7 +105,7 @@
       },
       {
         "date": "2026-01-21",
-        "similarity": 95.9,
+        "similarity": 96.0,
         "future_5d_return": -1.26,
         "rsi": 44.5,
         "price_vs_sma50": -0.0102
@@ -125,7 +125,7 @@
   "narrative": {
     "date": "September 13, 2026",
     "macro": "Macro Regime: UNKNOWN_UNCERTAINTY \u2014 Trade policy uncertainty unavailable \u2014 regime not determined",
-    "technicals": "Order book is balanced. No clear direction.",
+    "technicals": "Order book shows bearish imbalance. More sell orders than buy orders.",
     "sentiment": "Neutral sentiment. No extremes.",
     "upcoming_events": "Next event: FOMC Meeting on 2026-09-18 (Impact: HIGH)",
     "trader_comment": "Market is in a consolidation phase. Watch for breakout."
@@ -201,8 +201,8 @@
   ],
   "event_risk": {
     "expected_move": "\u00b14.0%",
-    "expected_range_low": 74142.14,
-    "expected_range_high": 80320.66,
+    "expected_range_low": 74132.54,
+    "expected_range_high": 80310.26,
     "direction": "UNCERTAIN",
     "recommendation": "Reduce position size by 50% before event",
     "event": {
@@ -243,9 +243,9 @@
     "source": "yfinance spot BTC ETFs (proxy, not true creation/redemption flow)"
   },
   "onchain": {
-    "mvrv_zscore": 1.761,
-    "miner_reserves": 313361740.0,
-    "nvt_ratio": 102.01,
+    "mvrv_zscore": 1.759,
+    "miner_reserves": 313556217.0,
+    "nvt_ratio": 100.95,
     "hashrate_trend": "FALLING",
     "exchange_flow_net": null,
     "mvrv_is_proxy": true,
@@ -253,18 +253,18 @@
     "hashrate_source": "mempool.space (blockchain.info unavailable)"
   },
   "exit_strategy": {
-    "entry": 77257.0,
+    "entry": 77230.1,
     "signal": "NO TRADE",
-    "current_price": 78029.57,
+    "current_price": 78002.40100000001,
     "scenarios": []
   },
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.5,
-      "cnn_score": 0.5,
-      "ensemble_score": 0.5,
+      "cnn_score": 0.384,
+      "ensemble_score": 0.442,
       "action": "HOLD",
-      "confidence": 0.5,
+      "confidence": 0.442,
       "trade_qualified": false
     }
   },
