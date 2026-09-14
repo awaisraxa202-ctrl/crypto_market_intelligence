@@ -1,27 +1,8 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 8793.47868425262,
-  "positions": {
-    "LINK@4h": {
-      "asset": "LINK",
-      "trade_type": "INTRADAY_4H",
-      "side": "LONG",
-      "qty": 113.72885641756857,
-      "avg_entry": 11.25531,
-      "opened": "2026-09-13T12:55:37.808007",
-      "tranches": 1,
-      "last_tranche_notional": 1280.0535349252236,
-      "stop_loss": 11.15245,
-      "take_profit_1": 11.5,
-      "take_profit_2": 11.5,
-      "risk_distance": 0.10285999999999973,
-      "entry_conviction": 0.5,
-      "expected_hours": 10,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    }
-  },
+  "cash": 10097.70055648897,
+  "positions": {},
   "closed_trades": [
     {
       "asset": "ETH",
@@ -260,6 +241,23 @@
       "opened": "2026-09-13T23:03:33.839292",
       "closed": "2026-09-14T02:15:34.085366",
       "holding_days": 0
+    },
+    {
+      "asset": "LINK",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "TAKE_PROFIT_2",
+      "successful": true,
+      "profitable": true,
+      "entry_price": 11.25531,
+      "exit_price": 11.4908,
+      "qty": 113.72885642,
+      "tranches": 1,
+      "pnl": 26.78,
+      "return_pct": 2.09,
+      "opened": "2026-09-13T12:55:37.808007",
+      "closed": "2026-09-14T16:45:32.356445",
+      "holding_days": 1
     }
   ],
   "equity_curve": [
@@ -586,6 +584,10 @@
     {
       "ts": "2026-09-14T15:04:32.920090",
       "equity": 10088.85
+    },
+    {
+      "ts": "2026-09-14T16:45:32.361602",
+      "equity": 10097.7
     }
   ],
   "stats": {
@@ -601,32 +603,34 @@
         "avg_holding_days": null
       },
       "INTRADAY_4H": {
-        "closed": 14,
-        "wins": 11,
+        "closed": 15,
+        "wins": 12,
         "losses": 3,
-        "win_rate": 78.6,
-        "profit_factor": 4.41,
-        "net_pnl": 144.88,
-        "open": 1,
-        "avg_holding_days": 0.0
+        "win_rate": 80.0,
+        "profit_factor": 5.04,
+        "net_pnl": 171.66,
+        "open": 0,
+        "avg_holding_days": 0.1
       }
     },
-    "equity": 10088.85,
-    "cash": 8793.48,
-    "open_positions": 1,
-    "total_return_pct": 0.89,
-    "closed_trades": 14,
+    "equity": 10097.7,
+    "cash": 10097.7,
+    "open_positions": 0,
+    "total_return_pct": 0.98,
+    "closed_trades": 15,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
-    "wins": 11,
+    "wins": 12,
     "losses": 3,
-    "win_rate": 78.6,
-    "win_rate_basis": "11W/3L from 14 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 4.41,
-    "avg_win": 17.03,
+    "win_rate": 80.0,
+    "win_rate_basis": "12W/3L from 15 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 5.04,
+    "avg_win": 17.85,
     "avg_loss": -14.16,
     "dca_positions": 0,
-    "last_events": []
+    "last_events": [
+      "LINK@4h TP2 hit between full runs \u2014 closed (+26.78)"
+    ]
   }
 }
