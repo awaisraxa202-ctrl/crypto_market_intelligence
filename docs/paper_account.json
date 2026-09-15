@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 6634.144745167741,
+  "cash": 5624.446150732551,
   "positions": {
     "AVAX@4h": {
       "asset": "AVAX",
@@ -21,24 +21,6 @@
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     },
-    "XRP@4h": {
-      "asset": "XRP",
-      "trade_type": "INTRADAY_4H",
-      "side": "LONG",
-      "qty": 813.7137518273236,
-      "avg_entry": 1.40087,
-      "opened": "2026-09-15T07:03:30.304276",
-      "tranches": 1,
-      "last_tranche_notional": 1139.9071835223428,
-      "stop_loss": 1.3828,
-      "take_profit_1": 1.4247,
-      "take_profit_2": 1.4247,
-      "risk_distance": 0.01807000000000003,
-      "entry_conviction": 0.45,
-      "expected_hours": 5,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
     "ETH@4h": {
       "asset": "ETH",
       "trade_type": "INTRADAY_4H",
@@ -54,6 +36,42 @@
       "risk_distance": 17.74668900000006,
       "entry_conviction": 0.37,
       "expected_hours": 5,
+      "tp1_hit": true,
+      "stop_moved_to_breakeven": false
+    },
+    "BNB@4h": {
+      "asset": "BNB",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "qty": 1.6219443156199584,
+      "avg_entry": 720.45,
+      "opened": "2026-09-15T13:04:03.714752",
+      "tranches": 1,
+      "last_tranche_notional": 1168.5297821883992,
+      "stop_loss": 724.177077,
+      "take_profit_1": 715.01,
+      "take_profit_2": 715.01,
+      "risk_distance": 3.7270770000000084,
+      "entry_conviction": 0.45,
+      "expected_hours": 5,
+      "tp1_hit": true,
+      "stop_moved_to_breakeven": false
+    },
+    "DOGE@4h": {
+      "asset": "DOGE",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "qty": 11978.378303138852,
+      "avg_entry": 0.082891,
+      "opened": "2026-09-15T13:04:03.714771",
+      "tranches": 1,
+      "last_tranche_notional": 992.8997559254827,
+      "stop_loss": 0.081647,
+      "take_profit_1": 0.0846,
+      "take_profit_2": 0.0846,
+      "risk_distance": 0.001244000000000009,
+      "entry_conviction": 0.45,
+      "expected_hours": 9,
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     }
@@ -414,6 +432,23 @@
       "return_pct": 0.86,
       "opened": "2026-09-15T03:03:33.677352",
       "closed": "2026-09-15T08:00:54.047332",
+      "holding_days": 0
+    },
+    {
+      "asset": "XRP",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "TAKE_PROFIT_2",
+      "successful": true,
+      "profitable": true,
+      "entry_price": 1.40087,
+      "exit_price": 1.42356,
+      "qty": 813.71375183,
+      "tranches": 1,
+      "pnl": 18.46,
+      "return_pct": 1.62,
+      "opened": "2026-09-15T07:03:30.304276",
+      "closed": "2026-09-15T13:04:03.711639",
       "holding_days": 0
     }
   ],
@@ -813,6 +848,10 @@
     {
       "ts": "2026-09-15T11:04:28.891992",
       "equity": 10050.7
+    },
+    {
+      "ts": "2026-09-15T13:04:03.714782",
+      "equity": 10067.06
     }
   ],
   "stats": {
@@ -828,34 +867,36 @@
         "avg_holding_days": null
       },
       "INTRADAY_4H": {
-        "closed": 21,
-        "wins": 15,
+        "closed": 22,
+        "wins": 16,
         "losses": 6,
-        "win_rate": 71.4,
-        "profit_factor": 3.17,
-        "net_pnl": 174.26,
-        "open": 3,
+        "win_rate": 72.7,
+        "profit_factor": 3.4,
+        "net_pnl": 192.72,
+        "open": 4,
         "avg_holding_days": 0.0
       }
     },
-    "equity": 10050.7,
-    "cash": 6634.14,
-    "open_positions": 3,
-    "total_return_pct": 0.51,
-    "closed_trades": 21,
+    "equity": 10067.06,
+    "cash": 5624.45,
+    "open_positions": 4,
+    "total_return_pct": 0.67,
+    "closed_trades": 22,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
-    "wins": 15,
+    "wins": 16,
     "losses": 6,
-    "win_rate": 71.4,
-    "win_rate_basis": "15W/6L from 21 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 3.17,
-    "avg_win": 16.98,
+    "win_rate": 72.7,
+    "win_rate_basis": "16W/6L from 22 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 3.4,
+    "avg_win": 17.07,
     "avg_loss": -13.4,
     "dca_positions": 0,
     "last_events": [
-      "BNB \u26a14h SKIPPED \u2014 target 715.01 is inside round-trip costs from entry 719.6900"
+      "XRP@4h TP2 hit \u2014 closed (+18.46)",
+      "BNB \u26a14h OPENED SHORT 1.621944 @ 720.4500 \u2192 715.01 (~5h)",
+      "DOGE \u26a14h OPENED LONG 11978.378303 @ 0.0829 \u2192 0.0846 (~9h)"
     ]
   }
 }
