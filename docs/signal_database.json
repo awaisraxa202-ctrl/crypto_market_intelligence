@@ -1654,11 +1654,14 @@
       "stop_loss": 726.16,
       "take_profit_1": 715.01,
       "take_profit_2": 715.01,
-      "status": "ACTIVE",
-      "exit_price": null,
-      "exit_date": null,
-      "profit_pct": null,
-      "holding_days": null
+      "status": "CLOSED_WIN",
+      "exit_price": 714.78,
+      "exit_date": "2026-09-15T15:02:00.999929",
+      "profit_pct": 0.9725685785536136,
+      "holding_days": 0,
+      "hit_tp2": true,
+      "exit_target": "TP2",
+      "trade_outcome": "SUCCESSFUL (ran to TP2)"
     },
     {
       "id": "AVAX@4h_20260915_0303",
@@ -1739,11 +1742,14 @@
       "stop_loss": 723.574324,
       "take_profit_1": 715.01,
       "take_profit_2": 715.01,
-      "status": "ACTIVE",
-      "exit_price": null,
-      "exit_date": null,
-      "profit_pct": null,
-      "holding_days": null
+      "status": "CLOSED_WIN",
+      "exit_price": 714.78,
+      "exit_date": "2026-09-15T15:02:01.002926",
+      "profit_pct": 0.6822381858856009,
+      "holding_days": 0,
+      "hit_tp2": true,
+      "exit_target": "TP2",
+      "trade_outcome": "SUCCESSFUL (ran to TP2)"
     },
     {
       "id": "BNB@4h_20260915_1302",
@@ -1757,11 +1763,14 @@
       "stop_loss": 724.177077,
       "take_profit_1": 715.01,
       "take_profit_2": 715.01,
-      "status": "ACTIVE",
-      "exit_price": null,
-      "exit_date": null,
-      "profit_pct": null,
-      "holding_days": null
+      "status": "CLOSED_WIN",
+      "exit_price": 714.78,
+      "exit_date": "2026-09-15T15:02:01.005684",
+      "profit_pct": 0.7870081199250568,
+      "holding_days": 0,
+      "hit_tp2": true,
+      "exit_target": "TP2",
+      "trade_outcome": "SUCCESSFUL (ran to TP2)"
     },
     {
       "id": "DOGE@4h_20260915_1303",
@@ -1775,11 +1784,21 @@
       "stop_loss": 0.081647,
       "take_profit_1": 0.0846,
       "take_profit_2": 0.0846,
-      "status": "ACTIVE",
-      "exit_price": null,
-      "exit_date": null,
-      "profit_pct": null,
-      "holding_days": null
+      "status": "CLOSED_LOSS",
+      "exit_price": 0.0811585,
+      "exit_date": "2026-09-15T15:02:53.473575",
+      "profit_pct": -2.090094220120413,
+      "holding_days": 0,
+      "post_mortem": {
+        "asset": "DOGE@4h",
+        "entry": 0.082891,
+        "exit": 0.0811585,
+        "profit_pct": -2.09,
+        "holding_days": 0,
+        "why_it_failed": "Stop-loss was triggered due to unexpected market movement.",
+        "lesson": "Consider wider stop-loss during event weeks.",
+        "improvement": "Stop-loss multiplier increased from 2x to 2.5x ATR."
+      }
     },
     {
       "id": "ETH@4h_20260915_1432",
@@ -1793,26 +1812,36 @@
       "stop_loss": 2414.242818,
       "take_profit_1": 2498.97,
       "take_profit_2": 2498.97,
-      "status": "ACTIVE",
-      "exit_price": null,
-      "exit_date": null,
-      "profit_pct": null,
-      "holding_days": null
+      "status": "CLOSED_LOSS",
+      "exit_price": 2400.42,
+      "exit_date": "2026-09-15T15:01:27.192137",
+      "profit_pct": -1.3390875462392078,
+      "holding_days": 0,
+      "post_mortem": {
+        "asset": "ETH@4h",
+        "entry": 2433.0,
+        "exit": 2400.42,
+        "profit_pct": -1.34,
+        "holding_days": 0,
+        "why_it_failed": "Stop-loss was triggered due to unexpected market movement.",
+        "lesson": "Consider wider stop-loss during event weeks.",
+        "improvement": "Stop-loss multiplier increased from 2x to 2.5x ATR."
+      }
     }
   ],
   "performance": {
     "total_signals": 84,
     "excluded_pre_fix": 0,
-    "active_signals": 7,
-    "closed_signals": 77,
-    "win_count": 69,
-    "loss_count": 8,
+    "active_signals": 2,
+    "closed_signals": 82,
+    "win_count": 72,
+    "loss_count": 10,
     "population": "all_generated_signals",
     "population_label": "Every signal generated, including ones never traded by the paper account",
-    "win_rate": 89.6103896103896,
-    "total_profit_pct": 103.37,
-    "avg_profit_pct": 1.67,
-    "avg_loss_pct": 1.52,
+    "win_rate": 87.8048780487805,
+    "total_profit_pct": 102.38,
+    "avg_profit_pct": 1.64,
+    "avg_loss_pct": 1.56,
     "best_trade": 3.1223649588233107,
     "worst_trade": -2.7989714325971202,
     "avg_holding_days": 0.2
@@ -1967,6 +1996,12 @@
       "asset": "ETH@4h",
       "predicted_direction": "LONG",
       "correct": false
+    },
+    {
+      "timestamp": "2026-09-15T15:03:28.636817",
+      "asset": "BNB@4h",
+      "predicted_direction": "SHORT",
+      "correct": true
     }
   ]
 }
