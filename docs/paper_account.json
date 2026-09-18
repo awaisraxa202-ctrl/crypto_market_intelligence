@@ -1,25 +1,8 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 5463.6989158761,
+  "cash": 6262.524820592358,
   "positions": {
-    "ADA": {
-      "asset": "ADA",
-      "trade_type": "SWING_DAILY",
-      "side": "SHORT",
-      "qty": 4679.385437689627,
-      "avg_entry": 0.1978,
-      "opened": "2026-09-15T19:03:43.522658",
-      "tranches": 1,
-      "last_tranche_notional": 925.5824395750083,
-      "stop_loss": 0.22426,
-      "take_profit_1": 0.144921,
-      "take_profit_2": 0.0920283,
-      "risk_distance": 0.026459999999999984,
-      "entry_conviction": 0.41,
-      "expected_hours": 120,
-      "tp1_hit": false
-    },
     "DOGE": {
       "asset": "DOGE",
       "trade_type": "SWING_DAILY",
@@ -925,6 +908,23 @@
       "opened": "2026-09-18T15:04:33.394953",
       "closed": "2026-09-18T20:45:36.533086",
       "holding_days": 0
+    },
+    {
+      "asset": "ADA",
+      "trade_type": "SWING_DAILY",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 0.1978,
+      "exit_price": 0.224439,
+      "qty": 4679.38543769,
+      "tranches": 1,
+      "pnl": -124.66,
+      "return_pct": -13.47,
+      "opened": "2026-09-15T19:03:43.522658",
+      "closed": "2026-09-18T21:15:33.676931",
+      "holding_days": 3
     }
   ],
   "equity_curve": [
@@ -1631,19 +1631,23 @@
     {
       "ts": "2026-09-18T21:04:19.579689",
       "equity": 10004.82
+    },
+    {
+      "ts": "2026-09-18T21:15:44.063569",
+      "equity": 9757.65
     }
   ],
   "stats": {
     "by_type": {
       "SWING_DAILY": {
-        "closed": 0,
+        "closed": 1,
         "wins": 0,
-        "losses": 0,
-        "win_rate": null,
-        "profit_factor": null,
-        "net_pnl": 0,
-        "open": 2,
-        "avg_holding_days": null
+        "losses": 1,
+        "win_rate": 0.0,
+        "profit_factor": 0.0,
+        "net_pnl": -124.66,
+        "open": 1,
+        "avg_holding_days": 3.0
       },
       "INTRADAY_4H": {
         "closed": 49,
@@ -1656,22 +1660,24 @@
         "avg_holding_days": 0.0
       }
     },
-    "equity": 10004.82,
-    "cash": 5463.7,
-    "open_positions": 5,
-    "total_return_pct": 0.05,
-    "closed_trades": 49,
+    "equity": 9757.65,
+    "cash": 6262.52,
+    "open_positions": 4,
+    "total_return_pct": -2.42,
+    "closed_trades": 50,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
     "wins": 19,
-    "losses": 30,
-    "win_rate": 38.8,
-    "win_rate_basis": "19W/30L from 49 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 0.99,
+    "losses": 31,
+    "win_rate": 38.0,
+    "win_rate_basis": "19W/31L from 50 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 0.71,
     "avg_win": 17.03,
-    "avg_loss": -10.93,
+    "avg_loss": -14.6,
     "dca_positions": 0,
-    "last_events": []
+    "last_events": [
+      "ADA stopped out between full runs (-124.66)"
+    ]
   }
 }
