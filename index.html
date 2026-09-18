@@ -936,7 +936,7 @@
 
     // ─── LOAD V6 DATA ───
     function loadV6Data() {
-    fetch('docs/v6_results.json')
+    fetch('https://awaisraxa202-ctrl.github.io/crypto_market_intelligence/docs/v6_results.json?t=' + Date.now())
         .then(res => {
             if (!res.ok) throw new Error('V6 data not found');
             return res.json();
@@ -1754,7 +1754,7 @@
 
       let assetData = (CMI.data && CMI.data.assets && CMI.data.assets[asset]) || null;
 
-      fetch('docs/v6_results.json')
+      fetch('https://awaisraxa202-ctrl.github.io/crypto_market_intelligence/docs/v6_results.json?t=' + Date.now())
         .then(res => res.ok ? res.json() : {})
         .catch(() => ({}))
         .then(v6 => {
