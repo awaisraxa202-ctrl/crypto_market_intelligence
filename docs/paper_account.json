@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 4618.782176233162,
+  "cash": 6133.186155638639,
   "positions": {
     "ADA": {
       "asset": "ADA",
@@ -55,24 +55,6 @@
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     },
-    "LINK@4h": {
-      "asset": "LINK",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 73.44558011244936,
-      "avg_entry": 12.16269,
-      "opened": "2026-09-18T15:04:33.394968",
-      "tranches": 1,
-      "last_tranche_notional": 893.2958227778867,
-      "stop_loss": 12.289368,
-      "take_profit_1": 12.0,
-      "take_profit_2": 12.0,
-      "risk_distance": 0.12667800000000007,
-      "entry_conviction": 0.7,
-      "expected_hours": 8,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
     "DOGE@4h": {
       "asset": "DOGE",
       "trade_type": "INTRADAY_4H",
@@ -88,24 +70,6 @@
       "risk_distance": 0.0009839999999999988,
       "entry_conviction": 0.66,
       "expected_hours": 16,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
-    "ETH@4h": {
-      "asset": "ETH",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 0.24961905280099025,
-      "avg_entry": 2583.74,
-      "opened": "2026-09-18T15:04:33.394983",
-      "tranches": 1,
-      "last_tranche_notional": 644.9507314840305,
-      "stop_loss": 2624.500163,
-      "take_profit_1": 2550.0,
-      "take_profit_2": 2550.0,
-      "risk_distance": 40.760163000000375,
-      "entry_conviction": 0.59,
-      "expected_hours": 18,
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     }
@@ -892,6 +856,40 @@
       "opened": "2026-09-18T11:04:38.830810",
       "closed": "2026-09-18T18:00:52.463514",
       "holding_days": 0
+    },
+    {
+      "asset": "LINK",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 12.16269,
+      "exit_price": 12.299199,
+      "qty": 73.44558011,
+      "tranches": 1,
+      "pnl": -10.03,
+      "return_pct": -1.12,
+      "opened": "2026-09-18T15:04:33.394968",
+      "closed": "2026-09-18T19:15:41.425027",
+      "holding_days": 0
+    },
+    {
+      "asset": "ETH",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 2583.74,
+      "exit_price": 2626.599763,
+      "qty": 0.24961905,
+      "tranches": 1,
+      "pnl": -10.7,
+      "return_pct": -1.66,
+      "opened": "2026-09-18T15:04:33.394983",
+      "closed": "2026-09-18T19:15:44.801395",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
@@ -1582,6 +1580,10 @@
     {
       "ts": "2026-09-18T19:03:46.418117",
       "equity": 10030.99
+    },
+    {
+      "ts": "2026-09-18T19:15:44.810101",
+      "equity": 10018.7
     }
   ],
   "stats": {
@@ -1597,32 +1599,35 @@
         "avg_holding_days": null
       },
       "INTRADAY_4H": {
-        "closed": 46,
+        "closed": 48,
         "wins": 19,
-        "losses": 27,
-        "win_rate": 41.3,
-        "profit_factor": 1.1,
-        "net_pnl": 29.85,
-        "open": 4,
+        "losses": 29,
+        "win_rate": 39.6,
+        "profit_factor": 1.03,
+        "net_pnl": 9.12,
+        "open": 2,
         "avg_holding_days": 0.0
       }
     },
-    "equity": 10030.99,
-    "cash": 4618.78,
-    "open_positions": 6,
-    "total_return_pct": 0.31,
-    "closed_trades": 46,
+    "equity": 10018.7,
+    "cash": 6133.19,
+    "open_positions": 4,
+    "total_return_pct": 0.19,
+    "closed_trades": 48,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
     "wins": 19,
-    "losses": 27,
-    "win_rate": 41.3,
-    "win_rate_basis": "19W/27L from 46 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 1.1,
+    "losses": 29,
+    "win_rate": 39.6,
+    "win_rate_basis": "19W/29L from 48 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 1.03,
     "avg_win": 17.03,
-    "avg_loss": -10.88,
+    "avg_loss": -10.84,
     "dca_positions": 0,
-    "last_events": []
+    "last_events": [
+      "LINK@4h stopped out between full runs (-10.03)",
+      "ETH@4h stopped out between full runs (-10.70)"
+    ]
   }
 }
