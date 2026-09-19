@@ -3583,7 +3583,20 @@ def score_4h_bar(df_upto):
     # (separation small relative to ATR) is the honest definition of "no real
     # trend", and it catches both ends of a range.
     ema_separation = abs(float(latest['ema20']) - float(latest['ema50']))
-    ranging = (not trend_up and not trend_dn) or (ema_separation < atr * 1.0)
+    # Mean-reversion only evaluates when there is genuinely no trend read at all
+    # (both trend_up and trend_dn false). It used to also fire whenever EMA
+    # separation was small relative to ATR, even with trend_up/trend_dn true -
+    # meant to catch a reversal right at range resistance before the EMA stack
+    # flipped. In practice that let mean-reversion's SHORT score override a
+    # correct, active uptrend call any time price sat near the top of its own
+    # recent local range - which is what price does on every single new high
+    # during a normal grind-up, not a rare exhaustion signal. Confirmed live
+    # 2026-09-18/19: ~20 straight SHORT stop-losses across nearly every asset
+    # while the broader market (RISK_ON, Fear&Greed 71) was climbing. Gating
+    # strictly on "no trend read at all" keeps the original chop-market fix
+    # (EMA20/EMA50 criss-crossing) while no longer letting mean-reversion
+    # contest an active trend.
+    ranging = not trend_up and not trend_dn
     if ranging and sup and res and res > sup:
         band = res - sup
         if band > 0:

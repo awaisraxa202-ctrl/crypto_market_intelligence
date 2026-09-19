@@ -1035,5 +1035,76 @@ class TestDashboardWiring(unittest.TestCase):
         self.assertIn("typeof Chart === 'undefined'", self.html)
 
 
+class TestMeanReversionCannotOverrideActiveTrend(unittest.TestCase):
+    """Regression for the live 2026-09-18/19 incident: ~20 straight SHORT
+    stop-losses across nearly every asset while the broader market (RISK_ON,
+    Fear&Greed 71) was climbing.
+
+    Root cause: score_4h_bar()'s 'ranging' gate fired whenever EMA20/EMA50
+    separation was small relative to ATR, even with trend_up genuinely true —
+    a completely ordinary condition early or mid-trend, not a real range. Once
+    'ranging' was true, price sitting in the top 30% of its recent local
+    support/resistance band (which is exactly what price does on every new
+    high during a normal grind-up) scored a mean-reversion SHORT that could
+    outweigh and override the correct trend-following LONG call.
+
+    This fixture reproduces that exact condition: a clear uptrend (ema20 >
+    ema50, price > ema20), EMA separation below one ATR (the old 'ranging'
+    trigger), RSI in the trend bonus band, and price near the top of its
+    recent range. Confirmed by direct computation that the pre-fix formula
+    would have picked MEAN_REVERSION/SHORT here (mean-reversion score -0.50
+    vs trend score 0.45) — the fix must keep this in TREND mode instead.
+    """
+
+    def _build_uptrend_df(self):
+        import numpy as np
+        np.random.seed(7)
+        n = 90
+        drift = np.cumsum(np.full(n, 0.05))
+        osc = 1.0 * np.sin(np.linspace(0, 10 * np.pi, n))
+        noise = np.random.normal(0, 0.15, n)
+        close = 100 + drift + osc + noise
+        high = close + np.abs(np.random.normal(0.32, 0.05, n))
+        low = close - np.abs(np.random.normal(0.32, 0.05, n))
+        open_ = close - 0.03
+        volume = np.full(n, 1000.0)
+        df = pd.DataFrame({'open': open_, 'high': high, 'low': low,
+                            'close': close, 'volume': volume})
+        df = cmi.prepare_4h_df(df)
+
+        last = df.index[-1]
+        prior = df.index[-4]
+        # Force a slightly negative recent EMA20 slope so the trend score
+        # alone (0.45) is smaller than the old mean-reversion score (-0.50) —
+        # otherwise trend wins on magnitude regardless of the bug, and the
+        # fixture would not actually exercise the override path.
+        df.loc[prior, 'ema20'] = 104.3
+        df.loc[last, 'ema50'] = 103.5
+        df.loc[last, 'ema20'] = 104.0       # trend_up: ema20 > ema50
+        df.loc[last, 'atr'] = 0.7           # separation 0.5 / atr 0.7 < 1.0
+        df.loc[last, 'close'] = 104.6       # price > ema20 -> trend_up True
+        df.loc[last, 'rsi'] = 60.0          # trend bonus band, and > 55
+        return df
+
+    def test_fixture_reproduces_the_bug_precondition(self):
+        df = self._build_uptrend_df()
+        latest = df.iloc[-1]
+        trend_up = latest['ema20'] > latest['ema50'] and latest['close'] > latest['ema20']
+        ema_sep = abs(latest['ema20'] - latest['ema50'])
+        self.assertTrue(trend_up)
+        self.assertLess(ema_sep, latest['atr'], "fixture must trigger the old ranging condition")
+        sr = cmi.find_support_resistance(df, window=5)
+        pos = (latest['close'] - sr['nearest_support']) / (sr['nearest_resistance'] - sr['nearest_support'])
+        self.assertGreaterEqual(pos, 0.70, "fixture must place price near the top of its range")
+
+    def test_active_uptrend_does_not_flip_to_mean_reversion_short(self):
+        df = self._build_uptrend_df()
+        out = cmi.score_4h_bar(df)
+        self.assertEqual(out.get('mode'), 'TREND',
+                          "an active uptrend must not be overridden by mean-reversion")
+        self.assertNotEqual(out.get('signal'), 'SHORT',
+                             "this exact condition produced ~20 straight losing SHORTs live")
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
