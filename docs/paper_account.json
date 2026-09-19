@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 4521.48085884671,
+  "cash": 5449.305572679703,
   "positions": {
     "DOGE": {
       "asset": "DOGE",
@@ -71,24 +71,6 @@
       "risk_distance": 0.016321999999999948,
       "entry_conviction": 0.39,
       "expected_hours": 6,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
-    "AVAX@4h": {
-      "asset": "AVAX",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 114.68425382601069,
-      "avg_entry": 8.191,
-      "opened": "2026-09-18T23:04:11.131218",
-      "tranches": 1,
-      "last_tranche_notional": 939.3787230888537,
-      "stop_loss": 8.268581,
-      "take_profit_1": 7.7955,
-      "take_profit_2": 7.7955,
-      "risk_distance": 0.07758099999999857,
-      "entry_conviction": 0.76,
-      "expected_hours": 17,
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     },
@@ -961,6 +943,23 @@
       "opened": "2026-09-15T19:03:43.522658",
       "closed": "2026-09-18T21:15:33.676931",
       "holding_days": 3
+    },
+    {
+      "asset": "AVAX",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 8.191,
+      "exit_price": 8.275196,
+      "qty": 114.68425383,
+      "tranches": 1,
+      "pnl": -9.66,
+      "return_pct": -1.03,
+      "opened": "2026-09-18T23:04:11.131218",
+      "closed": "2026-09-19T00:45:41.551802",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
@@ -1679,6 +1678,10 @@
     {
       "ts": "2026-09-18T23:41:45.711457",
       "equity": 9724.09
+    },
+    {
+      "ts": "2026-09-19T00:45:44.874668",
+      "equity": 9744.84
     }
   ],
   "stats": {
@@ -1694,32 +1697,34 @@
         "avg_holding_days": 3.0
       },
       "INTRADAY_4H": {
-        "closed": 49,
+        "closed": 50,
         "wins": 19,
-        "losses": 30,
-        "win_rate": 38.8,
-        "profit_factor": 0.99,
-        "net_pnl": -4.46,
-        "open": 5,
+        "losses": 31,
+        "win_rate": 38.0,
+        "profit_factor": 0.96,
+        "net_pnl": -14.12,
+        "open": 4,
         "avg_holding_days": 0.0
       }
     },
-    "equity": 9724.09,
-    "cash": 4521.48,
-    "open_positions": 6,
-    "total_return_pct": -2.76,
-    "closed_trades": 50,
+    "equity": 9744.84,
+    "cash": 5449.31,
+    "open_positions": 5,
+    "total_return_pct": -2.55,
+    "closed_trades": 51,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
     "wins": 19,
-    "losses": 31,
-    "win_rate": 38.0,
-    "win_rate_basis": "19W/31L from 50 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 0.71,
+    "losses": 32,
+    "win_rate": 37.3,
+    "win_rate_basis": "19W/32L from 51 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 0.7,
     "avg_win": 17.03,
-    "avg_loss": -14.6,
+    "avg_loss": -14.45,
     "dca_positions": 0,
-    "last_events": []
+    "last_events": [
+      "AVAX@4h stopped out between full runs (-9.66)"
+    ]
   }
 }
