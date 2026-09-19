@@ -1,43 +1,8 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 4464.3348033676675,
+  "cash": 6019.863623312398,
   "positions": {
-    "DOGE": {
-      "asset": "DOGE",
-      "trade_type": "SWING_DAILY",
-      "side": "SHORT",
-      "qty": 11665.001881641228,
-      "avg_entry": 0.079,
-      "opened": "2026-09-16T13:03:46.619774",
-      "tranches": 1,
-      "last_tranche_notional": 921.535148649657,
-      "stop_loss": 0.0885561,
-      "take_profit_1": 0.0598222,
-      "take_profit_2": 0.0406663,
-      "risk_distance": 0.009556099999999998,
-      "entry_conviction": 0.37,
-      "expected_hours": 120,
-      "tp1_hit": false
-    },
-    "DOGE@4h": {
-      "asset": "DOGE",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 8661.996857332935,
-      "avg_entry": 0.087628,
-      "opened": "2026-09-18T15:04:33.394976",
-      "tranches": 1,
-      "last_tranche_notional": 759.0334606143704,
-      "stop_loss": 0.088612,
-      "take_profit_1": 0.0837,
-      "take_profit_2": 0.0837,
-      "risk_distance": 0.0009839999999999988,
-      "entry_conviction": 0.66,
-      "expected_hours": 16,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
     "ETH@4h": {
       "asset": "ETH",
       "trade_type": "INTRADAY_4H",
@@ -1011,6 +976,40 @@
       "opened": "2026-09-18T20:05:58.231550",
       "closed": "2026-09-19T05:30:45.832914",
       "holding_days": 0
+    },
+    {
+      "asset": "DOGE",
+      "trade_type": "SWING_DAILY",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 0.079,
+      "exit_price": 0.088627,
+      "qty": 11665.00188164,
+      "tranches": 1,
+      "pnl": -112.3,
+      "return_pct": -12.19,
+      "opened": "2026-09-16T13:03:46.619774",
+      "closed": "2026-09-19T13:00:40.171435",
+      "holding_days": 2
+    },
+    {
+      "asset": "DOGE",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 0.087628,
+      "exit_price": 0.088683,
+      "qty": 8661.99685733,
+      "tranches": 1,
+      "pnl": -9.14,
+      "return_pct": -1.2,
+      "opened": "2026-09-18T15:04:33.394976",
+      "closed": "2026-09-19T13:00:40.178111",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
@@ -1777,47 +1776,54 @@
     {
       "ts": "2026-09-19T12:08:16.782111",
       "equity": 9684.09
+    },
+    {
+      "ts": "2026-09-19T13:00:50.234102",
+      "equity": 9444.09
     }
   ],
   "stats": {
     "by_type": {
       "SWING_DAILY": {
-        "closed": 1,
+        "closed": 2,
         "wins": 0,
-        "losses": 1,
+        "losses": 2,
         "win_rate": 0.0,
         "profit_factor": 0.0,
-        "net_pnl": -124.66,
-        "open": 2,
-        "avg_holding_days": 3.0
+        "net_pnl": -236.96,
+        "open": 1,
+        "avg_holding_days": 2.5
       },
       "INTRADAY_4H": {
-        "closed": 52,
+        "closed": 53,
         "wins": 19,
-        "losses": 33,
-        "win_rate": 36.5,
-        "profit_factor": 0.88,
-        "net_pnl": -45.54,
-        "open": 4,
+        "losses": 34,
+        "win_rate": 35.8,
+        "profit_factor": 0.86,
+        "net_pnl": -54.68,
+        "open": 3,
         "avg_holding_days": 0.0
       }
     },
-    "equity": 9684.09,
-    "cash": 4464.33,
-    "open_positions": 6,
-    "total_return_pct": -3.16,
-    "closed_trades": 53,
+    "equity": 9444.09,
+    "cash": 6019.86,
+    "open_positions": 4,
+    "total_return_pct": -5.56,
+    "closed_trades": 55,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
     "wins": 19,
-    "losses": 34,
-    "win_rate": 35.8,
-    "win_rate_basis": "19W/34L from 53 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 0.66,
+    "losses": 36,
+    "win_rate": 34.5,
+    "win_rate_basis": "19W/36L from 55 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 0.53,
     "avg_win": 17.03,
-    "avg_loss": -14.52,
+    "avg_loss": -17.09,
     "dca_positions": 0,
-    "last_events": []
+    "last_events": [
+      "DOGE stopped out between full runs (-112.30)",
+      "DOGE@4h stopped out between full runs (-9.14)"
+    ]
   }
 }
