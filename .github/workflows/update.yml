@@ -69,12 +69,41 @@ jobs:
             # minutes apart: "remote: Internal Server Error" with no real
             # conflict) — retry with backoff before dropping a whole cycle's
             # freshly computed data over something a second attempt fixes.
+            #
+            # A genuine rebase CONFLICT is a different failure mode from a
+            # transient push rejection, and the plain retry above never
+            # handled it: `git pull --rebase` left the repo mid-rebase, the
+            # loop's next `git pull --rebase` failed identically every time
+            # (the conflict doesn't go away by asking again), and all 5
+            # attempts burned through with the whole cycle's freshly computed
+            # data discarded. Confirmed 2026-09-20 17:00-17:11 UTC: runs #498
+            # and #499 both hit this and failed outright.
+            # Every file this job writes is fully regenerated each run (no
+            # hand-authored content), so there's nothing to merge line-by-line
+            # on conflict — the data this run just computed supersedes
+            # whatever the colliding run wrote. On conflict: abort the
+            # rebase, reset onto the new tip, and recommit just this run's
+            # files on top of it.
             for attempt in 1 2 3 4 5; do
-              git pull --rebase origin main
-              if git push; then
-                exit 0
+              if git pull --rebase origin main; then
+                if git push; then
+                  exit 0
+                fi
+                echo "Push attempt $attempt failed (rebase succeeded, push rejected)."
+              else
+                echo "Rebase conflict on attempt $attempt — keeping this run's freshly computed data."
+                git rebase --abort
+                git fetch origin main
+                git reset --soft origin/main
+                for f in docs/market_intelligence.json docs/signal_history.json docs/signal_database.json docs/v6_results.json docs/market_summary.txt docs/paper_account.json; do
+                  [ -f "$f" ] && git add "$f"
+                done
+                git commit -m "Hourly update [$(date -u +%Y-%m-%d_%H-%M)]"
+                if git push; then
+                  exit 0
+                fi
+                echo "Push attempt $attempt failed (after conflict resolution)."
               fi
-              echo "Push attempt $attempt failed."
               [ "$attempt" -lt 5 ] && sleep $((attempt * 5))
             done
             echo "::error::git push failed after 5 attempts"

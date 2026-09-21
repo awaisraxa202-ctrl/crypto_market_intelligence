@@ -64,12 +64,33 @@ jobs:
           # 16 minutes apart: "remote: Internal Server Error" with no real
           # conflict at all) — retry with backoff before failing the whole
           # job over something a second attempt fixes on its own.
+          #
+          # A genuine rebase CONFLICT is different from a transient push
+          # rejection, and the plain retry above never handled it — see
+          # update.yml's history 2026-09-20 17:00-17:11 UTC for the same bug
+          # in the sibling workflow. Both files this job writes are fully
+          # regenerated each run, so on conflict just abort the rebase, reset
+          # onto the new tip, and recommit this run's data on top of it.
           for attempt in 1 2 3 4 5; do
-            git pull --rebase origin main
-            if git push; then
-              exit 0
+            if git pull --rebase origin main; then
+              if git push; then
+                exit 0
+              fi
+              echo "Push attempt $attempt failed (rebase succeeded, push rejected)."
+            else
+              echo "Rebase conflict on attempt $attempt — keeping this run's freshly computed data."
+              git rebase --abort
+              git fetch origin main
+              git reset --soft origin/main
+              for f in docs/paper_account.json docs/signal_database.json; do
+                [ -f "$f" ] && git add "$f"
+              done
+              git commit -m "Position check $(date -u +%H:%M)"
+              if git push; then
+                exit 0
+              fi
+              echo "Push attempt $attempt failed (after conflict resolution)."
             fi
-            echo "Push attempt $attempt failed."
             [ "$attempt" -lt 5 ] && sleep $((attempt * 5))
           done
           echo "::error::git push failed after 5 attempts"
