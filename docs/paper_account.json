@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 4736.66958339811,
+  "cash": 5482.715545747766,
   "positions": {
     "SOL": {
       "asset": "SOL",
@@ -18,23 +18,6 @@
       "risk_distance": 9.816999999999993,
       "entry_conviction": 0.31,
       "expected_hours": 144,
-      "tp1_hit": false
-    },
-    "XRP": {
-      "asset": "XRP",
-      "trade_type": "SWING_DAILY",
-      "side": "SHORT",
-      "qty": 575.6986141447651,
-      "avg_entry": 1.47,
-      "opened": "2026-09-21T09:03:18.124157",
-      "tranches": 1,
-      "last_tranche_notional": 846.2769627928046,
-      "stop_loss": 1.63951,
-      "take_profit_1": 1.14432,
-      "take_profit_2": 0.814199,
-      "risk_distance": 0.16951000000000005,
-      "entry_conviction": 0.34,
-      "expected_hours": 120,
       "tp1_hit": false
     },
     "BTC": {
@@ -1127,6 +1110,23 @@
       "opened": "2026-09-19T03:03:53.359119",
       "closed": "2026-09-23T04:00:43.951214",
       "holding_days": 4
+    },
+    {
+      "asset": "XRP",
+      "trade_type": "SWING_DAILY",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 1.47,
+      "exit_price": 1.640822,
+      "qty": 575.69861414,
+      "tranches": 1,
+      "pnl": -98.34,
+      "return_pct": -11.62,
+      "opened": "2026-09-21T09:03:18.124157",
+      "closed": "2026-09-23T04:15:38.217099",
+      "holding_days": 1
     }
   ],
   "equity_curve": [
@@ -2157,19 +2157,23 @@
     {
       "ts": "2026-09-23T04:00:57.142584",
       "equity": 9408.87
+    },
+    {
+      "ts": "2026-09-23T04:15:44.995216",
+      "equity": 9231.06
     }
   ],
   "stats": {
     "by_type": {
       "SWING_DAILY": {
-        "closed": 4,
+        "closed": 5,
         "wins": 0,
-        "losses": 4,
+        "losses": 5,
         "win_rate": 0.0,
         "profit_factor": 0.0,
-        "net_pnl": -465.44,
-        "open": 3,
-        "avg_holding_days": 2.5
+        "net_pnl": -563.78,
+        "open": 2,
+        "avg_holding_days": 2.2
       },
       "INTRADAY_4H": {
         "closed": 58,
@@ -2182,24 +2186,24 @@
         "avg_holding_days": 0.1
       }
     },
-    "equity": 9408.87,
-    "cash": 4736.67,
-    "open_positions": 4,
-    "total_return_pct": -5.91,
-    "closed_trades": 62,
+    "equity": 9231.06,
+    "cash": 5482.72,
+    "open_positions": 3,
+    "total_return_pct": -7.69,
+    "closed_trades": 63,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
     "wins": 23,
-    "losses": 39,
-    "win_rate": 37.1,
-    "win_rate_basis": "23W/39L from 62 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 0.43,
+    "losses": 40,
+    "win_rate": 36.5,
+    "win_rate_basis": "23W/40L from 63 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 0.39,
     "avg_win": 16.23,
-    "avg_loss": -22.25,
+    "avg_loss": -24.15,
     "dca_positions": 0,
     "last_events": [
-      "ADA stopped out between full runs (-99.94)"
+      "XRP stopped out between full runs (-98.34)"
     ]
   }
 }
