@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 5226.803120138127,
+  "cash": 6138.9228913255265,
   "positions": {
     "SOL": {
       "asset": "SOL",
@@ -36,24 +36,6 @@
       "entry_conviction": 0.48,
       "expected_hours": 120,
       "tp1_hit": false
-    },
-    "SOL@4h": {
-      "asset": "SOL",
-      "trade_type": "INTRADAY_4H",
-      "side": "LONG",
-      "qty": 7.92972396846511,
-      "avg_entry": 116.36,
-      "opened": "2026-09-23T13:09:47.187645",
-      "tranches": 1,
-      "last_tranche_notional": 922.7026809706002,
-      "stop_loss": 115.348203,
-      "take_profit_1": 118.44,
-      "take_profit_2": 118.44,
-      "risk_distance": 1.0117970000000014,
-      "entry_conviction": 0.45,
-      "expected_hours": 7,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
     }
   },
   "closed_trades": [
@@ -1195,6 +1177,23 @@
       "opened": "2026-09-23T09:04:07.148763",
       "closed": "2026-09-23T13:09:47.179068",
       "holding_days": 0
+    },
+    {
+      "asset": "SOL",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 116.36,
+      "exit_price": 115.255924,
+      "qty": 7.92972397,
+      "tranches": 1,
+      "pnl": -8.76,
+      "return_pct": -0.95,
+      "opened": "2026-09-23T13:09:47.187645",
+      "closed": "2026-09-23T14:15:34.560936",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
@@ -2265,6 +2264,10 @@
     {
       "ts": "2026-09-23T13:09:47.187661",
       "equity": 9142.85
+    },
+    {
+      "ts": "2026-09-23T14:15:34.568914",
+      "equity": 9102.31
     }
   ],
   "stats": {
@@ -2280,35 +2283,34 @@
         "avg_holding_days": 2.2
       },
       "INTRADAY_4H": {
-        "closed": 62,
+        "closed": 63,
         "wins": 24,
-        "losses": 38,
-        "win_rate": 38.7,
-        "profit_factor": 0.91,
-        "net_pnl": -37.94,
-        "open": 1,
+        "losses": 39,
+        "win_rate": 38.1,
+        "profit_factor": 0.89,
+        "net_pnl": -46.7,
+        "open": 0,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 9142.85,
-    "cash": 5226.8,
-    "open_positions": 3,
-    "total_return_pct": -8.57,
-    "closed_trades": 67,
+    "equity": 9102.31,
+    "cash": 6138.92,
+    "open_positions": 2,
+    "total_return_pct": -8.98,
+    "closed_trades": 68,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
     "wins": 24,
-    "losses": 43,
-    "win_rate": 35.8,
-    "win_rate_basis": "24W/43L from 67 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "losses": 44,
+    "win_rate": 35.3,
+    "win_rate_basis": "24W/44L from 68 closed trades (excl. 0 pre-fix + 0 corrupted)",
     "profit_factor": 0.39,
     "avg_win": 15.93,
-    "avg_loss": -22.89,
+    "avg_loss": -22.57,
     "dca_positions": 0,
     "last_events": [
-      "BTC@4h stopped out (-5.29)",
-      "SOL \u26a14h OPENED LONG 7.929724 @ 116.3600 \u2192 118.44 (~7h)"
+      "SOL@4h stopped out between full runs (-8.76)"
     ]
   }
 }
