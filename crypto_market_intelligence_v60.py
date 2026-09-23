@@ -1541,8 +1541,23 @@ def build_sub_signals_weighted(latest, asset_name, historical_accuracy=0.5, regi
         above50 = price > sma50
         above200 = price > sma200
         golden = sma50 > sma200
-        if above50 and above200 and golden:
-            score, verdict, detail = 1.0, 'BULLISH', "Price above both SMA50 and SMA200. Golden cross confirmed."
+        # above50-and-above200-but-not-golden used to fall through to the
+        # final `else` and get scored -1.0 BEARISH with the message "Price
+        # below both SMA50 and SMA200" — wrong on both counts. That's exactly
+        # the shape of a sharp recovery after a deep drawdown: price rips
+        # back above both SMAs fast (bullish), but the faster-moving SMA50
+        # hasn't caught up to cross above SMA200 yet (golden cross pending).
+        # Confirmed on ADA 2026-09-23: regime detector correctly called
+        # STRONG_BULL (same close>sma50, close>sma200, macd_hist>0 condition),
+        # while this — the single highest-weighted sub-signal — scored the
+        # same bar maximally BEARISH, dragging genuinely bullish setups into
+        # NO TRADE or SHORT. Confirmed root cause of 5-for-5 losing SHORT
+        # swing trades on ADA/DOGE/XRP the same week.
+        if above50 and above200:
+            if golden:
+                score, verdict, detail = 1.0, 'BULLISH', "Price above both SMA50 and SMA200. Golden cross confirmed."
+            else:
+                score, verdict, detail = 0.6, 'BULLISH', "Price above both SMA50 and SMA200 (golden cross pending)."
         elif above50 and not above200:
             score, verdict, detail = 0.3, 'CAUTIOUSLY BULLISH', "Price above SMA50 but below SMA200."
         elif not above50 and above200:

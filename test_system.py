@@ -1106,5 +1106,45 @@ class TestMeanReversionCannotOverrideActiveTrend(unittest.TestCase):
                              "this exact condition produced ~20 straight losing SHORTs live")
 
 
+class TestTrendSignalRecoveringAssetNotScoredBearish(unittest.TestCase):
+    """Regression for a live bug confirmed on ADA 2026-09-23: the daily swing
+    engine's 'trend' sub-signal — its single highest-weighted factor — only
+    had four explicit branches (bullish-golden, above50-only, above200-only,
+    and a catch-all 'else'). A fifth real case fell through to that 'else'
+    and got scored -1.0 BEARISH with the message "Price below both SMA50
+    and SMA200": price above BOTH SMA50 and SMA200, but SMA50 hasn't yet
+    crossed above SMA200 (golden cross pending) — exactly what a sharp
+    recovery after a deep drawdown looks like, since price outruns the
+    slower-moving SMA50.
+
+    Confirmed live: the regime detector (the same close>sma50, close>sma200,
+    macd_hist>0 condition) correctly called STRONG_BULL for ADA on the same
+    bar this sub-signal scored maximally BEARISH. That -1.0 on a ~36%-weight
+    factor was enough to flip genuinely bullish setups to NO TRADE or SHORT
+    — root cause of 5-for-5 losing SHORT swing trades on ADA/DOGE/XRP the
+    same week.
+    """
+
+    def test_price_above_both_smas_is_never_scored_bearish(self):
+        latest = {'close': 100.0, 'sma_50': 90.0, 'sma_200': 95.0}  # above both, not golden
+        out = cmi.build_sub_signals_weighted(latest, 'TEST', regime='STRONG_BULL')
+        trend = out['sub_signals']['trend']
+        self.assertGreater(trend['score'], 0,
+                            "price above both SMA50 and SMA200 must not score BEARISH, "
+                            "even without a confirmed golden cross")
+        self.assertNotIn('below both', trend['detail'].lower(),
+                          "price is above both SMAs here — the detail message must not claim otherwise")
+
+    def test_golden_cross_confirmed_still_scores_highest(self):
+        latest = {'close': 100.0, 'sma_50': 95.0, 'sma_200': 90.0}  # above both, golden confirmed
+        out = cmi.build_sub_signals_weighted(latest, 'TEST', regime='STRONG_BULL')
+        self.assertEqual(out['sub_signals']['trend']['score'], 1.0)
+
+    def test_genuinely_bearish_case_unaffected(self):
+        latest = {'close': 80.0, 'sma_50': 90.0, 'sma_200': 95.0}  # below both
+        out = cmi.build_sub_signals_weighted(latest, 'TEST', regime='STRONG_BEAR')
+        self.assertEqual(out['sub_signals']['trend']['score'], -1.0)
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
