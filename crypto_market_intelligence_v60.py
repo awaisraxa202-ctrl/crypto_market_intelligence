@@ -1723,11 +1723,41 @@ def adaptive_threshold_adjustment(volatility, base_threshold=0.3):
 def false_signal_filter(signal, conviction, volume_ratio, volatility):
     if conviction < 0.3:
         return {'filter': True, 'reason': 'Low conviction', 'original_signal': signal}
-    if signal in ['STRONG LONG', 'LONG'] and volume_ratio < 1.0:
+    # Volume confirmation used to apply to LONGs only, so a weak-volume SHORT
+    # sailed through while the same-strength LONG was blocked — a built-in
+    # lean toward shorting, on top of the SHORT-biased scoring bugs fixed
+    # 2026-09-19 and 2026-09-23.
+    if signal in ['STRONG LONG', 'LONG', 'STRONG SHORT', 'SHORT'] and volume_ratio < 1.0:
         return {'filter': True, 'reason': 'Low volume confirmation', 'original_signal': signal}
     if volatility > 1.0 and signal in ['STRONG LONG', 'LONG']:
         return {'filter': True, 'reason': 'High volatility, waiting for clarity', 'original_signal': signal}
     return {'filter': False, 'original_signal': signal}
+
+
+def mtf_direction_multiplier(tf_signals, signal):
+    """Conviction multiplier from how many timeframes agree with THIS signal's
+    direction. multi_timeframe_analysis's own `strength` only looks at whether
+    the timeframes match each other, which got it backwards twice: bullish +
+    neutral (no disagreement) scored 0.6 while bullish + bearish (a real
+    conflict) scored 0.8, and three bearish timeframes still boosted a LONG
+    signal by 1.2 because they 'agreed' with each other.
+    """
+    if signal in ('STRONG LONG', 'LONG'):
+        want, against = 'BULLISH', 'BEARISH'
+    elif signal in ('STRONG SHORT', 'SHORT'):
+        want, against = 'BEARISH', 'BULLISH'
+    else:
+        return 1.0
+    vals = list((tf_signals or {}).values())
+    if not vals:
+        return 1.0
+    agree = sum(1 for v in vals if v == want)
+    oppose = sum(1 for v in vals if v == against)
+    if oppose == 0:
+        return {3: 1.2, 2: 1.0, 1: 0.8}.get(agree, 0.6)
+    if agree > oppose:
+        return 0.6
+    return 0.3
 
 # ===================== 57-59. MULTI-TF, VOLATILITY, TARGETS =====================
 
@@ -3987,16 +4017,25 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000, learn
     # "multi-timeframe confirmation" the system claims to do: agreement across
     # timeframes raises conviction, disagreement cuts it.
     _raw_conviction = narrative['conviction']
-    _mtf_strength = mtf.get('strength', 1.0) if isinstance(mtf, dict) else 1.0
+    _mtf_strength = mtf_direction_multiplier(mtf.get('signals') if isinstance(mtf, dict) else None,
+                                             narrative['signal'])
     narrative['conviction'] = round(min(1.0, _raw_conviction * _mtf_strength), 2)
     narrative['conviction_raw'] = _raw_conviction
     narrative['mtf_multiplier'] = _mtf_strength
+
+    # Volume confirmation must read the last COMPLETED daily candle. Binance and
+    # Kraken both return today's still-forming candle as the final row, so
+    # latest['volume_ratio'] compared a partial day's volume against full-day
+    # averages — almost always < 1.0 for most of the UTC day, which is why
+    # "Low volume confirmation" blocked roughly half of all signals regardless
+    # of how strong they were.
+    _closed_vr = df['volume_ratio'].iloc[-2] if len(df) >= 2 else latest.get('volume_ratio')
 
     # ─── ACCURACY: apply the false-signal filter to the signal itself ───
     # false_signal_filter was computed but its verdict was ignored; a signal that
     # failed volume/volatility confirmation still traded at full conviction.
     try:
-        _vr = float(latest.get('volume_ratio')) if pd.notna(latest.get('volume_ratio')) else 1.0
+        _vr = float(_closed_vr) if pd.notna(_closed_vr) else 1.0
         _vt = float(latest.get('atr_pct')) if pd.notna(latest.get('atr_pct')) else 0.5
         _pre_filter = false_signal_filter(narrative['signal'], narrative['conviction'], _vr, _vt)
         if _pre_filter.get('filter'):
@@ -4102,7 +4141,7 @@ def process_asset(code, config, fng_df, macro_data, account_capital=10000, learn
         _season = {}
     # false_signal_filter: flags signals that fail volume/volatility confirmation
     try:
-        _vol_ratio = float(latest.get('volume_ratio')) if pd.notna(latest.get('volume_ratio')) else 1.0
+        _vol_ratio = float(_closed_vr) if pd.notna(_closed_vr) else 1.0
         _volat = float(latest.get('atr_pct')) if pd.notna(latest.get('atr_pct')) else 0.5
         _filt = false_signal_filter(narrative['signal'], narrative['conviction'], _vol_ratio, _volat)
     except Exception:

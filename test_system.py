@@ -1146,5 +1146,45 @@ class TestTrendSignalRecoveringAssetNotScoredBearish(unittest.TestCase):
         self.assertEqual(out['sub_signals']['trend']['score'], -1.0)
 
 
+class TestMtfMultiplierFollowsSignalDirection(unittest.TestCase):
+    """multi_timeframe_analysis's own strength scored bullish+neutral (no
+    disagreement) at 0.6 but bullish+bearish (a real conflict) at 0.8, and
+    boosted a LONG by 1.2 when all three timeframes were BEARISH. Confirmed
+    2026-09-25: BTC/ETH/BNB/DOGE had a LONG signal with two bullish timeframes
+    and one neutral, got cut 40%, and were filtered out as 'Low conviction'."""
+
+    def test_two_agree_one_neutral_is_not_penalised(self):
+        m = cmi.mtf_direction_multiplier({'1h': 'BULLISH', '4h': 'NEUTRAL', '1d': 'BULLISH'}, 'LONG')
+        self.assertGreaterEqual(m, 1.0)
+
+    def test_real_conflict_scores_below_neutral_case(self):
+        neutral = cmi.mtf_direction_multiplier({'1h': 'BULLISH', '4h': 'NEUTRAL', '1d': 'BULLISH'}, 'LONG')
+        conflict = cmi.mtf_direction_multiplier({'1h': 'BULLISH', '4h': 'BEARISH', '1d': 'BULLISH'}, 'LONG')
+        self.assertLess(conflict, neutral)
+
+    def test_all_timeframes_against_the_signal_never_boosts_it(self):
+        m = cmi.mtf_direction_multiplier({'1h': 'BEARISH', '4h': 'BEARISH', '1d': 'BEARISH'}, 'LONG')
+        self.assertLess(m, 1.0)
+
+    def test_full_agreement_boosts_both_directions(self):
+        self.assertGreater(cmi.mtf_direction_multiplier(
+            {'1h': 'BULLISH', '4h': 'BULLISH', '1d': 'BULLISH'}, 'LONG'), 1.0)
+        self.assertGreater(cmi.mtf_direction_multiplier(
+            {'1h': 'BEARISH', '4h': 'BEARISH', '1d': 'BEARISH'}, 'SHORT'), 1.0)
+
+
+class TestVolumeFilterIsDirectionNeutral(unittest.TestCase):
+    """The volume-confirmation filter used to apply to LONGs only, so a
+    low-volume SHORT passed while an identical LONG was blocked."""
+
+    def test_low_volume_blocks_short_as_well_as_long(self):
+        self.assertTrue(cmi.false_signal_filter('LONG', 0.5, 0.6, 0.5)['filter'])
+        self.assertTrue(cmi.false_signal_filter('SHORT', 0.5, 0.6, 0.5)['filter'])
+
+    def test_confirmed_volume_passes_both(self):
+        self.assertFalse(cmi.false_signal_filter('LONG', 0.5, 1.3, 0.5)['filter'])
+        self.assertFalse(cmi.false_signal_filter('SHORT', 0.5, 1.3, 0.5)['filter'])
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
