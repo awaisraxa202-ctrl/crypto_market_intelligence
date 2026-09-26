@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 5381.14877476541,
+  "cash": 5047.273338091747,
   "positions": {
     "SOL": {
       "asset": "SOL",
@@ -37,23 +37,22 @@
       "expected_hours": 120,
       "tp1_hit": false
     },
-    "ETH@4h": {
-      "asset": "ETH",
-      "trade_type": "INTRADAY_4H",
+    "LINK": {
+      "asset": "LINK",
+      "trade_type": "SWING_DAILY",
       "side": "LONG",
-      "qty": 0.28148195410354937,
-      "avg_entry": 2695.88,
-      "opened": "2026-09-25T15:03:35.747231",
+      "qty": 75.85298732195714,
+      "avg_entry": 14.32,
+      "opened": "2026-09-26T15:03:46.565560",
       "tranches": 1,
-      "last_tranche_notional": 758.8415704286767,
-      "stop_loss": 2669.39,
-      "take_profit_1": 2748.87,
-      "take_profit_2": 2748.87,
-      "risk_distance": 26.490000000000236,
-      "entry_conviction": 0.75,
-      "expected_hours": 8,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
+      "last_tranche_notional": 1086.2147784504264,
+      "stop_loss": 12.7298,
+      "take_profit_1": 17.5137,
+      "take_profit_2": 20.7029,
+      "risk_distance": 1.5902000000000012,
+      "entry_conviction": 0.44,
+      "expected_hours": 120,
+      "tp1_hit": false
     }
   },
   "closed_trades": [
@@ -1401,6 +1400,23 @@
       "holding_days": 1
     },
     {
+      "asset": "ETH",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "TIME_EXIT",
+      "successful": false,
+      "profitable": "False",
+      "entry_price": 2695.88,
+      "exit_price": 2685.869584,
+      "qty": 0.28148195,
+      "tranches": 1,
+      "pnl": -2.82,
+      "return_pct": -0.37,
+      "opened": "2026-09-25T15:03:35.747231",
+      "closed": "2026-09-26T15:03:46.546958",
+      "holding_days": 1
+    },
+    {
       "asset": "AVAX",
       "trade_type": "INTRADAY_4H",
       "side": "LONG",
@@ -1414,7 +1430,7 @@
       "pnl": 21.81,
       "return_pct": 2.71,
       "opened": "2026-09-26T08:54:27.852149",
-      "closed": "2026-09-26T15:00:52.646195",
+      "closed": "2026-09-26T15:03:46.556307",
       "holding_days": 0
     }
   ],
@@ -2728,8 +2744,8 @@
       "equity": 9128.04
     },
     {
-      "ts": "2026-09-26T15:00:52.662652",
-      "equity": 9141.02
+      "ts": "2026-09-26T15:03:46.565574",
+      "equity": 9135.81
     }
   ],
   "stats": {
@@ -2741,38 +2757,40 @@
         "win_rate": 0.0,
         "profit_factor": 0.0,
         "net_pnl": -563.78,
-        "open": 2,
+        "open": 3,
         "avg_holding_days": 2.2
       },
       "INTRADAY_4H": {
-        "closed": 75,
+        "closed": 76,
         "wins": 31,
-        "losses": 44,
-        "win_rate": 41.3,
+        "losses": 45,
+        "win_rate": 40.8,
         "profit_factor": 0.97,
-        "net_pnl": -12.03,
-        "open": 1,
+        "net_pnl": -14.85,
+        "open": 0,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 9141.02,
-    "cash": 5381.15,
+    "equity": 9135.81,
+    "cash": 5047.27,
     "open_positions": 3,
-    "total_return_pct": -8.59,
-    "closed_trades": 80,
+    "total_return_pct": -8.64,
+    "closed_trades": 81,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
     "wins": 31,
-    "losses": 49,
-    "win_rate": 38.8,
-    "win_rate_basis": "31W/49L from 80 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "losses": 50,
+    "win_rate": 38.3,
+    "win_rate_basis": "31W/50L from 81 closed trades (excl. 0 pre-fix + 0 corrupted)",
     "profit_factor": 0.44,
     "avg_win": 14.85,
-    "avg_loss": -21.15,
+    "avg_loss": -20.78,
     "dca_positions": 0,
     "last_events": [
-      "AVAX@4h TP2 hit between full runs \u2014 closed (+21.81)"
+      "ETH@4h time-exited after 24h (expected ~8h) (-2.82)",
+      "AVAX@4h TP2 hit \u2014 closed (+21.81)",
+      "LINK OPENED LONG 75.852987 @ 14.3200"
     ]
   }
 }
