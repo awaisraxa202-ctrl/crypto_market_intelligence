@@ -10021,11 +10021,21 @@
       "stop_loss": 10.723206,
       "take_profit_1": 11,
       "take_profit_2": 11,
-      "status": "ACTIVE",
-      "exit_price": null,
-      "exit_date": null,
-      "profit_pct": null,
-      "holding_days": null
+      "status": "CLOSED_LOSS",
+      "exit_price": 10.702,
+      "exit_date": "2026-09-26T20:17:44.273141",
+      "profit_pct": -1.879526909324288,
+      "holding_days": 0,
+      "post_mortem": {
+        "asset": "AVAX@4h",
+        "entry": 10.907,
+        "exit": 10.702,
+        "profit_pct": -1.88,
+        "holding_days": 0,
+        "why_it_failed": "Stop-loss was triggered due to unexpected market movement.",
+        "lesson": "Consider wider stop-loss during event weeks.",
+        "improvement": "Stop-loss multiplier increased from 2x to 2.5x ATR."
+      }
     },
     {
       "id": "SOL_20260926_1901",
@@ -10080,21 +10090,75 @@
       "exit_date": null,
       "profit_pct": null,
       "holding_days": null
+    },
+    {
+      "id": "SOL_20260926_2015",
+      "asset": "SOL",
+      "base_asset": "SOL",
+      "timeframe": "1d",
+      "signal": "LONG",
+      "entry_price": 121.0,
+      "conviction": 0.44,
+      "entry_date": "2026-09-26T20:15:55.045782",
+      "stop_loss": 109.72,
+      "take_profit_1": 143.56,
+      "take_profit_2": 166.12,
+      "status": "ACTIVE",
+      "exit_price": null,
+      "exit_date": null,
+      "profit_pct": null,
+      "holding_days": null
+    },
+    {
+      "id": "LINK_20260926_2017",
+      "asset": "LINK",
+      "base_asset": "LINK",
+      "timeframe": "1d",
+      "signal": "LONG",
+      "entry_price": 14.09,
+      "conviction": 0.37,
+      "entry_date": "2026-09-26T20:17:20.843954",
+      "stop_loss": 12.4954,
+      "take_profit_1": 17.2792,
+      "take_profit_2": 20.4685,
+      "status": "ACTIVE",
+      "exit_price": null,
+      "exit_date": null,
+      "profit_pct": null,
+      "holding_days": null
+    },
+    {
+      "id": "AVAX@4h_20260926_2017",
+      "asset": "AVAX@4h",
+      "base_asset": "AVAX",
+      "timeframe": "4h",
+      "signal": "LONG",
+      "entry_price": 10.702,
+      "conviction": 0.45,
+      "entry_date": "2026-09-26T20:17:44.260598",
+      "stop_loss": 10.524094,
+      "take_profit_1": 10.963,
+      "take_profit_2": 10.963,
+      "status": "ACTIVE",
+      "exit_price": null,
+      "exit_date": null,
+      "profit_pct": null,
+      "holding_days": null
     }
   ],
   "performance": {
-    "total_signals": 435,
+    "total_signals": 438,
     "excluded_pre_fix": 0,
-    "active_signals": 135,
-    "closed_signals": 300,
+    "active_signals": 137,
+    "closed_signals": 301,
     "win_count": 107,
-    "loss_count": 193,
+    "loss_count": 194,
     "population": "all_generated_signals",
     "population_label": "Every signal generated, including ones never traded by the paper account",
-    "win_rate": 35.66666666666667,
-    "total_profit_pct": -793.23,
+    "win_rate": 35.548172757475086,
+    "total_profit_pct": -795.11,
     "avg_profit_pct": 1.88,
-    "avg_loss_pct": 5.15,
+    "avg_loss_pct": 5.14,
     "best_trade": 4.695349911786936,
     "worst_trade": -15.418965751918673,
     "avg_holding_days": 0.4
@@ -10603,6 +10667,12 @@
       "asset": "AVAX@4h",
       "predicted_direction": "LONG",
       "correct": true
+    },
+    {
+      "timestamp": "2026-09-26T20:17:44.370776",
+      "asset": "AVAX@4h",
+      "predicted_direction": "LONG",
+      "correct": false
     }
   ]
 }
