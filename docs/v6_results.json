@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-09-26T20:20:20.224155",
-  "imbalance": 0.572,
+  "timestamp": "2026-09-26T21:05:38.826070",
+  "imbalance": 0.616,
   "regime": {
     "regime": "UNKNOWN_UNCERTAINTY",
     "description": "Trade policy uncertainty unavailable \u2014 regime not determined",
@@ -15,10 +15,10 @@
   },
   "ml_signal": {
     "bilstm_score": 0.5,
-    "cnn_score": 0.5,
-    "ensemble_score": 0.5,
+    "cnn_score": 0.624,
+    "ensemble_score": 0.562,
     "action": "HOLD",
-    "confidence": 0.5,
+    "confidence": 0.562,
     "trade_qualified": false
   },
   "big_trade": {
@@ -38,7 +38,7 @@
   "explanation": {
     "asset": "BTC",
     "signal": "HOLD",
-    "confidence": 0.5,
+    "confidence": 0.562,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
       "\u2705 order_book: Bullish order book imbalance",
@@ -49,14 +49,21 @@
     "historical_trades": [
       {
         "date": "2026-05-03",
-        "similarity": 98.3,
+        "similarity": 98.4,
         "future_5d_return": 2.1,
         "rsi": 69.0,
         "price_vs_sma50": 0.0811
       },
       {
+        "date": "2026-04-22",
+        "similarity": 98.0,
+        "future_5d_return": -1.06,
+        "rsi": 68.8,
+        "price_vs_sma50": 0.1028
+      },
+      {
         "date": "2026-04-23",
-        "similarity": 98.1,
+        "similarity": 98.0,
         "future_5d_return": -2.49,
         "rsi": 67.8,
         "price_vs_sma50": 0.1022
@@ -70,17 +77,10 @@
       },
       {
         "date": "2026-05-14",
-        "similarity": 98.0,
+        "similarity": 97.9,
         "future_5d_return": -5.32,
         "rsi": 67.5,
         "price_vs_sma50": 0.0845
-      },
-      {
-        "date": "2026-04-22",
-        "similarity": 97.9,
-        "future_5d_return": -1.06,
-        "rsi": 68.8,
-        "price_vs_sma50": 0.1028
       },
       {
         "date": "2026-04-20",
@@ -97,18 +97,18 @@
         "price_vs_sma50": 0.0883
       },
       {
-        "date": "2026-05-12",
-        "similarity": 97.5,
-        "future_5d_return": -3.83,
-        "rsi": 67.7,
-        "price_vs_sma50": 0.0821
-      },
-      {
         "date": "2026-04-26",
         "similarity": 97.4,
         "future_5d_return": -0.53,
         "rsi": 73.7,
         "price_vs_sma50": 0.0989
+      },
+      {
+        "date": "2026-05-12",
+        "similarity": 97.4,
+        "future_5d_return": -3.83,
+        "rsi": 67.7,
+        "price_vs_sma50": 0.0821
       },
       {
         "date": "2026-04-24",
@@ -195,8 +195,8 @@
   ],
   "event_risk": {
     "expected_move": "\u00b14.0%",
-    "expected_range_low": 80677.54,
-    "expected_range_high": 87400.66,
+    "expected_range_low": 80722.66,
+    "expected_range_high": 87449.54,
     "direction": "UNCERTAIN",
     "recommendation": "Reduce position size by 50% before event",
     "event": {
@@ -237,27 +237,27 @@
     "source": "yfinance spot BTC ETFs (proxy, not true creation/redemption flow)"
   },
   "onchain": {
-    "mvrv_zscore": 2.049,
-    "miner_reserves": 313804657.0,
-    "nvt_ratio": 95.15,
+    "mvrv_zscore": 2.055,
+    "miner_reserves": 315937435.0,
+    "nvt_ratio": 95.76,
     "hashrate_trend": "FALLING",
     "mvrv_is_proxy": true,
-    "miner_reserves_trend": "FALLING",
+    "miner_reserves_trend": "RISING",
     "hashrate_source": "mempool.space (blockchain.info unavailable)"
   },
   "exit_strategy": {
-    "entry": 84001.1,
+    "entry": 84014.6,
     "signal": "NO TRADE",
-    "current_price": 84841.111,
+    "current_price": 84854.74600000001,
     "scenarios": []
   },
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.5,
-      "cnn_score": 0.5,
-      "ensemble_score": 0.5,
+      "cnn_score": 0.624,
+      "ensemble_score": 0.562,
       "action": "HOLD",
-      "confidence": 0.5,
+      "confidence": 0.562,
       "trade_qualified": false
     }
   },
@@ -603,16 +603,16 @@
     "ETH": {
       "symbol": "ETHUSDT",
       "bars_used": 721,
-      "total_trades": 44,
+      "total_trades": 45,
       "wins": 20,
-      "losses": 24,
+      "losses": 25,
       "time_exits": 3,
-      "win_rate": 45.5,
-      "profit_factor": 1.62,
-      "avg_r": 0.315,
-      "total_r": 13.88,
+      "win_rate": 44.4,
+      "profit_factor": 1.55,
+      "avg_r": 0.286,
+      "total_r": 12.88,
       "gross_r_win": 36.38,
-      "gross_r_loss": 22.5,
+      "gross_r_loss": 23.5,
       "trades": [
         {
           "side": "SHORT",
