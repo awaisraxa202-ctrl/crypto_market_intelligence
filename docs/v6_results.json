@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-09-26T08:57:03.408988",
-  "imbalance": 0.141,
+  "timestamp": "2026-09-26T09:05:26.920495",
+  "imbalance": 0.39,
   "regime": {
     "regime": "UNKNOWN_UNCERTAINTY",
     "description": "Trade policy uncertainty unavailable \u2014 regime not determined",
@@ -15,28 +15,30 @@
   },
   "ml_signal": {
     "bilstm_score": 0.5,
-    "cnn_score": 0.012,
-    "ensemble_score": 0.256,
-    "action": "SELL",
-    "confidence": 0.744,
-    "trade_qualified": true
+    "cnn_score": 0.385,
+    "ensemble_score": 0.443,
+    "action": "HOLD",
+    "confidence": 0.443,
+    "trade_qualified": false
   },
   "big_trade": {
-    "position_size": 0.1112,
-    "risk_pct": 3.74,
-    "target_movement": 3368.3920000000003,
-    "trade_type": "BIG"
+    "position_size": 0,
+    "risk_pct": 0,
+    "target_movement": 0,
+    "trade_type": "BIG",
+    "gated_reason": "not trade_qualified (action=HOLD)"
   },
   "small_trade": {
-    "position_size": 0.1036,
-    "risk_pct": 0.87,
-    "target_movement": 842.0980000000001,
-    "trade_type": "SMALL"
+    "position_size": 0,
+    "risk_pct": 0,
+    "target_movement": 0,
+    "trade_type": "SMALL",
+    "gated_reason": "not trade_qualified (action=HOLD)"
   },
   "explanation": {
     "asset": "BTC",
-    "signal": "SELL",
-    "confidence": 0.744,
+    "signal": "HOLD",
+    "confidence": 0.443,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
       "\u274c order_book: Order book data unavailable",
@@ -116,7 +118,7 @@
         "price_vs_sma50": 0.0821
       }
     ],
-    "risk_warning": "\u2705 Moderate confidence. Standard position size recommended.",
+    "risk_warning": "\u26a0\ufe0f Low confidence trade. Reduce position size by 50%.",
     "trader_comment": "No clear directional bias. Patience is key.",
     "historical_win_rate": 20.0
   },
@@ -193,8 +195,8 @@
   ],
   "event_risk": {
     "expected_move": "\u00b14.0%",
-    "expected_range_low": 80836.61,
-    "expected_range_high": 87572.99,
+    "expected_range_low": 80823.17,
+    "expected_range_high": 87558.43,
     "direction": "UNCERTAIN",
     "recommendation": "Reduce position size by 50% before event",
     "event": {
@@ -235,44 +237,28 @@
     "source": "yfinance spot BTC ETFs (proxy, not true creation/redemption flow)"
   },
   "onchain": {
-    "mvrv_zscore": 2.068,
-    "miner_reserves": 315541224.0,
-    "nvt_ratio": 54.03,
+    "mvrv_zscore": 2.067,
+    "miner_reserves": 315707581.0,
+    "nvt_ratio": 54.26,
     "hashrate_trend": "FALLING",
     "mvrv_is_proxy": true,
     "miner_reserves_trend": "RISING",
     "hashrate_source": "mempool.space (blockchain.info unavailable)"
   },
   "exit_strategy": {
-    "entry": 84209.8,
-    "signal": "SHORT",
-    "current_price": 85051.898,
-    "scenarios": [
-      {
-        "condition": "Price hits TP1 ($81683.51)",
-        "action": "Take 50% profit",
-        "reason": "Lock in gains, reduce risk"
-      },
-      {
-        "condition": "Price hits TP2 ($79157.21)",
-        "action": "Take remaining 50% profit",
-        "reason": "Target hit, complete the trade"
-      },
-      {
-        "condition": "Price hits SL ($86736.09)",
-        "action": "Exit immediately",
-        "reason": "Stop-loss protects capital"
-      }
-    ]
+    "entry": 84195.2,
+    "signal": "NO TRADE",
+    "current_price": 85037.152,
+    "scenarios": []
   },
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.5,
-      "cnn_score": 0.012,
-      "ensemble_score": 0.256,
-      "action": "SELL",
-      "confidence": 0.744,
-      "trade_qualified": true
+      "cnn_score": 0.385,
+      "ensemble_score": 0.443,
+      "action": "HOLD",
+      "confidence": 0.443,
+      "trade_qualified": false
     }
   },
   "order_book_history_depth": 1,
@@ -287,9 +273,9 @@
       "win_rate": 31.8,
       "profit_factor": 0.86,
       "avg_r": -0.092,
-      "total_r": -4.04,
+      "total_r": -4.05,
       "gross_r_win": 24.32,
-      "gross_r_loss": 28.36,
+      "gross_r_loss": 28.37,
       "trades": [
         {
           "side": "SHORT",
