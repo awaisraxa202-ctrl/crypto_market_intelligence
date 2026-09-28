@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 3169.280887568723,
+  "cash": 4465.379900005274,
   "positions": {
     "SOL": {
       "asset": "SOL",
@@ -54,24 +54,6 @@
       "expected_hours": 120,
       "tp1_hit": false
     },
-    "SOL@4h": {
-      "asset": "SOL",
-      "trade_type": "INTRADAY_4H",
-      "side": "LONG",
-      "qty": 6.152731469520145,
-      "avg_entry": 123.01,
-      "opened": "2026-09-27T13:03:56.683602",
-      "tranches": 1,
-      "last_tranche_notional": 756.847498065673,
-      "stop_loss": 120.8,
-      "take_profit_1": 125.0,
-      "take_profit_2": 125.0,
-      "risk_distance": 2.210000000000008,
-      "entry_conviction": 0.45,
-      "expected_hours": 10,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
     "LINK@4h": {
       "asset": "LINK",
       "trade_type": "INTRADAY_4H",
@@ -87,24 +69,6 @@
       "risk_distance": 0.18568999999999924,
       "entry_conviction": 0.45,
       "expected_hours": 7,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
-    "ETH@4h": {
-      "asset": "ETH",
-      "trade_type": "INTRADAY_4H",
-      "side": "LONG",
-      "qty": 0.20943647898373682,
-      "avg_entry": 2671.37,
-      "opened": "2026-09-27T22:39:52.006538",
-      "tranches": 1,
-      "last_tranche_notional": 559.482326862785,
-      "stop_loss": 2657.064497,
-      "take_profit_1": 2698.71,
-      "take_profit_2": 2698.71,
-      "risk_distance": 14.305503000000044,
-      "entry_conviction": 0.41,
-      "expected_hours": 6,
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     }
@@ -1537,6 +1501,40 @@
       "opened": "2026-09-27T21:03:30.079995",
       "closed": "2026-09-27T22:15:47.132751",
       "holding_days": 0
+    },
+    {
+      "asset": "SOL",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 123.01,
+      "exit_price": 120.70336,
+      "qty": 6.15273147,
+      "tranches": 1,
+      "pnl": -14.19,
+      "return_pct": -1.88,
+      "opened": "2026-09-27T13:03:56.683602",
+      "closed": "2026-09-28T02:01:22.858469",
+      "holding_days": 0
+    },
+    {
+      "asset": "ETH",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 2671.37,
+      "exit_price": 2654.938845,
+      "qty": 0.20943648,
+      "tranches": 1,
+      "pnl": -3.44,
+      "return_pct": -0.62,
+      "opened": "2026-09-27T22:39:52.006538",
+      "closed": "2026-09-28T02:01:26.294921",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
@@ -2951,6 +2949,10 @@
     {
       "ts": "2026-09-28T01:03:55.353349",
       "equity": 9097.5
+    },
+    {
+      "ts": "2026-09-28T02:01:26.307999",
+      "equity": 9063.07
     }
   ],
   "stats": {
@@ -2966,32 +2968,35 @@
         "avg_holding_days": 2.2
       },
       "INTRADAY_4H": {
-        "closed": 79,
+        "closed": 81,
         "wins": 32,
-        "losses": 47,
-        "win_rate": 40.5,
-        "profit_factor": 0.96,
-        "net_pnl": -17.73,
-        "open": 3,
+        "losses": 49,
+        "win_rate": 39.5,
+        "profit_factor": 0.93,
+        "net_pnl": -35.36,
+        "open": 1,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 9097.5,
-    "cash": 3169.28,
-    "open_positions": 6,
-    "total_return_pct": -9.03,
-    "closed_trades": 84,
+    "equity": 9063.07,
+    "cash": 4465.38,
+    "open_positions": 4,
+    "total_return_pct": -9.37,
+    "closed_trades": 86,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
     "wins": 32,
-    "losses": 52,
-    "win_rate": 38.1,
-    "win_rate_basis": "32W/52L from 84 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 0.45,
+    "losses": 54,
+    "win_rate": 37.2,
+    "win_rate_basis": "32W/54L from 86 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 0.44,
     "avg_win": 14.94,
-    "avg_loss": -20.38,
+    "avg_loss": -19.95,
     "dca_positions": 0,
-    "last_events": []
+    "last_events": [
+      "SOL@4h stopped out between full runs (-14.19)",
+      "ETH@4h stopped out between full runs (-3.44)"
+    ]
   }
 }
