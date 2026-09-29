@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 2628.824868037672,
+  "cash": 3959.038109835464,
   "positions": {
     "SOL": {
       "asset": "SOL",
@@ -54,24 +54,6 @@
       "expected_hours": 120,
       "tp1_hit": false
     },
-    "BNB@4h": {
-      "asset": "BNB",
-      "trade_type": "INTRADAY_4H",
-      "side": "LONG",
-      "qty": 0.5419677803805244,
-      "avg_entry": 761.66,
-      "opened": "2026-09-28T09:03:44.772802",
-      "tranches": 1,
-      "last_tranche_notional": 412.79517960463016,
-      "stop_loss": 756.50143,
-      "take_profit_1": 777.97,
-      "take_profit_2": 777.97,
-      "risk_distance": 5.158569999999941,
-      "entry_conviction": 0.36,
-      "expected_hours": 14,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
     "BTC@4h": {
       "asset": "BTC",
       "trade_type": "INTRADAY_4H",
@@ -90,24 +72,6 @@
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     },
-    "XRP@4h": {
-      "asset": "XRP",
-      "trade_type": "INTRADAY_4H",
-      "side": "LONG",
-      "qty": 316.8566195888452,
-      "avg_entry": 1.493,
-      "opened": "2026-09-28T17:03:39.315558",
-      "tranches": 1,
-      "last_tranche_notional": 473.0669330461459,
-      "stop_loss": 1.475621,
-      "take_profit_1": 1.535,
-      "take_profit_2": 1.535,
-      "risk_distance": 0.017379000000000033,
-      "entry_conviction": 0.38,
-      "expected_hours": 8,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
     "DOGE@4h": {
       "asset": "DOGE",
       "trade_type": "INTRADAY_4H",
@@ -123,24 +87,6 @@
       "risk_distance": 0.0012690000000000062,
       "entry_conviction": 0.36,
       "expected_hours": 12,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
-    "AVAX@4h": {
-      "asset": "AVAX",
-      "trade_type": "INTRADAY_4H",
-      "side": "LONG",
-      "qty": 43.37951595396098,
-      "avg_entry": 10.698,
-      "opened": "2026-09-29T01:04:31.242633",
-      "tranches": 1,
-      "last_tranche_notional": 464.07406167547464,
-      "stop_loss": 10.520783,
-      "take_profit_1": 10.963,
-      "take_profit_2": 10.963,
-      "risk_distance": 0.17721700000000062,
-      "entry_conviction": 0.45,
-      "expected_hours": 5,
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     }
@@ -1794,6 +1740,57 @@
       "opened": "2026-09-28T15:04:40.359135",
       "closed": "2026-09-28T17:15:48.844990",
       "holding_days": 0
+    },
+    {
+      "asset": "BNB",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 761.66,
+      "exit_price": 755.896229,
+      "qty": 0.54196778,
+      "tranches": 1,
+      "pnl": -3.12,
+      "return_pct": -0.76,
+      "opened": "2026-09-28T09:03:44.772802",
+      "closed": "2026-09-29T01:30:50.420718",
+      "holding_days": 0
+    },
+    {
+      "asset": "XRP",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 1.493,
+      "exit_price": 1.474441,
+      "qty": 316.85661959,
+      "tranches": 1,
+      "pnl": -5.88,
+      "return_pct": -1.24,
+      "opened": "2026-09-28T17:03:39.315558",
+      "closed": "2026-09-29T01:30:53.822755",
+      "holding_days": 0
+    },
+    {
+      "asset": "AVAX",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 10.698,
+      "exit_price": 10.512366,
+      "qty": 43.37951595,
+      "tranches": 1,
+      "pnl": -8.05,
+      "return_pct": -1.74,
+      "opened": "2026-09-29T01:04:31.242633",
+      "closed": "2026-09-29T01:31:00.588777",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
@@ -3304,6 +3301,10 @@
     {
       "ts": "2026-09-29T01:04:31.242652",
       "equity": 9111.16
+    },
+    {
+      "ts": "2026-09-29T01:31:00.608278",
+      "equity": 9046.38
     }
   ],
   "stats": {
@@ -3319,34 +3320,36 @@
         "avg_holding_days": 2.2
       },
       "INTRADAY_4H": {
-        "closed": 92,
+        "closed": 95,
         "wins": 36,
-        "losses": 56,
-        "win_rate": 39.1,
-        "profit_factor": 0.92,
-        "net_pnl": -43.74,
-        "open": 5,
+        "losses": 59,
+        "win_rate": 37.9,
+        "profit_factor": 0.89,
+        "net_pnl": -60.79,
+        "open": 2,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 9111.16,
-    "cash": 2628.82,
-    "open_positions": 8,
-    "total_return_pct": -8.89,
-    "closed_trades": 97,
+    "equity": 9046.38,
+    "cash": 3959.04,
+    "open_positions": 5,
+    "total_return_pct": -9.54,
+    "closed_trades": 100,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
     "wins": 36,
-    "losses": 61,
-    "win_rate": 37.1,
-    "win_rate_basis": "36W/61L from 97 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 0.46,
+    "losses": 64,
+    "win_rate": 36.0,
+    "win_rate_basis": "36W/64L from 100 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 0.45,
     "avg_win": 14.11,
-    "avg_loss": -18.29,
+    "avg_loss": -17.7,
     "dca_positions": 0,
     "last_events": [
-      "AVAX \u26a14h OPENED LONG 43.379516 @ 10.6980 \u2192 10.963 (~5h)"
+      "BNB@4h stopped out between full runs (-3.12)",
+      "XRP@4h stopped out between full runs (-5.88)",
+      "AVAX@4h stopped out between full runs (-8.05)"
     ]
   }
 }
