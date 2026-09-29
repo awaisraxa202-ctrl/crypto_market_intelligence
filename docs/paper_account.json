@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 3959.038109835464,
+  "cash": 4496.288314023909,
   "positions": {
     "SOL": {
       "asset": "SOL",
@@ -69,24 +69,6 @@
       "risk_distance": 380.0093040000065,
       "entry_conviction": 0.57,
       "expected_hours": 13,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
-    "DOGE@4h": {
-      "asset": "DOGE",
-      "trade_type": "INTRADAY_4H",
-      "side": "LONG",
-      "qty": 5834.81739530633,
-      "avg_entry": 0.093604,
-      "opened": "2026-09-28T23:03:32.719838",
-      "tranches": 1,
-      "last_tranche_notional": 546.1622474702538,
-      "stop_loss": 0.092335,
-      "take_profit_1": 0.0976,
-      "take_profit_2": 0.0976,
-      "risk_distance": 0.0012690000000000062,
-      "entry_conviction": 0.36,
-      "expected_hours": 12,
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     }
@@ -1791,6 +1773,23 @@
       "opened": "2026-09-29T01:04:31.242633",
       "closed": "2026-09-29T01:31:00.588777",
       "holding_days": 0
+    },
+    {
+      "asset": "DOGE",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 0.093604,
+      "exit_price": 0.092261,
+      "qty": 5834.81739531,
+      "tranches": 1,
+      "pnl": -7.84,
+      "return_pct": -1.43,
+      "opened": "2026-09-28T23:03:32.719838",
+      "closed": "2026-09-29T02:30:49.223468",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
@@ -3305,6 +3304,10 @@
     {
       "ts": "2026-09-29T01:31:00.608278",
       "equity": 9046.38
+    },
+    {
+      "ts": "2026-09-29T02:30:49.238792",
+      "equity": 9033.07
     }
   ],
   "stats": {
@@ -3320,36 +3323,34 @@
         "avg_holding_days": 2.2
       },
       "INTRADAY_4H": {
-        "closed": 95,
+        "closed": 96,
         "wins": 36,
-        "losses": 59,
-        "win_rate": 37.9,
-        "profit_factor": 0.89,
-        "net_pnl": -60.79,
-        "open": 2,
+        "losses": 60,
+        "win_rate": 37.5,
+        "profit_factor": 0.88,
+        "net_pnl": -68.63,
+        "open": 1,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 9046.38,
-    "cash": 3959.04,
-    "open_positions": 5,
-    "total_return_pct": -9.54,
-    "closed_trades": 100,
+    "equity": 9033.07,
+    "cash": 4496.29,
+    "open_positions": 4,
+    "total_return_pct": -9.67,
+    "closed_trades": 101,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
     "wins": 36,
-    "losses": 64,
-    "win_rate": 36.0,
-    "win_rate_basis": "36W/64L from 100 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "losses": 65,
+    "win_rate": 35.6,
+    "win_rate_basis": "36W/65L from 101 closed trades (excl. 0 pre-fix + 0 corrupted)",
     "profit_factor": 0.45,
     "avg_win": 14.11,
-    "avg_loss": -17.7,
+    "avg_loss": -17.55,
     "dca_positions": 0,
     "last_events": [
-      "BNB@4h stopped out between full runs (-3.12)",
-      "XRP@4h stopped out between full runs (-5.88)",
-      "AVAX@4h stopped out between full runs (-8.05)"
+      "DOGE@4h stopped out between full runs (-7.84)"
     ]
   }
 }
