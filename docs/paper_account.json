@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 2777.161524188635,
+  "cash": 3827.405762479133,
   "positions": {
     "SOL": {
       "asset": "SOL",
@@ -87,42 +87,6 @@
       "risk_distance": 4.408297999999945,
       "entry_conviction": 0.63,
       "expected_hours": 16,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
-    "ADA@4h": {
-      "asset": "ADA",
-      "trade_type": "INTRADAY_4H",
-      "side": "LONG",
-      "qty": 2297.3817538176413,
-      "avg_entry": 0.251147,
-      "opened": "2026-09-29T11:03:56.145755",
-      "tranches": 1,
-      "last_tranche_notional": 576.9805353260392,
-      "stop_loss": 0.247433,
-      "take_profit_1": 0.2567,
-      "take_profit_2": 0.2567,
-      "risk_distance": 0.003714000000000023,
-      "entry_conviction": 0.45,
-      "expected_hours": 5,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
-    "DOGE@4h": {
-      "asset": "DOGE",
-      "trade_type": "INTRADAY_4H",
-      "side": "LONG",
-      "qty": 5113.003711389014,
-      "avg_entry": 0.095885,
-      "opened": "2026-09-29T13:04:22.194604",
-      "tranches": 1,
-      "last_tranche_notional": 490.26036086653556,
-      "stop_loss": 0.094806,
-      "take_profit_1": 0.0976,
-      "take_profit_2": 0.0976,
-      "risk_distance": 0.0010789999999999966,
-      "entry_conviction": 0.45,
-      "expected_hours": 5,
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     }
@@ -1895,6 +1859,40 @@
       "opened": "2026-09-29T03:04:06.487932",
       "closed": "2026-09-29T07:15:54.235606",
       "holding_days": 0
+    },
+    {
+      "asset": "ADA",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 0.251147,
+      "exit_price": 0.247235,
+      "qty": 2297.38175382,
+      "tranches": 1,
+      "pnl": -8.99,
+      "return_pct": -1.56,
+      "opened": "2026-09-29T11:03:56.145755",
+      "closed": "2026-09-29T15:30:49.619946",
+      "holding_days": 0
+    },
+    {
+      "asset": "DOGE",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 0.095885,
+      "exit_price": 0.09473,
+      "qty": 5113.00371139,
+      "tranches": 1,
+      "pnl": -5.9,
+      "return_pct": -1.2,
+      "opened": "2026-09-29T13:04:22.194604",
+      "closed": "2026-09-29T15:30:53.141291",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
@@ -3461,6 +3459,10 @@
     {
       "ts": "2026-09-29T15:04:26.437860",
       "equity": 9101.99
+    },
+    {
+      "ts": "2026-09-29T15:30:53.151086",
+      "equity": 9036.59
     }
   ],
   "stats": {
@@ -3476,32 +3478,35 @@
         "avg_holding_days": 2.2
       },
       "INTRADAY_4H": {
-        "closed": 99,
+        "closed": 101,
         "wins": 39,
-        "losses": 60,
-        "win_rate": 39.4,
-        "profit_factor": 0.94,
-        "net_pnl": -36.63,
-        "open": 4,
+        "losses": 62,
+        "win_rate": 38.6,
+        "profit_factor": 0.91,
+        "net_pnl": -51.52,
+        "open": 2,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 9101.99,
-    "cash": 2777.16,
-    "open_positions": 7,
-    "total_return_pct": -8.98,
-    "closed_trades": 104,
+    "equity": 9036.59,
+    "cash": 3827.41,
+    "open_positions": 5,
+    "total_return_pct": -9.63,
+    "closed_trades": 106,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
     "wins": 39,
-    "losses": 65,
-    "win_rate": 37.5,
-    "win_rate_basis": "39W/65L from 104 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "losses": 67,
+    "win_rate": 36.8,
+    "win_rate_basis": "39W/67L from 106 closed trades (excl. 0 pre-fix + 0 corrupted)",
     "profit_factor": 0.47,
     "avg_win": 13.85,
-    "avg_loss": -17.55,
+    "avg_loss": -17.24,
     "dca_positions": 0,
-    "last_events": []
+    "last_events": [
+      "ADA@4h stopped out between full runs (-8.99)",
+      "DOGE@4h stopped out between full runs (-5.90)"
+    ]
   }
 }
