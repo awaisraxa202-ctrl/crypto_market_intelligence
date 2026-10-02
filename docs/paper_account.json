@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 3593.2594831748775,
+  "cash": 4316.647206824862,
   "positions": {
     "SOL": {
       "asset": "SOL",
@@ -53,24 +53,6 @@
       "entry_conviction": 0.44,
       "expected_hours": 120,
       "tp1_hit": false
-    },
-    "LINK@4h": {
-      "asset": "LINK",
-      "trade_type": "INTRADAY_4H",
-      "side": "LONG",
-      "qty": 51.1174342291691,
-      "avg_entry": 14.60426,
-      "opened": "2026-10-02T05:03:29.710209",
-      "tranches": 1,
-      "last_tranche_notional": 746.5323000156851,
-      "stop_loss": 14.1912,
-      "take_profit_1": 15.0,
-      "take_profit_2": 15.0,
-      "risk_distance": 0.41305999999999976,
-      "entry_conviction": 0.45,
-      "expected_hours": 10,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
     },
     "DOGE@4h": {
       "asset": "DOGE",
@@ -2029,6 +2011,23 @@
       "opened": "2026-10-01T07:55:52.402834",
       "closed": "2026-10-02T03:03:22.398325",
       "holding_days": 0
+    },
+    {
+      "asset": "LINK",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 14.60426,
+      "exit_price": 14.179847,
+      "qty": 51.11743423,
+      "tranches": 1,
+      "pnl": -21.69,
+      "return_pct": -2.91,
+      "opened": "2026-10-02T05:03:29.710209",
+      "closed": "2026-10-02T16:45:36.538752",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
@@ -3819,6 +3818,10 @@
     {
       "ts": "2026-10-02T15:03:21.738238",
       "equity": 9070.94
+    },
+    {
+      "ts": "2026-10-02T16:45:39.972985",
+      "equity": 9045.58
     }
   ],
   "stats": {
@@ -3834,32 +3837,34 @@
         "avg_holding_days": 2.2
       },
       "INTRADAY_4H": {
-        "closed": 109,
+        "closed": 110,
         "wins": 45,
-        "losses": 64,
-        "win_rate": 41.3,
-        "profit_factor": 0.98,
-        "net_pnl": -11.59,
-        "open": 2,
+        "losses": 65,
+        "win_rate": 40.9,
+        "profit_factor": 0.95,
+        "net_pnl": -33.28,
+        "open": 1,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 9070.94,
-    "cash": 3593.26,
-    "open_positions": 5,
-    "total_return_pct": -9.29,
-    "closed_trades": 114,
+    "equity": 9045.58,
+    "cash": 4316.65,
+    "open_positions": 4,
+    "total_return_pct": -9.54,
+    "closed_trades": 115,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
     "wins": 45,
-    "losses": 69,
-    "win_rate": 39.5,
-    "win_rate_basis": "45W/69L from 114 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 0.51,
+    "losses": 70,
+    "win_rate": 39.1,
+    "win_rate_basis": "45W/70L from 115 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 0.5,
     "avg_win": 13.1,
-    "avg_loss": -16.88,
+    "avg_loss": -16.95,
     "dca_positions": 0,
-    "last_events": []
+    "last_events": [
+      "LINK@4h stopped out between full runs (-21.69)"
+    ]
   }
 }
