@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 4954.693331299185,
+  "cash": 6104.584020497587,
   "positions": {
     "SOL": {
       "asset": "SOL",
@@ -20,23 +20,6 @@
       "expected_hours": 144,
       "tp1_hit": false
     },
-    "BTC": {
-      "asset": "BTC",
-      "trade_type": "SWING_DAILY",
-      "side": "LONG",
-      "qty": 0.022849240533107745,
-      "avg_entry": 86011.5,
-      "opened": "2026-09-21T17:03:26.167969",
-      "tranches": 1,
-      "last_tranche_notional": 1965.297452113397,
-      "stop_loss": 81231.36,
-      "take_profit_1": 95571.79,
-      "take_profit_2": 105132.07,
-      "risk_distance": 4780.139999999999,
-      "entry_conviction": 0.48,
-      "expected_hours": 120,
-      "tp1_hit": false
-    },
     "LINK": {
       "asset": "LINK",
       "trade_type": "SWING_DAILY",
@@ -51,6 +34,23 @@
       "take_profit_2": 20.7029,
       "risk_distance": 1.5902000000000012,
       "entry_conviction": 0.44,
+      "expected_hours": 120,
+      "tp1_hit": false
+    },
+    "ADA": {
+      "asset": "ADA",
+      "trade_type": "SWING_DAILY",
+      "side": "LONG",
+      "qty": 2931.4304980523143,
+      "avg_entry": 0.2725,
+      "opened": "2026-10-06T17:04:52.599642",
+      "tranches": 1,
+      "last_tranche_notional": 798.8148107192557,
+      "stop_loss": 0.238294,
+      "take_profit_1": 0.34095,
+      "take_profit_2": 0.409387,
+      "risk_distance": 0.034206000000000014,
+      "entry_conviction": 0.37,
       "expected_hours": 120,
       "tp1_hit": false
     }
@@ -2250,6 +2250,23 @@
       "holding_days": 0
     },
     {
+      "asset": "BTC",
+      "trade_type": "SWING_DAILY",
+      "side": "LONG",
+      "reason": "TIME_EXIT",
+      "successful": false,
+      "profitable": "False",
+      "entry_price": 86011.5,
+      "exit_price": 85526.32416,
+      "qty": 0.02284924,
+      "tranches": 1,
+      "pnl": -11.09,
+      "return_pct": -0.56,
+      "opened": "2026-09-21T17:03:26.167969",
+      "closed": "2026-10-06T17:04:52.566601",
+      "holding_days": 15
+    },
+    {
       "asset": "LINK",
       "trade_type": "INTRADAY_4H",
       "side": "LONG",
@@ -2263,7 +2280,7 @@
       "pnl": -7.05,
       "return_pct": -0.95,
       "opened": "2026-10-06T10:52:50.731873",
-      "closed": "2026-10-06T17:01:24.110049",
+      "closed": "2026-10-06T17:04:52.583311",
       "holding_days": 0
     }
   ],
@@ -4265,21 +4282,21 @@
       "equity": 9104.55
     },
     {
-      "ts": "2026-10-06T17:01:24.129250",
-      "equity": 9039.78
+      "ts": "2026-10-06T17:04:52.599659",
+      "equity": 9031.96
     }
   ],
   "stats": {
     "by_type": {
       "SWING_DAILY": {
-        "closed": 5,
+        "closed": 6,
         "wins": 0,
-        "losses": 5,
+        "losses": 6,
         "win_rate": 0.0,
         "profit_factor": 0.0,
-        "net_pnl": -563.78,
+        "net_pnl": -574.87,
         "open": 3,
-        "avg_holding_days": 2.2
+        "avg_holding_days": 4.3
       },
       "INTRADAY_4H": {
         "closed": 125,
@@ -4292,24 +4309,26 @@
         "avg_holding_days": 0.1
       }
     },
-    "equity": 9039.78,
-    "cash": 4954.69,
+    "equity": 9031.96,
+    "cash": 6104.58,
     "open_positions": 3,
-    "total_return_pct": -9.6,
-    "closed_trades": 130,
+    "total_return_pct": -9.68,
+    "closed_trades": 131,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
     "wins": 56,
-    "losses": 74,
-    "win_rate": 43.1,
-    "win_rate_basis": "56W/74L from 130 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "losses": 75,
+    "win_rate": 42.7,
+    "win_rate_basis": "56W/75L from 131 closed trades (excl. 0 pre-fix + 0 corrupted)",
     "profit_factor": 0.54,
     "avg_win": 11.78,
-    "avg_loss": -16.47,
+    "avg_loss": -16.4,
     "dca_positions": 0,
     "last_events": [
-      "LINK@4h stopped out between full runs (-7.05)"
+      "BTC time-exited after 360h (expected ~120h) (-11.09)",
+      "LINK@4h stopped out (-7.05)",
+      "ADA OPENED LONG 2931.430498 @ 0.2725"
     ]
   }
 }
