@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 6027.041477159109,
+  "cash": 7686.520217050169,
   "positions": {
     "SOL": {
       "asset": "SOL",
@@ -18,40 +18,6 @@
       "risk_distance": 9.816999999999993,
       "entry_conviction": 0.31,
       "expected_hours": 144,
-      "tp1_hit": false
-    },
-    "LINK": {
-      "asset": "LINK",
-      "trade_type": "SWING_DAILY",
-      "side": "LONG",
-      "qty": 75.85298732195714,
-      "avg_entry": 14.32,
-      "opened": "2026-09-26T15:03:46.565560",
-      "tranches": 1,
-      "last_tranche_notional": 1086.2147784504264,
-      "stop_loss": 12.7298,
-      "take_profit_1": 17.5137,
-      "take_profit_2": 20.7029,
-      "risk_distance": 1.5902000000000012,
-      "entry_conviction": 0.44,
-      "expected_hours": 120,
-      "tp1_hit": false
-    },
-    "ADA": {
-      "asset": "ADA",
-      "trade_type": "SWING_DAILY",
-      "side": "LONG",
-      "qty": 2931.4304980523143,
-      "avg_entry": 0.2725,
-      "opened": "2026-10-06T17:04:52.599642",
-      "tranches": 1,
-      "last_tranche_notional": 798.8148107192557,
-      "stop_loss": 0.238294,
-      "take_profit_1": 0.34095,
-      "take_profit_2": 0.409387,
-      "risk_distance": 0.034206000000000014,
-      "entry_conviction": 0.37,
-      "expected_hours": 120,
       "tp1_hit": false
     }
   },
@@ -2435,13 +2401,43 @@
       "opened": "2026-10-08T13:03:30.819660",
       "closed": "2026-10-08T15:15:42.121623",
       "holding_days": 0
+    },
+    {
+      "asset": "LINK",
+      "trade_type": "SWING_DAILY",
+      "side": "LONG",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 14.32,
+      "exit_price": 12.719616,
+      "qty": 75.85298732,
+      "tranches": 1,
+      "pnl": -121.39,
+      "return_pct": -11.18,
+      "opened": "2026-09-26T15:03:46.565560",
+      "closed": "2026-10-08T15:30:41.788816",
+      "holding_days": 12
+    },
+    {
+      "asset": "ADA",
+      "trade_type": "SWING_DAILY",
+      "side": "LONG",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 0.2725,
+      "exit_price": 0.238103,
+      "qty": 2931.43049805,
+      "tranches": 1,
+      "pnl": -100.83,
+      "return_pct": -12.62,
+      "opened": "2026-10-06T17:04:52.599642",
+      "closed": "2026-10-08T15:30:45.173065",
+      "holding_days": 1
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-09-13T19:57:49.437973",
-      "equity": 10051.71
-    },
     {
       "ts": "2026-09-13T21:04:02.205223",
       "equity": 10074.46
@@ -4437,19 +4433,23 @@
     {
       "ts": "2026-10-08T15:15:42.145515",
       "equity": 8691.95
+    },
+    {
+      "ts": "2026-10-08T15:30:45.188011",
+      "equity": 8660.15
     }
   ],
   "stats": {
     "by_type": {
       "SWING_DAILY": {
-        "closed": 6,
+        "closed": 8,
         "wins": 0,
-        "losses": 6,
+        "losses": 8,
         "win_rate": 0.0,
         "profit_factor": 0.0,
-        "net_pnl": -574.87,
-        "open": 3,
-        "avg_holding_days": 4.3
+        "net_pnl": -797.09,
+        "open": 1,
+        "avg_holding_days": 4.9
       },
       "INTRADAY_4H": {
         "closed": 134,
@@ -4462,24 +4462,25 @@
         "avg_holding_days": 0.1
       }
     },
-    "equity": 8691.95,
-    "cash": 6027.04,
-    "open_positions": 3,
-    "total_return_pct": -13.08,
-    "closed_trades": 140,
+    "equity": 8660.15,
+    "cash": 7686.52,
+    "open_positions": 1,
+    "total_return_pct": -13.4,
+    "closed_trades": 142,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
     "wins": 58,
-    "losses": 82,
-    "win_rate": 41.4,
-    "win_rate_basis": "58W/82L from 140 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 0.52,
+    "losses": 84,
+    "win_rate": 40.8,
+    "win_rate_basis": "58W/84L from 142 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 0.44,
     "avg_win": 11.57,
-    "avg_loss": -15.71,
+    "avg_loss": -17.98,
     "dca_positions": 0,
     "last_events": [
-      "AVAX@4h stopped out between full runs (-12.68)"
+      "LINK stopped out between full runs (-121.39)",
+      "ADA stopped out between full runs (-100.83)"
     ]
   }
 }
