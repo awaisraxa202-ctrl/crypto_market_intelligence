@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 3376.226347703605,
+  "cash": 5204.599519684033,
   "positions": {
     "DOGE": {
       "asset": "DOGE",
@@ -19,24 +19,6 @@
       "entry_conviction": 0.42,
       "expected_hours": 120,
       "tp1_hit": false
-    },
-    "BTC@4h": {
-      "asset": "BTC",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 0.013845236730087997,
-      "avg_entry": 82583.7,
-      "opened": "2026-10-09T09:03:53.349376",
-      "tranches": 1,
-      "last_tranche_notional": 1143.390876546568,
-      "stop_loss": 83763.174944,
-      "take_profit_1": 80909.0,
-      "take_profit_2": 80909.0,
-      "risk_distance": 1179.4749440000014,
-      "entry_conviction": 0.45,
-      "expected_hours": 14,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
     },
     "ETH@4h": {
       "asset": "ETH",
@@ -71,24 +53,6 @@
       "risk_distance": 0.036856,
       "entry_conviction": 0.45,
       "expected_hours": 17,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
-    "LINK@4h": {
-      "asset": "LINK",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 54.49212416683988,
-      "avg_entry": 12.87235,
-      "opened": "2026-10-09T09:03:53.349410",
-      "tranches": 1,
-      "last_tranche_notional": 701.4416945190213,
-      "stop_loss": 13.276236,
-      "take_profit_1": 12.5,
-      "take_profit_2": 12.5,
-      "risk_distance": 0.40388599999999997,
-      "entry_conviction": 0.45,
-      "expected_hours": 14,
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     },
@@ -2542,13 +2506,43 @@
       "opened": "2026-09-20T23:48:00.890546",
       "closed": "2026-10-09T00:00:41.000536",
       "holding_days": 18
+    },
+    {
+      "asset": "BTC",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "TIME_EXIT",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 82583.7,
+      "exit_price": 83028.66984,
+      "qty": 0.01384524,
+      "tranches": 1,
+      "pnl": -6.16,
+      "return_pct": -0.54,
+      "opened": "2026-10-09T09:03:53.349376",
+      "closed": "2026-10-11T03:06:52.527931",
+      "holding_days": 1
+    },
+    {
+      "asset": "LINK",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "TIME_EXIT",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 12.87235,
+      "exit_price": 12.993166,
+      "qty": 54.49212417,
+      "tranches": 1,
+      "pnl": -6.58,
+      "return_pct": -0.94,
+      "opened": "2026-10-09T09:03:53.349410",
+      "closed": "2026-10-11T03:07:03.391213",
+      "holding_days": 1
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-09-15T16:15:39.721021",
-      "equity": 10066.39
-    },
     {
       "ts": "2026-09-15T17:03:22.672791",
       "equity": 10066.39
@@ -4544,6 +4538,10 @@
     {
       "ts": "2026-10-11T03:03:42.258998",
       "equity": 8686.57
+    },
+    {
+      "ts": "2026-10-11T03:07:06.877637",
+      "equity": 8653.84
     }
   ],
   "stats": {
@@ -4559,32 +4557,35 @@
         "avg_holding_days": 6.3
       },
       "INTRADAY_4H": {
-        "closed": 134,
+        "closed": 136,
         "wins": 58,
-        "losses": 76,
-        "win_rate": 43.3,
-        "profit_factor": 0.94,
-        "net_pnl": -41.8,
-        "open": 5,
+        "losses": 78,
+        "win_rate": 42.6,
+        "profit_factor": 0.92,
+        "net_pnl": -54.54,
+        "open": 3,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 8686.57,
-    "cash": 3376.23,
-    "open_positions": 6,
-    "total_return_pct": -13.13,
-    "closed_trades": 143,
+    "equity": 8653.84,
+    "cash": 5204.6,
+    "open_positions": 4,
+    "total_return_pct": -13.46,
+    "closed_trades": 145,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
     "wins": 58,
-    "losses": 85,
-    "win_rate": 40.6,
-    "win_rate_basis": "58W/85L from 143 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "losses": 87,
+    "win_rate": 40.0,
+    "win_rate_basis": "58W/87L from 145 closed trades (excl. 0 pre-fix + 0 corrupted)",
     "profit_factor": 0.44,
     "avg_win": 11.57,
-    "avg_loss": -17.94,
+    "avg_loss": -17.68,
     "dca_positions": 0,
-    "last_events": []
+    "last_events": [
+      "BTC@4h time-exited between full runs after 42h (-6.16)",
+      "LINK@4h time-exited between full runs after 42h (-6.58)"
+    ]
   }
 }
