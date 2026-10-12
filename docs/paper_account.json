@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 5473.141192036694,
+  "cash": 7607.081939332602,
   "positions": {
     "DOGE": {
       "asset": "DOGE",
@@ -19,42 +19,6 @@
       "entry_conviction": 0.42,
       "expected_hours": 120,
       "tp1_hit": false
-    },
-    "DOGE@4h": {
-      "asset": "DOGE",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 13393.50054198337,
-      "avg_entry": 0.084899,
-      "opened": "2026-10-12T19:29:16.692478",
-      "tranches": 1,
-      "last_tranche_notional": 1137.0948025138462,
-      "stop_loss": 0.0863,
-      "take_profit_1": 0.082901,
-      "take_profit_2": 0.082901,
-      "risk_distance": 0.0014009999999999995,
-      "entry_conviction": 0.75,
-      "expected_hours": 10,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
-    "BTC@4h": {
-      "asset": "BTC",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 0.011642702429377419,
-      "avg_entry": 82986.7,
-      "opened": "2026-10-12T21:03:36.757659",
-      "tranches": 1,
-      "last_tranche_notional": 966.189453696015,
-      "stop_loss": 83339.7,
-      "take_profit_1": 82154.7,
-      "take_profit_2": 82154.7,
-      "risk_distance": 353.0,
-      "entry_conviction": 0.45,
-      "expected_hours": 9,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
     }
   },
   "closed_trades": [
@@ -2709,13 +2673,43 @@
       "opened": "2026-10-12T15:03:34.964342",
       "closed": "2026-10-12T17:03:26.744522",
       "holding_days": 0
+    },
+    {
+      "asset": "DOGE",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "TAKE_PROFIT_2",
+      "successful": true,
+      "profitable": true,
+      "entry_price": 0.084899,
+      "exit_price": 0.082967,
+      "qty": 13393.50054198,
+      "tranches": 1,
+      "pnl": 25.87,
+      "return_pct": 2.28,
+      "opened": "2026-10-12T19:29:16.692478",
+      "closed": "2026-10-12T23:06:24.948114",
+      "holding_days": 0
+    },
+    {
+      "asset": "BTC",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "TAKE_PROFIT_2",
+      "successful": true,
+      "profitable": true,
+      "entry_price": 82986.7,
+      "exit_price": 82220.42376,
+      "qty": 0.0116427,
+      "tranches": 1,
+      "pnl": 8.92,
+      "return_pct": 0.92,
+      "opened": "2026-10-12T21:03:36.757659",
+      "closed": "2026-10-12T23:06:28.408693",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-09-17T12:30:46.013943",
-      "equity": 10085.73
-    },
     {
       "ts": "2026-09-17T13:04:02.478690",
       "equity": 10074.97
@@ -4711,6 +4705,10 @@
     {
       "ts": "2026-10-12T23:03:32.417167",
       "equity": 8568.53
+    },
+    {
+      "ts": "2026-10-12T23:06:28.431414",
+      "equity": 8625.79
     }
   ],
   "stats": {
@@ -4726,32 +4724,35 @@
         "avg_holding_days": 6.3
       },
       "INTRADAY_4H": {
-        "closed": 147,
-        "wins": 64,
+        "closed": 149,
+        "wins": 66,
         "losses": 83,
-        "win_rate": 43.5,
-        "profit_factor": 0.95,
-        "net_pnl": -39.0,
-        "open": 2,
+        "win_rate": 44.3,
+        "profit_factor": 0.99,
+        "net_pnl": -4.21,
+        "open": 0,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 8568.53,
-    "cash": 5473.14,
-    "open_positions": 3,
-    "total_return_pct": -14.31,
-    "closed_trades": 156,
+    "equity": 8625.79,
+    "cash": 7607.08,
+    "open_positions": 1,
+    "total_return_pct": -13.74,
+    "closed_trades": 158,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
-    "wins": 64,
+    "wins": 66,
     "losses": 92,
-    "win_rate": 41.0,
-    "win_rate_basis": "64W/92L from 156 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 0.46,
-    "avg_win": 11.12,
+    "win_rate": 41.8,
+    "win_rate_basis": "66W/92L from 158 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 0.48,
+    "avg_win": 11.31,
     "avg_loss": -16.99,
     "dca_positions": 0,
-    "last_events": []
+    "last_events": [
+      "DOGE@4h TP2 hit between full runs \u2014 closed (+25.87)",
+      "BTC@4h TP2 hit between full runs \u2014 closed (+8.92)"
+    ]
   }
 }
