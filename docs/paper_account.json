@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 5457.706532616712,
+  "cash": 7570.5730187912595,
   "positions": {
     "DOGE": {
       "asset": "DOGE",
@@ -19,42 +19,6 @@
       "entry_conviction": 0.42,
       "expected_hours": 120,
       "tp1_hit": false
-    },
-    "SOL@4h": {
-      "asset": "SOL",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 10.289365805859086,
-      "avg_entry": 110.2,
-      "opened": "2026-10-12T13:04:08.041161",
-      "tranches": 1,
-      "last_tranche_notional": 1133.8881118056713,
-      "stop_loss": 110.969935,
-      "take_profit_1": 109.15,
-      "take_profit_2": 109.15,
-      "risk_distance": 0.7699350000000038,
-      "entry_conviction": 0.45,
-      "expected_hours": 5,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
-    "DOGE@4h": {
-      "asset": "DOGE",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 11197.869927955358,
-      "avg_entry": 0.08604,
-      "opened": "2026-10-12T13:04:08.041177",
-      "tranches": 1,
-      "last_tranche_notional": 963.464728601279,
-      "stop_loss": 0.086681,
-      "take_profit_1": 0.0851,
-      "take_profit_2": 0.0851,
-      "risk_distance": 0.0006409999999999888,
-      "entry_conviction": 0.45,
-      "expected_hours": 5,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
     }
   },
   "closed_trades": [
@@ -2658,13 +2622,43 @@
       "opened": "2026-10-11T15:03:42.114598",
       "closed": "2026-10-11T15:45:41.256009",
       "holding_days": 0
+    },
+    {
+      "asset": "SOL",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "TAKE_PROFIT_2",
+      "successful": true,
+      "profitable": true,
+      "entry_price": 110.2,
+      "exit_price": 109.23732,
+      "qty": 10.28936581,
+      "tranches": 1,
+      "pnl": 9.91,
+      "return_pct": 0.87,
+      "opened": "2026-10-12T13:04:08.041161",
+      "closed": "2026-10-12T14:45:37.970191",
+      "holding_days": 0
+    },
+    {
+      "asset": "DOGE",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "TAKE_PROFIT_2",
+      "successful": true,
+      "profitable": true,
+      "entry_price": 0.08604,
+      "exit_price": 0.085168,
+      "qty": 11197.86992796,
+      "tranches": 1,
+      "pnl": 9.76,
+      "return_pct": 1.01,
+      "opened": "2026-10-12T13:04:08.041177",
+      "closed": "2026-10-12T14:45:37.995124",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-09-17T02:10:31.055476",
-      "equity": 10070.26
-    },
     {
       "ts": "2026-09-17T03:04:05.172140",
       "equity": 10072.6
@@ -4660,6 +4654,10 @@
     {
       "ts": "2026-10-12T13:04:08.041184",
       "equity": 8615.65
+    },
+    {
+      "ts": "2026-10-12T14:45:38.018419",
+      "equity": 8618.55
     }
   ],
   "stats": {
@@ -4675,36 +4673,35 @@
         "avg_holding_days": 6.3
       },
       "INTRADAY_4H": {
-        "closed": 144,
-        "wins": 61,
+        "closed": 146,
+        "wins": 63,
         "losses": 83,
-        "win_rate": 42.4,
-        "profit_factor": 0.9,
-        "net_pnl": -73.24,
-        "open": 2,
+        "win_rate": 43.2,
+        "profit_factor": 0.93,
+        "net_pnl": -53.57,
+        "open": 0,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 8615.65,
-    "cash": 5457.71,
-    "open_positions": 3,
-    "total_return_pct": -13.84,
-    "closed_trades": 153,
+    "equity": 8618.55,
+    "cash": 7570.57,
+    "open_positions": 1,
+    "total_return_pct": -13.81,
+    "closed_trades": 155,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
-    "wins": 61,
+    "wins": 63,
     "losses": 92,
-    "win_rate": 39.9,
-    "win_rate_basis": "61W/92L from 153 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 0.43,
-    "avg_win": 11.1,
+    "win_rate": 40.6,
+    "win_rate_basis": "63W/92L from 155 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 0.45,
+    "avg_win": 11.06,
     "avg_loss": -16.99,
     "dca_positions": 0,
     "last_events": [
-      "SOL \u26a14h OPENED SHORT 10.289366 @ 110.2000 \u2192 109.15 (~5h)",
-      "BNB \u26a14h SKIPPED \u2014 target 742.92554 is inside round-trip costs from entry 747.4100",
-      "DOGE \u26a14h OPENED SHORT 11197.869928 @ 0.0860 \u2192 0.0851 (~5h)"
+      "SOL@4h TP2 hit between full runs \u2014 closed (+9.91)",
+      "DOGE@4h TP2 hit between full runs \u2014 closed (+9.76)"
     ]
   }
 }
