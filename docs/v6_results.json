@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-10-16T09:05:54.181786",
-  "imbalance": 0.136,
+  "timestamp": "2026-10-16T11:05:58.113307",
+  "imbalance": 0.282,
   "regime": {
     "regime": "UNKNOWN_UNCERTAINTY",
     "description": "Trade policy uncertainty unavailable \u2014 regime not determined",
@@ -15,28 +15,28 @@
   },
   "ml_signal": {
     "bilstm_score": 0.5,
-    "cnn_score": 0.004,
-    "ensemble_score": 0.252,
+    "cnn_score": 0.223,
+    "ensemble_score": 0.361,
     "action": "SELL",
-    "confidence": 0.748,
+    "confidence": 0.639,
     "trade_qualified": true
   },
   "big_trade": {
-    "position_size": 0.1141,
-    "risk_pct": 3.75,
-    "target_movement": 3284.512,
+    "position_size": 0.1108,
+    "risk_pct": 3.64,
+    "target_movement": 3284.52,
     "trade_type": "BIG"
   },
   "small_trade": {
-    "position_size": 0.1064,
-    "risk_pct": 0.87,
-    "target_movement": 821.128,
+    "position_size": 0.0998,
+    "risk_pct": 0.82,
+    "target_movement": 821.13,
     "trade_type": "SMALL"
   },
   "explanation": {
     "asset": "BTC",
     "signal": "SELL",
-    "confidence": 0.748,
+    "confidence": 0.639,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
       "\u274c order_book: Order book data unavailable",
@@ -53,18 +53,18 @@
         "price_vs_sma50": 0.0025
       },
       {
+        "date": "2026-08-02",
+        "similarity": 99.0,
+        "future_5d_return": 2.18,
+        "rsi": 44.6,
+        "price_vs_sma50": 0.0024
+      },
+      {
         "date": "2026-05-21",
-        "similarity": 99.1,
+        "similarity": 98.9,
         "future_5d_return": -2.23,
         "rsi": 39.7,
         "price_vs_sma50": 0.0175
-      },
-      {
-        "date": "2026-10-10",
-        "similarity": 99.0,
-        "future_5d_return": -0.94,
-        "rsi": 43.1,
-        "price_vs_sma50": 0.026
       },
       {
         "date": "2026-10-09",
@@ -74,43 +74,43 @@
         "price_vs_sma50": 0.0228
       },
       {
-        "date": "2026-08-02",
-        "similarity": 98.8,
-        "future_5d_return": 2.18,
-        "rsi": 44.6,
-        "price_vs_sma50": 0.0024
-      },
-      {
-        "date": "2026-05-18",
-        "similarity": 98.4,
-        "future_5d_return": -0.36,
-        "rsi": 39.6,
-        "price_vs_sma50": 0.0173
-      },
-      {
-        "date": "2026-01-26",
-        "similarity": 98.2,
-        "future_5d_return": -10.88,
-        "rsi": 42.7,
-        "price_vs_sma50": -0.0202
+        "date": "2026-10-10",
+        "similarity": 98.9,
+        "future_5d_return": -0.94,
+        "rsi": 43.1,
+        "price_vs_sma50": 0.026
       },
       {
         "date": "2026-05-17",
-        "similarity": 98.1,
+        "similarity": 98.2,
         "future_5d_return": -2.52,
         "rsi": 46.2,
         "price_vs_sma50": 0.0264
       },
       {
+        "date": "2026-05-18",
+        "similarity": 98.2,
+        "future_5d_return": -0.36,
+        "rsi": 39.6,
+        "price_vs_sma50": 0.0173
+      },
+      {
         "date": "2026-08-13",
-        "similarity": 98.1,
+        "similarity": 98.2,
         "future_5d_return": 1.98,
         "rsi": 39.8,
         "price_vs_sma50": 0.0006
       },
       {
+        "date": "2026-01-26",
+        "similarity": 98.1,
+        "future_5d_return": -10.88,
+        "rsi": 42.7,
+        "price_vs_sma50": -0.0202
+      },
+      {
         "date": "2026-01-21",
-        "similarity": 98.0,
+        "similarity": 97.9,
         "future_5d_return": -1.26,
         "rsi": 44.5,
         "price_vs_sma50": -0.0102
@@ -131,12 +131,12 @@
   "macro_data": {
     "fed_trend": "NOT_CONFIGURED",
     "fed_label": "FRED_API_KEY not configured",
-    "dxy": 101.78,
+    "dxy": 101.65,
     "dxy_trend": "FALLING",
-    "dxy_label": "FALLING (101.78)",
-    "vix": 16.02,
+    "dxy_label": "FALLING (101.65)",
+    "vix": 16.11,
     "vix_level": "MEDIUM",
-    "vix_label": "ELEVATED (16.02)",
+    "vix_label": "ELEVATED (16.11)",
     "liquidity": "TIGHTENING",
     "liquidity_desc": "Short-end yield 4.09% (rising vs 5d ago)",
     "fed_impact": "\ud83d\udfe1 NEUTRAL",
@@ -193,8 +193,8 @@
   ],
   "event_risk": {
     "expected_move": "\u00b14.0%",
-    "expected_range_low": 78813.6,
-    "expected_range_high": 85381.4,
+    "expected_range_low": 78909.02,
+    "expected_range_high": 85484.78,
     "direction": "UNCERTAIN",
     "recommendation": "Reduce position size by 50% before event",
     "event": {
@@ -235,31 +235,31 @@
     "source": "yfinance spot BTC ETFs (proxy, not true creation/redemption flow)"
   },
   "onchain": {
-    "mvrv_zscore": 1.169,
-    "miner_reserves": 314784784.0,
-    "nvt_ratio": 53.16,
+    "mvrv_zscore": 1.178,
+    "miner_reserves": 314513504.0,
+    "nvt_ratio": 53.08,
     "hashrate_trend": "FALLING",
     "mvrv_is_proxy": true,
-    "miner_reserves_trend": "RISING",
+    "miner_reserves_trend": "FALLING",
     "hashrate_source": "mempool.space (blockchain.info unavailable)"
   },
   "exit_strategy": {
-    "entry": 82112.8,
+    "entry": 82113.0,
     "signal": "SHORT",
-    "current_price": 82933.928,
+    "current_price": 82934.13,
     "scenarios": [
       {
-        "condition": "Price hits TP1 ($79649.42)",
+        "condition": "Price hits TP1 ($79649.61)",
         "action": "Take 50% profit",
         "reason": "Lock in gains, reduce risk"
       },
       {
-        "condition": "Price hits TP2 ($77186.03)",
+        "condition": "Price hits TP2 ($77186.22)",
         "action": "Take remaining 50% profit",
         "reason": "Target hit, complete the trade"
       },
       {
-        "condition": "Price hits SL ($84576.18)",
+        "condition": "Price hits SL ($84576.39)",
         "action": "Exit immediately",
         "reason": "Stop-loss protects capital"
       }
@@ -268,10 +268,10 @@
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.5,
-      "cnn_score": 0.004,
-      "ensemble_score": 0.252,
+      "cnn_score": 0.223,
+      "ensemble_score": 0.361,
       "action": "SELL",
-      "confidence": 0.748,
+      "confidence": 0.639,
       "trade_qualified": true
     }
   },
