@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-10-17T19:06:23.187043",
-  "imbalance": 0.629,
+  "timestamp": "2026-10-17T20:14:26.137277",
+  "imbalance": 0.677,
   "regime": {
     "regime": "UNKNOWN_UNCERTAINTY",
     "description": "Trade policy uncertainty unavailable \u2014 regime not determined",
@@ -15,30 +15,28 @@
   },
   "ml_signal": {
     "bilstm_score": 0.5,
-    "cnn_score": 0.643,
-    "ensemble_score": 0.572,
-    "action": "HOLD",
-    "confidence": 0.572,
-    "trade_qualified": false
+    "cnn_score": 0.716,
+    "ensemble_score": 0.608,
+    "action": "BUY",
+    "confidence": 0.608,
+    "trade_qualified": true
   },
   "big_trade": {
-    "position_size": 0,
-    "risk_pct": 0,
-    "target_movement": 0,
-    "trade_type": "BIG",
-    "gated_reason": "not trade_qualified (action=HOLD)"
+    "position_size": 0.1106,
+    "risk_pct": 3.61,
+    "target_movement": 3261.032,
+    "trade_type": "BIG"
   },
   "small_trade": {
-    "position_size": 0,
-    "risk_pct": 0,
-    "target_movement": 0,
-    "trade_type": "SMALL",
-    "gated_reason": "not trade_qualified (action=HOLD)"
+    "position_size": 0.0986,
+    "risk_pct": 0.8,
+    "target_movement": 815.258,
+    "trade_type": "SMALL"
   },
   "explanation": {
     "asset": "BTC",
-    "signal": "HOLD",
-    "confidence": 0.572,
+    "signal": "BUY",
+    "confidence": 0.608,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
       "\u2705 order_book: Bullish order book imbalance",
@@ -62,63 +60,63 @@
         "price_vs_sma50": 0.0012
       },
       {
-        "date": "2026-08-01",
-        "similarity": 98.7,
-        "future_5d_return": 2.39,
-        "rsi": 40.1,
-        "price_vs_sma50": -0.0095
-      },
-      {
         "date": "2026-05-21",
-        "similarity": 98.6,
+        "similarity": 98.9,
         "future_5d_return": -2.23,
         "rsi": 39.7,
         "price_vs_sma50": 0.0175
       },
       {
-        "date": "2026-10-08",
-        "similarity": 98.4,
-        "future_5d_return": 1.74,
-        "rsi": 36.9,
-        "price_vs_sma50": 0.0144
+        "date": "2026-08-01",
+        "similarity": 98.6,
+        "future_5d_return": 2.39,
+        "rsi": 40.1,
+        "price_vs_sma50": -0.0095
       },
       {
         "date": "2026-05-20",
-        "similarity": 98.2,
+        "similarity": 98.3,
         "future_5d_return": -0.28,
         "rsi": 35.1,
         "price_vs_sma50": 0.0191
       },
       {
-        "date": "2026-05-19",
-        "similarity": 98.1,
-        "future_5d_return": 0.3,
-        "rsi": 34.2,
-        "price_vs_sma50": 0.0121
-      },
-      {
         "date": "2026-08-03",
-        "similarity": 98.0,
+        "similarity": 98.3,
         "future_5d_return": 2.27,
         "rsi": 41.5,
         "price_vs_sma50": 0.0025
       },
       {
-        "date": "2026-05-26",
-        "similarity": 97.9,
-        "future_5d_return": -2.97,
-        "rsi": 32.6,
-        "price_vs_sma50": -0.0163
+        "date": "2026-10-09",
+        "similarity": 98.2,
+        "future_5d_return": -1.19,
+        "rsi": 43.0,
+        "price_vs_sma50": 0.0228
       },
       {
         "date": "2026-01-21",
-        "similarity": 97.8,
+        "similarity": 98.1,
         "future_5d_return": -1.26,
         "rsi": 44.5,
         "price_vs_sma50": -0.0102
+      },
+      {
+        "date": "2026-10-08",
+        "similarity": 98.1,
+        "future_5d_return": 1.74,
+        "rsi": 36.9,
+        "price_vs_sma50": 0.0144
+      },
+      {
+        "date": "2026-08-13",
+        "similarity": 97.9,
+        "future_5d_return": 1.98,
+        "rsi": 39.8,
+        "price_vs_sma50": 0.0006
       }
     ],
-    "risk_warning": "\u26a0\ufe0f Low confidence trade. Reduce position size by 50%.",
+    "risk_warning": "\u2705 Moderate confidence. Standard position size recommended.",
     "trader_comment": "No clear directional bias. Patience is key.",
     "historical_win_rate": 40.0
   },
@@ -195,8 +193,8 @@
   ],
   "event_risk": {
     "expected_move": "\u00b14.0%",
-    "expected_range_low": 78123.94,
-    "expected_range_high": 84634.26,
+    "expected_range_low": 78254.4,
+    "expected_range_high": 84775.6,
     "direction": "UNCERTAIN",
     "recommendation": "Reduce position size by 50% before event",
     "event": {
@@ -237,28 +235,49 @@
     "source": "yfinance spot BTC ETFs (proxy, not true creation/redemption flow)"
   },
   "onchain": {
-    "mvrv_zscore": 1.078,
-    "miner_reserves": 315720013.0,
-    "nvt_ratio": 112.42,
+    "mvrv_zscore": 1.091,
+    "miner_reserves": 314511221.0,
+    "nvt_ratio": 118.55,
     "hashrate_trend": "RISING",
     "mvrv_is_proxy": true,
-    "miner_reserves_trend": "RISING",
+    "miner_reserves_trend": "FALLING",
     "hashrate_source": "mempool.space (blockchain.info unavailable)"
   },
   "exit_strategy": {
-    "entry": 81414.1,
-    "signal": "NO TRADE",
-    "current_price": 82228.24100000001,
-    "scenarios": []
+    "entry": 81525.8,
+    "signal": "LONG",
+    "current_price": 82341.058,
+    "scenarios": [
+      {
+        "condition": "Price hits TP1 ($83971.57)",
+        "action": "Take 50% profit",
+        "reason": "Lock in gains, reduce risk"
+      },
+      {
+        "condition": "Price hits TP2 ($86417.35)",
+        "action": "Take remaining 50% profit",
+        "reason": "Target hit, complete the trade"
+      },
+      {
+        "condition": "Price hits SL ($79080.03)",
+        "action": "Exit immediately",
+        "reason": "Stop-loss protects capital"
+      },
+      {
+        "condition": "No target hit after 7 days",
+        "action": "Close position",
+        "reason": "Time-based exit, opportunity cost"
+      }
+    ]
   },
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.5,
-      "cnn_score": 0.643,
-      "ensemble_score": 0.572,
-      "action": "HOLD",
-      "confidence": 0.572,
-      "trade_qualified": false
+      "cnn_score": 0.716,
+      "ensemble_score": 0.608,
+      "action": "BUY",
+      "confidence": 0.608,
+      "trade_qualified": true
     }
   },
   "order_book_history_depth": 1,
@@ -280,7 +299,7 @@
         {
           "side": "SHORT",
           "entry": 61286.6,
-          "exit": 61878.7405,
+          "exit": 61878.9057,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
@@ -288,7 +307,7 @@
         {
           "side": "SHORT",
           "entry": 61399.8,
-          "exit": 61888.4269,
+          "exit": 61888.7119,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 3
@@ -304,7 +323,7 @@
         {
           "side": "LONG",
           "entry": 62567.4,
-          "exit": 62260.8401,
+          "exit": 62260.8378,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
@@ -625,7 +644,7 @@
         {
           "side": "SHORT",
           "entry": 1618.94,
-          "exit": 1633.9244,
+          "exit": 1633.9202,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
@@ -633,7 +652,7 @@
         {
           "side": "SHORT",
           "entry": 1638.38,
-          "exit": 1654.9688,
+          "exit": 1654.9671,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 2
