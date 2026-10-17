@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-10-17T05:05:57.478319",
-  "imbalance": 0.309,
+  "timestamp": "2026-10-17T06:22:52.155932",
+  "imbalance": 0.221,
   "regime": {
     "regime": "UNKNOWN_UNCERTAINTY",
     "description": "Trade policy uncertainty unavailable \u2014 regime not determined",
@@ -15,28 +15,28 @@
   },
   "ml_signal": {
     "bilstm_score": 0.5,
-    "cnn_score": 0.263,
-    "ensemble_score": 0.382,
+    "cnn_score": 0.132,
+    "ensemble_score": 0.316,
     "action": "SELL",
-    "confidence": 0.618,
+    "confidence": 0.6839999999999999,
     "trade_qualified": true
   },
   "big_trade": {
-    "position_size": 0.1111,
-    "risk_pct": 3.62,
-    "target_movement": 3257.5679999999998,
+    "position_size": 0.113,
+    "risk_pct": 3.68,
+    "target_movement": 3259.552,
     "trade_type": "BIG"
   },
   "small_trade": {
-    "position_size": 0.0993,
-    "risk_pct": 0.81,
-    "target_movement": 814.3919999999999,
+    "position_size": 0.1033,
+    "risk_pct": 0.84,
+    "target_movement": 814.888,
     "trade_type": "SMALL"
   },
   "explanation": {
     "asset": "BTC",
     "signal": "SELL",
-    "confidence": 0.618,
+    "confidence": 0.6839999999999999,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
       "\u274c order_book: Order book data unavailable",
@@ -193,8 +193,8 @@
   ],
   "event_risk": {
     "expected_move": "\u00b14.0%",
-    "expected_range_low": 78238.18,
-    "expected_range_high": 84758.02,
+    "expected_range_low": 78241.63,
+    "expected_range_high": 84761.77,
     "direction": "UNCERTAIN",
     "recommendation": "Reduce position size by 50% before event",
     "event": {
@@ -235,31 +235,31 @@
     "source": "yfinance spot BTC ETFs (proxy, not true creation/redemption flow)"
   },
   "onchain": {
-    "mvrv_zscore": 1.089,
-    "miner_reserves": 313324819.0,
-    "nvt_ratio": 62.65,
+    "mvrv_zscore": 1.09,
+    "miner_reserves": 314518566.0,
+    "nvt_ratio": 63.47,
     "hashrate_trend": "RISING",
     "mvrv_is_proxy": true,
-    "miner_reserves_trend": "FALLING",
+    "miner_reserves_trend": "RISING",
     "hashrate_source": "mempool.space (blockchain.info unavailable)"
   },
   "exit_strategy": {
-    "entry": 81439.2,
+    "entry": 81488.8,
     "signal": "SHORT",
-    "current_price": 82253.592,
+    "current_price": 82303.68800000001,
     "scenarios": [
       {
-        "condition": "Price hits TP1 ($78996.02)",
+        "condition": "Price hits TP1 ($79044.14)",
         "action": "Take 50% profit",
         "reason": "Lock in gains, reduce risk"
       },
       {
-        "condition": "Price hits TP2 ($76552.85)",
+        "condition": "Price hits TP2 ($76599.47)",
         "action": "Take remaining 50% profit",
         "reason": "Target hit, complete the trade"
       },
       {
-        "condition": "Price hits SL ($83882.38)",
+        "condition": "Price hits SL ($83933.46)",
         "action": "Exit immediately",
         "reason": "Stop-loss protects capital"
       }
@@ -268,10 +268,10 @@
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.5,
-      "cnn_score": 0.263,
-      "ensemble_score": 0.382,
+      "cnn_score": 0.132,
+      "ensemble_score": 0.316,
       "action": "SELL",
-      "confidence": 0.618,
+      "confidence": 0.6839999999999999,
       "trade_qualified": true
     }
   },
