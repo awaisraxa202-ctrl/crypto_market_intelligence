@@ -1,6 +1,6 @@
 {
   "version": "5.0",
-  "generated_at": "2026-10-20T13:11:46.586996",
+  "generated_at": "2026-10-20T15:06:04.422649",
   "update_schedule": "Every 2 hours",
   "disclaimer": "THIS IS A RESEARCH AND EDUCATIONAL TOOL ONLY. NOT FINANCIAL ADVICE.",
   "fear_greed": {
@@ -8,12 +8,12 @@
     "label": "Greed"
   },
   "global_data": {
-    "total_market_cap": 2738216242354.9634,
-    "total_volume": 66319975025.4082,
-    "btc_dominance": 59.53356020306383,
-    "eth_dominance": 10.620763645531662,
-    "market_cap_change_24h": -3.7363777412367627,
-    "active_cryptocurrencies": 22396
+    "total_market_cap": 2794747802969.332,
+    "total_volume": 72659467293.85658,
+    "btc_dominance": 59.53676617661755,
+    "eth_dominance": 10.719536984861326,
+    "market_cap_change_24h": -1.4309912798752138,
+    "active_cryptocurrencies": 22402
   },
   "market_report": {
     "date": "2026-10-20",
@@ -22,22 +22,23 @@
     "bearish_assets": 0,
     "neutral_assets": 9,
     "regime_distribution": {
-      "BEAR_TREND": 8,
+      "RANGE": 2,
+      "BEAR_TREND": 6,
       "STRONG_BEAR": 1
     },
     "risk_metrics": {
       "var_95": -5.06,
       "expected_shortfall": -6.79,
-      "max_drawdown": -52.43,
-      "sortino_ratio": -1.9,
-      "calmar_ratio": -0.94,
+      "max_drawdown": -40.57,
+      "sortino_ratio": -1.01,
+      "calmar_ratio": -0.85,
       "kelly_fraction": 0,
       "risk_of_ruin": 100.0,
       "risk_grade": "F"
     },
     "correlation_risk": {
       "risk_reduction": 0.9,
-      "avg_correlation": 0.75,
+      "avg_correlation": 0.751,
       "max_correlation": 0.831,
       "warning": true
     },
@@ -47,8 +48,8 @@
       "message": "Correlations stable",
       "threshold": 0.3
     },
-    "profit_factor": 0.81,
-    "recovery_factor": -0.94
+    "profit_factor": 0.9,
+    "recovery_factor": -0.85
   },
   "portfolio_simulation": {
     "final_value": 10000,
@@ -234,14 +235,14 @@
           "win_rate": 46.5,
           "profit_factor": 1.08,
           "net_pnl": 63.76,
-          "open": 0,
+          "open": 3,
           "avg_holding_days": 0.1
         }
       },
-      "equity": 8626.16,
-      "cash": 7649.68,
-      "open_positions": 1,
-      "total_return_pct": -13.74,
+      "equity": 8648.86,
+      "cash": 4692.89,
+      "open_positions": 4,
+      "total_return_pct": -13.51,
       "closed_trades": 164,
       "excluded_pre_fix": 0,
       "excluded_corrupted": 0,
@@ -255,7 +256,9 @@
       "avg_loss": -16.99,
       "dca_positions": 0,
       "last_events": [
-        "BTC \u26a14h SKIPPED \u2014 target 80867.4664 is inside round-trip costs from entry 81355.6000"
+        "ETH \u26a14h OPENED SHORT 0.465179 @ 2466.6900 \u2192 2406.71 (~10h)",
+        "SOL \u26a14h OPENED SHORT 9.080658 @ 107.3700 \u2192 105.0 (~13h)",
+        "DOGE \u26a14h OPENED SHORT 10185.767155 @ 0.0813 \u2192 0.0796 (~8h)"
       ]
     },
     "positions": {
@@ -275,6 +278,60 @@
         "entry_conviction": 0.42,
         "expected_hours": 120,
         "tp1_hit": false
+      },
+      "ETH@4h": {
+        "asset": "ETH",
+        "trade_type": "INTRADAY_4H",
+        "side": "SHORT",
+        "qty": 0.46517896252660007,
+        "avg_entry": 2466.69,
+        "opened": "2026-10-20T15:03:51.496301",
+        "tranches": 1,
+        "last_tranche_notional": 1147.4522950747391,
+        "stop_loss": 2487.003742,
+        "take_profit_1": 2406.71,
+        "take_profit_2": 2406.71,
+        "risk_distance": 20.31374199999982,
+        "entry_conviction": 0.52,
+        "expected_hours": 10,
+        "tp1_hit": true,
+        "stop_moved_to_breakeven": false
+      },
+      "SOL@4h": {
+        "asset": "SOL",
+        "trade_type": "INTRADAY_4H",
+        "side": "SHORT",
+        "qty": 9.080657680217993,
+        "avg_entry": 107.37,
+        "opened": "2026-10-20T15:03:51.496320",
+        "tranches": 1,
+        "last_tranche_notional": 974.990215125006,
+        "stop_loss": 109.04915,
+        "take_profit_1": 105.0,
+        "take_profit_2": 105.0,
+        "risk_distance": 1.6791499999999928,
+        "entry_conviction": 0.45,
+        "expected_hours": 13,
+        "tp1_hit": true,
+        "stop_moved_to_breakeven": false
+      },
+      "DOGE@4h": {
+        "asset": "DOGE",
+        "trade_type": "INTRADAY_4H",
+        "side": "SHORT",
+        "qty": 10185.76715508542,
+        "avg_entry": 0.081334,
+        "opened": "2026-10-20T15:03:51.496332",
+        "tranches": 1,
+        "last_tranche_notional": 828.4491857917176,
+        "stop_loss": 0.082364,
+        "take_profit_1": 0.0796,
+        "take_profit_2": 0.0796,
+        "risk_distance": 0.0010300000000000031,
+        "entry_conviction": 0.42,
+        "expected_hours": 8,
+        "tp1_hit": true,
+        "stop_moved_to_breakeven": false
       }
     },
     "recent_closed": [
@@ -535,10 +592,6 @@
       }
     ],
     "equity_curve": [
-      {
-        "ts": "2026-10-14T23:03:18.805895",
-        "equity": 8632.09
-      },
       {
         "ts": "2026-10-15T01:03:24.584424",
         "equity": 8633.33
@@ -934,22 +987,26 @@
       {
         "ts": "2026-10-20T13:09:29.626171",
         "equity": 8626.16
+      },
+      {
+        "ts": "2026-10-20T15:03:51.496344",
+        "equity": 8648.86
       }
     ]
   },
   "risk_metrics": {
     "var_95": -5.06,
     "expected_shortfall": -6.79,
-    "max_drawdown": -52.43,
-    "sortino_ratio": -1.9,
-    "calmar_ratio": -0.94,
+    "max_drawdown": -40.57,
+    "sortino_ratio": -1.01,
+    "calmar_ratio": -0.85,
     "kelly_fraction": 0,
     "risk_of_ruin": 100.0,
     "risk_grade": "F"
   },
   "correlation_risk": {
     "risk_reduction": 0.9,
-    "avg_correlation": 0.75,
+    "avg_correlation": 0.751,
     "max_correlation": 0.831,
     "warning": true
   },
@@ -962,24 +1019,24 @@
   "ensemble_signal": {
     "signal": "NO TRADE",
     "score": 0.0,
-    "confidence": 0.07,
+    "confidence": 0.06,
     "consensus": 1.0
   },
-  "profit_factor": 0.81,
-  "recovery_factor": -0.94,
+  "profit_factor": 0.9,
+  "recovery_factor": -0.85,
   "signal_performance": {
-    "total_signals": 769,
+    "total_signals": 772,
     "excluded_pre_fix": 0,
-    "active_signals": 57,
-    "closed_signals": 712,
+    "active_signals": 54,
+    "closed_signals": 718,
     "win_count": 219,
-    "loss_count": 493,
+    "loss_count": 499,
     "population": "all_generated_signals",
     "population_label": "Every signal generated, including ones never traded by the paper account",
-    "win_rate": 30.758426966292134,
-    "total_profit_pct": -2572.51,
+    "win_rate": 30.501392757660167,
+    "total_profit_pct": -2582.3,
     "avg_profit_pct": 2.19,
-    "avg_loss_pct": 6.19,
+    "avg_loss_pct": 6.14,
     "best_trade": 20.16588209862681,
     "worst_trade": -17.982975466766774,
     "avg_holding_days": 3.1
@@ -994,10 +1051,10 @@
   },
   "trade_rankings": [
     {
-      "asset": "DOGE",
+      "asset": "BTC",
       "signal": "NO TRADE",
-      "confidence": 0.16,
-      "action": "Filtered: Low volume confirmation"
+      "confidence": 0.12,
+      "action": "Filtered: Low conviction"
     },
     {
       "asset": "ADA",
@@ -1006,15 +1063,9 @@
       "action": "Filtered: Low conviction"
     },
     {
-      "asset": "AVAX",
-      "signal": "NO TRADE",
-      "confidence": 0.09,
-      "action": "Filtered: Low conviction"
-    },
-    {
       "asset": "ETH",
       "signal": "NO TRADE",
-      "confidence": 0.06,
+      "confidence": 0.07,
       "action": "Filtered: Low conviction"
     },
     {
@@ -1036,15 +1087,21 @@
       "action": "Filtered: Low conviction"
     },
     {
-      "asset": "BTC",
+      "asset": "DOGE",
       "signal": "NO TRADE",
-      "confidence": 0.04,
+      "confidence": 0.05,
       "action": "Filtered: Low conviction"
     },
     {
       "asset": "BNB",
       "signal": "NO TRADE",
       "confidence": 0.04,
+      "action": "Filtered: Low conviction"
+    },
+    {
+      "asset": "AVAX",
+      "signal": "NO TRADE",
+      "confidence": 0.0,
       "action": "Filtered: Low conviction"
     }
   ],
@@ -1053,154 +1110,150 @@
       "asset": "BTC",
       "name": "Bitcoin",
       "date": "2026-10-20",
-      "price": 81354.7,
+      "price": 83117.9,
       "signal": "NO TRADE",
-      "conviction": 0.04,
-      "composite_score": -0.077,
-      "regime": "BEAR_TREND",
+      "conviction": 0.12,
+      "composite_score": 0.24,
+      "regime": "RANGE",
       "action": "Filtered: Low conviction",
       "indicators": {
-        "rsi": 34.2,
-        "macd_hist": -384.1134,
+        "rsi": 41.4,
+        "macd_hist": -271.5901,
         "volatility": 0.3,
-        "drawdown": -34.8,
+        "drawdown": -33.4,
         "fng_value": 55,
         "funding_rate": null
       },
       "sub_signals": {
         "trend": {
-          "score": -0.3,
-          "verdict": "CAUTIOUSLY BEARISH",
-          "detail": "Price below SMA50 but above SMA200.",
-          "weight": 0.327
+          "score": 1.0,
+          "verdict": "BULLISH",
+          "detail": "Price above both SMA50 and SMA200. Golden cross confirmed.",
+          "weight": 0.1869
         },
         "momentum": {
-          "score": -0.3,
-          "verdict": "BEARISH",
-          "detail": "RSI 34.2 (weak) + MACD negative.",
-          "weight": 0.2607
+          "score": 0,
+          "verdict": "NEUTRAL",
+          "detail": "RSI 41.4, MACD -271.5901.",
+          "weight": 0.1982
         },
         "volatility": {
           "score": 0.5,
           "verdict": "SAFE",
-          "detail": "Volatility 0.3%, ATR 2.50%.",
-          "weight": 0.128
+          "detail": "Volatility 0.3%, ATR 2.55%.",
+          "weight": 0.2378
         },
         "sentiment": {
           "score": 0,
           "verdict": "NEUTRAL",
           "detail": "Fear & Greed: 55 (Neutral).",
-          "weight": 0.1137
+          "weight": 0.1563
         },
         "funding": {
           "score": 0,
           "verdict": "UNKNOWN",
           "detail": "Data unavailable.",
-          "weight": 0.0758
+          "weight": 0.0906
         },
         "volume": {
           "score": 0,
           "verdict": "NORMAL",
-          "detail": "Volume 0.3x avg.",
-          "weight": 0.0474
+          "detail": "Volume 0.6x avg.",
+          "weight": 0.0566
         },
         "drawdown": {
           "score": 0.2,
           "verdict": "OVERSOLD",
-          "detail": "Down 34.8% from peak.",
-          "weight": 0.0474
+          "detail": "Down 33.4% from peak.",
+          "weight": 0.0736
         }
       },
       "position_sizing": {
-        "size_multiplier": 0.02,
-        "position_size": 0.0011,
-        "risk_amount": 4.62,
-        "risk_percent": 0.05,
-        "stop_loss": 77289.79,
-        "take_profit_1": 89484.53,
-        "take_profit_2": 97614.36,
+        "size_multiplier": 0.04,
+        "position_size": 0.0018,
+        "risk_amount": 7.56,
+        "risk_percent": 0.08,
+        "stop_loss": 78884.19,
+        "take_profit_1": 91585.33,
+        "take_profit_2": 100052.76,
         "direction": "LONG"
       },
       "trade_plan": {
         "asset": "BTC",
         "signal": "NO TRADE",
-        "conviction": 0.04,
-        "entry_price": 81354.7,
+        "conviction": 0.12,
+        "entry_price": 83117.9,
         "entry_type": "NO_TRADE",
-        "stop_loss": 77289.79,
-        "take_profit_1": 89484.53,
-        "take_profit_2": 97614.36,
-        "position_size": 0.0011,
-        "risk_amount": 4.62,
-        "risk_percent": 0.05,
+        "stop_loss": 78884.19,
+        "take_profit_1": 91585.33,
+        "take_profit_2": 100052.76,
+        "position_size": 0.0018,
+        "risk_amount": 7.56,
+        "risk_percent": 0.08,
         "risk_reward_ratio": 2.0,
-        "expected_days_to_tp1": 8,
-        "expected_days_to_tp2": 16,
+        "expected_days_to_tp1": 14,
+        "expected_days_to_tp2": 28,
         "time_horizon": "MULTI-WEEK",
-        "time_note": "~8d to TP1, ~16d to TP2 given ATR $2,032.46/day, BEAR_TREND regime, 4% conviction. Estimate, not a promise."
+        "time_note": "~14d to TP1, ~28d to TP2 given ATR $2,116.86/day, RANGE regime, 12% conviction. Estimate, not a promise."
       },
       "multi_timeframe": {
         "signals": {
-          "1h": "BEARISH",
-          "4h": "BEARISH",
-          "1d": "BEARISH"
+          "1h": "BULLISH",
+          "4h": "BULLISH",
+          "1d": "NEUTRAL"
         },
         "data": {
           "1h": {
-            "price": 81354.9,
-            "sma20": 81680.15,
-            "sma50": 81824.07199999999,
-            "rsi": 39.6853262379766
+            "price": 83117.9,
+            "sma20": 81847.405,
+            "sma50": 81897.658,
+            "rsi": 70.71945596568911
           },
           "4h": {
-            "price": 81355.6,
-            "sma20": 81692.34,
-            "sma50": 82069.296,
-            "rsi": 44.657344603442255
+            "price": 83105.7,
+            "sma20": 81779.845,
+            "sma50": 82104.298,
+            "rsi": 60.07051608461351
           },
           "1d": {
-            "price": 81365.0,
-            "sma20": 83132.3,
-            "sma50": 81536.718,
-            "rsi": 46.072770771679366
+            "price": 83100.0,
+            "sma20": 83219.05,
+            "sma50": 81571.418,
+            "rsi": 53.24546637936312
           }
         },
-        "alignment": "STRONG",
-        "strength": 1.2,
-        "recommendation": "BEARISH"
+        "alignment": "WEAK",
+        "strength": 0.6,
+        "recommendation": "CAUTIOUS_NEUTRAL"
       },
       "regime_strategy": {
-        "regime": "BEAR_TREND",
-        "recommended_strategy": "Volatility Breakout",
-        "size_multiplier": 0.3
+        "regime": "RANGE",
+        "recommended_strategy": "RSI + Trend Filter",
+        "size_multiplier": 0.5
       },
       "volatility_forecast": {
-        "current_annual_vol": 24.1,
+        "current_annual_vol": 26.0,
         "long_term_vol": 41.9,
-        "forecast_5d_vol": 69.7,
-        "forecast_20d_vol": 139.5,
+        "forecast_5d_vol": 72.3,
+        "forecast_20d_vol": 144.6,
         "regime": "LOW"
       },
       "price_targets": {
         "target_1": {
-          "price": 79322.24,
-          "probability": 0.7
+          "price": 84388.01,
+          "probability": 0.55
         },
         "target_2": {
-          "price": 77289.79,
-          "probability": 0.5
+          "price": 85658.13,
+          "probability": 0.35
         },
         "target_3": {
-          "price": 75257.33,
-          "probability": 0.25
+          "price": 87351.61,
+          "probability": 0.15
         }
       },
       "regime_change": {
-        "change": true,
-        "previous_regime": "RANGE",
-        "new_regime": "BEAR_TREND",
-        "message": "Regime changed from RANGE to BEAR_TREND",
-        "implication": "RECALIBRATE"
+        "change": false
       },
       "regime_shift": {
         "shift": true,
@@ -1212,10 +1265,10 @@
         "var_95": -2.34,
         "expected_shortfall": -2.89,
         "max_drawdown": -7.0,
-        "sortino_ratio": 5.4,
-        "calmar_ratio": 3.95,
-        "kelly_fraction": 0.172,
-        "risk_of_ruin": 84.2,
+        "sortino_ratio": 5.8,
+        "calmar_ratio": 4.34,
+        "kelly_fraction": 0.186,
+        "risk_of_ruin": 83.0,
         "risk_grade": "A"
       },
       "walk_forward": {
@@ -1230,73 +1283,73 @@
         "losses": 0,
         "excluded_pre_fix": 262,
         "tradeable_signals": 262,
-        "no_trade_readings": 758,
-        "total_rows_logged": 1020,
-        "counts_basis": "262 tradeable signals; 758 NO TRADE readings logged for audit and excluded from signal stats",
+        "no_trade_readings": 767,
+        "total_rows_logged": 1029,
+        "counts_basis": "262 tradeable signals; 767 NO TRADE readings logged for audit and excluded from signal stats",
         "avg_conviction": 0.38,
         "avg_conviction_basis": "mean conviction of tradeable signals only",
         "signal_distribution": {
           "STRONG_LONG": 0,
           "LONG": 163,
-          "NO_TRADE": 758,
+          "NO_TRADE": 767,
           "SHORT": 99,
           "STRONG_SHORT": 0
         }
       },
       "onchain": {
         "exchange_flow": {
-          "current_price": 81390.59,
-          "price_change_7d": -2.27,
-          "price_vs_avg": -0.68,
-          "signal": "NEUTRAL"
+          "current_price": 83249.46,
+          "price_change_7d": -0.26,
+          "price_vs_avg": 1.59,
+          "signal": "BULLISH"
         },
         "network_activity": {
           "active_addresses": null,
-          "transactions_24h": 923687,
-          "hashrate": "1279187581293524760680",
+          "transactions_24h": 843521,
+          "hashrate": "1188536492855400958742",
           "signal": "HEALTHY"
         }
       },
-      "conviction_raw": 0.08,
+      "conviction_raw": 0.24,
       "mtf_multiplier": 1.0,
       "filtered_reason": "Low conviction",
-      "signal_before_filter": "NO TRADE",
+      "signal_before_filter": "LONG",
       "support_resistance": {
-        "nearest_resistance": 81431.1,
-        "nearest_support": 80328.6,
+        "nearest_resistance": 84527.1,
+        "nearest_support": 81542.8,
         "resistance_levels": [
-          81431.1,
           84527.1,
-          85060.8
+          85060.8,
+          85588.9
         ],
         "support_levels": [
+          81542.8,
           80328.6,
-          76466.0,
-          76459.7
+          76466.0
         ],
         "no_resistance_overhead": false,
         "no_support_below": false
       },
       "whale_activity": {
         "alert": false,
-        "zscore": -1.16,
+        "zscore": -0.76,
         "severity": "NONE",
-        "description": "Volume normal (-1.2 sigma). No unusual whale activity detected."
+        "description": "Volume normal (-0.8 sigma). No unusual whale activity detected."
       },
       "exchange_flow": {
         "signal": "NEUTRAL",
         "confidence": 0,
-        "description": "Normal exchange flow. Volume at -1.2\u03c3."
+        "description": "Normal exchange flow. Volume at -0.8\u03c3."
       },
       "monte_carlo": {
-        "profitable_pct": 58.0,
-        "mean": 0.1099,
-        "median": 0.0604,
-        "std": 0.3708,
+        "profitable_pct": 59.6667,
+        "mean": 0.1354,
+        "median": 0.09,
+        "std": 0.3761,
         "min": -0.6587,
         "max": 1.3035,
-        "pct_5": -0.4413,
-        "pct_95": 0.7574
+        "pct_5": -0.4325,
+        "pct_95": 0.8301
       },
       "strategy_validation": {
         "SMA20 Crossover": {
@@ -1315,30 +1368,30 @@
           "var_95": -0.02328146425803379
         },
         "SMA50 Trend": {
-          "total_return": 0.0716139800188087,
-          "sharpe": 0.26369587358198904,
-          "sortino": 0.3059144252659107,
-          "calmar": 0.2660051188085889,
+          "total_return": 0.09704634512472299,
+          "sharpe": 0.3103183811414721,
+          "sortino": 0.35942124799771463,
+          "calmar": 0.3604718597969454,
           "max_drawdown": -0.2692203080134727,
-          "trades": 24.0,
-          "win_rate": 46.38069705093834,
-          "avg_win": 0.014111981841566564,
-          "avg_loss": 0.011543979446186152,
+          "trades": 23.5,
+          "win_rate": 46.64879356568365,
+          "avg_win": 0.014120353784149844,
+          "avg_loss": 0.01156191500525273,
           "max_consecutive_wins": 7,
           "max_consecutive_losses": 6,
-          "kelly_fraction": 0.02518669866379278,
+          "kelly_fraction": 0.029641859665690915,
           "var_95": -0.020661531154105406
         },
         "Golden Cross": {
-          "total_return": -0.13087945964924141,
-          "sharpe": -0.2766238442308753,
-          "sortino": -0.2217738354650483,
-          "calmar": -0.47495504633946556,
+          "total_return": -0.11204301459140886,
+          "sharpe": -0.21915339792645125,
+          "sortino": -0.17545156160858058,
+          "calmar": -0.406598524549948,
           "max_drawdown": -0.27556178349497457,
           "trades": 1.5,
-          "win_rate": 49.0990990990991,
-          "avg_win": 0.01293186691328044,
-          "avg_loss": 0.013396959057126685,
+          "win_rate": 49.549549549549546,
+          "avg_win": 0.012955838121805686,
+          "avg_loss": 0.013463228305923015,
           "max_consecutive_wins": 6,
           "max_consecutive_losses": 6,
           "kelly_fraction": 0,
@@ -1360,30 +1413,30 @@
           "var_95": -0.03049837968540081
         },
         "RSI + Trend Filter": {
-          "total_return": -0.006458672580003988,
-          "sharpe": 0.05737630961087131,
-          "sortino": 0.03724735450893882,
-          "calmar": -0.022656761861867544,
+          "total_return": 0.015074343564200676,
+          "sharpe": 0.12656543208394075,
+          "sortino": 0.08192936969775703,
+          "calmar": 0.05288018677637619,
           "max_drawdown": -0.28506600455002595,
           "trades": 4.5,
-          "win_rate": 47.76119402985074,
-          "avg_win": 0.014625366005540149,
-          "avg_loss": 0.01311752313584314,
+          "win_rate": 48.507462686567166,
+          "avg_win": 0.014639878833932725,
+          "avg_loss": 0.013221040816189593,
           "max_consecutive_wins": 6,
           "max_consecutive_losses": 7,
-          "kelly_fraction": 0.009080933523921196,
+          "kelly_fraction": 0.020053744334787137,
           "var_95": -0.009186632322666588
         },
         "Bollinger Bounce": {
-          "total_return": -0.22465413684344993,
-          "sharpe": -0.22452890025884298,
-          "sortino": -0.21700765347347498,
-          "calmar": -0.4853507421584307,
+          "total_return": -0.2078500698882817,
+          "sharpe": -0.19139865740529413,
+          "sortino": -0.18475503459536816,
+          "calmar": -0.4490466416305412,
           "max_drawdown": -0.4628696679114527,
           "trades": 10.5,
-          "win_rate": 47.671232876712324,
-          "avg_win": 0.017053642797685887,
-          "avg_loss": 0.01630240847523816,
+          "win_rate": 47.94520547945205,
+          "avg_win": 0.017045157409419438,
+          "avg_loss": 0.016356764292518686,
           "max_consecutive_wins": 6,
           "max_consecutive_losses": 7,
           "kelly_fraction": 0,
@@ -1420,30 +1473,30 @@
           "var_95": 0.0
         },
         "Stoch RSI Oversold": {
-          "total_return": -0.12009731116023958,
-          "sharpe": -0.04587427554954424,
-          "sortino": -0.044354561617676404,
-          "calmar": -0.25312590933759166,
+          "total_return": -0.10102718465295413,
+          "sharpe": -0.011431418289054975,
+          "sortino": -0.01103714350323955,
+          "calmar": -0.21293231077401567,
           "max_drawdown": -0.4744568087657393,
           "trades": 21.5,
-          "win_rate": 46.73913043478261,
-          "avg_win": 0.01634097202317279,
-          "avg_loss": 0.014486458548136884,
+          "win_rate": 47.01086956521739,
+          "avg_win": 0.016336508022177905,
+          "avg_loss": 0.01453010806278406,
           "max_consecutive_wins": 6,
           "max_consecutive_losses": 7,
           "kelly_fraction": 0,
           "var_95": -0.025093133098447074
         },
         "Williams %R": {
-          "total_return": -0.20944288351532714,
-          "sharpe": -0.19359431722076506,
-          "sortino": -0.1835038239570016,
-          "calmar": -0.46141405310458716,
+          "total_return": -0.1923091431440177,
+          "sharpe": -0.16055603777100688,
+          "sortino": -0.1519802510000987,
+          "calmar": -0.4236674920523515,
           "max_drawdown": -0.45391526787298225,
           "trades": 16.5,
-          "win_rate": 46.742209631728045,
-          "avg_win": 0.01756035824066948,
-          "avg_loss": 0.01608511446158691,
+          "win_rate": 47.02549575070821,
+          "avg_win": 0.017548360298563388,
+          "avg_loss": 0.01613918029725348,
           "max_consecutive_wins": 6,
           "max_consecutive_losses": 7,
           "kelly_fraction": 0,
@@ -1480,7 +1533,7 @@
         2.2,
         0.67,
         0.44,
-        0.24
+        1.03
       ],
       "adaptive_threshold": 0.3,
       "kelly_position_size": 0,
@@ -2930,7 +2983,7 @@
             81382.0,
             82001.7,
             81843.7,
-            81354.7
+            83117.9
           ],
           "sma50": [
             null,
@@ -3653,7 +3706,7 @@
             81322.02,
             81397.5,
             81480.74,
-            81536.51
+            81571.78
           ],
           "sma200": [
             null,
@@ -4376,7 +4429,7 @@
             72425.02,
             72494.54,
             72569.35,
-            72641.46
+            72650.27
           ],
           "bb_upper": [
             null,
@@ -5099,7 +5152,7 @@
             86463.37,
             86453.63,
             86429.66,
-            86423.62
+            86404.06
           ],
           "bb_lower": [
             null,
@@ -5822,7 +5875,7 @@
             80346.27,
             80209.91,
             80054.91,
-            79839.95
+            80035.83
           ]
         },
         "rsi": {
@@ -7270,7 +7323,7 @@
             38.6,
             33.4,
             34.9,
-            34.2
+            41.4
           ],
           "overbought": [
             70,
@@ -10164,7 +10217,7 @@
             81.639,
             37.1814,
             -10.6777,
-            -87.061
+            53.5931
           ],
           "signal": [
             0.0,
@@ -10887,7 +10940,7 @@
             608.2301,
             494.0203,
             393.0807,
-            297.0524
+            325.1832
           ],
           "hist": [
             0.0,
@@ -11610,7 +11663,7 @@
             -526.5911,
             -456.8389,
             -403.7584,
-            -384.1134
+            -271.5901
           ]
         },
         "equity": {
@@ -13058,7 +13111,7 @@
             1.0741,
             1.0823,
             1.0802,
-            1.0716
+            1.097
           ],
           "buy_hold": [
             1.0,
@@ -13781,7 +13834,7 @@
             1.1251,
             1.1337,
             1.1315,
-            1.1248
+            1.1491
           ]
         },
         "drawdown": {
@@ -15229,7 +15282,7 @@
             -6.23,
             -5.52,
             -5.7,
-            -6.45
+            -4.23
           ],
           "buy_hold": [
             0.0,
@@ -15952,7 +16005,7 @@
             -34.77,
             -34.28,
             -34.4,
-            -34.79
+            -33.38
           ]
         },
         "volume": {
@@ -17400,7 +17453,7 @@
             599.0,
             987.0,
             1935.0,
-            649.0
+            1218.0
           ],
           "volume_sma20": [
             null,
@@ -18123,7 +18176,7 @@
             2367.0,
             2259.0,
             2247.0,
-            2144.0
+            2172.0
           ]
         }
       },
@@ -18142,46 +18195,46 @@
         "features": [
           {
             "feature": "trend",
-            "contribution": -0.0981,
-            "direction": "BEARISH",
-            "raw_score": -0.3,
-            "weight": 0.327,
-            "verdict": "CAUTIOUSLY BEARISH",
-            "importance_pct": 39.3
-          },
-          {
-            "feature": "momentum",
-            "contribution": -0.0782,
-            "direction": "BEARISH",
-            "raw_score": -0.3,
-            "weight": 0.2607,
-            "verdict": "BEARISH",
-            "importance_pct": 31.3
+            "contribution": 0.1869,
+            "direction": "BULLISH",
+            "raw_score": 1.0,
+            "weight": 0.1869,
+            "verdict": "BULLISH",
+            "importance_pct": 58.3
           },
           {
             "feature": "volatility",
-            "contribution": 0.064,
+            "contribution": 0.1189,
             "direction": "BULLISH",
             "raw_score": 0.5,
-            "weight": 0.128,
+            "weight": 0.2378,
             "verdict": "SAFE",
-            "importance_pct": 25.6
+            "importance_pct": 37.1
           },
           {
             "feature": "drawdown",
-            "contribution": 0.0095,
+            "contribution": 0.0147,
             "direction": "BULLISH",
             "raw_score": 0.2,
-            "weight": 0.0474,
+            "weight": 0.0736,
             "verdict": "OVERSOLD",
-            "importance_pct": 3.8
+            "importance_pct": 4.6
+          },
+          {
+            "feature": "momentum",
+            "contribution": 0.0,
+            "direction": "NEUTRAL",
+            "raw_score": 0,
+            "weight": 0.1982,
+            "verdict": "NEUTRAL",
+            "importance_pct": 0.0
           },
           {
             "feature": "sentiment",
             "contribution": 0.0,
             "direction": "NEUTRAL",
             "raw_score": 0,
-            "weight": 0.1137,
+            "weight": 0.1563,
             "verdict": "NEUTRAL",
             "importance_pct": 0.0
           },
@@ -18190,7 +18243,7 @@
             "contribution": 0.0,
             "direction": "NEUTRAL",
             "raw_score": 0,
-            "weight": 0.0758,
+            "weight": 0.0906,
             "verdict": "UNKNOWN",
             "importance_pct": 0.0
           },
@@ -18199,14 +18252,14 @@
             "contribution": 0.0,
             "direction": "NEUTRAL",
             "raw_score": 0,
-            "weight": 0.0474,
+            "weight": 0.0566,
             "verdict": "NORMAL",
             "importance_pct": 0.0
           }
         ],
         "top_driver": "trend",
-        "sum_of_contributions": -0.1028,
-        "composite_score": -0.077,
+        "sum_of_contributions": 0.3205,
+        "composite_score": 0.24,
         "method": "exact_additive_attribution"
       },
       "recommended_trade_size": {
@@ -18217,79 +18270,23 @@
       },
       "intraday_trade": {
         "timeframe": "4h",
-        "signal": "SHORT",
-        "conviction": 0.45,
-        "entry": 81355.6,
-        "stop_loss": 81712.9375,
-        "take_profit": 80867.4664,
-        "target_source": "nearest 4h support (min-dist floor)",
-        "expected_hours": 5,
-        "risk_reward": 1.37,
-        "reason": "4h SHORT (trend-following): RSI 45, EMA20 < EMA50, target at nearest 4h support (min-dist floor)",
+        "signal": "NO TRADE",
+        "conviction": 0.15,
+        "entry": null,
+        "stop_loss": null,
+        "take_profit": null,
+        "target_source": null,
+        "expected_hours": null,
+        "risk_reward": null,
+        "reason": "4h signals not aligned (score +0.15)",
         "levels": {
-          "support": 81333.2,
-          "resistance": 81587.7,
-          "atr_4h": 714.674999,
-          "rsi_4h": 44.7
+          "support": 81635.7,
+          "resistance": 83845.2,
+          "atr_4h": 837.103571,
+          "rsi_4h": 60.1,
+          "range_position": 0.665
         },
-        "mode": "TREND",
-        "move_pct": 0.6,
-        "move_abs": 488.1336,
-        "expected_label": "~5h",
-        "cvd": {
-          "cvd": null,
-          "cvd_normalized": null,
-          "trend": "UNAVAILABLE",
-          "sample_trades": 0
-        },
-        "liquidation_estimate": {
-          "clusters": [
-            {
-              "level": 81500.0,
-              "direction": "ABOVE",
-              "distance_pct": 0.18,
-              "weight": 0.97
-            },
-            {
-              "level": 81000,
-              "direction": "BELOW",
-              "distance_pct": 0.44,
-              "weight": 0.93
-            },
-            {
-              "level": 82000,
-              "direction": "ABOVE",
-              "distance_pct": 0.79,
-              "weight": 0.87
-            },
-            {
-              "level": 80500.0,
-              "direction": "BELOW",
-              "distance_pct": 1.05,
-              "weight": 0.82
-            },
-            {
-              "level": 80000,
-              "direction": "BELOW",
-              "distance_pct": 1.67,
-              "weight": 0.72
-            }
-          ],
-          "nearest_above": {
-            "level": 81500.0,
-            "direction": "ABOVE",
-            "distance_pct": 0.18,
-            "weight": 0.97
-          },
-          "nearest_below": {
-            "level": 81000,
-            "direction": "BELOW",
-            "distance_pct": 0.44,
-            "weight": 0.93
-          },
-          "funding_skew": 0.0,
-          "method": "proxy_round_levels_plus_funding"
-        }
+        "mode": "TREND"
       },
       "big_trade": {
         "position_size": 0,
@@ -18310,17 +18307,17 @@
       "asset": "ETH",
       "name": "Ethereum",
       "date": "2026-10-20",
-      "price": 2390.19,
+      "price": 2465.89,
       "signal": "NO TRADE",
-      "conviction": 0.06,
-      "composite_score": -0.114,
+      "conviction": 0.07,
+      "composite_score": -0.125,
       "regime": "BEAR_TREND",
       "action": "Filtered: Low conviction",
       "indicators": {
-        "rsi": 24.0,
-        "macd_hist": -19.1215,
+        "rsi": 31.8,
+        "macd_hist": -14.2905,
         "volatility": 0.4,
-        "drawdown": -50.5,
+        "drawdown": -48.9,
         "fng_value": 55,
         "funding_rate": null
       },
@@ -18334,7 +18331,7 @@
         "momentum": {
           "score": -0.3,
           "verdict": "BEARISH",
-          "detail": "RSI 24.0 (weak) + MACD negative.",
+          "detail": "RSI 31.8 (weak) + MACD negative.",
           "weight": 0.2607
         },
         "volatility": {
@@ -18358,73 +18355,73 @@
         "volume": {
           "score": 0,
           "verdict": "NORMAL",
-          "detail": "Volume 0.3x avg.",
+          "detail": "Volume 0.5x avg.",
           "weight": 0.0474
         },
         "drawdown": {
-          "score": 0.5,
-          "verdict": "DEEP VALUE",
-          "detail": "Down 50.5% from peak.",
+          "score": 0.2,
+          "verdict": "OVERSOLD",
+          "detail": "Down 48.9% from peak.",
           "weight": 0.0474
         }
       },
       "position_sizing": {
         "size_multiplier": 0.01,
-        "position_size": 0.0137,
-        "risk_amount": 2.77,
+        "position_size": 0.013,
+        "risk_amount": 2.74,
         "risk_percent": 0.03,
-        "stop_loss": 2187.7,
-        "take_profit_1": 2795.16,
-        "take_profit_2": 3200.13,
+        "stop_loss": 2254.8,
+        "take_profit_1": 2888.07,
+        "take_profit_2": 3310.24,
         "direction": "LONG"
       },
       "trade_plan": {
         "asset": "ETH",
         "signal": "NO TRADE",
-        "conviction": 0.06,
-        "entry_price": 2390.19,
+        "conviction": 0.07,
+        "entry_price": 2465.89,
         "entry_type": "NO_TRADE",
-        "stop_loss": 2187.7,
-        "take_profit_1": 2795.16,
-        "take_profit_2": 3200.13,
-        "position_size": 0.0137,
-        "risk_amount": 2.77,
+        "stop_loss": 2254.8,
+        "take_profit_1": 2888.07,
+        "take_profit_2": 3310.24,
+        "position_size": 0.013,
+        "risk_amount": 2.74,
         "risk_percent": 0.03,
         "risk_reward_ratio": 2.0,
         "expected_days_to_tp1": 8,
         "expected_days_to_tp2": 16,
         "time_horizon": "MULTI-WEEK",
-        "time_note": "~8d to TP1, ~16d to TP2 given ATR $101.24/day, BEAR_TREND regime, 6% conviction. Estimate, not a promise."
+        "time_note": "~8d to TP1, ~16d to TP2 given ATR $105.54/day, BEAR_TREND regime, 7% conviction. Estimate, not a promise."
       },
       "multi_timeframe": {
         "signals": {
-          "1h": "BEARISH",
-          "4h": "BEARISH",
+          "1h": "BULLISH",
+          "4h": "BULLISH",
           "1d": "BEARISH"
         },
         "data": {
           "1h": {
-            "price": 2391.0,
-            "sma20": 2395.1035,
-            "sma50": 2398.4213999999997,
-            "rsi": 46.61496122186838
+            "price": 2466.5,
+            "sma20": 2403.225,
+            "sma50": 2401.3289999999997,
+            "rsi": 72.24936099638344
           },
           "4h": {
-            "price": 2391.0,
-            "sma20": 2402.2195,
-            "sma50": 2436.3831999999998,
-            "rsi": 45.53626350232439
+            "price": 2466.69,
+            "sma20": 2406.004,
+            "sma50": 2437.897,
+            "rsi": 58.30113161476645
           },
           "1d": {
-            "price": 2391.0,
-            "sma20": 2529.2525,
-            "sma50": 2548.6924,
-            "rsi": 36.69417930492518
+            "price": 2465.26,
+            "sma20": 2532.9655000000002,
+            "sma50": 2550.1776,
+            "rsi": 45.127879494461084
           }
         },
-        "alignment": "STRONG",
-        "strength": 1.2,
-        "recommendation": "BEARISH"
+        "alignment": "MODERATE",
+        "strength": 0.8,
+        "recommendation": "CAUTIOUS_BEARISH"
       },
       "regime_strategy": {
         "regime": "BEAR_TREND",
@@ -18432,23 +18429,23 @@
         "size_multiplier": 0.3
       },
       "volatility_forecast": {
-        "current_annual_vol": 32.6,
+        "current_annual_vol": 37.3,
         "long_term_vol": 66.3,
-        "forecast_5d_vol": 102.9,
-        "forecast_20d_vol": 205.9,
+        "forecast_5d_vol": 109.3,
+        "forecast_20d_vol": 218.7,
         "regime": "LOW"
       },
       "price_targets": {
         "target_1": {
-          "price": 2288.95,
+          "price": 2360.35,
           "probability": 0.7
         },
         "target_2": {
-          "price": 2187.7,
+          "price": 2254.8,
           "probability": 0.5
         },
         "target_3": {
-          "price": 2086.46,
+          "price": 2149.26,
           "probability": 0.25
         }
       },
@@ -18464,11 +18461,11 @@
       "risk_metrics": {
         "var_95": -3.21,
         "expected_shortfall": -4.1,
-        "max_drawdown": -13.89,
-        "sortino_ratio": 4.74,
-        "calmar_ratio": 2.33,
-        "kelly_fraction": 0.171,
-        "risk_of_ruin": 84.3,
+        "max_drawdown": -13.55,
+        "sortino_ratio": 5.18,
+        "calmar_ratio": 2.7,
+        "kelly_fraction": 0.187,
+        "risk_of_ruin": 82.9,
         "risk_grade": "A"
       },
       "walk_forward": {
@@ -18483,63 +18480,63 @@
         "losses": 0,
         "excluded_pre_fix": 262,
         "tradeable_signals": 262,
-        "no_trade_readings": 759,
-        "total_rows_logged": 1021,
-        "counts_basis": "262 tradeable signals; 759 NO TRADE readings logged for audit and excluded from signal stats",
+        "no_trade_readings": 768,
+        "total_rows_logged": 1030,
+        "counts_basis": "262 tradeable signals; 768 NO TRADE readings logged for audit and excluded from signal stats",
         "avg_conviction": 0.38,
         "avg_conviction_basis": "mean conviction of tradeable signals only",
         "signal_distribution": {
           "STRONG_LONG": 0,
           "LONG": 163,
-          "NO_TRADE": 759,
+          "NO_TRADE": 768,
           "SHORT": 99,
           "STRONG_SHORT": 0
         }
       },
       "onchain": {
         "exchange_flow": {
-          "current_price": 2388.96,
-          "price_change_7d": -4.54,
-          "price_vs_avg": -1.52,
-          "signal": "NEUTRAL"
+          "current_price": 2470.9,
+          "price_change_7d": -1.78,
+          "price_vs_avg": 1.88,
+          "signal": "BULLISH"
         },
         "network_activity": {
           "active_addresses": null,
-          "transactions_24h": 1776335,
+          "transactions_24h": 1794382,
           "hashrate": "0",
           "signal": "HEALTHY"
         }
       },
-      "conviction_raw": 0.11,
+      "conviction_raw": 0.13,
       "mtf_multiplier": 1.0,
       "filtered_reason": "Low conviction",
       "signal_before_filter": "NO TRADE",
       "support_resistance": {
         "nearest_resistance": 2533.96,
-        "nearest_support": 2369.61,
+        "nearest_support": 2434.85,
         "resistance_levels": [
           2533.96,
           2535.53,
           2719.04
         ],
         "support_levels": [
-          2369.61,
-          2367.0,
-          2356.45
+          2434.85,
+          2411.8,
+          2369.61
         ],
         "no_resistance_overhead": false,
         "no_support_below": false
       },
       "whale_activity": {
         "alert": false,
-        "zscore": -1.31,
+        "zscore": -0.96,
         "severity": "NONE",
-        "description": "Volume normal (-1.3 sigma). No unusual whale activity detected."
+        "description": "Volume normal (-1.0 sigma). No unusual whale activity detected."
       },
       "exchange_flow": {
         "signal": "NEUTRAL",
         "confidence": 0,
-        "description": "Normal exchange flow. Volume at -1.3\u03c3."
+        "description": "Normal exchange flow. Volume at -1.0\u03c3."
       },
       "monte_carlo": {
         "profitable_pct": 90.6667,
@@ -18583,60 +18580,60 @@
           "var_95": -0.029196315043857557
         },
         "Golden Cross": {
-          "total_return": 0.19766779364372278,
-          "sharpe": 0.4369972899623893,
-          "sortino": 0.35752939286670465,
-          "calmar": 0.4624289542815257,
+          "total_return": 0.2355992769060702,
+          "sharpe": 0.4831213306768574,
+          "sortino": 0.3949210884825353,
+          "calmar": 0.5511668099332652,
           "max_drawdown": -0.4274554865424432,
           "trades": 1.5,
-          "win_rate": 51.470588235294116,
-          "avg_win": 0.024517070653515667,
-          "avg_loss": 0.023029501011419082,
+          "win_rate": 51.9607843137255,
+          "avg_win": 0.02452289828115716,
+          "avg_loss": 0.023199846271161336,
           "max_consecutive_wins": 9,
           "max_consecutive_losses": 5,
-          "kelly_fraction": 0.05885691364321229,
+          "kelly_fraction": 0.06513365899683908,
           "var_95": -0.025591025332219464
         },
         "RSI < 30, > 70": {
-          "total_return": -0.5548807481519179,
-          "sharpe": -0.5897904372884119,
-          "sortino": -0.5442477027483594,
-          "calmar": -0.8620669383710218,
+          "total_return": -0.5407833218532136,
+          "sharpe": -0.556873088177395,
+          "sortino": -0.5134894271653782,
+          "calmar": -0.840165069962879,
           "max_drawdown": -0.6436631814235113,
           "trades": 8.5,
-          "win_rate": 47.0414201183432,
-          "avg_win": 0.02550392341503834,
-          "avg_loss": 0.025840886331684083,
+          "win_rate": 47.337278106508876,
+          "avg_win": 0.02550161638859131,
+          "avg_loss": 0.025950466223678498,
           "max_consecutive_wins": 8,
           "max_consecutive_losses": 7,
           "kelly_fraction": 0,
           "var_95": -0.037491409572986134
         },
         "RSI + Trend Filter": {
-          "total_return": 0.19631098799460633,
-          "sharpe": 0.6135196201135606,
-          "sortino": 0.3448622395602763,
-          "calmar": 0.9388099399041789,
+          "total_return": 0.2341994996991954,
+          "sharpe": 0.702933669418559,
+          "sortino": 0.39411541392918853,
+          "calmar": 1.1200026064981718,
           "max_drawdown": -0.20910620952164516,
           "trades": 4.5,
-          "win_rate": 50.617283950617285,
-          "avg_win": 0.021333488227972177,
-          "avg_loss": 0.016669261281974938,
+          "win_rate": 51.85185185185185,
+          "avg_win": 0.021423995631675557,
+          "avg_loss": 0.01693422527493127,
           "max_consecutive_wins": 6,
           "max_consecutive_losses": 4,
-          "kelly_fraction": 0.12031311143722823,
-          "var_95": -0.0010357125702482595
+          "kelly_fraction": 0.13793984340620585,
+          "var_95": -0.00086396318187687
         },
         "Bollinger Bounce": {
-          "total_return": -0.4914392232921271,
-          "sharpe": -0.41633591574927464,
-          "sortino": -0.40978588229108803,
-          "calmar": -0.7589406482692862,
+          "total_return": -0.47533253269565323,
+          "sharpe": -0.3847982949051917,
+          "sortino": -0.37851282539789755,
+          "calmar": -0.7340667236344707,
           "max_drawdown": -0.6475331429576497,
           "trades": 10.5,
-          "win_rate": 47.527472527472526,
-          "avg_win": 0.026406595879280074,
-          "avg_loss": 0.026109537570547108,
+          "win_rate": 47.8021978021978,
+          "avg_win": 0.02639928670286763,
+          "avg_loss": 0.02621361058114642,
           "max_consecutive_wins": 6,
           "max_consecutive_losses": 7,
           "kelly_fraction": 0,
@@ -18673,30 +18670,30 @@
           "var_95": 0.0
         },
         "Stoch RSI Oversold": {
-          "total_return": -0.12120376131624211,
-          "sharpe": 0.10096215108178404,
-          "sortino": 0.09710315898808934,
-          "calmar": -0.21854566180872712,
+          "total_return": -0.09337129809433908,
+          "sharpe": 0.13432417989848974,
+          "sortino": 0.12906143073646942,
+          "calmar": -0.1683602217816053,
           "max_drawdown": -0.5545923918742464,
           "trades": 20.5,
-          "win_rate": 50.0,
-          "avg_win": 0.0228482075646416,
-          "avg_loss": 0.022345619284043636,
+          "win_rate": 50.264550264550266,
+          "avg_win": 0.02286024225737251,
+          "avg_loss": 0.022430778612380686,
           "max_consecutive_wins": 6,
           "max_consecutive_losses": 5,
-          "kelly_fraction": 0.010998418129213238,
+          "kelly_fraction": 0.014634549111852321,
           "var_95": -0.03646064917741232
         },
         "Williams %R": {
-          "total_return": -0.338382794955591,
-          "sharpe": -0.15794819022020115,
-          "sortino": -0.15748748586785505,
-          "calmar": -0.6161748210919032,
+          "total_return": -0.31742863548631794,
+          "sharpe": -0.12649524038424761,
+          "sortino": -0.12602544874038046,
+          "calmar": -0.5780185505764209,
           "max_drawdown": -0.5491668652671556,
           "trades": 15.5,
-          "win_rate": 48.11827956989247,
-          "avg_win": 0.025534415824565556,
-          "avg_loss": 0.024502978581722377,
+          "win_rate": 48.38709677419355,
+          "avg_win": 0.02553219573211527,
+          "avg_loss": 0.02459760000372782,
           "max_consecutive_wins": 6,
           "max_consecutive_losses": 7,
           "kelly_fraction": 0,
@@ -18733,7 +18730,7 @@
         -0.31,
         -2.55,
         -2.86,
-        -3.25
+        -2.11
       ],
       "adaptive_threshold": 0.3,
       "kelly_position_size": 0,
@@ -20183,7 +20180,7 @@
             2399.7,
             2407.51,
             2405.43,
-            2390.19
+            2465.89
           ],
           "sma50": [
             null,
@@ -20906,7 +20903,7 @@
             2551.44,
             2550.45,
             2550.21,
-            2548.68
+            2550.19
           ],
           "sma200": [
             null,
@@ -21629,7 +21626,7 @@
             2146.18,
             2147.52,
             2149.26,
-            2150.95
+            2151.32
           ],
           "bb_upper": [
             null,
@@ -22352,7 +22349,7 @@
             2812.06,
             2802.19,
             2790.86,
-            2776.02
+            2773.05
           ],
           "bb_lower": [
             null,
@@ -23075,7 +23072,7 @@
             2330.88,
             2312.75,
             2296.95,
-            2282.41
+            2292.94
           ]
         },
         "rsi": {
@@ -24523,7 +24520,7 @@
             27.3,
             23.5,
             24.1,
-            24.0
+            31.8
           ],
           "overbought": [
             70,
@@ -27417,7 +27414,7 @@
             -44.0827,
             -47.257,
             -49.3714,
-            -51.681
+            -45.6423
           ],
           "signal": [
             0.0,
@@ -28140,7 +28137,7 @@
             -16.1621,
             -22.381,
             -27.7791,
-            -32.5595
+            -31.3517
           ],
           "hist": [
             0.0,
@@ -28863,7 +28860,7 @@
             -27.9207,
             -24.876,
             -21.5923,
-            -19.1215
+            -14.2905
           ]
         },
         "equity": {
@@ -31034,7 +31031,7 @@
             0.9034,
             0.9064,
             0.9056,
-            0.8999
+            0.9284
           ]
         },
         "drawdown": {
@@ -33205,7 +33202,7 @@
             -50.32,
             -50.16,
             -50.2,
-            -50.51
+            -48.95
           ]
         },
         "volume": {
@@ -34653,7 +34650,7 @@
             22858.0,
             20150.0,
             18440.0,
-            9820.0
+            15245.0
           ],
           "volume_sma20": [
             null,
@@ -35376,7 +35373,7 @@
             31353.0,
             30566.0,
             29698.0,
-            28287.0
+            28558.0
           ]
         }
       },
@@ -35400,7 +35397,7 @@
             "raw_score": -0.3,
             "weight": 0.327,
             "verdict": "CAUTIOUSLY BEARISH",
-            "importance_pct": 49.0
+            "importance_pct": 52.8
           },
           {
             "feature": "momentum",
@@ -35409,16 +35406,16 @@
             "raw_score": -0.3,
             "weight": 0.2607,
             "verdict": "BEARISH",
-            "importance_pct": 39.1
+            "importance_pct": 42.1
           },
           {
             "feature": "drawdown",
-            "contribution": 0.0237,
+            "contribution": 0.0095,
             "direction": "BULLISH",
-            "raw_score": 0.5,
+            "raw_score": 0.2,
             "weight": 0.0474,
-            "verdict": "DEEP VALUE",
-            "importance_pct": 11.8
+            "verdict": "OVERSOLD",
+            "importance_pct": 5.1
           },
           {
             "feature": "volatility",
@@ -35458,8 +35455,8 @@
           }
         ],
         "top_driver": "trend",
-        "sum_of_contributions": -0.1526,
-        "composite_score": -0.114,
+        "sum_of_contributions": -0.1668,
+        "composite_score": -0.125,
         "method": "exact_additive_attribution"
       },
       "recommended_trade_size": {
@@ -35470,27 +35467,80 @@
       },
       "intraday_trade": {
         "timeframe": "4h",
-        "signal": "NO TRADE",
-        "conviction": 0.45,
-        "entry": null,
-        "stop_loss": null,
-        "take_profit": null,
-        "target_source": null,
-        "expected_hours": null,
-        "risk_reward": null,
-        "reason": "R:R 0.40 below 1.2 minimum",
+        "signal": "SHORT",
+        "conviction": 0.52,
+        "entry": 2466.69,
+        "stop_loss": 2487.003742,
+        "take_profit": 2406.71,
+        "target_source": "nearest 4h support",
+        "expected_hours": 10,
+        "risk_reward": 2.95,
+        "reason": "4h SHORT (range/mean-reversion): RSI 58, price 85% up the range, target at nearest 4h support",
         "levels": {
-          "support": 2390.35,
-          "resistance": 2427.3,
-          "atr_4h": 33.789969,
-          "rsi_4h": 45.5,
-          "proposed": {
-            "entry": 2391.0,
-            "stop": 2427.3,
-            "target": 2376.654
-          }
+          "support": 2406.71,
+          "resistance": 2477.22,
+          "atr_4h": 39.134969,
+          "rsi_4h": 58.3,
+          "range_position": 0.851
         },
-        "mode": "TREND"
+        "mode": "MEAN_REVERSION",
+        "move_pct": 2.43,
+        "move_abs": 59.98,
+        "expected_label": "~10h",
+        "cvd": {
+          "cvd": null,
+          "cvd_normalized": null,
+          "trend": "UNAVAILABLE",
+          "sample_trades": 0
+        },
+        "liquidation_estimate": {
+          "clusters": [
+            {
+              "level": 2450.0,
+              "direction": "BELOW",
+              "distance_pct": 0.68,
+              "weight": 0.89
+            },
+            {
+              "level": 2500,
+              "direction": "ABOVE",
+              "distance_pct": 1.35,
+              "weight": 0.77
+            },
+            {
+              "level": 2400,
+              "direction": "BELOW",
+              "distance_pct": 2.7,
+              "weight": 0.55
+            },
+            {
+              "level": 2550.0,
+              "direction": "ABOVE",
+              "distance_pct": 3.38,
+              "weight": 0.44
+            },
+            {
+              "level": 2600,
+              "direction": "ABOVE",
+              "distance_pct": 5.4,
+              "weight": 0.1
+            }
+          ],
+          "nearest_above": {
+            "level": 2500,
+            "direction": "ABOVE",
+            "distance_pct": 1.35,
+            "weight": 0.77
+          },
+          "nearest_below": {
+            "level": 2450.0,
+            "direction": "BELOW",
+            "distance_pct": 0.68,
+            "weight": 0.89
+          },
+          "funding_skew": 0.0,
+          "method": "proxy_round_levels_plus_funding"
+        }
       },
       "big_trade": {
         "position_size": 0,
@@ -35511,17 +35561,17 @@
       "asset": "SOL",
       "name": "Solana",
       "date": "2026-10-20",
-      "price": 104.32,
+      "price": 107.36,
       "signal": "NO TRADE",
       "conviction": 0.06,
       "composite_score": -0.114,
       "regime": "BEAR_TREND",
       "action": "Filtered: Low conviction",
       "indicators": {
-        "rsi": 21.2,
-        "macd_hist": -1.1389,
+        "rsi": 28.0,
+        "macd_hist": -0.9449,
         "volatility": 0.4,
-        "drawdown": -60.1,
+        "drawdown": -58.9,
         "fng_value": 55,
         "funding_rate": null
       },
@@ -35535,7 +35585,7 @@
         "momentum": {
           "score": -0.3,
           "verdict": "BEARISH",
-          "detail": "RSI 21.2 (weak) + MACD negative.",
+          "detail": "RSI 28.0 (weak) + MACD negative.",
           "weight": 0.2607
         },
         "volatility": {
@@ -35559,72 +35609,72 @@
         "volume": {
           "score": 0,
           "verdict": "NORMAL",
-          "detail": "Volume 0.2x avg.",
+          "detail": "Volume 0.4x avg.",
           "weight": 0.0474
         },
         "drawdown": {
           "score": 0.5,
           "verdict": "DEEP VALUE",
-          "detail": "Down 60.1% from peak.",
+          "detail": "Down 58.9% from peak.",
           "weight": 0.0474
         }
       },
       "position_sizing": {
         "size_multiplier": 0.01,
-        "position_size": 0.2441,
-        "risk_amount": 2.45,
+        "position_size": 0.2326,
+        "risk_amount": 2.42,
         "risk_percent": 0.02,
-        "stop_loss": 94.2957,
-        "take_profit_1": 124.369,
-        "take_profit_2": 144.417,
+        "stop_loss": 96.9429,
+        "take_profit_1": 128.194,
+        "take_profit_2": 149.029,
         "direction": "LONG"
       },
       "trade_plan": {
         "asset": "SOL",
         "signal": "NO TRADE",
         "conviction": 0.06,
-        "entry_price": 104.32,
+        "entry_price": 107.36,
         "entry_type": "NO_TRADE",
-        "stop_loss": 94.2957,
-        "take_profit_1": 124.369,
-        "take_profit_2": 144.417,
-        "position_size": 0.2441,
-        "risk_amount": 2.45,
+        "stop_loss": 96.9429,
+        "take_profit_1": 128.194,
+        "take_profit_2": 149.029,
+        "position_size": 0.2326,
+        "risk_amount": 2.42,
         "risk_percent": 0.02,
         "risk_reward_ratio": 2.0,
         "expected_days_to_tp1": 8,
         "expected_days_to_tp2": 16,
         "time_horizon": "MULTI-WEEK",
-        "time_note": "~8d to TP1, ~16d to TP2 given ATR $5.01/day, BEAR_TREND regime, 6% conviction. Estimate, not a promise."
+        "time_note": "~8d to TP1, ~16d to TP2 given ATR $5.21/day, BEAR_TREND regime, 6% conviction. Estimate, not a promise."
       },
       "multi_timeframe": {
         "signals": {
-          "1h": "NEUTRAL",
-          "4h": "NEUTRAL",
+          "1h": "BULLISH",
+          "4h": "BULLISH",
           "1d": "BEARISH"
         },
         "data": {
           "1h": {
-            "price": 104.3,
-            "sma20": 104.473,
-            "sma50": 104.1306,
-            "rsi": 48.75544520413165
+            "price": 107.36,
+            "sma20": 104.874,
+            "sma50": 104.31199999999998,
+            "rsi": 70.74828427224051
           },
           "4h": {
-            "price": 104.3,
-            "sma20": 103.97850000000001,
-            "sma50": 105.0862,
-            "rsi": 49.00375935394163
+            "price": 107.37,
+            "sma20": 104.13199999999999,
+            "sma50": 105.1476,
+            "rsi": 59.5203650016758
           },
           "1d": {
-            "price": 104.32,
-            "sma20": 110.91900000000001,
-            "sma50": 109.40540000000001,
-            "rsi": 40.00653523816326
+            "price": 107.35,
+            "sma20": 111.0705,
+            "sma50": 109.46600000000001,
+            "rsi": 46.34853557805063
           }
         },
-        "alignment": "WEAK",
-        "strength": 0.6,
+        "alignment": "MODERATE",
+        "strength": 0.8,
         "recommendation": "CAUTIOUS_BEARISH"
       },
       "regime_strategy": {
@@ -35633,23 +35683,23 @@
         "size_multiplier": 0.3
       },
       "volatility_forecast": {
-        "current_annual_vol": 39.0,
+        "current_annual_vol": 42.4,
         "long_term_vol": 72.9,
-        "forecast_5d_vol": 117.6,
-        "forecast_20d_vol": 235.2,
+        "forecast_5d_vol": 122.1,
+        "forecast_20d_vol": 244.3,
         "regime": "LOW"
       },
       "price_targets": {
         "target_1": {
-          "price": 99.31,
+          "price": 102.15,
           "probability": 0.7
         },
         "target_2": {
-          "price": 94.3,
+          "price": 96.94,
           "probability": 0.5
         },
         "target_3": {
-          "price": 89.28,
+          "price": 91.73,
           "probability": 0.25
         }
       },
@@ -35666,10 +35716,10 @@
         "var_95": -3.61,
         "expected_shortfall": -4.94,
         "max_drawdown": -15.39,
-        "sortino_ratio": 4.41,
-        "calmar_ratio": 2.32,
-        "kelly_fraction": 0.153,
-        "risk_of_ruin": 85.8,
+        "sortino_ratio": 4.77,
+        "calmar_ratio": 2.58,
+        "kelly_fraction": 0.165,
+        "risk_of_ruin": 84.8,
         "risk_grade": "A"
       },
       "walk_forward": {
@@ -35684,25 +35734,25 @@
         "losses": 0,
         "excluded_pre_fix": 262,
         "tradeable_signals": 262,
-        "no_trade_readings": 760,
-        "total_rows_logged": 1022,
-        "counts_basis": "262 tradeable signals; 760 NO TRADE readings logged for audit and excluded from signal stats",
+        "no_trade_readings": 769,
+        "total_rows_logged": 1031,
+        "counts_basis": "262 tradeable signals; 769 NO TRADE readings logged for audit and excluded from signal stats",
         "avg_conviction": 0.38,
         "avg_conviction_basis": "mean conviction of tradeable signals only",
         "signal_distribution": {
           "STRONG_LONG": 0,
           "LONG": 163,
-          "NO_TRADE": 760,
+          "NO_TRADE": 769,
           "SHORT": 99,
           "STRONG_SHORT": 0
         }
       },
       "onchain": {
         "exchange_flow": {
-          "current_price": 104.25,
-          "price_change_7d": -2.3,
-          "price_vs_avg": -0.39,
-          "signal": "NEUTRAL"
+          "current_price": 107.67,
+          "price_change_7d": 0.16,
+          "price_vs_avg": 2.87,
+          "signal": "BULLISH"
         },
         "network_activity": {
           "signal": "UNKNOWN",
@@ -35714,12 +35764,12 @@
       "filtered_reason": "Low conviction",
       "signal_before_filter": "NO TRADE",
       "support_resistance": {
-        "nearest_resistance": 104.38,
+        "nearest_resistance": 119.97,
         "nearest_support": 100.83,
         "resistance_levels": [
-          104.38,
-          105.87,
-          119.97
+          119.97,
+          120.07,
+          121.67
         ],
         "support_levels": [
           100.83,
@@ -35731,14 +35781,14 @@
       },
       "whale_activity": {
         "alert": false,
-        "zscore": -1.33,
+        "zscore": -1.07,
         "severity": "NONE",
-        "description": "Volume normal (-1.3 sigma). No unusual whale activity detected."
+        "description": "Volume normal (-1.1 sigma). No unusual whale activity detected."
       },
       "exchange_flow": {
         "signal": "NEUTRAL",
         "confidence": 0,
-        "description": "Normal exchange flow. Volume at -1.3\u03c3."
+        "description": "Normal exchange flow. Volume at -1.1\u03c3."
       },
       "monte_carlo": {
         "profitable_pct": 49.0,
@@ -35782,63 +35832,63 @@
           "var_95": -0.036150813660325465
         },
         "Golden Cross": {
-          "total_return": -0.19722485085712105,
-          "sharpe": -0.12725294232722206,
-          "sortino": -0.09117274997849358,
-          "calmar": -0.3902097877159788,
+          "total_return": -0.17383109651093276,
+          "sharpe": -0.08651743776575914,
+          "sortino": -0.061998387041670336,
+          "calmar": -0.34392519488888634,
           "max_drawdown": -0.5054328647457574,
           "trades": 1.5,
-          "win_rate": 49.685534591194966,
-          "avg_win": 0.029772195682942114,
-          "avg_loss": 0.03053346126638653,
+          "win_rate": 50.314465408805034,
+          "avg_win": 0.029687084685214048,
+          "avg_loss": 0.03084397522540346,
           "max_consecutive_wins": 7,
           "max_consecutive_losses": 5,
           "kelly_fraction": 0,
           "var_95": -0.0262427992319183
         },
         "RSI < 30, > 70": {
-          "total_return": -0.45333758011584857,
-          "sharpe": -0.16642558377833366,
-          "sortino": -0.19335838548412124,
-          "calmar": -0.6801108824837845,
+          "total_return": -0.43740723352413247,
+          "sharpe": -0.14319813585782384,
+          "sortino": -0.16630891109118673,
+          "calmar": -0.6562116900188759,
           "max_drawdown": -0.6665642203227902,
           "trades": 8.5,
-          "win_rate": 48.78587196467991,
-          "avg_win": 0.029934274525916325,
-          "avg_loss": 0.029411336180188853,
+          "win_rate": 49.00662251655629,
+          "avg_win": 0.02990287381122615,
+          "avg_loss": 0.02951267158138426,
           "max_consecutive_wins": 6,
           "max_consecutive_losses": 7,
           "kelly_fraction": 0,
           "var_95": -0.048642242489823295
         },
         "RSI + Trend Filter": {
-          "total_return": -0.49292134662510223,
-          "sharpe": -0.4675316257852312,
-          "sortino": -0.3993135084643389,
-          "calmar": -0.8123620740320794,
+          "total_return": -0.4781445147016007,
+          "sharpe": -0.43698141837884613,
+          "sortino": -0.37290484948793684,
+          "calmar": -0.7880090247856059,
           "max_drawdown": -0.6067754298013145,
           "trades": 6.5,
-          "win_rate": 46.8503937007874,
-          "avg_win": 0.029506534969828763,
-          "avg_loss": 0.029320046510881114,
+          "win_rate": 47.24409448818898,
+          "avg_win": 0.02945200814395267,
+          "avg_loss": 0.029494055376603736,
           "max_consecutive_wins": 5,
           "max_consecutive_losses": 5,
           "kelly_fraction": 0,
           "var_95": -0.041064638783269936
         },
         "Bollinger Bounce": {
-          "total_return": -0.12468387211539478,
-          "sharpe": 0.18733793029341764,
-          "sortino": 0.19632987268364008,
-          "calmar": -0.21005355730492886,
+          "total_return": -0.09917619354207041,
+          "sharpe": 0.21173919213169215,
+          "sortino": 0.22173697686375274,
+          "calmar": -0.16708104985858735,
           "max_drawdown": -0.5935813404692533,
           "trades": 12.5,
-          "win_rate": 47.58064516129033,
-          "avg_win": 0.03297880897181971,
-          "avg_loss": 0.028797467120917877,
+          "win_rate": 47.8494623655914,
+          "avg_win": 0.03292254215661116,
+          "avg_loss": 0.028914965103479056,
           "max_consecutive_wins": 5,
           "max_consecutive_losses": 5,
-          "kelly_fraction": 0.01807474615399171,
+          "kelly_fraction": 0.02047076612588752,
           "var_95": -0.04680405169402724
         },
         "MACD Crossover": {
@@ -35872,33 +35922,33 @@
           "var_95": 0.0
         },
         "Stoch RSI Oversold": {
-          "total_return": -0.559387633118495,
-          "sharpe": -0.47877370687513066,
-          "sortino": -0.48351900144892906,
-          "calmar": -0.8753182994478921,
+          "total_return": -0.5465477021817641,
+          "sharpe": -0.4519027089512144,
+          "sortino": -0.45602083240294805,
+          "calmar": -0.8552266387690316,
           "max_drawdown": -0.6390676779764908,
           "trades": 21.5,
-          "win_rate": 44.04432132963989,
-          "avg_win": 0.03001218200244302,
-          "avg_loss": 0.02619772529282217,
+          "win_rate": 44.32132963988919,
+          "avg_win": 0.02996812658908211,
+          "avg_loss": 0.026298197266895668,
           "max_consecutive_wins": 6,
           "max_consecutive_losses": 7,
           "kelly_fraction": 0,
           "var_95": -0.04489527566450646
         },
         "Williams %R": {
-          "total_return": -0.2744902689299853,
-          "sharpe": -0.014038778483299,
-          "sortino": -0.015270217983706393,
-          "calmar": -0.4978652690372974,
+          "total_return": -0.25334811419021497,
+          "sharpe": 0.012193568773715588,
+          "sortino": 0.013255354900007892,
+          "calmar": -0.45951802780876116,
           "max_drawdown": -0.551334439256541,
           "trades": 17.5,
-          "win_rate": 46.83195592286501,
-          "avg_win": 0.030756569158221662,
-          "avg_loss": 0.027171584077971385,
+          "win_rate": 47.107438016528924,
+          "avg_win": 0.03071099457755778,
+          "avg_loss": 0.027281837857002222,
           "max_consecutive_wins": 5,
           "max_consecutive_losses": 7,
-          "kelly_fraction": 0,
+          "kelly_fraction": 0.0012080278300306926,
           "var_95": -0.04615462559529837
         }
       },
@@ -35932,7 +35982,7 @@
         0.64,
         -1.83,
         -1.22,
-        -1.4
+        -0.65
       ],
       "adaptive_threshold": 0.3,
       "kelly_position_size": 0,
@@ -37382,7 +37432,7 @@
             103.34,
             104.02,
             104.95,
-            104.32
+            107.36
           ],
           "sma50": [
             null,
@@ -38105,7 +38155,7 @@
             109.35,
             109.32,
             109.38,
-            109.41
+            109.47
           ],
           "sma200": [
             null,
@@ -38828,7 +38878,7 @@
             87.46,
             87.58,
             87.71,
-            87.83
+            87.84
           ],
           "bb_upper": [
             null,
@@ -39551,7 +39601,7 @@
             126.38,
             125.93,
             125.21,
-            124.54
+            124.45
           ],
           "bb_lower": [
             null,
@@ -40274,7 +40324,7 @@
             99.72,
             98.69,
             98.0,
-            97.3
+            97.69
           ]
         },
         "rsi": {
@@ -41722,7 +41772,7 @@
             22.1,
             18.4,
             21.7,
-            21.2
+            28.0
           ],
           "overbought": [
             70,
@@ -44616,7 +44666,7 @@
             -1.8753,
             -2.072,
             -2.1284,
-            -2.1985
+            -1.956
           ],
           "signal": [
             0.0,
@@ -45339,7 +45389,7 @@
             -0.0276,
             -0.4365,
             -0.7748,
-            -1.0596
+            -1.0111
           ],
           "hist": [
             0.0,
@@ -46062,7 +46112,7 @@
             -1.8477,
             -1.6356,
             -1.3535,
-            -1.1389
+            -0.9449
           ]
         },
         "equity": {
@@ -48233,7 +48283,7 @@
             0.5912,
             0.5951,
             0.6004,
-            0.5968
+            0.6142
           ]
         },
         "drawdown": {
@@ -50404,7 +50454,7 @@
             -60.48,
             -60.22,
             -59.87,
-            -60.11
+            -58.95
           ]
         },
         "volume": {
@@ -51852,7 +51902,7 @@
             110285.0,
             163559.0,
             203150.0,
-            67146.0
+            114894.0
           ],
           "volume_sma20": [
             null,
@@ -52575,7 +52625,7 @@
             327443.0,
             316287.0,
             302907.0,
-            279684.0
+            282072.0
           ]
         }
       },
@@ -52669,27 +52719,62 @@
       },
       "intraday_trade": {
         "timeframe": "4h",
-        "signal": "NO TRADE",
+        "signal": "SHORT",
         "conviction": 0.45,
-        "entry": null,
-        "stop_loss": null,
-        "take_profit": null,
-        "target_source": null,
-        "expected_hours": null,
-        "risk_reward": null,
-        "reason": "R:R 0.55 below 1.2 minimum",
+        "entry": 107.37,
+        "stop_loss": 109.04915,
+        "take_profit": 105.0,
+        "target_source": "liquidation cluster estimate (2.21% away)",
+        "expected_hours": 13,
+        "risk_reward": 2.22,
+        "reason": "4h SHORT (range/mean-reversion): RSI 60, price 76% up the range, target at nearest 4h support",
         "levels": {
           "support": 103.64,
-          "resistance": 105.5,
-          "atr_4h": 1.667314,
-          "rsi_4h": 49.0,
-          "proposed": {
-            "entry": 104.3,
-            "stop": 105.5,
-            "target": 103.64
-          }
+          "resistance": 108.57,
+          "atr_4h": 1.9166,
+          "rsi_4h": 59.5,
+          "range_position": 0.757
         },
-        "mode": "TREND"
+        "mode": "MEAN_REVERSION",
+        "move_pct": 3.47,
+        "move_abs": 3.73,
+        "expected_label": "~13h",
+        "cvd": {
+          "cvd": null,
+          "cvd_normalized": null,
+          "trend": "UNAVAILABLE",
+          "sample_trades": 0
+        },
+        "liquidation_estimate": {
+          "clusters": [
+            {
+              "level": 105.0,
+              "direction": "BELOW",
+              "distance_pct": 2.21,
+              "weight": 0.63
+            },
+            {
+              "level": 110,
+              "direction": "ABOVE",
+              "distance_pct": 2.45,
+              "weight": 0.59
+            }
+          ],
+          "nearest_above": {
+            "level": 110,
+            "direction": "ABOVE",
+            "distance_pct": 2.45,
+            "weight": 0.59
+          },
+          "nearest_below": {
+            "level": 105.0,
+            "direction": "BELOW",
+            "distance_pct": 2.21,
+            "weight": 0.63
+          },
+          "funding_skew": 0.0,
+          "method": "proxy_round_levels_plus_funding"
+        }
       },
       "big_trade": {
         "position_size": 0,
@@ -52710,17 +52795,17 @@
       "asset": "BNB",
       "name": "BNB",
       "date": "2026-10-20",
-      "price": 728.96,
+      "price": 737.78,
       "signal": "NO TRADE",
       "conviction": 0.04,
       "composite_score": -0.077,
       "regime": "BEAR_TREND",
       "action": "Filtered: Low conviction",
       "indicators": {
-        "rsi": 31.0,
-        "macd_hist": -3.8562,
+        "rsi": 34.8,
+        "macd_hist": -3.2933,
         "volatility": 0.3,
-        "drawdown": -44.3,
+        "drawdown": -43.6,
         "fng_value": 55,
         "funding_rate": null
       },
@@ -52734,13 +52819,13 @@
         "momentum": {
           "score": -0.3,
           "verdict": "BEARISH",
-          "detail": "RSI 31.0 (weak) + MACD negative.",
+          "detail": "RSI 34.8 (weak) + MACD negative.",
           "weight": 0.2607
         },
         "volatility": {
           "score": 0.5,
           "verdict": "SAFE",
-          "detail": "Volatility 0.3%, ATR 2.77%.",
+          "detail": "Volatility 0.3%, ATR 2.83%.",
           "weight": 0.128
         },
         "sentiment": {
@@ -52758,43 +52843,43 @@
         "volume": {
           "score": 0,
           "verdict": "NORMAL",
-          "detail": "Volume 0.5x avg.",
+          "detail": "Volume 0.7x avg.",
           "weight": 0.0474
         },
         "drawdown": {
           "score": 0.2,
           "verdict": "OVERSOLD",
-          "detail": "Down 44.3% from peak.",
+          "detail": "Down 43.6% from peak.",
           "weight": 0.0474
         }
       },
       "position_sizing": {
         "size_multiplier": 0.02,
-        "position_size": 0.1033,
-        "risk_amount": 4.18,
+        "position_size": 0.0979,
+        "risk_amount": 4.09,
         "risk_percent": 0.04,
-        "stop_loss": 688.521,
-        "take_profit_1": 809.837,
-        "take_profit_2": 890.714,
+        "stop_loss": 695.98,
+        "take_profit_1": 821.38,
+        "take_profit_2": 904.98,
         "direction": "LONG"
       },
       "trade_plan": {
         "asset": "BNB",
         "signal": "NO TRADE",
         "conviction": 0.04,
-        "entry_price": 728.96,
+        "entry_price": 737.78,
         "entry_type": "NO_TRADE",
-        "stop_loss": 688.521,
-        "take_profit_1": 809.837,
-        "take_profit_2": 890.714,
-        "position_size": 0.1033,
-        "risk_amount": 4.18,
+        "stop_loss": 695.98,
+        "take_profit_1": 821.38,
+        "take_profit_2": 904.98,
+        "position_size": 0.0979,
+        "risk_amount": 4.09,
         "risk_percent": 0.04,
         "risk_reward_ratio": 2.0,
         "expected_days_to_tp1": 8,
         "expected_days_to_tp2": 16,
         "time_horizon": "MULTI-WEEK",
-        "time_note": "~8d to TP1, ~16d to TP2 given ATR $20.22/day, BEAR_TREND regime, 4% conviction. Estimate, not a promise."
+        "time_note": "~8d to TP1, ~16d to TP2 given ATR $20.90/day, BEAR_TREND regime, 4% conviction. Estimate, not a promise."
       },
       "multi_timeframe": {
         "signals": {
@@ -52804,22 +52889,22 @@
         },
         "data": {
           "1h": {
-            "price": 728.96,
-            "sma20": 728.5355000000001,
-            "sma50": 724.114,
-            "rsi": 54.64586848693541
+            "price": 737.78,
+            "sma20": 729.9265,
+            "sma50": 724.9138,
+            "rsi": 70.29351717601531
           },
           "4h": {
-            "price": 728.96,
-            "sma20": 722.22,
-            "sma50": 728.5394,
-            "rsi": 53.98749401403621
+            "price": 737.78,
+            "sma20": 722.661,
+            "sma50": 728.7158000000001,
+            "rsi": 61.56021368627839
           },
           "1d": {
-            "price": 728.96,
-            "sma20": 749.5854999999999,
-            "sma50": 747.2757999999999,
-            "rsi": 44.217396636562995
+            "price": 737.78,
+            "sma20": 750.0265,
+            "sma50": 747.4521999999998,
+            "rsi": 47.83414263779487
           }
         },
         "alignment": "MODERATE",
@@ -52832,23 +52917,23 @@
         "size_multiplier": 0.3
       },
       "volatility_forecast": {
-        "current_annual_vol": 27.5,
+        "current_annual_vol": 28.3,
         "long_term_vol": 43.7,
-        "forecast_5d_vol": 76.0,
-        "forecast_20d_vol": 151.9,
+        "forecast_5d_vol": 77.0,
+        "forecast_20d_vol": 154.0,
         "regime": "LOW"
       },
       "price_targets": {
         "target_1": {
-          "price": 708.74,
+          "price": 716.88,
           "probability": 0.7
         },
         "target_2": {
-          "price": 688.52,
+          "price": 695.98,
           "probability": 0.5
         },
         "target_3": {
-          "price": 668.3,
+          "price": 675.08,
           "probability": 0.25
         }
       },
@@ -52862,10 +52947,10 @@
         "var_95": -2.04,
         "expected_shortfall": -3.42,
         "max_drawdown": -10.31,
-        "sortino_ratio": 4.91,
-        "calmar_ratio": 2.61,
-        "kelly_fraction": 0.18,
-        "risk_of_ruin": 83.5,
+        "sortino_ratio": 5.13,
+        "calmar_ratio": 2.76,
+        "kelly_fraction": 0.189,
+        "risk_of_ruin": 82.7,
         "risk_grade": "A"
       },
       "walk_forward": {
@@ -52880,24 +52965,24 @@
         "losses": 0,
         "excluded_pre_fix": 262,
         "tradeable_signals": 262,
-        "no_trade_readings": 761,
-        "total_rows_logged": 1023,
-        "counts_basis": "262 tradeable signals; 761 NO TRADE readings logged for audit and excluded from signal stats",
+        "no_trade_readings": 770,
+        "total_rows_logged": 1032,
+        "counts_basis": "262 tradeable signals; 770 NO TRADE readings logged for audit and excluded from signal stats",
         "avg_conviction": 0.38,
         "avg_conviction_basis": "mean conviction of tradeable signals only",
         "signal_distribution": {
           "STRONG_LONG": 0,
           "LONG": 163,
-          "NO_TRADE": 761,
+          "NO_TRADE": 770,
           "SHORT": 99,
           "STRONG_SHORT": 0
         }
       },
       "onchain": {
         "exchange_flow": {
-          "current_price": 729.39,
-          "price_change_7d": -1.49,
-          "price_vs_avg": 0.39,
+          "current_price": 738.5,
+          "price_change_7d": -0.74,
+          "price_vs_avg": 1.65,
           "signal": "BULLISH"
         },
         "network_activity": {
@@ -52911,30 +52996,30 @@
       "signal_before_filter": "NO TRADE",
       "support_resistance": {
         "nearest_resistance": 756.4,
-        "nearest_support": 719.92,
+        "nearest_support": 734.6,
         "resistance_levels": [
           756.4,
           769.14,
           773.4
         ],
         "support_levels": [
+          734.6,
           719.92,
-          706.44,
-          704.0
+          706.44
         ],
         "no_resistance_overhead": false,
         "no_support_below": false
       },
       "whale_activity": {
         "alert": false,
-        "zscore": -1.27,
+        "zscore": -0.84,
         "severity": "NONE",
-        "description": "Volume normal (-1.3 sigma). No unusual whale activity detected."
+        "description": "Volume normal (-0.8 sigma). No unusual whale activity detected."
       },
       "exchange_flow": {
         "signal": "NEUTRAL",
         "confidence": 0,
-        "description": "Normal exchange flow. Volume at -1.3\u03c3."
+        "description": "Normal exchange flow. Volume at -0.8\u03c3."
       },
       "monte_carlo": {},
       "strategy_validation": {
@@ -52969,30 +53054,30 @@
           "var_95": -0.02627483182129012
         },
         "Golden Cross": {
-          "total_return": -0.1414330930677974,
-          "sharpe": -0.5088560894298002,
-          "sortino": -0.3482691379137604,
-          "calmar": -0.8343924271753368,
+          "total_return": -0.1310449234574731,
+          "sharpe": -0.46139586785552406,
+          "sortino": -0.3161270556495463,
+          "calmar": -0.7731068407043362,
           "max_drawdown": -0.16950428654606792,
           "trades": 1.5,
-          "win_rate": 46.53465346534654,
-          "avg_win": 0.015465022705969191,
-          "avg_loss": 0.015878131560714184,
+          "win_rate": 47.524752475247524,
+          "avg_win": 0.015335487920711446,
+          "avg_loss": 0.016124549507968895,
           "max_consecutive_wins": 6,
           "max_consecutive_losses": 5,
           "kelly_fraction": 0,
           "var_95": -0.012088655637311319
         },
         "RSI < 30, > 70": {
-          "total_return": -0.24374326195073437,
-          "sharpe": -0.536217953219636,
-          "sortino": -0.42349299084733383,
-          "calmar": -0.6197014325443241,
+          "total_return": -0.23459298699793252,
+          "sharpe": -0.5068293417804702,
+          "sortino": -0.3996772581970792,
+          "calmar": -0.5964374520303853,
           "max_drawdown": -0.39332370259334626,
           "trades": 4.5,
-          "win_rate": 50.69124423963134,
-          "avg_win": 0.014445541134438508,
-          "avg_loss": 0.01692162020237362,
+          "win_rate": 51.1520737327189,
+          "avg_win": 0.014398710610827327,
+          "avg_loss": 0.017054673408469462,
           "max_consecutive_wins": 8,
           "max_consecutive_losses": 5,
           "kelly_fraction": 0,
@@ -53014,15 +53099,15 @@
           "var_95": -0.005205302175914139
         },
         "Bollinger Bounce": {
-          "total_return": -0.27733295454729057,
-          "sharpe": -0.577714373718062,
-          "sortino": -0.48155174447988647,
-          "calmar": -0.6687231600158577,
+          "total_return": -0.2685890957060745,
+          "sharpe": -0.5505032443728559,
+          "sortino": -0.45814320063558117,
+          "calmar": -0.6476394019584159,
           "max_drawdown": -0.4147201280432908,
           "trades": 6.5,
-          "win_rate": 48.41628959276018,
-          "avg_win": 0.01556278285720493,
-          "avg_loss": 0.016869449784591276,
+          "win_rate": 48.86877828054298,
+          "avg_win": 0.015504306654949306,
+          "avg_loss": 0.016993799071568064,
           "max_consecutive_wins": 5,
           "max_consecutive_losses": 5,
           "kelly_fraction": 0,
@@ -53059,33 +53144,33 @@
           "var_95": -0.002
         },
         "Stoch RSI Oversold": {
-          "total_return": 0.2675498953825073,
-          "sharpe": 0.6346246426462014,
-          "sortino": 0.6283935945577911,
-          "calmar": 0.6706954593513228,
+          "total_return": 0.28288652575629136,
+          "sharpe": 0.6581410591253116,
+          "sortino": 0.6506672903933214,
+          "calmar": 0.7091414035694683,
           "max_drawdown": -0.3989141295831551,
           "trades": 17.5,
-          "win_rate": 50.35971223021583,
-          "avg_win": 0.017931421276198102,
-          "avg_loss": 0.01584379844865558,
+          "win_rate": 50.719424460431654,
+          "avg_win": 0.017869832139583916,
+          "avg_loss": 0.015938877412833983,
           "max_consecutive_wins": 6,
           "max_consecutive_losses": 5,
-          "kelly_fraction": 0.0649867621732046,
+          "kelly_fraction": 0.06763944284478861,
           "var_95": -0.025649477339186932
         },
         "Williams %R": {
-          "total_return": 0.18678016507325834,
-          "sharpe": 0.5049138128689454,
-          "sortino": 0.4797071158409889,
-          "calmar": 0.47418960921071285,
+          "total_return": 0.20113952780364963,
+          "sharpe": 0.5283474725569053,
+          "sortino": 0.5013230884683162,
+          "calmar": 0.5106445539794386,
           "max_drawdown": -0.393893416146662,
           "trades": 11.5,
-          "win_rate": 53.61216730038023,
-          "avg_win": 0.017311569482288857,
-          "avg_loss": 0.017885766193355804,
+          "win_rate": 53.99239543726235,
+          "avg_win": 0.017254779225467087,
+          "avg_loss": 0.01801029334903466,
           "max_consecutive_wins": 5,
           "max_consecutive_losses": 5,
-          "kelly_fraction": 0.05685725348901691,
+          "kelly_fraction": 0.059703116056530905,
           "var_95": -0.02556424324553851
         }
       },
@@ -53119,7 +53204,7 @@
         -0.84,
         -1.81,
         -1.4,
-        -2.04
+        -1.56
       ],
       "adaptive_threshold": 0.3,
       "kelly_position_size": 0,
@@ -53215,20 +53300,20 @@
       "intraday_trade": {
         "timeframe": "4h",
         "signal": "NO TRADE",
-        "conviction": 0.09,
+        "conviction": 0.15,
         "entry": null,
         "stop_loss": null,
         "take_profit": null,
         "target_source": null,
         "expected_hours": null,
         "risk_reward": null,
-        "reason": "4h signals not aligned (score +0.09)",
+        "reason": "4h signals not aligned (score +0.15)",
         "levels": {
-          "support": 725.48,
-          "resistance": 729.72,
-          "atr_4h": 6.307837,
-          "rsi_4h": 54.0,
-          "range_position": 0.821
+          "support": 737.17,
+          "resistance": 746.14,
+          "atr_4h": 6.988551,
+          "rsi_4h": 61.6,
+          "range_position": 0.068
         },
         "mode": "TREND"
       },
@@ -53251,17 +53336,17 @@
       "asset": "XRP",
       "name": "XRP",
       "date": "2026-10-20",
-      "price": 1.3,
+      "price": 1.33,
       "signal": "NO TRADE",
       "conviction": 0.06,
       "composite_score": -0.114,
       "regime": "BEAR_TREND",
       "action": "Filtered: Low conviction",
       "indicators": {
-        "rsi": 20.8,
-        "macd_hist": -0.0136,
+        "rsi": 27.6,
+        "macd_hist": -0.0114,
         "volatility": 0.4,
-        "drawdown": -63.5,
+        "drawdown": -62.5,
         "fng_value": 55,
         "funding_rate": null
       },
@@ -53275,7 +53360,7 @@
         "momentum": {
           "score": -0.3,
           "verdict": "BEARISH",
-          "detail": "RSI 20.8 (weak) + MACD negative.",
+          "detail": "RSI 27.6 (weak) + MACD negative.",
           "weight": 0.2607
         },
         "volatility": {
@@ -53299,37 +53384,37 @@
         "volume": {
           "score": 0,
           "verdict": "NORMAL",
-          "detail": "Volume 0.2x avg.",
+          "detail": "Volume 0.5x avg.",
           "weight": 0.0474
         },
         "drawdown": {
           "score": 0.5,
           "verdict": "DEEP VALUE",
-          "detail": "Down 63.5% from peak.",
+          "detail": "Down 62.5% from peak.",
           "weight": 0.0474
         }
       },
       "position_sizing": {
         "size_multiplier": 0.01,
-        "position_size": 23.023,
-        "risk_amount": 2.65,
+        "position_size": 21.5664,
+        "risk_amount": 2.6,
         "risk_percent": 0.03,
-        "stop_loss": 1.18219,
-        "take_profit_1": 1.52718,
-        "take_profit_2": 1.75717,
+        "stop_loss": 1.21225,
+        "take_profit_1": 1.57362,
+        "take_profit_2": 1.81454,
         "direction": "LONG"
       },
       "trade_plan": {
         "asset": "XRP",
         "signal": "NO TRADE",
         "conviction": 0.06,
-        "entry_price": 1.29719,
+        "entry_price": 1.33271,
         "entry_type": "NO_TRADE",
-        "stop_loss": 1.18219,
-        "take_profit_1": 1.52718,
-        "take_profit_2": 1.75717,
-        "position_size": 23.023,
-        "risk_amount": 2.65,
+        "stop_loss": 1.21225,
+        "take_profit_1": 1.57362,
+        "take_profit_2": 1.81454,
+        "position_size": 21.5664,
+        "risk_amount": 2.6,
         "risk_percent": 0.03,
         "risk_reward_ratio": 2.0,
         "expected_days_to_tp1": 8,
@@ -53339,32 +53424,32 @@
       },
       "multi_timeframe": {
         "signals": {
-          "1h": "NEUTRAL",
-          "4h": "NEUTRAL",
+          "1h": "BULLISH",
+          "4h": "BULLISH",
           "1d": "BEARISH"
         },
         "data": {
           "1h": {
-            "price": 1.29711,
-            "sma20": 1.2990134999999998,
-            "sma50": 1.2968244000000002,
-            "rsi": 47.88705701055151
+            "price": 1.3327,
+            "sma20": 1.303294,
+            "sma50": 1.2990488000000002,
+            "rsi": 68.24279893652535
           },
           "4h": {
-            "price": 1.29729,
-            "sma20": 1.2965315,
-            "sma50": 1.3236805999999999,
-            "rsi": 45.8550368829065
+            "price": 1.33133,
+            "sma20": 1.2982334999999998,
+            "sma50": 1.3243614,
+            "rsi": 57.77126861015274
           },
           "1d": {
-            "price": 1.29723,
-            "sma20": 1.3934335,
-            "sma50": 1.4121789999999999,
-            "rsi": 36.14186470825398
+            "price": 1.33133,
+            "sma20": 1.3951385,
+            "sma50": 1.4128610000000001,
+            "rsi": 42.01263115125509
           }
         },
-        "alignment": "WEAK",
-        "strength": 0.6,
+        "alignment": "MODERATE",
+        "strength": 0.8,
         "recommendation": "CAUTIOUS_BEARISH"
       },
       "regime_strategy": {
@@ -53373,23 +53458,23 @@
         "size_multiplier": 0.3
       },
       "volatility_forecast": {
-        "current_annual_vol": 38.2,
-        "long_term_vol": 74.4,
-        "forecast_5d_vol": 117.8,
-        "forecast_20d_vol": 235.6,
+        "current_annual_vol": 42.2,
+        "long_term_vol": 74.5,
+        "forecast_5d_vol": 123.2,
+        "forecast_20d_vol": 246.3,
         "regime": "LOW"
       },
       "price_targets": {
         "target_1": {
-          "price": 1.24,
+          "price": 1.27,
           "probability": 0.7
         },
         "target_2": {
-          "price": 1.18,
+          "price": 1.21,
           "probability": 0.5
         },
         "target_3": {
-          "price": 1.12,
+          "price": 1.15,
           "probability": 0.25
         }
       },
@@ -53406,10 +53491,10 @@
         "var_95": -4.38,
         "expected_shortfall": -5.84,
         "max_drawdown": -17.79,
-        "sortino_ratio": 2.5,
-        "calmar_ratio": 1.1,
-        "kelly_fraction": 0.095,
-        "risk_of_ruin": 90.9,
+        "sortino_ratio": 2.78,
+        "calmar_ratio": 1.28,
+        "kelly_fraction": 0.107,
+        "risk_of_ruin": 89.9,
         "risk_grade": "A"
       },
       "walk_forward": {
@@ -53424,25 +53509,25 @@
         "losses": 0,
         "excluded_pre_fix": 262,
         "tradeable_signals": 262,
-        "no_trade_readings": 762,
-        "total_rows_logged": 1024,
-        "counts_basis": "262 tradeable signals; 762 NO TRADE readings logged for audit and excluded from signal stats",
+        "no_trade_readings": 771,
+        "total_rows_logged": 1033,
+        "counts_basis": "262 tradeable signals; 771 NO TRADE readings logged for audit and excluded from signal stats",
         "avg_conviction": 0.38,
         "avg_conviction_basis": "mean conviction of tradeable signals only",
         "signal_distribution": {
           "STRONG_LONG": 0,
           "LONG": 163,
-          "NO_TRADE": 762,
+          "NO_TRADE": 771,
           "SHORT": 99,
           "STRONG_SHORT": 0
         }
       },
       "onchain": {
         "exchange_flow": {
-          "current_price": 1.3,
-          "price_change_7d": -4.84,
-          "price_vs_avg": -1.51,
-          "signal": "NEUTRAL"
+          "current_price": 1.34,
+          "price_change_7d": -2.26,
+          "price_vs_avg": 1.87,
+          "signal": "BULLISH"
         },
         "network_activity": {
           "signal": "UNKNOWN",
@@ -53455,30 +53540,30 @@
       "signal_before_filter": "NO TRADE",
       "support_resistance": {
         "nearest_resistance": 1.4502,
-        "nearest_support": 1.2908,
+        "nearest_support": 1.3324,
         "resistance_levels": [
           1.4502,
           1.472,
           1.533
         ],
         "support_levels": [
-          1.2908,
-          1.2861,
-          1.2641
+          1.3324,
+          1.3289,
+          1.3151
         ],
         "no_resistance_overhead": false,
         "no_support_below": false
       },
       "whale_activity": {
         "alert": false,
-        "zscore": -1.29,
+        "zscore": -0.82,
         "severity": "NONE",
-        "description": "Volume normal (-1.3 sigma). No unusual whale activity detected."
+        "description": "Volume normal (-0.8 sigma). No unusual whale activity detected."
       },
       "exchange_flow": {
         "signal": "NEUTRAL",
         "confidence": 0,
-        "description": "Normal exchange flow. Volume at -1.3\u03c3."
+        "description": "Normal exchange flow. Volume at -0.8\u03c3."
       },
       "monte_carlo": {
         "profitable_pct": 84.6667,
@@ -53522,33 +53607,33 @@
           "var_95": -0.02999079289428075
         },
         "Golden Cross": {
-          "total_return": -0.45766167284698334,
-          "sharpe": -0.9359148659426237,
-          "sortino": -0.5434967631827874,
-          "calmar": -0.9645350453252323,
+          "total_return": -0.4428112211934282,
+          "sharpe": -0.886167602578207,
+          "sortino": -0.5142182431449449,
+          "calmar": -0.933237294369471,
           "max_drawdown": -0.4744894185702336,
           "trades": 2.5,
-          "win_rate": 42.5531914893617,
-          "avg_win": 0.0238635841847399,
-          "avg_loss": 0.024209072615801984,
+          "win_rate": 43.262411347517734,
+          "avg_win": 0.023850544830282917,
+          "avg_loss": 0.024459197269718784,
           "max_consecutive_wins": 4,
           "max_consecutive_losses": 6,
           "kelly_fraction": 0,
           "var_95": -0.017894373696920596
         },
         "RSI < 30, > 70": {
-          "total_return": -0.1831432620292991,
-          "sharpe": 0.12901232193084894,
-          "sortino": 0.16433186093539942,
-          "calmar": -0.33448109311121554,
+          "total_return": -0.16077587457432374,
+          "sharpe": 0.15152270872531667,
+          "sortino": 0.19291216098589123,
+          "calmar": -0.293630732999221,
           "max_drawdown": -0.5475444376415131,
           "trades": 8.5,
-          "win_rate": 45.20547945205479,
-          "avg_win": 0.02961498629886315,
-          "avg_loss": 0.023782702272592483,
+          "win_rate": 45.4337899543379,
+          "avg_win": 0.029582087792652097,
+          "avg_loss": 0.023864642029789704,
           "max_consecutive_wins": 5,
           "max_consecutive_losses": 7,
-          "kelly_fraction": 0.012020227153127831,
+          "kelly_fraction": 0.01413804658185291,
           "var_95": -0.04371029723158959
         },
         "RSI + Trend Filter": {
@@ -53567,18 +53652,18 @@
           "var_95": -0.01455843293492698
         },
         "Bollinger Bounce": {
-          "total_return": -0.01631835569788853,
-          "sharpe": 0.2737777647756976,
-          "sortino": 0.3564011320382716,
-          "calmar": -0.026820147488423353,
+          "total_return": 0.010617075507725948,
+          "sharpe": 0.29686985178503666,
+          "sortino": 0.38627302626114735,
+          "calmar": 0.017449768609332485,
           "max_drawdown": -0.6084364638536081,
           "trades": 10.5,
-          "win_rate": 46.236559139784944,
-          "avg_win": 0.0275853200109551,
-          "avg_loss": 0.022436054031096234,
+          "win_rate": 46.45161290322581,
+          "avg_win": 0.02756440734221394,
+          "avg_loss": 0.022509294809122893,
           "max_consecutive_wins": 5,
           "max_consecutive_losses": 7,
-          "kelly_fraction": 0.0250897274389062,
+          "kelly_fraction": 0.027236119072315514,
           "var_95": -0.042554435758981546
         },
         "MACD Crossover": {
@@ -53612,33 +53697,33 @@
           "var_95": 0.0
         },
         "Stoch RSI Oversold": {
-          "total_return": 0.7940304486737606,
-          "sharpe": 0.7685964696904155,
-          "sortino": 0.9107936483525153,
-          "calmar": 1.441359455541899,
+          "total_return": 0.8431550653736211,
+          "sharpe": 0.7895874042910819,
+          "sortino": 0.9347801969885472,
+          "calmar": 1.5305326489609679,
           "max_drawdown": -0.5508899571309461,
           "trades": 23.5,
-          "win_rate": 46.954314720812185,
-          "avg_win": 0.03295978816649076,
-          "avg_loss": 0.024444510358368473,
+          "win_rate": 47.20812182741117,
+          "avg_win": 0.03290660749657879,
+          "avg_loss": 0.024541844060560352,
           "max_consecutive_wins": 5,
           "max_consecutive_losses": 7,
-          "kelly_fraction": 0.0761316978614442,
+          "kelly_fraction": 0.07835784769861988,
           "var_95": -0.04332221531749769
         },
         "Williams %R": {
-          "total_return": 0.6064103948235291,
-          "sharpe": 0.7003730159059818,
-          "sortino": 0.8962286618097104,
-          "calmar": 1.1295434685021601,
+          "total_return": 0.6503975495380521,
+          "sharpe": 0.7253816396092554,
+          "sortino": 0.9275995861650949,
+          "calmar": 1.2114770958441556,
           "max_drawdown": -0.5368632653222849,
           "trades": 19.5,
-          "win_rate": 45.93175853018373,
-          "avg_win": 0.02894041635522147,
-          "avg_loss": 0.020919651380276814,
+          "win_rate": 46.194225721784775,
+          "avg_win": 0.02890705139617399,
+          "avg_loss": 0.021001215044071053,
           "max_consecutive_wins": 5,
           "max_consecutive_losses": 7,
-          "kelly_fraction": 0.06848396756464468,
+          "kelly_fraction": 0.07103879883914055,
           "var_95": -0.03526017446794061
         }
       },
@@ -53672,7 +53757,7 @@
         0.22,
         -1.34,
         -1.64,
-        -1.74
+        -1.08
       ],
       "adaptive_threshold": 0.3,
       "kelly_position_size": 0,
@@ -55122,7 +55207,7 @@
             1.29,
             1.31,
             1.3,
-            1.3
+            1.33
           ],
           "sma50": [
             null,
@@ -58014,7 +58099,7 @@
             1.27,
             1.26,
             1.24,
-            1.23
+            1.24
           ]
         },
         "rsi": {
@@ -59462,7 +59547,7 @@
             24.4,
             20.0,
             20.5,
-            20.8
+            27.6
           ],
           "overbought": [
             70,
@@ -62356,7 +62441,7 @@
             -0.0328,
             -0.0353,
             -0.037,
-            -0.0383
+            -0.0355
           ],
           "signal": [
             0.0,
@@ -63079,7 +63164,7 @@
             -0.0129,
             -0.0174,
             -0.0213,
-            -0.0247
+            -0.0241
           ],
           "hist": [
             0.0,
@@ -63802,7 +63887,7 @@
             -0.02,
             -0.0179,
             -0.0157,
-            -0.0136
+            -0.0114
           ]
         },
         "equity": {
@@ -65973,7 +66058,7 @@
             2.4723,
             2.4975,
             2.4917,
-            2.4812
+            2.5491
           ]
         },
         "drawdown": {
@@ -68144,7 +68229,7 @@
             -63.62,
             -63.25,
             -63.33,
-            -63.49
+            -62.49
           ]
         },
         "volume": {
@@ -69592,7 +69677,7 @@
             14744109.0,
             16309745.0,
             12965437.0,
-            5544668.0
+            12203410.0
           ],
           "volume_sma20": [
             null,
@@ -70315,7 +70400,7 @@
             27604618.0,
             26268630.0,
             23926857.0,
-            22299498.0
+            22632435.0
           ]
         }
       },
@@ -70323,7 +70408,7 @@
         "best_day": "Sat",
         "worst_day": "Thu",
         "best_month": "Nov",
-        "worst_month": "Oct"
+        "worst_month": "Feb"
       },
       "signal_filter": {
         "filter": true,
@@ -70410,24 +70495,20 @@
       "intraday_trade": {
         "timeframe": "4h",
         "signal": "NO TRADE",
-        "conviction": 0.45,
+        "conviction": 0.15,
         "entry": null,
         "stop_loss": null,
         "take_profit": null,
         "target_source": null,
         "expected_hours": null,
         "risk_reward": null,
-        "reason": "R:R 0.69 below 1.2 minimum",
+        "reason": "4h signals not aligned (score +0.15)",
         "levels": {
-          "support": 1.29,
-          "resistance": 1.3085,
-          "atr_4h": 0.018595,
-          "rsi_4h": 45.9,
-          "proposed": {
-            "entry": 1.29729,
-            "stop": 1.3085,
-            "target": 1.289506
-          }
+          "support": 1.3177,
+          "resistance": 1.3387,
+          "atr_4h": 0.021636,
+          "rsi_4h": 57.8,
+          "range_position": 0.649
         },
         "mode": "TREND"
       },
@@ -70450,17 +70531,17 @@
       "asset": "ADA",
       "name": "Cardano",
       "date": "2026-10-20",
-      "price": 0.2162,
+      "price": 0.2243,
       "signal": "NO TRADE",
       "conviction": 0.09,
       "composite_score": -0.182,
       "regime": "BEAR_TREND",
       "action": "Filtered: Low conviction",
       "indicators": {
-        "rsi": 24.6,
-        "macd_hist": -0.0043,
+        "rsi": 29.6,
+        "macd_hist": -0.0038,
         "volatility": 0.7,
-        "drawdown": -82.4,
+        "drawdown": -81.8,
         "fng_value": 55,
         "funding_rate": null
       },
@@ -70474,13 +70555,13 @@
         "momentum": {
           "score": -0.3,
           "verdict": "BEARISH",
-          "detail": "RSI 24.6 (weak) + MACD negative.",
+          "detail": "RSI 29.6 (weak) + MACD negative.",
           "weight": 0.2607
         },
         "volatility": {
           "score": -0.7,
           "verdict": "DANGEROUS",
-          "detail": "High volatility: 0.7%, ATR 6.96%.",
+          "detail": "High volatility: 0.7%, ATR 6.94%.",
           "weight": 0.128
         },
         "sentiment": {
@@ -70498,36 +70579,36 @@
         "volume": {
           "score": 0,
           "verdict": "NORMAL",
-          "detail": "Volume 0.1x avg.",
+          "detail": "Volume 0.3x avg.",
           "weight": 0.0474
         },
         "drawdown": {
           "score": 0.5,
           "verdict": "DEEP VALUE",
-          "detail": "Down 82.4% from peak.",
+          "detail": "Down 81.8% from peak.",
           "weight": 0.0474
         }
       },
       "position_sizing": {
         "size_multiplier": 0.01,
-        "position_size": 59.7953,
+        "position_size": 57.7825,
         "risk_amount": 1.8,
         "risk_percent": 0.02,
-        "stop_loss": 0.186112,
-        "take_profit_1": 0.27642,
-        "take_profit_2": 0.336626,
+        "stop_loss": 0.193173,
+        "take_profit_1": 0.286627,
+        "take_profit_2": 0.348929,
         "direction": "LONG"
       },
       "trade_plan": {
         "asset": "ADA",
         "signal": "NO TRADE",
         "conviction": 0.09,
-        "entry_price": 0.216215,
+        "entry_price": 0.224324,
         "entry_type": "NO_TRADE",
-        "stop_loss": 0.186112,
-        "take_profit_1": 0.27642,
-        "take_profit_2": 0.336626,
-        "position_size": 59.7953,
+        "stop_loss": 0.193173,
+        "take_profit_1": 0.286627,
+        "take_profit_2": 0.348929,
+        "position_size": 57.7825,
         "risk_amount": 1.8,
         "risk_percent": 0.02,
         "risk_reward_ratio": 2.0,
@@ -70538,33 +70619,33 @@
       },
       "multi_timeframe": {
         "signals": {
-          "1h": "BEARISH",
-          "4h": "BEARISH",
+          "1h": "BULLISH",
+          "4h": "NEUTRAL",
           "1d": "BEARISH"
         },
         "data": {
           "1h": {
-            "price": 0.216215,
-            "sma20": 0.21696705,
-            "sma50": 0.21773765999999997,
-            "rsi": 44.63601319028321
+            "price": 0.224324,
+            "sma20": 0.21795084999999997,
+            "sma50": 0.21804956,
+            "rsi": 67.56061805171862
           },
           "4h": {
-            "price": 0.216215,
-            "sma20": 0.21855815,
-            "sma50": 0.22622944,
-            "rsi": 40.803104649679256
+            "price": 0.224201,
+            "sma20": 0.21895745,
+            "sma50": 0.22638916,
+            "rsi": 54.14858993800302
           },
           "1d": {
-            "price": 0.216215,
-            "sma20": 0.23956204999999997,
-            "sma50": 0.23021709999999998,
-            "rsi": 39.34610999138314
+            "price": 0.224201,
+            "sma20": 0.23996135000000002,
+            "sma50": 0.23037682,
+            "rsi": 44.32391000244987
           }
         },
-        "alignment": "STRONG",
-        "strength": 1.2,
-        "recommendation": "BEARISH"
+        "alignment": "CONFLICT",
+        "strength": 0.3,
+        "recommendation": "WAIT"
       },
       "regime_strategy": {
         "regime": "BEAR_TREND",
@@ -70572,15 +70653,15 @@
         "size_multiplier": 0.3
       },
       "volatility_forecast": {
-        "current_annual_vol": 60.6,
+        "current_annual_vol": 64.9,
         "long_term_vol": 88.8,
-        "forecast_5d_vol": 160.6,
-        "forecast_20d_vol": 321.3,
+        "forecast_5d_vol": 166.4,
+        "forecast_20d_vol": 332.8,
         "regime": "LOW"
       },
       "price_targets": {
         "target_1": {
-          "price": 0.2,
+          "price": 0.21,
           "probability": 0.7
         },
         "target_2": {
@@ -70588,7 +70669,7 @@
           "probability": 0.5
         },
         "target_3": {
-          "price": 0.17,
+          "price": 0.18,
           "probability": 0.25
         }
       },
@@ -70603,11 +70684,11 @@
       "risk_metrics": {
         "var_95": -5.74,
         "expected_shortfall": -7.12,
-        "max_drawdown": -20.08,
-        "sortino_ratio": 3.27,
-        "calmar_ratio": 1.67,
-        "kelly_fraction": 0.108,
-        "risk_of_ruin": 89.8,
+        "max_drawdown": -19.44,
+        "sortino_ratio": 3.59,
+        "calmar_ratio": 1.98,
+        "kelly_fraction": 0.12,
+        "risk_of_ruin": 88.7,
         "risk_grade": "A"
       },
       "walk_forward": {
@@ -70622,25 +70703,25 @@
         "losses": 0,
         "excluded_pre_fix": 262,
         "tradeable_signals": 262,
-        "no_trade_readings": 763,
-        "total_rows_logged": 1025,
-        "counts_basis": "262 tradeable signals; 763 NO TRADE readings logged for audit and excluded from signal stats",
+        "no_trade_readings": 772,
+        "total_rows_logged": 1034,
+        "counts_basis": "262 tradeable signals; 772 NO TRADE readings logged for audit and excluded from signal stats",
         "avg_conviction": 0.38,
         "avg_conviction_basis": "mean conviction of tradeable signals only",
         "signal_distribution": {
           "STRONG_LONG": 0,
           "LONG": 163,
-          "NO_TRADE": 763,
+          "NO_TRADE": 772,
           "SHORT": 99,
           "STRONG_SHORT": 0
         }
       },
       "onchain": {
         "exchange_flow": {
-          "current_price": 0.22,
-          "price_change_7d": -7.69,
-          "price_vs_avg": -3.61,
-          "signal": "NEUTRAL"
+          "current_price": 0.23,
+          "price_change_7d": -4.53,
+          "price_vs_avg": 0.37,
+          "signal": "BULLISH"
         },
         "network_activity": {
           "signal": "UNKNOWN",
@@ -70652,12 +70733,12 @@
       "filtered_reason": "Low conviction",
       "signal_before_filter": "NO TRADE",
       "support_resistance": {
-        "nearest_resistance": 0.2239,
+        "nearest_resistance": 0.2263,
         "nearest_support": 0.2024,
         "resistance_levels": [
-          0.2239,
           0.2263,
-          0.232
+          0.232,
+          0.2547
         ],
         "support_levels": [
           0.2024,
@@ -70669,14 +70750,14 @@
       },
       "whale_activity": {
         "alert": false,
-        "zscore": -1.54,
+        "zscore": -1.34,
         "severity": "NONE",
-        "description": "Volume normal (-1.5 sigma). No unusual whale activity detected."
+        "description": "Volume normal (-1.3 sigma). No unusual whale activity detected."
       },
       "exchange_flow": {
         "signal": "NEUTRAL",
         "confidence": 0,
-        "description": "Normal exchange flow. Volume at -1.5\u03c3."
+        "description": "Normal exchange flow. Volume at -1.3\u03c3."
       },
       "monte_carlo": {
         "profitable_pct": 92.3333,
@@ -70720,33 +70801,33 @@
           "var_95": -0.038696714216404526
         },
         "Golden Cross": {
-          "total_return": -0.49727383962014304,
-          "sharpe": -0.9944890577699238,
-          "sortino": -0.48181685230214627,
-          "calmar": -0.9449121828609188,
-          "max_drawdown": -0.5262646081189711,
+          "total_return": -0.478419428804426,
+          "sharpe": -0.9299732970910645,
+          "sortino": -0.4498639662395176,
+          "calmar": -0.9157113609093522,
+          "max_drawdown": -0.5224565831850431,
           "trades": 1.5,
-          "win_rate": 43.269230769230774,
-          "avg_win": 0.02884442964201125,
-          "avg_loss": 0.03206229558237487,
+          "win_rate": 44.230769230769226,
+          "avg_win": 0.02885283492705921,
+          "avg_loss": 0.03247760763945593,
           "max_consecutive_wins": 4,
           "max_consecutive_losses": 4,
           "kelly_fraction": 0,
           "var_95": -0.018646673736393726
         },
         "RSI < 30, > 70": {
-          "total_return": -0.10469637303898116,
-          "sharpe": 0.2840692510836351,
-          "sortino": 0.4507330149432881,
-          "calmar": -0.13297042869686107,
+          "total_return": -0.07111860502553669,
+          "sharpe": 0.3072434342646893,
+          "sortino": 0.487242370170428,
+          "calmar": -0.09032472782077551,
           "max_drawdown": -0.7873658381418202,
           "trades": 10.5,
-          "win_rate": 45.07042253521127,
-          "avg_win": 0.03761990413691212,
-          "avg_loss": 0.028926013749843087,
+          "win_rate": 45.305164319248824,
+          "avg_win": 0.03757643868933339,
+          "avg_loss": 0.02901593571326871,
           "max_consecutive_wins": 5,
           "max_consecutive_losses": 7,
-          "kelly_fraction": 0.02834969004096354,
+          "kelly_fraction": 0.030706713413134114,
           "var_95": -0.051323486111336525
         },
         "RSI + Trend Filter": {
@@ -70765,18 +70846,18 @@
           "var_95": -0.002
         },
         "Bollinger Bounce": {
-          "total_return": -0.028955568301906043,
-          "sharpe": 0.31240168127759016,
-          "sortino": 0.44644524643580497,
-          "calmar": -0.04553387136132512,
+          "total_return": 0.007462808298421608,
+          "sharpe": 0.3367609587185212,
+          "sortino": 0.4808734136809925,
+          "calmar": 0.011735585691550409,
           "max_drawdown": -0.6359127268607319,
           "trades": 13.5,
-          "win_rate": 44.985673352435526,
-          "avg_win": 0.038896840628637956,
-          "avg_loss": 0.029331946351463817,
+          "win_rate": 45.27220630372493,
+          "avg_win": 0.038835664882597314,
+          "avg_loss": 0.02944376703250984,
           "max_consecutive_wins": 5,
           "max_consecutive_losses": 7,
-          "kelly_fraction": 0.034995975758802735,
+          "kelly_fraction": 0.03779614052047869,
           "var_95": -0.045077881831189326
         },
         "MACD Crossover": {
@@ -70810,33 +70891,33 @@
           "var_95": 0.0
         },
         "Stoch RSI Oversold": {
-          "total_return": -0.3561829660756668,
-          "sharpe": 0.08745539382121571,
-          "sortino": 0.11835516198286941,
-          "calmar": -0.5370688411779937,
+          "total_return": -0.3320370357373812,
+          "sharpe": 0.11049584920010298,
+          "sortino": 0.14940023162725505,
+          "calmar": -0.5006605115803545,
           "max_drawdown": -0.6631979715941513,
           "trades": 21.5,
-          "win_rate": 44.743276283618584,
-          "avg_win": 0.03699520088021042,
-          "avg_loss": 0.02933229962245233,
+          "win_rate": 44.987775061124694,
+          "avg_win": 0.03695300453169959,
+          "avg_loss": 0.02942722452623357,
           "max_consecutive_wins": 5,
           "max_consecutive_losses": 6,
-          "kelly_fraction": 0.009320051554497909,
+          "kelly_fraction": 0.011792372851168895,
           "var_95": -0.05341747176676748
         },
         "Williams %R": {
-          "total_return": -0.09053899907943208,
-          "sharpe": 0.26015514625115477,
-          "sortino": 0.4160019252556419,
-          "calmar": -0.13703005797428974,
+          "total_return": -0.05643026815667063,
+          "sharpe": 0.28490884974902253,
+          "sortino": 0.45529550426642,
+          "calmar": -0.08540676388778337,
           "max_drawdown": -0.6607236428114148,
           "trades": 18.5,
-          "win_rate": 44.83627204030227,
-          "avg_win": 0.03521475079454125,
-          "avg_loss": 0.026843325905626925,
+          "win_rate": 45.08816120906801,
+          "avg_win": 0.035181322425600896,
+          "avg_loss": 0.02692988154614965,
           "max_consecutive_wins": 5,
           "max_consecutive_losses": 7,
-          "kelly_fraction": 0.027863385782983134,
+          "kelly_fraction": 0.030553661869858743,
           "var_95": -0.047530825165981616
         }
       },
@@ -70870,7 +70951,7 @@
         1.57,
         0.12,
         -0.38,
-        -0.5
+        0.11
       ],
       "adaptive_threshold": 0.3,
       "kelly_position_size": 0,
@@ -76660,7 +76741,7 @@
             40.1,
             32.4,
             24.2,
-            24.6
+            29.6
           ],
           "overbought": [
             70,
@@ -79554,7 +79635,7 @@
             -0.0016,
             -0.0027,
             -0.0037,
-            -0.0046
+            -0.0039
           ],
           "signal": [
             0.0,
@@ -80277,7 +80358,7 @@
             0.0031,
             0.0019,
             0.0008,
-            -0.0003
+            -0.0002
           ],
           "hist": [
             0.0,
@@ -81000,7 +81081,7 @@
             -0.0047,
             -0.0046,
             -0.0045,
-            -0.0043
+            -0.0038
           ]
         },
         "equity": {
@@ -83171,7 +83252,7 @@
             0.6174,
             0.6224,
             0.6137,
-            0.6088
+            0.6317
           ]
         },
         "drawdown": {
@@ -85342,7 +85423,7 @@
             -82.17,
             -82.03,
             -82.28,
-            -82.42
+            -81.76
           ]
         },
         "volume": {
@@ -86790,7 +86871,7 @@
             15818030.0,
             19075367.0,
             16454993.0,
-            5133359.0
+            9635834.0
           ],
           "volume_sma20": [
             null,
@@ -87513,7 +87594,7 @@
             36500313.0,
             36111399.0,
             35497432.0,
-            34461289.0
+            34686413.0
           ]
         }
       },
@@ -87608,24 +87689,20 @@
       "intraday_trade": {
         "timeframe": "4h",
         "signal": "NO TRADE",
-        "conviction": 0.45,
+        "conviction": 0.15,
         "entry": null,
         "stop_loss": null,
         "take_profit": null,
         "target_source": null,
         "expected_hours": null,
         "risk_reward": null,
-        "reason": "R:R 0.30 below 1.2 minimum",
+        "reason": "4h signals not aligned (score -0.15)",
         "levels": {
-          "support": 0.2157,
-          "resistance": 0.2206,
-          "atr_4h": 0.004144,
-          "rsi_4h": 40.8,
-          "proposed": {
-            "entry": 0.216215,
-            "stop": 0.2206,
-            "target": 0.214918
-          }
+          "support": 0.2203,
+          "resistance": 0.2311,
+          "atr_4h": 0.004767,
+          "rsi_4h": 54.1,
+          "range_position": 0.361
         },
         "mode": "TREND"
       },
@@ -87648,17 +87725,17 @@
       "asset": "DOGE",
       "name": "Dogecoin",
       "date": "2026-10-20",
-      "price": 0.0791,
+      "price": 0.0814,
       "signal": "NO TRADE",
-      "conviction": 0.16,
+      "conviction": 0.05,
       "composite_score": -0.322,
       "regime": "STRONG_BEAR",
-      "action": "Filtered: Low volume confirmation",
+      "action": "Filtered: Low conviction",
       "indicators": {
-        "rsi": 20.9,
-        "macd_hist": -0.0009,
+        "rsi": 26.6,
+        "macd_hist": -0.0008,
         "volatility": 0.5,
-        "drawdown": -83.1,
+        "drawdown": -82.6,
         "fng_value": 55,
         "funding_rate": null
       },
@@ -87672,7 +87749,7 @@
         "momentum": {
           "score": -0.3,
           "verdict": "BEARISH",
-          "detail": "RSI 20.9 (weak) + MACD negative.",
+          "detail": "RSI 26.6 (weak) + MACD negative.",
           "weight": 0.2796
         },
         "volatility": {
@@ -87696,72 +87773,72 @@
         "volume": {
           "score": 0,
           "verdict": "NORMAL",
-          "detail": "Volume 0.1x avg.",
+          "detail": "Volume 0.3x avg.",
           "weight": 0.0447
         },
         "drawdown": {
           "score": 0.5,
           "verdict": "DEEP VALUE",
-          "detail": "Down 83.1% from peak.",
+          "detail": "Down 82.6% from peak.",
           "weight": 0.0336
         }
       },
       "position_sizing": {
         "size_multiplier": 0.0,
-        "position_size": 100.2961,
-        "risk_amount": 0.79,
+        "position_size": 95.6944,
+        "risk_amount": 0.78,
         "risk_percent": 0.01,
-        "stop_loss": 0.071254,
-        "take_profit_1": 0.0948501,
-        "take_profit_2": 0.110581,
+        "stop_loss": 0.0732351,
+        "take_profit_1": 0.0977403,
+        "take_profit_2": 0.114077,
         "direction": "LONG"
       },
       "trade_plan": {
         "asset": "DOGE",
         "signal": "NO TRADE",
-        "conviction": 0.16,
-        "entry_price": 0.0791194,
+        "conviction": 0.05,
+        "entry_price": 0.0814035,
         "entry_type": "NO_TRADE",
-        "stop_loss": 0.071254,
-        "take_profit_1": 0.0948501,
-        "take_profit_2": 0.110581,
-        "position_size": 100.2961,
-        "risk_amount": 0.79,
+        "stop_loss": 0.0732351,
+        "take_profit_1": 0.0977403,
+        "take_profit_2": 0.114077,
+        "position_size": 95.6944,
+        "risk_amount": 0.78,
         "risk_percent": 0.01,
         "risk_reward_ratio": 2.0,
         "expected_days_to_tp1": 6,
-        "expected_days_to_tp2": 12,
+        "expected_days_to_tp2": 13,
         "time_horizon": "MULTI-WEEK",
-        "time_note": "~6d to TP1, ~12d to TP2 given ATR $0.00/day, STRONG_BEAR regime, 16% conviction. Estimate, not a promise."
+        "time_note": "~6d to TP1, ~13d to TP2 given ATR $0.00/day, STRONG_BEAR regime, 5% conviction. Estimate, not a promise."
       },
       "multi_timeframe": {
         "signals": {
-          "1h": "NEUTRAL",
-          "4h": "BEARISH",
+          "1h": "BULLISH",
+          "4h": "BULLISH",
           "1d": "BEARISH"
         },
         "data": {
           "1h": {
-            "price": 0.0791194,
-            "sma20": 0.079238975,
-            "sma50": 0.078984432,
-            "rsi": 48.83917427088042
+            "price": 0.0813337,
+            "sma20": 0.07952773999999999,
+            "sma50": 0.079114464,
+            "rsi": 68.2621472955702
           },
           "4h": {
-            "price": 0.0791194,
-            "sma20": 0.079129435,
-            "sma50": 0.081177116,
-            "rsi": 45.304040550498875
+            "price": 0.0813337,
+            "sma20": 0.07924015,
+            "sma50": 0.08122140199999998,
+            "rsi": 57.0154328500702
           },
           "1d": {
-            "price": 0.0791194,
-            "sma20": 0.08615725,
-            "sma50": 0.087859204,
-            "rsi": 35.43192646022902
+            "price": 0.0813337,
+            "sma20": 0.086267965,
+            "sma50": 0.08790349000000001,
+            "rsi": 40.677938446301035
           }
         },
-        "alignment": "WEAK",
-        "strength": 0.6,
+        "alignment": "MODERATE",
+        "strength": 0.8,
         "recommendation": "CAUTIOUS_BEARISH"
       },
       "regime_strategy": {
@@ -87770,10 +87847,10 @@
         "size_multiplier": 0.1
       },
       "volatility_forecast": {
-        "current_annual_vol": 45.6,
+        "current_annual_vol": 49.0,
         "long_term_vol": 82.2,
-        "forecast_5d_vol": 134.7,
-        "forecast_20d_vol": 269.4,
+        "forecast_5d_vol": 139.3,
+        "forecast_20d_vol": 278.6,
         "regime": "LOW"
       },
       "price_targets": {
@@ -87802,12 +87879,12 @@
       "risk_metrics": {
         "var_95": -5.0,
         "expected_shortfall": -5.75,
-        "max_drawdown": -21.21,
-        "sortino_ratio": 1.41,
-        "calmar_ratio": 0.42,
-        "kelly_fraction": 0.057,
-        "risk_of_ruin": 94.4,
-        "risk_grade": "B"
+        "max_drawdown": -21.08,
+        "sortino_ratio": 1.69,
+        "calmar_ratio": 0.57,
+        "kelly_fraction": 0.069,
+        "risk_of_ruin": 93.3,
+        "risk_grade": "A"
       },
       "walk_forward": {
         "validated": false,
@@ -87821,15 +87898,15 @@
         "losses": 0,
         "excluded_pre_fix": 262,
         "tradeable_signals": 262,
-        "no_trade_readings": 764,
-        "total_rows_logged": 1026,
-        "counts_basis": "262 tradeable signals; 764 NO TRADE readings logged for audit and excluded from signal stats",
+        "no_trade_readings": 773,
+        "total_rows_logged": 1035,
+        "counts_basis": "262 tradeable signals; 773 NO TRADE readings logged for audit and excluded from signal stats",
         "avg_conviction": 0.38,
         "avg_conviction_basis": "mean conviction of tradeable signals only",
         "signal_distribution": {
           "STRONG_LONG": 0,
           "LONG": 163,
-          "NO_TRADE": 764,
+          "NO_TRADE": 773,
           "SHORT": 99,
           "STRONG_SHORT": 0
         }
@@ -87837,9 +87914,9 @@
       "onchain": {
         "exchange_flow": {
           "current_price": 0.08,
-          "price_change_7d": -5.92,
-          "price_vs_avg": -1.91,
-          "signal": "NEUTRAL"
+          "price_change_7d": -3.31,
+          "price_vs_avg": 1.35,
+          "signal": "BULLISH"
         },
         "network_activity": {
           "signal": "UNKNOWN",
@@ -87847,35 +87924,35 @@
         }
       },
       "conviction_raw": 0.32,
-      "mtf_multiplier": 1.0,
-      "filtered_reason": "Low volume confirmation",
+      "mtf_multiplier": 0.3,
+      "filtered_reason": "Low conviction",
       "signal_before_filter": "SHORT",
       "support_resistance": {
         "nearest_resistance": 0.0916,
-        "nearest_support": 0.0784,
+        "nearest_support": 0.0813,
         "resistance_levels": [
           0.0916,
           0.0916,
           0.0963
         ],
         "support_levels": [
-          0.0784,
-          0.0783,
-          0.0692
+          0.0813,
+          0.0812,
+          0.0807
         ],
         "no_resistance_overhead": false,
         "no_support_below": false
       },
       "whale_activity": {
         "alert": false,
-        "zscore": -1.51,
+        "zscore": -1.19,
         "severity": "NONE",
-        "description": "Volume normal (-1.5 sigma). No unusual whale activity detected."
+        "description": "Volume normal (-1.2 sigma). No unusual whale activity detected."
       },
       "exchange_flow": {
         "signal": "NEUTRAL",
         "confidence": 0,
-        "description": "Normal exchange flow. Volume at -1.5\u03c3."
+        "description": "Normal exchange flow. Volume at -1.2\u03c3."
       },
       "monte_carlo": {},
       "strategy_validation": {
@@ -87910,30 +87987,30 @@
           "var_95": -0.04268567363269182
         },
         "Golden Cross": {
-          "total_return": -0.3647016910539511,
-          "sharpe": -0.49457035420888845,
-          "sortino": -0.254787364085876,
-          "calmar": -0.7566250068729125,
-          "max_drawdown": -0.4820111518138188,
+          "total_return": -0.3463612477813319,
+          "sharpe": -0.45166595826276545,
+          "sortino": -0.23224768828668027,
+          "calmar": -0.7198736533202666,
+          "max_drawdown": -0.481141720055753,
           "trades": 1.5,
-          "win_rate": 46.728971962616825,
-          "avg_win": 0.03320736550380165,
-          "avg_loss": 0.034992033787046975,
+          "win_rate": 47.66355140186916,
+          "avg_win": 0.03298961963854349,
+          "avg_loss": 0.035499448092642015,
           "max_consecutive_wins": 4,
           "max_consecutive_losses": 4,
           "kelly_fraction": 0,
           "var_95": -0.01830027534087142
         },
         "RSI < 30, > 70": {
-          "total_return": -0.6315018596695872,
-          "sharpe": -0.43968398330018366,
-          "sortino": -0.5145102218769619,
-          "calmar": -0.8763956819441514,
+          "total_return": -0.62086367734858,
+          "sharpe": -0.4174155708653205,
+          "sortino": -0.4881768094347732,
+          "calmar": -0.861632056299813,
           "max_drawdown": -0.7205670596969347,
           "trades": 7.5,
-          "win_rate": 45.66115702479338,
-          "avg_win": 0.03118873724980903,
-          "avg_loss": 0.02837282840987744,
+          "win_rate": 45.867768595041326,
+          "avg_win": 0.031147807471096536,
+          "avg_loss": 0.02845601923329787,
           "max_consecutive_wins": 5,
           "max_consecutive_losses": 7,
           "kelly_fraction": 0,
@@ -87955,15 +88032,15 @@
           "var_95": -0.03543150699708497
         },
         "Bollinger Bounce": {
-          "total_return": -0.6875306515517219,
-          "sharpe": -0.7563786587619045,
-          "sortino": -0.8084206655397194,
-          "calmar": -0.9536885153917445,
+          "total_return": -0.6785099658691873,
+          "sharpe": -0.7304270201198324,
+          "sortino": -0.7801626990897182,
+          "calmar": -0.9411757287734671,
           "max_drawdown": -0.7209174069473894,
           "trades": 7.5,
-          "win_rate": 42.857142857142854,
-          "avg_win": 0.0306592740627332,
-          "avg_loss": 0.026908828634919835,
+          "win_rate": 43.12169312169312,
+          "avg_win": 0.030606777451155913,
+          "avg_loss": 0.027003396057995163,
           "max_consecutive_wins": 5,
           "max_consecutive_losses": 7,
           "kelly_fraction": 0,
@@ -88000,30 +88077,30 @@
           "var_95": 0.0
         },
         "Stoch RSI Oversold": {
-          "total_return": -0.48453257958946927,
-          "sharpe": -0.2587719618147442,
-          "sortino": -0.2759517116386635,
-          "calmar": -0.7735633622183103,
+          "total_return": -0.4696515373297998,
+          "sharpe": -0.23454214229714776,
+          "sortino": -0.24989151596820658,
+          "calmar": -0.7498055602280789,
           "max_drawdown": -0.6263644366506689,
           "trades": 21.5,
-          "win_rate": 43.86422976501306,
-          "avg_win": 0.032728178800052514,
-          "avg_loss": 0.027002799741117942,
+          "win_rate": 44.12532637075718,
+          "avg_win": 0.03266530393363584,
+          "avg_loss": 0.027098248185358095,
           "max_consecutive_wins": 5,
           "max_consecutive_losses": 6,
           "kelly_fraction": 0,
           "var_95": -0.04949737778045693
         },
         "Williams %R": {
-          "total_return": -0.5691225003302061,
-          "sharpe": -0.39323768876127696,
-          "sortino": -0.4513343289490771,
-          "calmar": -0.8336268798558528,
+          "total_return": -0.5566834866749486,
+          "sharpe": -0.3693089784010637,
+          "sortino": -0.42359278846836557,
+          "calmar": -0.8154067319335686,
           "max_drawdown": -0.682706513048879,
           "trades": 14.5,
-          "win_rate": 44.5945945945946,
-          "avg_win": 0.030635407642897024,
-          "avg_loss": 0.026583399783983882,
+          "win_rate": 44.81981981981982,
+          "avg_win": 0.0305925278375339,
+          "avg_loss": 0.026665059241576777,
           "max_consecutive_wins": 5,
           "max_consecutive_losses": 7,
           "kelly_fraction": 0,
@@ -88060,7 +88137,7 @@
         -0.11,
         -1.25,
         -1.25,
-        -1.27
+        -0.79
       ],
       "adaptive_threshold": 0.3,
       "kelly_position_size": 0,
@@ -88155,27 +88232,39 @@
       },
       "intraday_trade": {
         "timeframe": "4h",
-        "signal": "NO TRADE",
-        "conviction": 0.45,
-        "entry": null,
-        "stop_loss": null,
-        "take_profit": null,
-        "target_source": null,
-        "expected_hours": null,
-        "risk_reward": null,
-        "reason": "R:R 0.61 below 1.2 minimum",
+        "signal": "SHORT",
+        "conviction": 0.42,
+        "entry": 0.081334,
+        "stop_loss": 0.082364,
+        "take_profit": 0.0796,
+        "target_source": "nearest 4h support",
+        "expected_hours": 8,
+        "risk_reward": 1.68,
+        "reason": "4h SHORT (range/mean-reversion): RSI 57, price 72% up the range, target at nearest 4h support",
         "levels": {
-          "support": 0.0788,
-          "resistance": 0.0799,
-          "atr_4h": 0.001283,
-          "rsi_4h": 45.3,
-          "proposed": {
-            "entry": 0.0791194,
-            "stop": 0.0799,
-            "target": 0.078645
-          }
+          "support": 0.0796,
+          "resistance": 0.082,
+          "atr_4h": 0.001457,
+          "rsi_4h": 57.0,
+          "range_position": 0.722
         },
-        "mode": "TREND"
+        "mode": "MEAN_REVERSION",
+        "move_pct": 2.13,
+        "move_abs": 0.0017,
+        "expected_label": "~8h",
+        "cvd": {
+          "cvd": null,
+          "cvd_normalized": null,
+          "trend": "UNAVAILABLE",
+          "sample_trades": 0
+        },
+        "liquidation_estimate": {
+          "clusters": [],
+          "nearest_above": null,
+          "nearest_below": null,
+          "funding_skew": 0.0,
+          "method": "proxy_round_levels_plus_funding"
+        }
       },
       "big_trade": {
         "position_size": 0,
@@ -88196,17 +88285,17 @@
       "asset": "LINK",
       "name": "Chainlink",
       "date": "2026-10-20",
-      "price": 11.96,
+      "price": 12.32,
       "signal": "NO TRADE",
       "conviction": 0.06,
       "composite_score": -0.114,
       "regime": "BEAR_TREND",
       "action": "Filtered: Low conviction",
       "indicators": {
-        "rsi": 24.9,
-        "macd_hist": -0.1921,
+        "rsi": 30.5,
+        "macd_hist": -0.1686,
         "volatility": 0.5,
-        "drawdown": -59.1,
+        "drawdown": -57.9,
         "fng_value": 55,
         "funding_rate": null
       },
@@ -88220,7 +88309,7 @@
         "momentum": {
           "score": -0.3,
           "verdict": "BEARISH",
-          "detail": "RSI 24.9 (weak) + MACD negative.",
+          "detail": "RSI 30.5 (weak) + MACD negative.",
           "weight": 0.2607
         },
         "volatility": {
@@ -88244,73 +88333,73 @@
         "volume": {
           "score": 0,
           "verdict": "NORMAL",
-          "detail": "Volume 0.3x avg.",
+          "detail": "Volume 0.4x avg.",
           "weight": 0.0474
         },
         "drawdown": {
           "score": 0.5,
           "verdict": "DEEP VALUE",
-          "detail": "Down 59.1% from peak.",
+          "detail": "Down 57.9% from peak.",
           "weight": 0.0474
         }
       },
       "position_sizing": {
         "size_multiplier": 0.01,
-        "position_size": 1.5716,
-        "risk_amount": 2.11,
+        "position_size": 1.5043,
+        "risk_amount": 2.09,
         "risk_percent": 0.02,
-        "stop_loss": 10.618,
-        "take_profit_1": 14.6362,
-        "take_profit_2": 17.315,
+        "stop_loss": 10.9345,
+        "take_profit_1": 15.1044,
+        "take_profit_2": 17.8843,
         "direction": "LONG"
       },
       "trade_plan": {
         "asset": "LINK",
         "signal": "NO TRADE",
         "conviction": 0.06,
-        "entry_price": 11.9574,
+        "entry_price": 12.3245,
         "entry_type": "NO_TRADE",
-        "stop_loss": 10.618,
-        "take_profit_1": 14.6362,
-        "take_profit_2": 17.315,
-        "position_size": 1.5716,
-        "risk_amount": 2.11,
+        "stop_loss": 10.9345,
+        "take_profit_1": 15.1044,
+        "take_profit_2": 17.8843,
+        "position_size": 1.5043,
+        "risk_amount": 2.09,
         "risk_percent": 0.02,
         "risk_reward_ratio": 2.0,
         "expected_days_to_tp1": 8,
         "expected_days_to_tp2": 16,
         "time_horizon": "MULTI-WEEK",
-        "time_note": "~8d to TP1, ~16d to TP2 given ATR $0.67/day, BEAR_TREND regime, 6% conviction. Estimate, not a promise."
+        "time_note": "~8d to TP1, ~16d to TP2 given ATR $0.69/day, BEAR_TREND regime, 6% conviction. Estimate, not a promise."
       },
       "multi_timeframe": {
         "signals": {
-          "1h": "BEARISH",
-          "4h": "BEARISH",
+          "1h": "BULLISH",
+          "4h": "NEUTRAL",
           "1d": "BEARISH"
         },
         "data": {
           "1h": {
-            "price": 11.95742,
-            "sma20": 11.9585135,
-            "sma50": 11.966545000000002,
-            "rsi": 48.80120979074646
+            "price": 12.32445,
+            "sma20": 12.01423,
+            "sma50": 11.986303,
+            "rsi": 66.09013845242043
           },
           "4h": {
-            "price": 11.94729,
-            "sma20": 11.978480000000001,
-            "sma50": 12.3579052,
-            "rsi": 44.84430450699609
+            "price": 12.32445,
+            "sma20": 11.997338000000001,
+            "sma50": 12.3654484,
+            "rsi": 55.063027429672964
           },
           "1d": {
-            "price": 11.94729,
-            "sma20": 13.01021,
-            "sma50": 12.6880114,
-            "rsi": 40.01651326861483
+            "price": 12.32445,
+            "sma20": 13.029068,
+            "sma50": 12.695554600000001,
+            "rsi": 44.77348945261527
           }
         },
-        "alignment": "STRONG",
-        "strength": 1.2,
-        "recommendation": "BEARISH"
+        "alignment": "CONFLICT",
+        "strength": 0.3,
+        "recommendation": "WAIT"
       },
       "regime_strategy": {
         "regime": "BEAR_TREND",
@@ -88318,23 +88407,23 @@
         "size_multiplier": 0.3
       },
       "volatility_forecast": {
-        "current_annual_vol": 50.9,
+        "current_annual_vol": 54.3,
         "long_term_vol": 82.4,
-        "forecast_5d_vol": 141.9,
-        "forecast_20d_vol": 283.8,
+        "forecast_5d_vol": 146.5,
+        "forecast_20d_vol": 293.0,
         "regime": "LOW"
       },
       "price_targets": {
         "target_1": {
-          "price": 11.29,
+          "price": 11.63,
           "probability": 0.7
         },
         "target_2": {
-          "price": 10.62,
+          "price": 10.93,
           "probability": 0.5
         },
         "target_3": {
-          "price": 9.95,
+          "price": 10.24,
           "probability": 0.25
         }
       },
@@ -88349,11 +88438,11 @@
       "risk_metrics": {
         "var_95": -5.08,
         "expected_shortfall": -5.47,
-        "max_drawdown": -22.53,
-        "sortino_ratio": 5.29,
-        "calmar_ratio": 2.2,
-        "kelly_fraction": 0.161,
-        "risk_of_ruin": 85.1,
+        "max_drawdown": -22.42,
+        "sortino_ratio": 5.64,
+        "calmar_ratio": 2.42,
+        "kelly_fraction": 0.172,
+        "risk_of_ruin": 84.2,
         "risk_grade": "A"
       },
       "walk_forward": {
@@ -88368,25 +88457,25 @@
         "losses": 0,
         "excluded_pre_fix": 262,
         "tradeable_signals": 262,
-        "no_trade_readings": 765,
-        "total_rows_logged": 1027,
-        "counts_basis": "262 tradeable signals; 765 NO TRADE readings logged for audit and excluded from signal stats",
+        "no_trade_readings": 774,
+        "total_rows_logged": 1036,
+        "counts_basis": "262 tradeable signals; 774 NO TRADE readings logged for audit and excluded from signal stats",
         "avg_conviction": 0.38,
         "avg_conviction_basis": "mean conviction of tradeable signals only",
         "signal_distribution": {
           "STRONG_LONG": 0,
           "LONG": 163,
-          "NO_TRADE": 765,
+          "NO_TRADE": 774,
           "SHORT": 99,
           "STRONG_SHORT": 0
         }
       },
       "onchain": {
         "exchange_flow": {
-          "current_price": 11.96,
-          "price_change_7d": -7.56,
-          "price_vs_avg": -2.54,
-          "signal": "NEUTRAL"
+          "current_price": 12.36,
+          "price_change_7d": -4.93,
+          "price_vs_avg": 0.75,
+          "signal": "BULLISH"
         },
         "network_activity": {
           "signal": "UNKNOWN",
@@ -88415,24 +88504,24 @@
       },
       "whale_activity": {
         "alert": false,
-        "zscore": -1.38,
+        "zscore": -1.11,
         "severity": "NONE",
-        "description": "Volume normal (-1.4 sigma). No unusual whale activity detected."
+        "description": "Volume normal (-1.1 sigma). No unusual whale activity detected."
       },
       "exchange_flow": {
         "signal": "NEUTRAL",
         "confidence": 0,
-        "description": "Normal exchange flow. Volume at -1.4\u03c3."
+        "description": "Normal exchange flow. Volume at -1.1\u03c3."
       },
       "monte_carlo": {
-        "profitable_pct": 95.6667,
-        "mean": 1.3655,
-        "median": 1.1521,
-        "std": 1.0582,
+        "profitable_pct": 96.3333,
+        "mean": 1.4396,
+        "median": 1.2533,
+        "std": 1.1041,
         "min": -0.4503,
-        "max": 5.2221,
-        "pct_5": 0.0697,
-        "pct_95": 3.2194
+        "max": 5.4131,
+        "pct_5": 0.0703,
+        "pct_95": 3.4062
       },
       "strategy_validation": {
         "SMA20 Crossover": {
@@ -88466,60 +88555,60 @@
           "var_95": -0.04354720307479132
         },
         "Golden Cross": {
-          "total_return": -0.37912964383198067,
-          "sharpe": -0.3739997495127288,
-          "sortino": -0.25656182183031717,
-          "calmar": -0.7068792752549754,
+          "total_return": -0.36007218437798905,
+          "sharpe": -0.336366881698633,
+          "sortino": -0.23066003257249543,
+          "calmar": -0.6713470415027427,
           "max_drawdown": -0.5363428482115654,
           "trades": 1.5,
-          "win_rate": 47.77070063694268,
-          "avg_win": 0.033829711916439846,
-          "avg_loss": 0.03466529945763541,
+          "win_rate": 48.40764331210191,
+          "avg_win": 0.03370035759661351,
+          "avg_loss": 0.03501306173727358,
           "max_consecutive_wins": 6,
           "max_consecutive_losses": 5,
           "kelly_fraction": 0,
           "var_95": -0.030381246511030136
         },
         "RSI < 30, > 70": {
-          "total_return": -0.5713854901224518,
-          "sharpe": -0.3935901774498384,
-          "sortino": -0.4218262331693483,
-          "calmar": -0.8560492612616876,
+          "total_return": -0.5582292755242896,
+          "sharpe": -0.3681666209256567,
+          "sortino": -0.39437569491301266,
+          "calmar": -0.8363386316036903,
           "max_drawdown": -0.6674680021104342,
           "trades": 6.5,
-          "win_rate": 47.21549636803874,
-          "avg_win": 0.030791409620794172,
-          "avg_loss": 0.029720680428475373,
+          "win_rate": 47.45762711864407,
+          "avg_win": 0.030756753365635214,
+          "avg_loss": 0.029827704048851093,
           "max_consecutive_wins": 8,
           "max_consecutive_losses": 6,
           "kelly_fraction": 0,
           "var_95": -0.047635511638332906
         },
         "RSI + Trend Filter": {
-          "total_return": 1.1962149284189474,
-          "sharpe": 1.3779846543271461,
-          "sortino": 1.0705300664275719,
-          "calmar": 4.454776720469752,
+          "total_return": 1.2636271933705512,
+          "sharpe": 1.4236774039553108,
+          "sortino": 1.104997366068932,
+          "calmar": 4.70582407111389,
           "max_drawdown": -0.26852410423227846,
           "trades": 6.5,
-          "win_rate": 54.78260869565217,
-          "avg_win": 0.03556207784787997,
-          "avg_loss": 0.025976924903980812,
+          "win_rate": 55.65217391304348,
+          "avg_win": 0.03538140137540745,
+          "avg_loss": 0.02635889294509919,
           "max_consecutive_wins": 6,
           "max_consecutive_losses": 4,
-          "kelly_fraction": 0.2175279577832336,
+          "kelly_fraction": 0.226133581869238,
           "var_95": -0.009364872529439516
         },
         "Bollinger Bounce": {
-          "total_return": -0.32098666697238354,
-          "sharpe": -0.035713153482104625,
-          "sortino": -0.034181581894692,
-          "calmar": -0.5720554977771333,
+          "total_return": -0.3001445234647434,
+          "sharpe": -0.009488214374213438,
+          "sortino": -0.009073491401892682,
+          "calmar": -0.5349110802489394,
           "max_drawdown": -0.5611110604122479,
           "trades": 9.5,
-          "win_rate": 47.774480712166174,
-          "avg_win": 0.033188663361245,
-          "avg_loss": 0.030596075441492284,
+          "win_rate": 48.07121661721068,
+          "avg_win": 0.0331319357084573,
+          "avg_loss": 0.030733786987975416,
           "max_consecutive_wins": 5,
           "max_consecutive_losses": 6,
           "kelly_fraction": 0,
@@ -88556,33 +88645,33 @@
           "var_95": 0.0
         },
         "Stoch RSI Oversold": {
-          "total_return": -0.2597393189478716,
-          "sharpe": 0.024453261769360392,
-          "sortino": 0.02639372408946531,
-          "calmar": -0.4730793792165909,
+          "total_return": -0.23701720349432365,
+          "sharpe": 0.05104819133942587,
+          "sortino": 0.05506076634670285,
+          "calmar": -0.43169417686526906,
           "max_drawdown": -0.549039612290847,
           "trades": 20.5,
-          "win_rate": 46.778711484593835,
-          "avg_win": 0.032034553406628564,
-          "avg_loss": 0.028009222723928064,
+          "win_rate": 47.05882352941176,
+          "avg_win": 0.03198672144355125,
+          "avg_loss": 0.028123046363700468,
           "max_consecutive_wins": 6,
           "max_consecutive_losses": 6,
-          "kelly_fraction": 0.002449919486756518,
+          "kelly_fraction": 0.005124101041193872,
           "var_95": -0.04742877989022731
         },
         "Williams %R": {
-          "total_return": -0.23114446422904533,
-          "sharpe": 0.0474374079331211,
-          "sortino": 0.04954460750444047,
-          "calmar": -0.4377900533304378,
+          "total_return": -0.20754463690057368,
+          "sharpe": 0.074698847058641,
+          "sortino": 0.0779616164074312,
+          "calmar": -0.3930917314425176,
           "max_drawdown": -0.5279801641691954,
           "trades": 15.5,
-          "win_rate": 47.28260869565217,
-          "avg_win": 0.03126895034168986,
-          "avg_loss": 0.027772130943188866,
+          "win_rate": 47.55434782608695,
+          "avg_win": 0.031227406531792425,
+          "avg_loss": 0.02788236708897252,
           "max_consecutive_wins": 6,
           "max_consecutive_losses": 6,
-          "kelly_fraction": 0.004606246415321398,
+          "kelly_fraction": 0.007266061548455327,
           "var_95": -0.045528237154421
         }
       },
@@ -88616,7 +88705,7 @@
         1.17,
         0.08,
         -0.2,
-        -0.43
+        0.08
       ],
       "adaptive_threshold": 0.3,
       "kelly_position_size": 0,
@@ -90066,7 +90155,7 @@
             11.97,
             12.03,
             12.04,
-            11.96
+            12.32
           ],
           "sma50": [
             null,
@@ -90789,7 +90878,7 @@
             12.65,
             12.66,
             12.68,
-            12.69
+            12.7
           ],
           "sma200": [
             null,
@@ -92235,7 +92324,7 @@
             15.29,
             14.96,
             14.79,
-            14.64
+            14.62
           ],
           "bb_lower": [
             null,
@@ -92958,7 +93047,7 @@
             11.57,
             11.56,
             11.47,
-            11.38
+            11.44
           ]
         },
         "rsi": {
@@ -94406,7 +94495,7 @@
             26.4,
             24.6,
             27.3,
-            24.9
+            30.5
           ],
           "overbought": [
             70,
@@ -97300,7 +97389,7 @@
             -0.152,
             -0.199,
             -0.2331,
-            -0.2634
+            -0.2341
           ],
           "signal": [
             0.0,
@@ -98023,7 +98112,7 @@
             0.0862,
             0.0292,
             -0.0233,
-            -0.0713
+            -0.0655
           ],
           "hist": [
             0.0,
@@ -98746,7 +98835,7 @@
             -0.2382,
             -0.2282,
             -0.2098,
-            -0.1921
+            -0.1686
           ]
         },
         "equity": {
@@ -100194,7 +100283,7 @@
             2.1993,
             2.2095,
             2.2106,
-            2.1962
+            2.2636
           ],
           "buy_hold": [
             1.0,
@@ -100917,7 +101006,7 @@
             0.9666,
             0.9711,
             0.9716,
-            0.9653
+            0.9949
           ]
         },
         "drawdown": {
@@ -102365,7 +102454,7 @@
             -6.98,
             -6.55,
             -6.51,
-            -7.11
+            -4.26
           ],
           "buy_hold": [
             0.0,
@@ -103088,7 +103177,7 @@
             -59.08,
             -58.89,
             -58.87,
-            -59.14
+            -57.88
           ]
         },
         "volume": {
@@ -104536,7 +104625,7 @@
             224170.0,
             278939.0,
             224900.0,
-            92155.0
+            146465.0
           ],
           "volume_sma20": [
             null,
@@ -105259,7 +105348,7 @@
             498238.0,
             415199.0,
             372509.0,
-            338910.0
+            341626.0
           ]
         }
       },
@@ -105354,24 +105443,20 @@
       "intraday_trade": {
         "timeframe": "4h",
         "signal": "NO TRADE",
-        "conviction": 0.45,
+        "conviction": 0.15,
         "entry": null,
         "stop_loss": null,
         "take_profit": null,
         "target_source": null,
         "expected_hours": null,
         "risk_reward": null,
-        "reason": "R:R 0.38 below 1.2 minimum",
+        "reason": "4h signals not aligned (score +0.15)",
         "levels": {
-          "support": 11.9255,
-          "resistance": 12.1338,
-          "atr_4h": 0.221683,
-          "rsi_4h": 44.8,
-          "proposed": {
-            "entry": 11.94729,
-            "stop": 12.1338,
-            "target": 11.875606
-          }
+          "support": 11.975,
+          "resistance": 12.4991,
+          "atr_4h": 0.253495,
+          "rsi_4h": 55.1,
+          "range_position": 0.667
         },
         "mode": "TREND"
       },
@@ -105394,168 +105479,165 @@
       "asset": "AVAX",
       "name": "Avalanche",
       "date": "2026-10-20",
-      "price": 9.46,
+      "price": 9.83,
       "signal": "NO TRADE",
-      "conviction": 0.09,
-      "composite_score": -0.182,
-      "regime": "BEAR_TREND",
+      "conviction": 0.0,
+      "composite_score": -0.002,
+      "regime": "RANGE",
       "action": "Filtered: Low conviction",
       "indicators": {
-        "rsi": 24.3,
-        "macd_hist": -0.2084,
+        "rsi": 29.3,
+        "macd_hist": -0.1846,
         "volatility": 0.7,
-        "drawdown": -82.5,
+        "drawdown": -81.8,
         "fng_value": 55,
         "funding_rate": null
       },
       "sub_signals": {
         "trend": {
-          "score": -0.3,
-          "verdict": "CAUTIOUSLY BEARISH",
-          "detail": "Price below SMA50 but above SMA200.",
-          "weight": 0.327
+          "score": 1.0,
+          "verdict": "BULLISH",
+          "detail": "Price above both SMA50 and SMA200. Golden cross confirmed.",
+          "weight": 0.1869
         },
         "momentum": {
           "score": -0.3,
           "verdict": "BEARISH",
-          "detail": "RSI 24.3 (weak) + MACD negative.",
-          "weight": 0.2607
+          "detail": "RSI 29.3 (weak) + MACD negative.",
+          "weight": 0.1982
         },
         "volatility": {
           "score": -0.7,
           "verdict": "DANGEROUS",
-          "detail": "High volatility: 0.7%, ATR 7.16%.",
-          "weight": 0.128
+          "detail": "High volatility: 0.7%, ATR 7.10%.",
+          "weight": 0.2378
         },
         "sentiment": {
           "score": 0,
           "verdict": "NEUTRAL",
           "detail": "Fear & Greed: 55 (Neutral).",
-          "weight": 0.1137
+          "weight": 0.1563
         },
         "funding": {
           "score": 0,
           "verdict": "UNKNOWN",
           "detail": "Data unavailable.",
-          "weight": 0.0758
+          "weight": 0.0906
         },
         "volume": {
           "score": 0,
           "verdict": "NORMAL",
-          "detail": "Volume 0.2x avg.",
-          "weight": 0.0474
+          "detail": "Volume 0.4x avg.",
+          "weight": 0.0566
         },
         "drawdown": {
           "score": 0.5,
           "verdict": "DEEP VALUE",
-          "detail": "Down 82.5% from peak.",
-          "weight": 0.0474
+          "detail": "Down 81.8% from peak.",
+          "weight": 0.0736
         }
       },
       "position_sizing": {
         "size_multiplier": 0.01,
-        "position_size": 1.3283,
-        "risk_amount": 1.8,
-        "risk_percent": 0.02,
-        "stop_loss": 8.10386,
-        "take_profit_1": 12.1693,
-        "take_profit_2": 14.8796,
+        "position_size": 2.149,
+        "risk_amount": 3.0,
+        "risk_percent": 0.03,
+        "stop_loss": 8.436,
+        "take_profit_1": 12.624,
+        "take_profit_2": 15.416,
         "direction": "LONG"
       },
       "trade_plan": {
         "asset": "AVAX",
         "signal": "NO TRADE",
-        "conviction": 0.09,
-        "entry_price": 9.459,
+        "conviction": 0.0,
+        "entry_price": 9.832,
         "entry_type": "NO_TRADE",
-        "stop_loss": 8.10386,
-        "take_profit_1": 12.1693,
-        "take_profit_2": 14.8796,
-        "position_size": 1.3283,
-        "risk_amount": 1.8,
-        "risk_percent": 0.02,
+        "stop_loss": 8.436,
+        "take_profit_1": 12.624,
+        "take_profit_2": 15.416,
+        "position_size": 2.149,
+        "risk_amount": 3.0,
+        "risk_percent": 0.03,
         "risk_reward_ratio": 2.0,
-        "expected_days_to_tp1": 8,
-        "expected_days_to_tp2": 15,
+        "expected_days_to_tp1": 15,
+        "expected_days_to_tp2": 30,
         "time_horizon": "MULTI-WEEK",
-        "time_note": "~8d to TP1, ~15d to TP2 given ATR $0.68/day, BEAR_TREND regime, 9% conviction. Estimate, not a promise."
+        "time_note": "~15d to TP1, ~30d to TP2 given ATR $0.70/day, RANGE regime, 0% conviction. Estimate, not a promise."
       },
       "multi_timeframe": {
         "signals": {
-          "1h": "BEARISH",
-          "4h": "BEARISH",
-          "1d": "BEARISH"
+          "1h": "BULLISH",
+          "4h": "NEUTRAL",
+          "1d": "NEUTRAL"
         },
         "data": {
           "1h": {
-            "price": 9.459,
-            "sma20": 9.5182,
-            "sma50": 9.59052,
-            "rsi": 41.31050742516041
+            "price": 9.83,
+            "sma20": 9.55655,
+            "sma50": 9.59942,
+            "rsi": 65.00204309339459
           },
           "4h": {
-            "price": 9.459,
-            "sma20": 9.65775,
-            "sma50": 9.93746,
-            "rsi": 40.23655147116328
+            "price": 9.83,
+            "sma20": 9.676300000000001,
+            "sma50": 9.94488,
+            "rsi": 52.50801612757768
           },
           "1d": {
-            "price": 9.459,
-            "sma20": 10.42475,
-            "sma50": 9.4938,
-            "rsi": 41.91967511962816
+            "price": 9.83,
+            "sma20": 10.443299999999999,
+            "sma50": 9.50122,
+            "rsi": 46.88417136387616
           }
         },
-        "alignment": "STRONG",
-        "strength": 1.2,
-        "recommendation": "BEARISH"
+        "alignment": "WEAK",
+        "strength": 0.6,
+        "recommendation": "CAUTIOUS_NEUTRAL"
       },
       "regime_strategy": {
-        "regime": "BEAR_TREND",
-        "recommended_strategy": "Volatility Breakout",
-        "size_multiplier": 0.3
+        "regime": "RANGE",
+        "recommended_strategy": "RSI + Trend Filter",
+        "size_multiplier": 0.5
       },
       "volatility_forecast": {
-        "current_annual_vol": 67.2,
+        "current_annual_vol": 69.8,
         "long_term_vol": 83.3,
-        "forecast_5d_vol": 164.6,
-        "forecast_20d_vol": 329.2,
+        "forecast_5d_vol": 168.1,
+        "forecast_20d_vol": 336.3,
         "regime": "LOW"
       },
       "price_targets": {
         "target_1": {
-          "price": 8.78,
-          "probability": 0.7
+          "price": 10.25,
+          "probability": 0.55
         },
         "target_2": {
-          "price": 8.1,
-          "probability": 0.5
+          "price": 10.67,
+          "probability": 0.35
         },
         "target_3": {
-          "price": 7.43,
-          "probability": 0.25
+          "price": 11.23,
+          "probability": 0.15
         }
       },
       "regime_change": {
-        "change": true,
-        "previous_regime": "RANGE",
-        "new_regime": "BEAR_TREND",
-        "message": "Regime changed from RANGE to BEAR_TREND",
-        "implication": "RECALIBRATE"
+        "change": false
       },
       "regime_shift": {
         "shift": true,
-        "message": "Regime instability detected",
-        "confidence": 0.7
+        "message": "Regime shift detected: Bullish bias changed from 65% to 5%",
+        "confidence": 0.6,
+        "direction": "BEARISH"
       },
       "risk_metrics": {
         "var_95": -4.69,
         "expected_shortfall": -7.33,
-        "max_drawdown": -18.56,
-        "sortino_ratio": 4.02,
-        "calmar_ratio": 2.57,
-        "kelly_fraction": 0.156,
-        "risk_of_ruin": 85.5,
+        "max_drawdown": -17.41,
+        "sortino_ratio": 4.31,
+        "calmar_ratio": 3.07,
+        "kelly_fraction": 0.17,
+        "risk_of_ruin": 84.4,
         "risk_grade": "A"
       },
       "walk_forward": {
@@ -105570,24 +105652,24 @@
         "losses": 0,
         "excluded_pre_fix": 262,
         "tradeable_signals": 262,
-        "no_trade_readings": 766,
-        "total_rows_logged": 1028,
-        "counts_basis": "262 tradeable signals; 766 NO TRADE readings logged for audit and excluded from signal stats",
+        "no_trade_readings": 775,
+        "total_rows_logged": 1037,
+        "counts_basis": "262 tradeable signals; 775 NO TRADE readings logged for audit and excluded from signal stats",
         "avg_conviction": 0.38,
         "avg_conviction_basis": "mean conviction of tradeable signals only",
         "signal_distribution": {
           "STRONG_LONG": 0,
           "LONG": 163,
-          "NO_TRADE": 766,
+          "NO_TRADE": 775,
           "SHORT": 99,
           "STRONG_SHORT": 0
         }
       },
       "onchain": {
         "exchange_flow": {
-          "current_price": 9.46,
-          "price_change_7d": -7.84,
-          "price_vs_avg": -4.07,
+          "current_price": 9.85,
+          "price_change_7d": -4.26,
+          "price_vs_avg": -0.12,
           "signal": "NEUTRAL"
         },
         "network_activity": {
@@ -105595,7 +105677,7 @@
           "detail": "Network data not available for this asset"
         }
       },
-      "conviction_raw": 0.18,
+      "conviction_raw": 0.0,
       "mtf_multiplier": 1.0,
       "filtered_reason": "Low conviction",
       "signal_before_filter": "NO TRADE",
@@ -105617,14 +105699,14 @@
       },
       "whale_activity": {
         "alert": false,
-        "zscore": -1.32,
+        "zscore": -1.01,
         "severity": "NONE",
-        "description": "Volume normal (-1.3 sigma). No unusual whale activity detected."
+        "description": "Volume normal (-1.0 sigma). No unusual whale activity detected."
       },
       "exchange_flow": {
         "signal": "NEUTRAL",
         "confidence": 0,
-        "description": "Normal exchange flow. Volume at -1.3\u03c3."
+        "description": "Normal exchange flow. Volume at -1.0\u03c3."
       },
       "monte_carlo": {},
       "strategy_validation": {
@@ -105644,30 +105726,30 @@
           "var_95": -0.04360000000000008
         },
         "SMA50 Trend": {
-          "total_return": -0.5688904364447782,
-          "sharpe": -0.546554244506607,
-          "sortino": -0.4706007813308622,
-          "calmar": -0.823991690888084,
+          "total_return": -0.5509796770535632,
+          "sharpe": -0.5068439200001517,
+          "sortino": -0.435396416242025,
+          "calmar": -0.7980494075055623,
           "max_drawdown": -0.6904079770897179,
-          "trades": 27.0,
-          "win_rate": 44.014084507042256,
-          "avg_win": 0.030869275326080015,
-          "avg_loss": 0.027825849556019702,
+          "trades": 26.5,
+          "win_rate": 44.36619718309859,
+          "avg_win": 0.030822859257689888,
+          "avg_loss": 0.02790154656944686,
           "max_consecutive_wins": 5,
           "max_consecutive_losses": 7,
           "kelly_fraction": 0,
           "var_95": -0.04021656050955413
         },
         "Golden Cross": {
-          "total_return": -0.3886160054772646,
-          "sharpe": -0.47172192204037494,
-          "sortino": -0.21226076258100376,
-          "calmar": -0.6609812146302064,
-          "max_drawdown": -0.5879380485793084,
+          "total_return": -0.3645070901630685,
+          "sharpe": -0.41845617603821456,
+          "sortino": -0.18723148525696043,
+          "calmar": -0.6261457300646084,
+          "max_drawdown": -0.5821441761256714,
           "trades": 1.5,
-          "win_rate": 51.78571428571429,
-          "avg_win": 0.02946238435853221,
-          "avg_loss": 0.03806548731439915,
+          "win_rate": 52.67857142857143,
+          "avg_win": 0.029387104127182918,
+          "avg_loss": 0.03852208667062311,
           "max_consecutive_wins": 4,
           "max_consecutive_losses": 4,
           "kelly_fraction": 0,
@@ -105689,30 +105771,30 @@
           "var_95": -0.05069002123142241
         },
         "RSI + Trend Filter": {
-          "total_return": -0.23879404496729661,
-          "sharpe": -0.10685250079167041,
-          "sortino": -0.06387967829837783,
-          "calmar": -0.37620872677946327,
+          "total_return": -0.2087771487597484,
+          "sharpe": -0.060324661515787636,
+          "sortino": -0.035925445808268675,
+          "calmar": -0.3289185261144527,
           "max_drawdown": -0.6347381864623244,
           "trades": 3.5,
-          "win_rate": 49.65034965034965,
-          "avg_win": 0.035552140176266456,
-          "avg_loss": 0.03629969915156021,
+          "win_rate": 50.349650349650354,
+          "avg_win": 0.03540587226699781,
+          "avg_loss": 0.03661567066870151,
           "max_consecutive_wins": 5,
           "max_consecutive_losses": 4,
           "kelly_fraction": 0,
           "var_95": -0.033538672142368275
         },
         "Bollinger Bounce": {
-          "total_return": -0.6421255205028171,
-          "sharpe": -0.48321300753641105,
-          "sortino": -0.49615125108793623,
-          "calmar": -0.9026020593724653,
+          "total_return": -0.6280133330778832,
+          "sharpe": -0.4523621202684408,
+          "sortino": -0.46387246353607653,
+          "calmar": -0.8827653000080014,
           "max_drawdown": -0.7114159710085919,
           "trades": 9.5,
-          "win_rate": 48.157248157248155,
-          "avg_win": 0.03192311162911329,
-          "avg_loss": 0.03255335872667261,
+          "win_rate": 48.402948402948404,
+          "avg_win": 0.03188807477165041,
+          "avg_loss": 0.032642347475682815,
           "max_consecutive_wins": 7,
           "max_consecutive_losses": 7,
           "kelly_fraction": 0,
@@ -105749,30 +105831,30 @@
           "var_95": 0.0
         },
         "Stoch RSI Oversold": {
-          "total_return": -0.3025056271125526,
-          "sharpe": 0.007762267213173526,
-          "sortino": 0.0073869500225491325,
-          "calmar": -0.4710370071968427,
+          "total_return": -0.2750010916344874,
+          "sharpe": 0.040150448854299775,
+          "sortino": 0.03814000838951796,
+          "calmar": -0.4282091953654058,
           "max_drawdown": -0.6422120183566338,
           "trades": 20.5,
-          "win_rate": 46.666666666666664,
-          "avg_win": 0.03424395972903154,
-          "avg_loss": 0.029912832806264035,
+          "win_rate": 46.95652173913044,
+          "avg_win": 0.03418702695730249,
+          "avg_loss": 0.030000521939442925,
           "max_consecutive_wins": 5,
           "max_consecutive_losses": 6,
-          "kelly_fraction": 0.000788568565694845,
+          "kelly_fraction": 0.004086883958842348,
           "var_95": -0.04785365853658541
         },
         "Williams %R": {
-          "total_return": -0.6933200882081564,
-          "sharpe": -0.5749136698220773,
-          "sortino": -0.5960410471516288,
-          "calmar": -0.8681894801320207,
+          "total_return": -0.6812266737776291,
+          "sharpe": -0.5447633112913113,
+          "sortino": -0.5640586625499139,
+          "calmar": -0.8530458612379028,
           "max_drawdown": -0.7985815355683958,
           "trades": 17.5,
-          "win_rate": 46.75925925925926,
-          "avg_win": 0.03190175911209149,
-          "avg_loss": 0.03125960684767331,
+          "win_rate": 46.99074074074074,
+          "avg_win": 0.03186786301158328,
+          "avg_loss": 0.03133556267917175,
           "max_consecutive_wins": 5,
           "max_consecutive_losses": 7,
           "kelly_fraction": 0,
@@ -105809,7 +105891,7 @@
         3.08,
         2.34,
         -0.3,
-        -2.53
+        -1.88
       ],
       "adaptive_threshold": 0.3,
       "kelly_position_size": 0,
@@ -105829,37 +105911,37 @@
         "features": [
           {
             "feature": "trend",
-            "contribution": -0.0981,
-            "direction": "BEARISH",
-            "raw_score": -0.3,
-            "weight": 0.327,
-            "verdict": "CAUTIOUSLY BEARISH",
-            "importance_pct": 33.9
+            "contribution": 0.1869,
+            "direction": "BULLISH",
+            "raw_score": 1.0,
+            "weight": 0.1869,
+            "verdict": "BULLISH",
+            "importance_pct": 41.6
           },
           {
             "feature": "volatility",
-            "contribution": -0.0896,
+            "contribution": -0.1665,
             "direction": "BEARISH",
             "raw_score": -0.7,
-            "weight": 0.128,
+            "weight": 0.2378,
             "verdict": "DANGEROUS",
-            "importance_pct": 30.9
+            "importance_pct": 37.0
           },
           {
             "feature": "momentum",
-            "contribution": -0.0782,
+            "contribution": -0.0595,
             "direction": "BEARISH",
             "raw_score": -0.3,
-            "weight": 0.2607,
+            "weight": 0.1982,
             "verdict": "BEARISH",
-            "importance_pct": 27.0
+            "importance_pct": 13.2
           },
           {
             "feature": "drawdown",
-            "contribution": 0.0237,
+            "contribution": 0.0368,
             "direction": "BULLISH",
             "raw_score": 0.5,
-            "weight": 0.0474,
+            "weight": 0.0736,
             "verdict": "DEEP VALUE",
             "importance_pct": 8.2
           },
@@ -105868,7 +105950,7 @@
             "contribution": 0.0,
             "direction": "NEUTRAL",
             "raw_score": 0,
-            "weight": 0.1137,
+            "weight": 0.1563,
             "verdict": "NEUTRAL",
             "importance_pct": 0.0
           },
@@ -105877,7 +105959,7 @@
             "contribution": 0.0,
             "direction": "NEUTRAL",
             "raw_score": 0,
-            "weight": 0.0758,
+            "weight": 0.0906,
             "verdict": "UNKNOWN",
             "importance_pct": 0.0
           },
@@ -105886,14 +105968,14 @@
             "contribution": 0.0,
             "direction": "NEUTRAL",
             "raw_score": 0,
-            "weight": 0.0474,
+            "weight": 0.0566,
             "verdict": "NORMAL",
             "importance_pct": 0.0
           }
         ],
         "top_driver": "trend",
-        "sum_of_contributions": -0.2422,
-        "composite_score": -0.182,
+        "sum_of_contributions": -0.0023,
+        "composite_score": -0.002,
         "method": "exact_additive_attribution"
       },
       "recommended_trade_size": {
@@ -105905,24 +105987,20 @@
       "intraday_trade": {
         "timeframe": "4h",
         "signal": "NO TRADE",
-        "conviction": 0.45,
+        "conviction": 0.15,
         "entry": null,
         "stop_loss": null,
         "take_profit": null,
         "target_source": null,
         "expected_hours": null,
         "risk_reward": null,
-        "reason": "R:R 0.43 below 1.2 minimum",
+        "reason": "4h signals not aligned (score -0.15)",
         "levels": {
-          "support": 9.332,
-          "resistance": 9.772,
-          "atr_4h": 0.198331,
-          "rsi_4h": 40.2,
-          "proposed": {
-            "entry": 9.459,
-            "stop": 9.756496,
-            "target": 9.332
-          }
+          "support": 9.798,
+          "resistance": 10.057,
+          "atr_4h": 0.226974,
+          "rsi_4h": 52.5,
+          "range_position": 0.124
         },
         "mode": "TREND"
       },
@@ -105942,7 +106020,7 @@
       }
     }
   },
-  "summary": "\n\ud83d\udcca **MARKET CORTEX DAILY SUMMARY**\n\ud83d\udcc5 Tuesday, October 20, 2026\n\u23f0 13:11 UTC\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n\ud83d\udd35 **MARKET OVERVIEW**\nMarket Mood: MIXED\nBullish Assets: 0/9\nBearish Assets: 0/9\nFear & Greed: 55 (Greed)\nTotal Market Cap: $2.74T\n24h Volume: $66.32B\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n\ud83d\udcc8 **SIGNAL PERFORMANCE**\nTotal Signals: 769\nActive Signals: 57\nWin Rate: 30.8%\nTotal Profit: -2572.5%\nAvg Win: 2.2%\nAvg Loss: 6.2%\nBest Trade: 20.2%\nWorst Trade: -18.0%\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n\ud83d\udd34 **TOP BUY SIGNALS**\n\u2022 No strong buy signals detected\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n\ud83d\udfe2 **TOP SELL SIGNALS**\n\u2022 No strong sell signals detected\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n\ud83d\udcc8 **RISK METRICS**\n\n\u2022 VaR (95%): -5.06%\n\u2022 Max Drawdown: -52.43%\n\u2022 Sortino Ratio: -1.9\n\u2022 Risk Grade: F\n\u2022 Kelly Fraction: 0\n\u2022 Risk of Ruin: 100.0%\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n\u26a0\ufe0f **DISCLAIMER:** Research & Educational Tool Only.\nNOT Financial Advice. Past performance \u2260 Future results.\n\n\ud83d\udcca **EDUCATION:**\n\u2022 Win Rate is NOT the only metric \u2014 a 40% win rate with 2:1 R:R is profitable.\n\u2022 The system self-improves over time based on historical performance.\n\u2022 Paper trade first for 3+ months before using real money.\n\u2022 Never risk more than 1-2% of capital on any single trade.\n\n[View Full Dashboard](https://awaisraxa202-ctrl.github.io/crypto_market_intelligence/)\n",
+  "summary": "\n\ud83d\udcca **MARKET CORTEX DAILY SUMMARY**\n\ud83d\udcc5 Tuesday, October 20, 2026\n\u23f0 15:06 UTC\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n\ud83d\udd35 **MARKET OVERVIEW**\nMarket Mood: MIXED\nBullish Assets: 0/9\nBearish Assets: 0/9\nFear & Greed: 55 (Greed)\nTotal Market Cap: $2.79T\n24h Volume: $72.66B\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n\ud83d\udcc8 **SIGNAL PERFORMANCE**\nTotal Signals: 772\nActive Signals: 54\nWin Rate: 30.5%\nTotal Profit: -2582.3%\nAvg Win: 2.2%\nAvg Loss: 6.1%\nBest Trade: 20.2%\nWorst Trade: -18.0%\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n\ud83d\udd34 **TOP BUY SIGNALS**\n\u2022 No strong buy signals detected\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n\ud83d\udfe2 **TOP SELL SIGNALS**\n\u2022 No strong sell signals detected\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n\ud83d\udcc8 **RISK METRICS**\n\n\u2022 VaR (95%): -5.06%\n\u2022 Max Drawdown: -40.57%\n\u2022 Sortino Ratio: -1.01\n\u2022 Risk Grade: F\n\u2022 Kelly Fraction: 0\n\u2022 Risk of Ruin: 100.0%\n\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n\u26a0\ufe0f **DISCLAIMER:** Research & Educational Tool Only.\nNOT Financial Advice. Past performance \u2260 Future results.\n\n\ud83d\udcca **EDUCATION:**\n\u2022 Win Rate is NOT the only metric \u2014 a 40% win rate with 2:1 R:R is profitable.\n\u2022 The system self-improves over time based on historical performance.\n\u2022 Paper trade first for 3+ months before using real money.\n\u2022 Never risk more than 1-2% of capital on any single trade.\n\n[View Full Dashboard](https://awaisraxa202-ctrl.github.io/crypto_market_intelligence/)\n",
   "cross_asset": {
     "correlation_matrix": {
       "BTC": {
@@ -105950,7 +106028,7 @@
         "ETH": 0.843,
         "SOL": 0.826,
         "BNB": 0.742,
-        "XRP": 0.819,
+        "XRP": 0.82,
         "ADA": 0.794,
         "DOGE": 0.75,
         "LINK": 0.774,
@@ -105962,7 +106040,7 @@
         "SOL": 0.86,
         "BNB": 0.739,
         "XRP": 0.781,
-        "ADA": 0.818,
+        "ADA": 0.819,
         "DOGE": 0.821,
         "LINK": 0.854,
         "AVAX": 0.757
@@ -105990,22 +106068,22 @@
         "AVAX": 0.631
       },
       "XRP": {
-        "BTC": 0.819,
+        "BTC": 0.82,
         "ETH": 0.781,
         "SOL": 0.793,
         "BNB": 0.678,
         "XRP": 1.0,
-        "ADA": 0.829,
+        "ADA": 0.83,
         "DOGE": 0.802,
         "LINK": 0.788,
         "AVAX": 0.716
       },
       "ADA": {
         "BTC": 0.794,
-        "ETH": 0.818,
+        "ETH": 0.819,
         "SOL": 0.832,
         "BNB": 0.711,
-        "XRP": 0.829,
+        "XRP": 0.83,
         "ADA": 1.0,
         "DOGE": 0.861,
         "LINK": 0.839,
@@ -106031,7 +106109,7 @@
         "ADA": 0.839,
         "DOGE": 0.828,
         "LINK": 1.0,
-        "AVAX": 0.786
+        "AVAX": 0.787
       },
       "AVAX": {
         "BTC": 0.707,
@@ -106041,13 +106119,13 @@
         "XRP": 0.716,
         "ADA": 0.797,
         "DOGE": 0.769,
-        "LINK": 0.786,
+        "LINK": 0.787,
         "AVAX": 1.0
       }
     },
     "funding_heatmap": {},
     "liquidations": {},
-    "altcoin_season_index": 50.00856401316517,
+    "altcoin_season_index": 50.008637291545064,
     "market_breadth": {
       "breadth_ratio": 0.0,
       "advance": 0,
@@ -106057,9 +106135,9 @@
     },
     "derivatives": {
       "options_btc": {
-        "put_call_ratio": 0.5477272727272727,
-        "avg_implied_vol": 44.29922727272727,
-        "total_options": 880
+        "put_call_ratio": 0.5476190476190477,
+        "avg_implied_vol": 44.77036281179138,
+        "total_options": 882
       }
     },
     "eth_network": {
@@ -106069,62 +106147,62 @@
     "onchain_summaries": {
       "BTC": {
         "nvt": {
-          "nvt": 69.62,
+          "nvt": 62.73,
           "signal": "OVERVALUED",
-          "detail": "NVT is 69.6 (very high). Price elevated relative to on-chain activity."
+          "detail": "NVT is 62.7 (very high). Price elevated relative to on-chain activity."
         },
         "velocity": {
-          "velocity": 1169.2159,
+          "velocity": 1323.5278,
           "signal": "HIGH",
-          "detail": "Velocity is 1169.216 (high). High turnover \u2014 speculative activity."
+          "detail": "Velocity is 1323.528 (high). High turnover \u2014 speculative activity."
         }
       },
       "ETH": {
         "nvt": {
-          "nvt": 32.61,
+          "nvt": 29.13,
           "signal": "ELEVATED",
-          "detail": "NVT is 32.6 (elevated). Price somewhat stretched."
+          "detail": "NVT is 29.1 (elevated). Price somewhat stretched."
         },
         "velocity": {
-          "velocity": 73.3245,
+          "velocity": 84.4876,
           "signal": "HIGH",
-          "detail": "Velocity is 73.324 (high). High turnover \u2014 speculative activity."
+          "detail": "Velocity is 84.488 (high). High turnover \u2014 speculative activity."
         }
       },
       "SOL": {
         "nvt": {
-          "nvt": 27.7,
+          "nvt": 25.64,
           "signal": "ELEVATED",
-          "detail": "NVT is 27.7 (elevated). Price somewhat stretched."
+          "detail": "NVT is 25.6 (elevated). Price somewhat stretched."
         },
         "velocity": {
-          "velocity": 3.7645,
+          "velocity": 4.1828,
           "signal": "HIGH",
-          "detail": "Velocity is 3.764 (high). High turnover \u2014 speculative activity."
+          "detail": "Velocity is 4.183 (high). High turnover \u2014 speculative activity."
         }
       },
       "BNB": {
         "nvt": {
-          "nvt": 150.92,
+          "nvt": 149.86,
           "signal": "OVERVALUED",
-          "detail": "NVT is 150.9 (very high). Price elevated relative to on-chain activity."
+          "detail": "NVT is 149.9 (very high). Price elevated relative to on-chain activity."
         },
         "velocity": {
-          "velocity": 4.8332,
+          "velocity": 4.9202,
           "signal": "HIGH",
-          "detail": "Velocity is 4.833 (high). High turnover \u2014 speculative activity."
+          "detail": "Velocity is 4.920 (high). High turnover \u2014 speculative activity."
         }
       },
       "XRP": {
         "nvt": {
-          "nvt": 68.23,
+          "nvt": 57.63,
           "signal": "OVERVALUED",
-          "detail": "NVT is 68.2 (very high). Price elevated relative to on-chain activity."
+          "detail": "NVT is 57.6 (very high). Price elevated relative to on-chain activity."
         },
         "velocity": {
-          "velocity": 0.019,
+          "velocity": 0.0231,
           "signal": "LOW",
-          "detail": "Velocity is 0.019 (low). Tokens being held \u2014 accumulation phase."
+          "detail": "Velocity is 0.023 (low). Tokens being held \u2014 accumulation phase."
         }
       }
     }
