@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 3627.942421038846,
+  "cash": 3599.8435521701213,
   "positions": {
     "DOGE": {
       "asset": "DOGE",
@@ -56,24 +56,6 @@
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     },
-    "SOL@4h": {
-      "asset": "SOL",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 5.7990984606057125,
-      "avg_entry": 106.2,
-      "opened": "2026-10-20T17:03:44.036148",
-      "tranches": 1,
-      "last_tranche_notional": 615.8642565163267,
-      "stop_loss": 107.141636,
-      "take_profit_1": 105.0,
-      "take_profit_2": 105.0,
-      "risk_distance": 0.9416360000000026,
-      "entry_conviction": 0.39,
-      "expected_hours": 9,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
     "BNB@4h": {
       "asset": "BNB",
       "trade_type": "INTRADAY_4H",
@@ -107,6 +89,24 @@
       "risk_distance": 0.030080000000000107,
       "entry_conviction": 0.4,
       "expected_hours": 19,
+      "tp1_hit": true,
+      "stop_moved_to_breakeven": false
+    },
+    "ADA@4h": {
+      "asset": "ADA",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "qty": 2808.451551088075,
+      "avg_entry": 0.226278,
+      "opened": "2026-10-21T13:04:04.099324",
+      "tranches": 1,
+      "last_tranche_notional": 635.4908000771075,
+      "stop_loss": 0.228348,
+      "take_profit_1": 0.2203,
+      "take_profit_2": 0.2203,
+      "risk_distance": 0.0020699999999999885,
+      "entry_conviction": 0.45,
+      "expected_hours": 10,
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     }
@@ -3001,13 +3001,26 @@
       "opened": "2026-10-21T08:58:48.983408",
       "closed": "2026-10-21T09:30:50.697679",
       "holding_days": 0
+    },
+    {
+      "asset": "SOL",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 106.2,
+      "exit_price": 107.227349,
+      "qty": 5.79909846,
+      "tranches": 1,
+      "pnl": -5.96,
+      "return_pct": -0.97,
+      "opened": "2026-10-20T17:03:44.036148",
+      "closed": "2026-10-21T13:04:04.072931",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-09-24T23:03:43.881182",
-      "equity": 9111.7
-    },
     {
       "ts": "2026-09-25T00:30:55.139827",
       "equity": 9137.38
@@ -5003,6 +5016,10 @@
     {
       "ts": "2026-10-21T11:04:19.746636",
       "equity": 8633.66
+    },
+    {
+      "ts": "2026-10-21T13:04:04.099354",
+      "equity": 8634.72
     }
   ],
   "stats": {
@@ -5018,34 +5035,35 @@
         "avg_holding_days": 6.3
       },
       "INTRADAY_4H": {
-        "closed": 161,
+        "closed": 162,
         "wins": 73,
-        "losses": 88,
-        "win_rate": 45.3,
-        "profit_factor": 1.07,
-        "net_pnl": 55.35,
+        "losses": 89,
+        "win_rate": 45.1,
+        "profit_factor": 1.06,
+        "net_pnl": 49.39,
         "open": 5,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 8633.66,
-    "cash": 3627.94,
+    "equity": 8634.72,
+    "cash": 3599.84,
     "open_positions": 6,
-    "total_return_pct": -13.66,
-    "closed_trades": 170,
+    "total_return_pct": -13.65,
+    "closed_trades": 171,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
     "wins": 73,
-    "losses": 97,
-    "win_rate": 42.9,
-    "win_rate_basis": "73W/97L from 170 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "losses": 98,
+    "win_rate": 42.7,
+    "win_rate_basis": "73W/98L from 171 closed trades (excl. 0 pre-fix + 0 corrupted)",
     "profit_factor": 0.52,
     "avg_win": 11.44,
-    "avg_loss": -16.41,
+    "avg_loss": -16.31,
     "dca_positions": 0,
     "last_events": [
-      "XRP \u26a14h OPENED SHORT 471.901954 @ 1.3572 \u2192 1.2982 (~19h)"
+      "SOL@4h stopped out (-5.96)",
+      "ADA \u26a14h OPENED SHORT 2808.451551 @ 0.2263 \u2192 0.2203 (~10h)"
     ]
   }
 }
