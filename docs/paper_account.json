@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 3614.5822392543932,
+  "cash": 4257.82578300782,
   "positions": {
     "DOGE": {
       "asset": "DOGE",
@@ -89,24 +89,6 @@
       "risk_distance": 0.010847999999999969,
       "entry_conviction": 0.75,
       "expected_hours": 13,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
-    "LINK@4h": {
-      "asset": "LINK",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 50.49387895425609,
-      "avg_entry": 12.63703,
-      "opened": "2026-10-21T19:04:27.521225",
-      "tranches": 1,
-      "last_tranche_notional": 638.0926631613028,
-      "stop_loss": 12.759587,
-      "take_profit_1": 12.5,
-      "take_profit_2": 12.5,
-      "risk_distance": 0.12255700000000047,
-      "entry_conviction": 0.57,
-      "expected_hours": 9,
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     }
@@ -3137,13 +3119,26 @@
       "opened": "2026-10-21T17:04:24.668653",
       "closed": "2026-10-21T18:30:46.599099",
       "holding_days": 0
+    },
+    {
+      "asset": "LINK",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "TAKE_PROFIT_2",
+      "successful": true,
+      "profitable": true,
+      "entry_price": 12.63703,
+      "exit_price": 12.51,
+      "qty": 50.49387895,
+      "tranches": 1,
+      "pnl": 6.41,
+      "return_pct": 1.01,
+      "opened": "2026-10-21T19:04:27.521225",
+      "closed": "2026-10-21T23:45:44.117732",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-09-25T13:04:08.313094",
-      "equity": 9173.41
-    },
     {
       "ts": "2026-09-25T13:45:43.416695",
       "equity": 9132.22
@@ -5139,6 +5134,10 @@
     {
       "ts": "2026-10-21T23:04:07.197616",
       "equity": 8508.83
+    },
+    {
+      "ts": "2026-10-21T23:45:44.145275",
+      "equity": 8500.67
     }
   ],
   "stats": {
@@ -5154,32 +5153,34 @@
         "avg_holding_days": 6.3
       },
       "INTRADAY_4H": {
-        "closed": 169,
-        "wins": 73,
+        "closed": 170,
+        "wins": 74,
         "losses": 96,
-        "win_rate": 43.2,
+        "win_rate": 43.5,
         "profit_factor": 0.99,
-        "net_pnl": -11.82,
-        "open": 5,
+        "net_pnl": -5.41,
+        "open": 4,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 8508.83,
-    "cash": 3614.58,
-    "open_positions": 6,
-    "total_return_pct": -14.91,
-    "closed_trades": 178,
+    "equity": 8500.67,
+    "cash": 4257.83,
+    "open_positions": 5,
+    "total_return_pct": -14.99,
+    "closed_trades": 179,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
-    "wins": 73,
+    "wins": 74,
     "losses": 105,
-    "win_rate": 41.0,
-    "win_rate_basis": "73W/105L from 178 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 0.5,
-    "avg_win": 11.44,
+    "win_rate": 41.3,
+    "win_rate_basis": "74W/105L from 179 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 0.51,
+    "avg_win": 11.37,
     "avg_loss": -15.8,
     "dca_positions": 0,
-    "last_events": []
+    "last_events": [
+      "LINK@4h TP2 hit between full runs \u2014 closed (+6.41)"
+    ]
   }
 }
