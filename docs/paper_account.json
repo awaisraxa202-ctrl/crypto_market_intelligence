@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 3617.8745678217447,
+  "cash": 3724.794835468073,
   "positions": {
     "DOGE": {
       "asset": "DOGE",
@@ -74,24 +74,6 @@
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     },
-    "XRP@4h": {
-      "asset": "XRP",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 543.7657825221155,
-      "avg_entry": 1.38104,
-      "opened": "2026-10-21T19:04:27.521208",
-      "tranches": 1,
-      "last_tranche_notional": 750.9622962943424,
-      "stop_loss": 1.391888,
-      "take_profit_1": 1.35,
-      "take_profit_2": 1.35,
-      "risk_distance": 0.010847999999999969,
-      "entry_conviction": 0.75,
-      "expected_hours": 13,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
     "LINK@4h": {
       "asset": "LINK",
       "trade_type": "INTRADAY_4H",
@@ -107,6 +89,24 @@
       "risk_distance": 0.11262800000000084,
       "entry_conviction": 0.43,
       "expected_hours": 8,
+      "tp1_hit": true,
+      "stop_moved_to_breakeven": false
+    },
+    "XRP@4h": {
+      "asset": "XRP",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "qty": 487.62945265119646,
+      "avg_entry": 1.34846,
+      "opened": "2026-10-22T02:06:32.767451",
+      "tranches": 1,
+      "last_tranche_notional": 657.5488117220324,
+      "stop_loss": 1.359643,
+      "take_profit_1": 1.2982,
+      "take_profit_2": 1.2982,
+      "risk_distance": 0.011182999999999943,
+      "entry_conviction": 0.41,
+      "expected_hours": 15,
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     }
@@ -3154,13 +3154,26 @@
       "opened": "2026-10-21T19:04:27.521225",
       "closed": "2026-10-21T23:45:44.117732",
       "holding_days": 0
+    },
+    {
+      "asset": "XRP",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "TAKE_PROFIT_2",
+      "successful": true,
+      "profitable": true,
+      "entry_price": 1.38104,
+      "exit_price": 1.35108,
+      "qty": 543.76578252,
+      "tranches": 1,
+      "pnl": 16.29,
+      "return_pct": 2.17,
+      "opened": "2026-10-21T19:04:27.521208",
+      "closed": "2026-10-22T02:06:32.752014",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-09-25T14:51:16.108204",
-      "equity": 9127.99
-    },
     {
       "ts": "2026-09-25T15:03:35.747250",
       "equity": 9142.84
@@ -5156,6 +5169,10 @@
     {
       "ts": "2026-10-22T01:03:59.289991",
       "equity": 8494.61
+    },
+    {
+      "ts": "2026-10-22T02:06:32.767464",
+      "equity": 8482.54
     }
   ],
   "stats": {
@@ -5171,34 +5188,35 @@
         "avg_holding_days": 6.3
       },
       "INTRADAY_4H": {
-        "closed": 170,
-        "wins": 74,
+        "closed": 171,
+        "wins": 75,
         "losses": 96,
-        "win_rate": 43.5,
-        "profit_factor": 0.99,
-        "net_pnl": -5.41,
+        "win_rate": 43.9,
+        "profit_factor": 1.01,
+        "net_pnl": 10.88,
         "open": 5,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 8494.61,
-    "cash": 3617.87,
+    "equity": 8482.54,
+    "cash": 3724.79,
     "open_positions": 6,
-    "total_return_pct": -15.05,
-    "closed_trades": 179,
+    "total_return_pct": -15.17,
+    "closed_trades": 180,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
-    "wins": 74,
+    "wins": 75,
     "losses": 105,
-    "win_rate": 41.3,
-    "win_rate_basis": "74W/105L from 179 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 0.51,
-    "avg_win": 11.37,
+    "win_rate": 41.7,
+    "win_rate_basis": "75W/105L from 180 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 0.52,
+    "avg_win": 11.44,
     "avg_loss": -15.8,
     "dca_positions": 0,
     "last_events": [
-      "LINK \u26a14h OPENED SHORT 50.924067 @ 12.5417 \u2192 12.26715 (~8h)"
+      "XRP@4h TP2 hit \u2014 closed (+16.29)",
+      "XRP \u26a14h OPENED SHORT 487.629453 @ 1.3485 \u2192 1.2982 (~15h)"
     ]
   }
 }
