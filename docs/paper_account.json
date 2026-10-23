@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 6866.240818152777,
+  "cash": 7640.748040996815,
   "positions": {
     "DOGE": {
       "asset": "DOGE",
@@ -19,24 +19,6 @@
       "entry_conviction": 0.42,
       "expected_hours": 120,
       "tp1_hit": false
-    },
-    "XRP@4h": {
-      "asset": "XRP",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 573.8884812549672,
-      "avg_entry": 1.32661,
-      "opened": "2026-10-23T07:04:08.282860",
-      "tranches": 1,
-      "last_tranche_notional": 761.3261981176521,
-      "stop_loss": 1.3463,
-      "take_profit_1": 1.3,
-      "take_profit_2": 1.3,
-      "risk_distance": 0.019689999999999985,
-      "entry_conviction": 0.45,
-      "expected_hours": 9,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
     }
   },
   "closed_trades": [
@@ -3286,13 +3268,26 @@
       "opened": "2026-10-23T05:04:10.702366",
       "closed": "2026-10-23T14:15:34.633872",
       "holding_days": 0
+    },
+    {
+      "asset": "XRP",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "TAKE_PROFIT_2",
+      "successful": true,
+      "profitable": true,
+      "entry_price": 1.32661,
+      "exit_price": 1.30104,
+      "qty": 573.88848125,
+      "tranches": 1,
+      "pnl": 14.67,
+      "return_pct": 1.93,
+      "opened": "2026-10-23T07:04:08.282860",
+      "closed": "2026-10-23T19:38:17.487314",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-09-27T11:03:51.397807",
-      "equity": 9179.94
-    },
     {
       "ts": "2026-09-27T13:03:56.683619",
       "equity": 9153.34
@@ -5288,6 +5283,10 @@
     {
       "ts": "2026-10-23T19:03:27.403639",
       "equity": 8598.22
+    },
+    {
+      "ts": "2026-10-23T19:38:17.515693",
+      "equity": 8615.99
     }
   ],
   "stats": {
@@ -5303,34 +5302,35 @@
         "avg_holding_days": 6.3
       },
       "INTRADAY_4H": {
-        "closed": 182,
-        "wins": 82,
+        "closed": 183,
+        "wins": 83,
         "losses": 100,
-        "win_rate": 45.1,
-        "profit_factor": 1.14,
-        "net_pnl": 126.77,
-        "open": 1,
+        "win_rate": 45.4,
+        "profit_factor": 1.16,
+        "net_pnl": 141.44,
+        "open": 0,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 8598.22,
-    "cash": 6866.24,
-    "open_positions": 2,
-    "total_return_pct": -14.02,
-    "closed_trades": 191,
+    "equity": 8615.99,
+    "cash": 7640.75,
+    "open_positions": 1,
+    "total_return_pct": -13.84,
+    "closed_trades": 192,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
-    "wins": 82,
+    "wins": 83,
     "losses": 109,
-    "win_rate": 42.9,
-    "win_rate_basis": "82W/109L from 191 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 0.59,
-    "avg_win": 12.22,
+    "win_rate": 43.2,
+    "win_rate_basis": "83W/109L from 192 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 0.6,
+    "avg_win": 12.25,
     "avg_loss": -15.48,
     "dca_positions": 0,
     "last_events": [
-      "BTC \u26a14h SKIPPED \u2014 target 80842.4176 is inside round-trip costs from entry 81330.4000"
+      "XRP@4h TP2 hit \u2014 closed (+14.67)",
+      "BTC \u26a14h SKIPPED \u2014 target 80707.9294 is inside round-trip costs from entry 81195.1000"
     ]
   }
 }
