@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 5132.486014893966,
+  "cash": 6116.282208196015,
   "positions": {
     "DOGE": {
       "asset": "DOGE",
@@ -19,24 +19,6 @@
       "entry_conviction": 0.42,
       "expected_hours": 120,
       "tp1_hit": false
-    },
-    "BNB@4h": {
-      "asset": "BNB",
-      "trade_type": "INTRADAY_4H",
-      "side": "LONG",
-      "qty": 1.322214295358833,
-      "avg_entry": 737.77,
-      "opened": "2026-10-23T03:03:51.580407",
-      "tranches": 1,
-      "last_tranche_notional": 975.4900406868862,
-      "stop_loss": 734.471347,
-      "take_profit_1": 746.14,
-      "take_profit_2": 746.14,
-      "risk_distance": 3.2986529999999448,
-      "entry_conviction": 0.45,
-      "expected_hours": 8,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
     },
     "LINK@4h": {
       "asset": "LINK",
@@ -3288,13 +3270,26 @@
       "opened": "2026-10-23T03:03:51.580427",
       "closed": "2026-10-23T08:55:34.368688",
       "holding_days": 0
+    },
+    {
+      "asset": "BNB",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "TAKE_PROFIT_2",
+      "successful": true,
+      "profitable": true,
+      "entry_price": 737.77,
+      "exit_price": 745.543088,
+      "qty": 1.3222143,
+      "tranches": 1,
+      "pnl": 10.28,
+      "return_pct": 1.05,
+      "opened": "2026-10-23T03:03:51.580407",
+      "closed": "2026-10-23T10:15:37.959728",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-09-27T00:00:36.588754",
-      "equity": 9129.24
-    },
     {
       "ts": "2026-09-27T01:04:02.811401",
       "equity": 9106.92
@@ -5290,6 +5285,10 @@
     {
       "ts": "2026-10-23T09:03:54.480175",
       "equity": 8611.49
+    },
+    {
+      "ts": "2026-10-23T10:15:44.487614",
+      "equity": 8609.2
     }
   ],
   "stats": {
@@ -5305,32 +5304,34 @@
         "avg_holding_days": 6.3
       },
       "INTRADAY_4H": {
-        "closed": 180,
-        "wins": 80,
+        "closed": 181,
+        "wins": 81,
         "losses": 100,
-        "win_rate": 44.4,
-        "profit_factor": 1.12,
-        "net_pnl": 108.26,
-        "open": 3,
+        "win_rate": 44.8,
+        "profit_factor": 1.14,
+        "net_pnl": 118.54,
+        "open": 2,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 8611.49,
-    "cash": 5132.49,
-    "open_positions": 4,
-    "total_return_pct": -13.89,
-    "closed_trades": 189,
+    "equity": 8609.2,
+    "cash": 6116.28,
+    "open_positions": 3,
+    "total_return_pct": -13.91,
+    "closed_trades": 190,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
-    "wins": 80,
+    "wins": 81,
     "losses": 109,
-    "win_rate": 42.3,
-    "win_rate_basis": "80W/109L from 189 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 0.58,
-    "avg_win": 12.29,
+    "win_rate": 42.6,
+    "win_rate_basis": "81W/109L from 190 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 0.59,
+    "avg_win": 12.26,
     "avg_loss": -15.48,
     "dca_positions": 0,
-    "last_events": []
+    "last_events": [
+      "BNB@4h TP2 hit between full runs \u2014 closed (+10.28)"
+    ]
   }
 }
