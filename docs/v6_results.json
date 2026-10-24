@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-10-24T07:05:52.503520",
-  "imbalance": 0.001,
+  "timestamp": "2026-10-24T08:31:51.497148",
+  "imbalance": 0.124,
   "regime": {
     "regime": "UNKNOWN_UNCERTAINTY",
     "description": "Trade policy uncertainty unavailable \u2014 regime not determined",
@@ -24,13 +24,13 @@
   "big_trade": {
     "position_size": 0.1162,
     "risk_pct": 3.75,
-    "target_movement": 3227.704,
+    "target_movement": 3227.5840000000003,
     "trade_type": "BIG"
   },
   "small_trade": {
     "position_size": 0.1084,
     "risk_pct": 0.88,
-    "target_movement": 806.926,
+    "target_movement": 806.8960000000001,
     "trade_type": "SMALL"
   },
   "explanation": {
@@ -46,15 +46,8 @@
     "historical_evidence": "Similar setups have shown a 50% win rate across 10 comparable past conditions.",
     "historical_trades": [
       {
-        "date": "2026-01-21",
-        "similarity": 98.8,
-        "future_5d_return": -1.26,
-        "rsi": 44.5,
-        "price_vs_sma50": -0.0102
-      },
-      {
         "date": "2026-08-01",
-        "similarity": 98.8,
+        "similarity": 98.9,
         "future_5d_return": 2.39,
         "rsi": 40.1,
         "price_vs_sma50": -0.0095
@@ -68,45 +61,31 @@
       },
       {
         "date": "2026-10-16",
-        "similarity": 98.7,
+        "similarity": 98.8,
         "future_5d_return": 3.09,
         "rsi": 39.9,
         "price_vs_sma50": 0.0031
       },
       {
+        "date": "2026-01-21",
+        "similarity": 98.7,
+        "future_5d_return": -1.26,
+        "rsi": 44.5,
+        "price_vs_sma50": -0.0102
+      },
+      {
         "date": "2026-10-17",
-        "similarity": 98.6,
+        "similarity": 98.7,
         "future_5d_return": -0.08,
         "rsi": 38.6,
         "price_vs_sma50": 0.0007
       },
       {
         "date": "2026-01-26",
-        "similarity": 98.5,
+        "similarity": 98.4,
         "future_5d_return": -10.88,
         "rsi": 42.7,
         "price_vs_sma50": -0.0202
-      },
-      {
-        "date": "2026-08-03",
-        "similarity": 98.5,
-        "future_5d_return": 2.27,
-        "rsi": 41.5,
-        "price_vs_sma50": 0.0025
-      },
-      {
-        "date": "2026-10-15",
-        "similarity": 98.5,
-        "future_5d_return": 0.98,
-        "rsi": 40.7,
-        "price_vs_sma50": 0.0112
-      },
-      {
-        "date": "2026-01-22",
-        "similarity": 98.4,
-        "future_5d_return": -0.37,
-        "rsi": 45.4,
-        "price_vs_sma50": -0.0085
       },
       {
         "date": "2026-05-18",
@@ -114,6 +93,27 @@
         "future_5d_return": -0.36,
         "rsi": 39.6,
         "price_vs_sma50": 0.0173
+      },
+      {
+        "date": "2026-08-03",
+        "similarity": 98.4,
+        "future_5d_return": 2.27,
+        "rsi": 41.5,
+        "price_vs_sma50": 0.0025
+      },
+      {
+        "date": "2026-10-15",
+        "similarity": 98.4,
+        "future_5d_return": 0.98,
+        "rsi": 40.7,
+        "price_vs_sma50": 0.0112
+      },
+      {
+        "date": "2026-01-22",
+        "similarity": 98.3,
+        "future_5d_return": -0.37,
+        "rsi": 45.4,
+        "price_vs_sma50": -0.0085
       }
     ],
     "risk_warning": "\u2705 Moderate confidence. Standard position size recommended.",
@@ -193,8 +193,8 @@
   ],
   "event_risk": {
     "expected_move": "\u00b14.0%",
-    "expected_range_low": 77526.43,
-    "expected_range_high": 83986.97,
+    "expected_range_low": 77470.46,
+    "expected_range_high": 83926.34,
     "direction": "UNCERTAIN",
     "recommendation": "Reduce position size by 50% before event",
     "event": {
@@ -235,31 +235,31 @@
     "source": "yfinance spot BTC ETFs (proxy, not true creation/redemption flow)"
   },
   "onchain": {
-    "mvrv_zscore": 0.892,
-    "miner_reserves": 315200272.0,
-    "nvt_ratio": 72.2,
+    "mvrv_zscore": 0.886,
+    "miner_reserves": 313718930.0,
+    "nvt_ratio": 72.27,
     "hashrate_trend": "RISING",
     "mvrv_is_proxy": true,
-    "miner_reserves_trend": "RISING",
+    "miner_reserves_trend": "FALLING",
     "hashrate_source": "mempool.space (blockchain.info unavailable)"
   },
   "exit_strategy": {
-    "entry": 80692.6,
+    "entry": 80689.6,
     "signal": "SHORT",
-    "current_price": 81499.52600000001,
+    "current_price": 81496.49600000001,
     "scenarios": [
       {
-        "condition": "Price hits TP1 ($78271.82)",
+        "condition": "Price hits TP1 ($78268.91)",
         "action": "Take 50% profit",
         "reason": "Lock in gains, reduce risk"
       },
       {
-        "condition": "Price hits TP2 ($75851.04)",
+        "condition": "Price hits TP2 ($75848.22)",
         "action": "Take remaining 50% profit",
         "reason": "Target hit, complete the trade"
       },
       {
-        "condition": "Price hits SL ($83113.38)",
+        "condition": "Price hits SL ($83110.29)",
         "action": "Exit immediately",
         "reason": "Stop-loss protects capital"
       }
@@ -302,7 +302,7 @@
         {
           "side": "LONG",
           "entry": 62567.4,
-          "exit": 62260.8606,
+          "exit": 62260.7991,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
@@ -334,7 +334,7 @@
         {
           "side": "SHORT",
           "entry": 64127.1,
-          "exit": 64372.2449,
+          "exit": 64372.2452,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 2
@@ -342,7 +342,7 @@
         {
           "side": "SHORT",
           "entry": 64310.2,
-          "exit": 64524.1506,
+          "exit": 64524.1508,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
@@ -350,7 +350,7 @@
         {
           "side": "SHORT",
           "entry": 65336.6,
-          "exit": 65554.7147,
+          "exit": 65554.7149,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
@@ -358,7 +358,7 @@
         {
           "side": "LONG",
           "entry": 64902.9,
-          "exit": 64648.2851,
+          "exit": 64648.285,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
