@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 5163.214811696485,
+  "cash": 6171.265048170997,
   "positions": {
     "DOGE": {
       "asset": "DOGE",
@@ -19,24 +19,6 @@
       "entry_conviction": 0.32,
       "expected_hours": 120,
       "tp1_hit": false
-    },
-    "ETH@4h": {
-      "asset": "ETH",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 0.43663785710028663,
-      "avg_entry": 2331.18,
-      "opened": "2026-10-27T13:04:06.001075",
-      "tranches": 1,
-      "last_tranche_notional": 1017.8814397150461,
-      "stop_loss": 2347.12,
-      "take_profit_1": 2305.19,
-      "take_profit_2": 2305.19,
-      "risk_distance": 15.940000000000055,
-      "entry_conviction": 0.45,
-      "expected_hours": 6,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
     },
     "ADA@4h": {
       "asset": "ADA",
@@ -3526,13 +3508,26 @@
       "opened": "2026-10-27T13:04:06.001095",
       "closed": "2026-10-27T16:30:48.938816",
       "holding_days": 0
+    },
+    {
+      "asset": "ETH",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 2331.18,
+      "exit_price": 2348.997696,
+      "qty": 0.43663786,
+      "tranches": 1,
+      "pnl": -7.78,
+      "return_pct": -0.76,
+      "opened": "2026-10-27T13:04:06.001075",
+      "closed": "2026-10-27T17:15:36.140325",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-09-30T19:03:38.778634",
-      "equity": 9042.21
-    },
     {
       "ts": "2026-09-30T20:24:18.097527",
       "equity": 9027.85
@@ -5528,6 +5523,10 @@
     {
       "ts": "2026-10-27T17:03:37.762576",
       "equity": 8721.5
+    },
+    {
+      "ts": "2026-10-27T17:15:42.846113",
+      "equity": 8703.43
     }
   ],
   "stats": {
@@ -5543,35 +5542,34 @@
         "avg_holding_days": 7.2
       },
       "INTRADAY_4H": {
-        "closed": 193,
+        "closed": 194,
         "wins": 88,
-        "losses": 105,
-        "win_rate": 45.6,
-        "profit_factor": 1.16,
-        "net_pnl": 146.43,
-        "open": 3,
+        "losses": 106,
+        "win_rate": 45.4,
+        "profit_factor": 1.15,
+        "net_pnl": 138.65,
+        "open": 2,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 8721.5,
-    "cash": 5163.21,
-    "open_positions": 4,
-    "total_return_pct": -12.78,
-    "closed_trades": 203,
+    "equity": 8703.43,
+    "cash": 6171.27,
+    "open_positions": 3,
+    "total_return_pct": -12.97,
+    "closed_trades": 204,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
     "wins": 89,
-    "losses": 114,
-    "win_rate": 43.8,
-    "win_rate_basis": "89W/114L from 203 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 0.66,
+    "losses": 115,
+    "win_rate": 43.6,
+    "win_rate_basis": "89W/115L from 204 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 0.65,
     "avg_win": 12.75,
-    "avg_loss": -15.17,
+    "avg_loss": -15.11,
     "dca_positions": 0,
     "last_events": [
-      "LINK \u26a14h OPENED SHORT 79.497522 @ 11.4655 \u2192 11.318 (~5h)",
-      "BNB skipped \u2014 correlated exposure cap"
+      "ETH@4h stopped out between full runs (-7.78)"
     ]
   }
 }
