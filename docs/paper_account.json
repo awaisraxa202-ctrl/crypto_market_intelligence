@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 3551.057949860183,
+  "cash": 5041.485141899816,
   "positions": {
     "DOGE": {
       "asset": "DOGE",
@@ -37,24 +37,6 @@
       "expected_hours": 120,
       "tp1_hit": false
     },
-    "XRP@4h": {
-      "asset": "XRP",
-      "trade_type": "INTRADAY_4H",
-      "side": "LONG",
-      "qty": 654.1142680421623,
-      "avg_entry": 1.32739,
-      "opened": "2026-10-28T21:03:45.338220",
-      "tranches": 1,
-      "last_tranche_notional": 868.2647382564858,
-      "stop_loss": 1.3131,
-      "take_profit_1": 1.35,
-      "take_profit_2": 1.35,
-      "risk_distance": 0.014290000000000136,
-      "entry_conviction": 0.45,
-      "expected_hours": 14,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
     "DOGE@4h": {
       "asset": "DOGE",
       "trade_type": "INTRADAY_4H",
@@ -70,24 +52,6 @@
       "risk_distance": 0.0005580000000000029,
       "entry_conviction": 0.45,
       "expected_hours": 9,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
-    "ADA@4h": {
-      "asset": "ADA",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 3052.405082083374,
-      "avg_entry": 0.205372,
-      "opened": "2026-10-28T23:03:54.746940",
-      "tranches": 1,
-      "last_tranche_notional": 626.8785365176267,
-      "stop_loss": 0.207299,
-      "take_profit_1": 0.2025,
-      "take_profit_2": 0.2025,
-      "risk_distance": 0.001927000000000012,
-      "entry_conviction": 0.75,
-      "expected_hours": 5,
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     }
@@ -3662,13 +3626,43 @@
       "opened": "2026-10-28T19:03:37.560456",
       "closed": "2026-10-28T20:00:53.863403",
       "holding_days": 0
+    },
+    {
+      "asset": "XRP",
+      "trade_type": "INTRADAY_4H",
+      "side": "LONG",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 1.32739,
+      "exit_price": 1.31205,
+      "qty": 654.11426804,
+      "tranches": 1,
+      "pnl": -10.03,
+      "return_pct": -1.16,
+      "opened": "2026-10-28T21:03:45.338220",
+      "closed": "2026-10-29T01:45:37.108778",
+      "holding_days": 0
+    },
+    {
+      "asset": "ADA",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "TAKE_PROFIT_2",
+      "successful": true,
+      "profitable": true,
+      "entry_price": 0.205372,
+      "exit_price": 0.202662,
+      "qty": 3052.40508208,
+      "tranches": 1,
+      "pnl": 8.27,
+      "return_pct": 1.32,
+      "opened": "2026-10-28T23:03:54.746940",
+      "closed": "2026-10-29T01:45:40.528847",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-10-02T11:04:03.064987",
-      "equity": 9128.28
-    },
     {
       "ts": "2026-10-02T13:03:50.953368",
       "equity": 9152.92
@@ -5664,6 +5658,10 @@
     {
       "ts": "2026-10-29T01:24:12.383707",
       "equity": 8647.11
+    },
+    {
+      "ts": "2026-10-29T01:45:40.567647",
+      "equity": 8633.23
     }
   ],
   "stats": {
@@ -5679,32 +5677,35 @@
         "avg_holding_days": 7.2
       },
       "INTRADAY_4H": {
-        "closed": 200,
-        "wins": 89,
-        "losses": 111,
-        "win_rate": 44.5,
+        "closed": 202,
+        "wins": 90,
+        "losses": 112,
+        "win_rate": 44.6,
         "profit_factor": 1.12,
-        "net_pnl": 116.6,
-        "open": 3,
+        "net_pnl": 114.84,
+        "open": 1,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 8647.11,
-    "cash": 3551.06,
-    "open_positions": 5,
-    "total_return_pct": -13.53,
-    "closed_trades": 210,
+    "equity": 8633.23,
+    "cash": 5041.49,
+    "open_positions": 3,
+    "total_return_pct": -13.67,
+    "closed_trades": 212,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
-    "wins": 90,
-    "losses": 120,
+    "wins": 91,
+    "losses": 121,
     "win_rate": 42.9,
-    "win_rate_basis": "90W/120L from 210 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "win_rate_basis": "91W/121L from 212 closed trades (excl. 0 pre-fix + 0 corrupted)",
     "profit_factor": 0.65,
-    "avg_win": 12.81,
-    "avg_loss": -14.81,
+    "avg_win": 12.76,
+    "avg_loss": -14.77,
     "dca_positions": 0,
-    "last_events": []
+    "last_events": [
+      "XRP@4h stopped out between full runs (-10.03)",
+      "ADA@4h TP2 hit between full runs \u2014 closed (+8.27)"
+    ]
   }
 }
