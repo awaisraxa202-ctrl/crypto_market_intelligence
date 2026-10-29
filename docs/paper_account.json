@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 4165.038012012965,
+  "cash": 5735.366584479017,
   "positions": {
     "DOGE": {
       "asset": "DOGE",
@@ -36,42 +36,6 @@
       "entry_conviction": 0.5,
       "expected_hours": 120,
       "tp1_hit": false
-    },
-    "ADA@4h": {
-      "asset": "ADA",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 4290.624082009951,
-      "avg_entry": 0.201678,
-      "opened": "2026-10-29T13:04:02.945854",
-      "tranches": 1,
-      "last_tranche_notional": 865.3244836116029,
-      "stop_loss": 0.2063,
-      "take_profit_1": 0.2,
-      "take_profit_2": 0.2,
-      "risk_distance": 0.004622000000000015,
-      "entry_conviction": 0.45,
-      "expected_hours": 10,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
-    "DOGE@4h": {
-      "asset": "DOGE",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 9193.47079441313,
-      "avg_entry": 0.079977,
-      "opened": "2026-10-29T14:44:47.129721",
-      "tranches": 1,
-      "last_tranche_notional": 735.2662137247789,
-      "stop_loss": 0.080616,
-      "take_profit_1": 0.0787,
-      "take_profit_2": 0.0787,
-      "risk_distance": 0.0006389999999999868,
-      "entry_conviction": 0.63,
-      "expected_hours": 7,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
     }
   },
   "closed_trades": [
@@ -3729,13 +3693,43 @@
       "opened": "2026-10-29T05:04:05.012838",
       "closed": "2026-10-29T12:00:52.662453",
       "holding_days": 0
+    },
+    {
+      "asset": "ADA",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 0.201678,
+      "exit_price": 0.206465,
+      "qty": 4290.62408201,
+      "tranches": 1,
+      "pnl": -20.54,
+      "return_pct": -2.37,
+      "opened": "2026-10-29T13:04:02.945854",
+      "closed": "2026-10-29T16:15:40.045511",
+      "holding_days": 0
+    },
+    {
+      "asset": "DOGE",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 0.079977,
+      "exit_price": 0.08068,
+      "qty": 9193.47079441,
+      "tranches": 1,
+      "pnl": -6.47,
+      "return_pct": -0.88,
+      "opened": "2026-10-29T14:44:47.129721",
+      "closed": "2026-10-29T16:15:40.080103",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-10-03T01:03:27.893736",
-      "equity": 9022.11
-    },
     {
       "ts": "2026-10-03T03:04:10.541172",
       "equity": 9035.06
@@ -5731,6 +5725,10 @@
     {
       "ts": "2026-10-29T15:04:02.217301",
       "equity": 8644.11
+    },
+    {
+      "ts": "2026-10-29T16:15:40.112592",
+      "equity": 8625.96
     }
   ],
   "stats": {
@@ -5746,32 +5744,35 @@
         "avg_holding_days": 7.2
       },
       "INTRADAY_4H": {
-        "closed": 205,
+        "closed": 207,
         "wins": 91,
-        "losses": 114,
-        "win_rate": 44.4,
-        "profit_factor": 1.11,
-        "net_pnl": 112.32,
-        "open": 2,
+        "losses": 116,
+        "win_rate": 44.0,
+        "profit_factor": 1.08,
+        "net_pnl": 85.31,
+        "open": 0,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 8644.11,
-    "cash": 4165.04,
-    "open_positions": 4,
-    "total_return_pct": -13.56,
-    "closed_trades": 215,
+    "equity": 8625.96,
+    "cash": 5735.37,
+    "open_positions": 2,
+    "total_return_pct": -13.74,
+    "closed_trades": 217,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
     "wins": 92,
-    "losses": 123,
-    "win_rate": 42.8,
-    "win_rate_basis": "92W/123L from 215 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 0.65,
+    "losses": 125,
+    "win_rate": 42.4,
+    "win_rate_basis": "92W/125L from 217 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 0.64,
     "avg_win": 12.76,
-    "avg_loss": -14.66,
+    "avg_loss": -14.64,
     "dca_positions": 0,
-    "last_events": []
+    "last_events": [
+      "ADA@4h stopped out between full runs (-20.54)",
+      "DOGE@4h stopped out between full runs (-6.47)"
+    ]
   }
 }
