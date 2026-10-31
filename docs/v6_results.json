@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-10-31T21:06:25.504307",
-  "imbalance": 0.596,
+  "timestamp": "2026-10-31T22:58:13.571779",
+  "imbalance": 0.067,
   "regime": {
     "regime": "UNKNOWN_UNCERTAINTY",
     "description": "Trade policy uncertainty unavailable \u2014 regime not determined",
@@ -15,33 +15,31 @@
   },
   "ml_signal": {
     "bilstm_score": 0.5,
-    "cnn_score": 0.5,
-    "ensemble_score": 0.5,
-    "action": "HOLD",
-    "confidence": 0.5,
-    "trade_qualified": false
+    "cnn_score": 0.0,
+    "ensemble_score": 0.25,
+    "action": "SELL",
+    "confidence": 0.75,
+    "trade_qualified": true
   },
   "big_trade": {
-    "position_size": 0,
-    "risk_pct": 0,
-    "target_movement": 0,
-    "trade_type": "BIG",
-    "gated_reason": "not trade_qualified (action=HOLD)"
+    "position_size": 0.1211,
+    "risk_pct": 3.75,
+    "target_movement": 3096.596,
+    "trade_type": "BIG"
   },
   "small_trade": {
-    "position_size": 0,
-    "risk_pct": 0,
-    "target_movement": 0,
-    "trade_type": "SMALL",
-    "gated_reason": "not trade_qualified (action=HOLD)"
+    "position_size": 0.113,
+    "risk_pct": 0.88,
+    "target_movement": 774.149,
+    "trade_type": "SMALL"
   },
   "explanation": {
     "asset": "BTC",
-    "signal": "HOLD",
-    "confidence": 0.5,
+    "signal": "SELL",
+    "confidence": 0.75,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
-      "\u2705 order_book: Bullish order book imbalance",
+      "\u274c order_book: Order book data unavailable",
       "\u274c onchain: NVT ratio normal",
       "\u2705 sentiment: Fear & Greed in buy zone"
     ],
@@ -49,7 +47,7 @@
     "historical_trades": [
       {
         "date": "2026-05-22",
-        "similarity": 98.6,
+        "similarity": 98.5,
         "future_5d_return": -1.48,
         "rsi": 32.9,
         "price_vs_sma50": -0.0121
@@ -63,31 +61,24 @@
       },
       {
         "date": "2026-10-25",
-        "similarity": 97.6,
+        "similarity": 97.8,
         "future_5d_return": -3.55,
         "rsi": 36.1,
         "price_vs_sma50": -0.0215
       },
       {
         "date": "2026-01-20",
-        "similarity": 97.5,
+        "similarity": 97.7,
         "future_5d_return": -1.97,
         "rsi": 35.4,
         "price_vs_sma50": -0.0224
       },
       {
         "date": "2026-01-25",
-        "similarity": 97.3,
+        "similarity": 97.5,
         "future_5d_return": -2.83,
         "rsi": 38.6,
         "price_vs_sma50": -0.0392
-      },
-      {
-        "date": "2026-06-01",
-        "similarity": 97.3,
-        "future_5d_return": -14.67,
-        "rsi": 25.7,
-        "price_vs_sma50": -0.0767
       },
       {
         "date": "2026-03-29",
@@ -104,28 +95,35 @@
         "price_vs_sma50": -0.0474
       },
       {
+        "date": "2026-06-01",
+        "similarity": 97.1,
+        "future_5d_return": -14.67,
+        "rsi": 25.7,
+        "price_vs_sma50": -0.0767
+      },
+      {
+        "date": "2026-05-19",
+        "similarity": 97.0,
+        "future_5d_return": 0.3,
+        "rsi": 34.2,
+        "price_vs_sma50": 0.0121
+      },
+      {
         "date": "2026-05-26",
         "similarity": 96.9,
         "future_5d_return": -2.97,
         "rsi": 32.6,
         "price_vs_sma50": -0.0163
-      },
-      {
-        "date": "2026-05-19",
-        "similarity": 96.8,
-        "future_5d_return": 0.3,
-        "rsi": 34.2,
-        "price_vs_sma50": 0.0121
       }
     ],
-    "risk_warning": "\u26a0\ufe0f Low confidence trade. Reduce position size by 50%.",
+    "risk_warning": "\u2705 Moderate confidence. Standard position size recommended.",
     "trader_comment": "No clear directional bias. Patience is key.",
     "historical_win_rate": 20.0
   },
   "narrative": {
     "date": "October 31, 2026",
     "macro": "Macro Regime: UNKNOWN_UNCERTAINTY \u2014 Trade policy uncertainty unavailable \u2014 regime not determined",
-    "technicals": "Order book shows bullish imbalance. More buy orders than sell orders.",
+    "technicals": "Order book shows bearish imbalance. More sell orders than buy orders.",
     "sentiment": "Neutral sentiment. No extremes.",
     "upcoming_events": "Next event: FOMC Meeting on 2026-11-05 (Impact: HIGH)",
     "trader_comment": "Market is in a consolidation phase. Watch for breakout."
@@ -195,8 +193,8 @@
   ],
   "event_risk": {
     "expected_move": "\u00b14.0%",
-    "expected_range_low": 74235.46,
-    "expected_range_high": 80421.74,
+    "expected_range_low": 74304.67,
+    "expected_range_high": 80496.73,
     "direction": "UNCERTAIN",
     "recommendation": "Reduce position size by 50% before event",
     "event": {
@@ -237,28 +235,44 @@
     "source": "yfinance spot BTC ETFs (proxy, not true creation/redemption flow)"
   },
   "onchain": {
-    "mvrv_zscore": 0.489,
-    "miner_reserves": 314047414.0,
-    "nvt_ratio": 25.79,
+    "mvrv_zscore": 0.496,
+    "miner_reserves": 313404788.0,
+    "nvt_ratio": 32.74,
     "hashrate_trend": "RISING",
     "mvrv_is_proxy": true,
     "miner_reserves_trend": "RISING",
     "hashrate_source": "mempool.space (blockchain.info unavailable)"
   },
   "exit_strategy": {
-    "entry": 77421.3,
-    "signal": "NO TRADE",
-    "current_price": 78195.513,
-    "scenarios": []
+    "entry": 77414.9,
+    "signal": "SHORT",
+    "current_price": 78189.049,
+    "scenarios": [
+      {
+        "condition": "Price hits TP1 ($75092.45)",
+        "action": "Take 50% profit",
+        "reason": "Lock in gains, reduce risk"
+      },
+      {
+        "condition": "Price hits TP2 ($72770.01)",
+        "action": "Take remaining 50% profit",
+        "reason": "Target hit, complete the trade"
+      },
+      {
+        "condition": "Price hits SL ($79737.35)",
+        "action": "Exit immediately",
+        "reason": "Stop-loss protects capital"
+      }
+    ]
   },
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.5,
-      "cnn_score": 0.5,
-      "ensemble_score": 0.5,
-      "action": "HOLD",
-      "confidence": 0.5,
-      "trade_qualified": false
+      "cnn_score": 0.0,
+      "ensemble_score": 0.25,
+      "action": "SELL",
+      "confidence": 0.75,
+      "trade_qualified": true
     }
   },
   "order_book_history_depth": 1,
