@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-10-31T17:06:47.444763",
-  "imbalance": 0.002,
+  "timestamp": "2026-10-31T18:06:29.853530",
+  "imbalance": 0.055,
   "regime": {
     "regime": "UNKNOWN_UNCERTAINTY",
     "description": "Trade policy uncertainty unavailable \u2014 regime not determined",
@@ -22,15 +22,15 @@
     "trade_qualified": true
   },
   "big_trade": {
-    "position_size": 0.121,
+    "position_size": 0.1209,
     "risk_pct": 3.75,
-    "target_movement": 3098.548,
+    "target_movement": 3102.196,
     "trade_type": "BIG"
   },
   "small_trade": {
-    "position_size": 0.113,
+    "position_size": 0.1128,
     "risk_pct": 0.88,
-    "target_movement": 774.637,
+    "target_movement": 775.549,
     "trade_type": "SMALL"
   },
   "explanation": {
@@ -43,15 +43,8 @@
       "\u274c onchain: NVT ratio normal",
       "\u2705 sentiment: Fear & Greed in buy zone"
     ],
-    "historical_evidence": "Similar setups have shown a 20% win rate across 10 comparable past conditions.",
+    "historical_evidence": "Similar setups have shown a 30% win rate across 10 comparable past conditions.",
     "historical_trades": [
-      {
-        "date": "2026-05-22",
-        "similarity": 98.4,
-        "future_5d_return": -1.48,
-        "rsi": 32.9,
-        "price_vs_sma50": -0.0121
-      },
       {
         "date": "2026-05-27",
         "similarity": 98.4,
@@ -60,22 +53,29 @@
         "price_vs_sma50": -0.0362
       },
       {
+        "date": "2026-05-22",
+        "similarity": 98.2,
+        "future_5d_return": -1.48,
+        "rsi": 32.9,
+        "price_vs_sma50": -0.0121
+      },
+      {
         "date": "2026-10-25",
-        "similarity": 97.9,
+        "similarity": 98.2,
         "future_5d_return": -3.55,
         "rsi": 36.1,
         "price_vs_sma50": -0.0215
       },
       {
         "date": "2026-01-20",
-        "similarity": 97.8,
+        "similarity": 98.1,
         "future_5d_return": -1.97,
         "rsi": 35.4,
         "price_vs_sma50": -0.0224
       },
       {
         "date": "2026-01-25",
-        "similarity": 97.6,
+        "similarity": 97.9,
         "future_5d_return": -2.83,
         "rsi": 38.6,
         "price_vs_sma50": -0.0392
@@ -102,11 +102,11 @@
         "price_vs_sma50": -0.0474
       },
       {
-        "date": "2026-06-01",
-        "similarity": 97.0,
-        "future_5d_return": -14.67,
-        "rsi": 25.7,
-        "price_vs_sma50": -0.0767
+        "date": "2026-03-28",
+        "similarity": 96.9,
+        "future_5d_return": 0.84,
+        "rsi": 38.4,
+        "price_vs_sma50": -0.0368
       },
       {
         "date": "2026-05-26",
@@ -118,7 +118,7 @@
     ],
     "risk_warning": "\u2705 Moderate confidence. Standard position size recommended.",
     "trader_comment": "No clear directional bias. Patience is key.",
-    "historical_win_rate": 20.0
+    "historical_win_rate": 30.0
   },
   "narrative": {
     "date": "October 31, 2026",
@@ -193,8 +193,8 @@
   ],
   "event_risk": {
     "expected_move": "\u00b14.0%",
-    "expected_range_low": 74342.98,
-    "expected_range_high": 80538.22,
+    "expected_range_low": 74455.49,
+    "expected_range_high": 80660.11,
     "direction": "UNCERTAIN",
     "recommendation": "Reduce position size by 50% before event",
     "event": {
@@ -235,31 +235,31 @@
     "source": "yfinance spot BTC ETFs (proxy, not true creation/redemption flow)"
   },
   "onchain": {
-    "mvrv_zscore": 0.5,
-    "miner_reserves": 314861923.0,
-    "nvt_ratio": 21.25,
+    "mvrv_zscore": 0.511,
+    "miner_reserves": 313779436.0,
+    "nvt_ratio": 22.45,
     "hashrate_trend": "RISING",
     "mvrv_is_proxy": true,
     "miner_reserves_trend": "FALLING",
     "hashrate_source": "mempool.space (blockchain.info unavailable)"
   },
   "exit_strategy": {
-    "entry": 77463.7,
+    "entry": 77554.9,
     "signal": "SHORT",
-    "current_price": 78238.337,
+    "current_price": 78330.449,
     "scenarios": [
       {
-        "condition": "Price hits TP1 ($75139.79)",
+        "condition": "Price hits TP1 ($75228.25)",
         "action": "Take 50% profit",
         "reason": "Lock in gains, reduce risk"
       },
       {
-        "condition": "Price hits TP2 ($72815.88)",
+        "condition": "Price hits TP2 ($72901.61)",
         "action": "Take remaining 50% profit",
         "reason": "Target hit, complete the trade"
       },
       {
-        "condition": "Price hits SL ($79787.61)",
+        "condition": "Price hits SL ($79881.55)",
         "action": "Exit immediately",
         "reason": "Stop-loss protects capital"
       }
