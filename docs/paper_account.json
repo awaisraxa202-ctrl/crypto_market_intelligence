@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 2549.4307842650387,
+  "cash": 4698.9902631522855,
   "positions": {
     "DOGE": {
       "asset": "DOGE",
@@ -17,23 +17,6 @@
       "take_profit_2": 0.0481306,
       "risk_distance": 0.0074174000000000045,
       "entry_conviction": 0.32,
-      "expected_hours": 120,
-      "tp1_hit": false
-    },
-    "XRP": {
-      "asset": "XRP",
-      "trade_type": "SWING_DAILY",
-      "side": "SHORT",
-      "qty": 882.5800155559665,
-      "avg_entry": 1.22,
-      "opened": "2026-10-30T01:03:47.203251",
-      "tranches": 1,
-      "last_tranche_notional": 1076.7476189782792,
-      "stop_loss": 1.32377,
-      "take_profit_1": 1.01815,
-      "take_profit_2": 0.814403,
-      "risk_distance": 0.10376999999999992,
-      "entry_conviction": 0.36,
       "expected_hours": 120,
       "tp1_hit": false
     },
@@ -72,24 +55,6 @@
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     },
-    "ETH@4h": {
-      "asset": "ETH",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 0.3062165802197897,
-      "avg_entry": 2395.76,
-      "opened": "2026-11-04T15:04:34.522581",
-      "tranches": 1,
-      "last_tranche_notional": 733.6214342273635,
-      "stop_loss": 2419.951252,
-      "take_profit_1": 2350.0,
-      "take_profit_2": 2350.0,
-      "risk_distance": 24.191251999999622,
-      "entry_conviction": 0.65,
-      "expected_hours": 17,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
     "AVAX@4h": {
       "asset": "AVAX",
       "trade_type": "INTRADAY_4H",
@@ -123,24 +88,6 @@
       "risk_distance": 0.1580849999999998,
       "entry_conviction": 0.46,
       "expected_hours": 8,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
-    "SOL@4h": {
-      "asset": "SOL",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 4.711666607030827,
-      "avg_entry": 95.52,
-      "opened": "2026-11-04T15:04:34.522604",
-      "tranches": 1,
-      "last_tranche_notional": 450.0583943035845,
-      "stop_loss": 96.634259,
-      "take_profit_1": 93.74,
-      "take_profit_2": 93.74,
-      "risk_distance": 1.114259000000004,
-      "entry_conviction": 0.42,
-      "expected_hours": 7,
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     }
@@ -4208,13 +4155,60 @@
       "opened": "2026-11-04T11:04:14.057554",
       "closed": "2026-11-04T14:45:48.609440",
       "holding_days": 0
+    },
+    {
+      "asset": "XRP",
+      "trade_type": "SWING_DAILY",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 1.22,
+      "exit_price": 1.324829,
+      "qty": 882.58001556,
+      "tranches": 1,
+      "pnl": -92.52,
+      "return_pct": -8.59,
+      "opened": "2026-10-30T01:03:47.203251",
+      "closed": "2026-11-04T15:30:44.232444",
+      "holding_days": 5
+    },
+    {
+      "asset": "ETH",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 2395.76,
+      "exit_price": 2421.887213,
+      "qty": 0.30621658,
+      "tranches": 1,
+      "pnl": -8.0,
+      "return_pct": -1.09,
+      "opened": "2026-11-04T15:04:34.522581",
+      "closed": "2026-11-04T15:30:51.025560",
+      "holding_days": 0
+    },
+    {
+      "asset": "SOL",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 95.52,
+      "exit_price": 96.711566,
+      "qty": 4.71166661,
+      "tranches": 1,
+      "pnl": -5.61,
+      "return_pct": -1.25,
+      "opened": "2026-11-04T15:04:34.522604",
+      "closed": "2026-11-04T15:31:01.075135",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-10-08T21:03:38.758768",
-      "equity": 8669.55
-    },
     {
       "ts": "2026-10-08T22:34:44.170610",
       "equity": 8672.06
@@ -6210,53 +6204,55 @@
     {
       "ts": "2026-11-04T15:04:34.522616",
       "equity": 8615.65
+    },
+    {
+      "ts": "2026-11-04T15:31:01.105036",
+      "equity": 8438.73
     }
   ],
   "stats": {
     "by_type": {
       "SWING_DAILY": {
-        "closed": 11,
+        "closed": 12,
         "wins": 1,
-        "losses": 10,
-        "win_rate": 9.1,
-        "profit_factor": 0.08,
-        "net_pnl": -835.31,
-        "open": 3,
-        "avg_holding_days": 6.6
+        "losses": 11,
+        "win_rate": 8.3,
+        "profit_factor": 0.07,
+        "net_pnl": -927.83,
+        "open": 2,
+        "avg_holding_days": 6.5
       },
       "INTRADAY_4H": {
-        "closed": 228,
+        "closed": 230,
         "wins": 104,
-        "losses": 124,
-        "win_rate": 45.6,
-        "profit_factor": 1.13,
-        "net_pnl": 146.17,
-        "open": 5,
+        "losses": 126,
+        "win_rate": 45.2,
+        "profit_factor": 1.12,
+        "net_pnl": 132.56,
+        "open": 3,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 8615.65,
-    "cash": 2549.43,
-    "open_positions": 8,
-    "total_return_pct": -13.84,
-    "closed_trades": 239,
+    "equity": 8438.73,
+    "cash": 4698.99,
+    "open_positions": 5,
+    "total_return_pct": -15.61,
+    "closed_trades": 242,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
     "wins": 105,
-    "losses": 134,
-    "win_rate": 43.9,
-    "win_rate_basis": "105W/134L from 239 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 0.65,
+    "losses": 137,
+    "win_rate": 43.4,
+    "win_rate_basis": "105W/137L from 242 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 0.62,
     "avg_win": 12.42,
-    "avg_loss": -14.88,
+    "avg_loss": -15.32,
     "dca_positions": 0,
     "last_events": [
-      "XRP \u26a14h OPENED SHORT 653.666429 @ 1.3208 \u2192 1.3 (~13h)",
-      "ETH \u26a14h OPENED SHORT 0.306217 @ 2395.7600 \u2192 2350.0 (~17h)",
-      "AVAX \u26a14h OPENED SHORT 69.961631 @ 8.9100 \u2192 8.724 (~7h)",
-      "LINK \u26a14h OPENED SHORT 45.711305 @ 11.5872 \u2192 11.5 (~8h)",
-      "SOL \u26a14h OPENED SHORT 4.711667 @ 95.5200 \u2192 93.74 (~7h)"
+      "XRP stopped out between full runs (-92.52)",
+      "ETH@4h stopped out between full runs (-8.00)",
+      "SOL@4h stopped out between full runs (-5.61)"
     ]
   }
 }
