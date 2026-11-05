@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 2971.3799329851145,
+  "cash": 3966.5196457600964,
   "positions": {
     "DOGE": {
       "asset": "DOGE",
@@ -36,24 +36,6 @@
       "entry_conviction": 0.36,
       "expected_hours": 120,
       "tp1_hit": false
-    },
-    "XRP@4h": {
-      "asset": "XRP",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 769.4963923235454,
-      "avg_entry": 1.30772,
-      "opened": "2026-11-04T23:04:04.147618",
-      "tranches": 1,
-      "last_tranche_notional": 1006.2858221693467,
-      "stop_loss": 1.318511,
-      "take_profit_1": 1.2791,
-      "take_profit_2": 1.2791,
-      "risk_distance": 0.010790999999999995,
-      "entry_conviction": 0.6,
-      "expected_hours": 9,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
     },
     "LINK@4h": {
       "asset": "LINK",
@@ -4344,13 +4326,26 @@
       "opened": "2026-11-04T19:04:40.075022",
       "closed": "2026-11-04T22:45:34.537184",
       "holding_days": 0
+    },
+    {
+      "asset": "XRP",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 1.30772,
+      "exit_price": 1.319566,
+      "qty": 769.49639232,
+      "tranches": 1,
+      "pnl": -9.12,
+      "return_pct": -0.91,
+      "opened": "2026-11-04T23:04:04.147618",
+      "closed": "2026-11-05T08:30:44.784656",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-10-09T19:03:55.589318",
-      "equity": 8637.28
-    },
     {
       "ts": "2026-10-09T21:03:57.806925",
       "equity": 8640.82
@@ -6346,6 +6341,10 @@
     {
       "ts": "2026-11-05T07:03:37.044086",
       "equity": 8402.43
+    },
+    {
+      "ts": "2026-11-05T08:30:57.726793",
+      "equity": 8409.04
     }
   ],
   "stats": {
@@ -6361,32 +6360,34 @@
         "avg_holding_days": 6.5
       },
       "INTRADAY_4H": {
-        "closed": 236,
+        "closed": 237,
         "wins": 107,
-        "losses": 129,
-        "win_rate": 45.3,
-        "profit_factor": 1.12,
-        "net_pnl": 139.16,
-        "open": 5,
+        "losses": 130,
+        "win_rate": 45.1,
+        "profit_factor": 1.11,
+        "net_pnl": 130.04,
+        "open": 4,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 8402.43,
-    "cash": 2971.38,
-    "open_positions": 7,
-    "total_return_pct": -15.98,
-    "closed_trades": 248,
+    "equity": 8409.04,
+    "cash": 3966.52,
+    "open_positions": 6,
+    "total_return_pct": -15.91,
+    "closed_trades": 249,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
     "wins": 108,
-    "losses": 140,
-    "win_rate": 43.5,
-    "win_rate_basis": "108W/140L from 248 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "losses": 141,
+    "win_rate": 43.4,
+    "win_rate_basis": "108W/141L from 249 closed trades (excl. 0 pre-fix + 0 corrupted)",
     "profit_factor": 0.63,
     "avg_win": 12.34,
-    "avg_loss": -15.16,
+    "avg_loss": -15.11,
     "dca_positions": 0,
-    "last_events": []
+    "last_events": [
+      "XRP@4h stopped out between full runs (-9.12)"
+    ]
   }
 }
