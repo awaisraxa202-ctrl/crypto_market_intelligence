@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-11-06T17:05:39.388522",
-  "imbalance": 0.143,
+  "timestamp": "2026-11-06T18:39:17.521202",
+  "imbalance": 0.326,
   "regime": {
     "regime": "UNKNOWN_UNCERTAINTY",
     "description": "Trade policy uncertainty unavailable \u2014 regime not determined",
@@ -15,35 +15,35 @@
   },
   "ml_signal": {
     "bilstm_score": 0.5,
-    "cnn_score": 0.015,
-    "ensemble_score": 0.258,
+    "cnn_score": 0.289,
+    "ensemble_score": 0.394,
     "action": "SELL",
-    "confidence": 0.742,
+    "confidence": 0.606,
     "trade_qualified": true
   },
   "big_trade": {
-    "position_size": 0.1233,
-    "risk_pct": 3.74,
-    "target_movement": 3035.68,
+    "position_size": 0.1188,
+    "risk_pct": 3.61,
+    "target_movement": 3034.988,
     "trade_type": "BIG"
   },
   "small_trade": {
-    "position_size": 0.1148,
-    "risk_pct": 0.87,
-    "target_movement": 758.92,
+    "position_size": 0.1058,
+    "risk_pct": 0.8,
+    "target_movement": 758.747,
     "trade_type": "SMALL"
   },
   "explanation": {
     "asset": "BTC",
     "signal": "SELL",
-    "confidence": 0.742,
+    "confidence": 0.606,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
       "\u274c order_book: Order book data unavailable",
       "\u274c onchain: NVT ratio normal",
       "\u2705 sentiment: Fear & Greed in buy zone"
     ],
-    "historical_evidence": "Similar setups have shown a 30% win rate across 10 comparable past conditions.",
+    "historical_evidence": "Similar setups have shown a 20% win rate across 10 comparable past conditions.",
     "historical_trades": [
       {
         "date": "2026-01-20",
@@ -54,8 +54,8 @@
       },
       {
         "date": "2026-11-01",
-        "similarity": 98.0,
-        "future_5d_return": -3.04,
+        "similarity": 97.9,
+        "future_5d_return": -3.12,
         "rsi": 35.3,
         "price_vs_sma50": -0.0449
       },
@@ -82,10 +82,17 @@
       },
       {
         "date": "2026-05-27",
-        "similarity": 97.2,
+        "similarity": 97.3,
         "future_5d_return": -4.06,
         "rsi": 31.9,
         "price_vs_sma50": -0.0362
+      },
+      {
+        "date": "2026-06-27",
+        "similarity": 97.1,
+        "future_5d_return": 2.57,
+        "rsi": 32.8,
+        "price_vs_sma50": -0.1416
       },
       {
         "date": "2026-03-29",
@@ -95,30 +102,23 @@
         "price_vs_sma50": -0.0413
       },
       {
-        "date": "2026-06-27",
-        "similarity": 97.0,
-        "future_5d_return": 2.57,
-        "rsi": 32.8,
-        "price_vs_sma50": -0.1416
-      },
-      {
         "date": "2026-05-26",
-        "similarity": 96.9,
+        "similarity": 96.8,
         "future_5d_return": -2.97,
         "rsi": 32.6,
         "price_vs_sma50": -0.0163
       },
       {
-        "date": "2026-05-19",
+        "date": "2026-05-31",
         "similarity": 96.8,
-        "future_5d_return": 0.3,
-        "rsi": 34.2,
-        "price_vs_sma50": 0.0121
+        "future_5d_return": -17.03,
+        "rsi": 30.4,
+        "price_vs_sma50": -0.0474
       }
     ],
     "risk_warning": "\u2705 Moderate confidence. Standard position size recommended.",
     "trader_comment": "No clear directional bias. Patience is key.",
-    "historical_win_rate": 30.0
+    "historical_win_rate": 20.0
   },
   "narrative": {
     "date": "November 06, 2026",
@@ -131,17 +131,17 @@
   "macro_data": {
     "fed_trend": "NOT_CONFIGURED",
     "fed_label": "FRED_API_KEY not configured",
-    "dxy": 102.16,
+    "dxy": 102.26,
     "dxy_trend": "RISING",
-    "dxy_label": "RISING (102.16)",
-    "vix": 23.86,
-    "vix_level": "MEDIUM",
-    "vix_label": "ELEVATED (23.86)",
+    "dxy_label": "RISING (102.26)",
+    "vix": 25.43,
+    "vix_level": "HIGH",
+    "vix_label": "FEAR (25.43)",
     "liquidity": "TIGHTENING",
     "liquidity_desc": "Short-end yield 4.00% (rising vs 5d ago)",
     "fed_impact": "\ud83d\udfe1 NEUTRAL",
     "dxy_impact": "\ud83d\udd34 BEARISH",
-    "vix_impact": "\ud83d\udfe1 NEUTRAL",
+    "vix_impact": "\ud83d\udd34 BEARISH",
     "overall": "RISK_OFF",
     "overall_desc": "Bearish macro \u2014 defensiveness warranted.",
     "overall_color": "#ff3864",
@@ -199,8 +199,8 @@
   ],
   "event_risk": {
     "expected_move": "\u00b14.0%",
-    "expected_range_low": 72811.87,
-    "expected_range_high": 78879.53,
+    "expected_range_low": 72756.38,
+    "expected_range_high": 78819.42,
     "direction": "UNCERTAIN",
     "recommendation": "Reduce position size by 50% before event",
     "event": {
@@ -211,61 +211,61 @@
     }
   },
   "etf_data": {
-    "total_net_flow": 1420859910.22,
+    "total_net_flow": 1686079394.98,
     "cumulative_holdings": null,
-    "daily_change": -0.3,
+    "daily_change": -0.31,
     "etfs_tracked": 4,
     "per_etf": {
       "IBIT": {
-        "close": 42.9,
-        "dollar_volume": 1244311455.46,
-        "pct_change": -0.3
+        "close": 42.88,
+        "dollar_volume": 1463961215.5,
+        "pct_change": -0.36
       },
       "FBTC": {
-        "close": 65.95,
-        "dollar_volume": 127009999.47,
-        "pct_change": -0.33
+        "close": 65.9,
+        "dollar_volume": 161352792.84,
+        "pct_change": -0.41
       },
       "ARKB": {
-        "close": 25.13,
-        "dollar_volume": 20483358.8,
-        "pct_change": -0.27
+        "close": 25.15,
+        "dollar_volume": 25607151.16,
+        "pct_change": -0.2
       },
       "BITB": {
-        "close": 41.13,
-        "dollar_volume": 29055096.48,
-        "pct_change": -0.29
+        "close": 41.14,
+        "dollar_volume": 35158235.49,
+        "pct_change": -0.28
       }
     },
     "metric": "dollar_volume_proxy",
     "source": "yfinance spot BTC ETFs (proxy, not true creation/redemption flow)"
   },
   "onchain": {
-    "mvrv_zscore": 0.312,
-    "miner_reserves": 317326254.0,
-    "nvt_ratio": 43.6,
+    "mvrv_zscore": 0.305,
+    "miner_reserves": 318562746.0,
+    "nvt_ratio": 44.39,
     "hashrate_trend": "FALLING",
     "mvrv_is_proxy": true,
     "miner_reserves_trend": "RISING",
     "hashrate_source": "mempool.space (blockchain.info unavailable)"
   },
   "exit_strategy": {
-    "entry": 75892.0,
+    "entry": 75874.7,
     "signal": "SHORT",
-    "current_price": 76650.92,
+    "current_price": 76633.447,
     "scenarios": [
       {
-        "condition": "Price hits TP1 ($73615.24)",
+        "condition": "Price hits TP1 ($73598.46)",
         "action": "Take 50% profit",
         "reason": "Lock in gains, reduce risk"
       },
       {
-        "condition": "Price hits TP2 ($71338.48)",
+        "condition": "Price hits TP2 ($71322.22)",
         "action": "Take remaining 50% profit",
         "reason": "Target hit, complete the trade"
       },
       {
-        "condition": "Price hits SL ($78168.76)",
+        "condition": "Price hits SL ($78150.94)",
         "action": "Exit immediately",
         "reason": "Stop-loss protects capital"
       }
@@ -274,10 +274,10 @@
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.5,
-      "cnn_score": 0.015,
-      "ensemble_score": 0.258,
+      "cnn_score": 0.289,
+      "ensemble_score": 0.394,
       "action": "SELL",
-      "confidence": 0.742,
+      "confidence": 0.606,
       "trade_qualified": true
     }
   },
