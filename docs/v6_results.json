@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-11-11T05:06:08.941041",
-  "imbalance": 0.475,
+  "timestamp": "2026-11-11T07:06:10.678689",
+  "imbalance": 0.665,
   "regime": {
     "regime": "UNKNOWN_UNCERTAINTY",
     "description": "Trade policy uncertainty unavailable \u2014 regime not determined",
@@ -15,10 +15,10 @@
   },
   "ml_signal": {
     "bilstm_score": 0.5,
-    "cnn_score": 0.5,
-    "ensemble_score": 0.5,
+    "cnn_score": 0.698,
+    "ensemble_score": 0.599,
     "action": "HOLD",
-    "confidence": 0.5,
+    "confidence": 0.599,
     "trade_qualified": false
   },
   "big_trade": {
@@ -38,28 +38,21 @@
   "explanation": {
     "asset": "BTC",
     "signal": "HOLD",
-    "confidence": 0.5,
+    "confidence": 0.599,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
-      "\u274c order_book: Order book data unavailable",
+      "\u2705 order_book: Bullish order book imbalance",
       "\u274c onchain: NVT ratio normal",
       "\u2705 sentiment: Fear & Greed in buy zone"
     ],
-    "historical_evidence": "Similar setups have shown a 30% win rate across 10 comparable past conditions.",
+    "historical_evidence": "Similar setups have shown a 20% win rate across 10 comparable past conditions.",
     "historical_trades": [
       {
         "date": "2026-11-06",
-        "similarity": 98.0,
-        "future_5d_return": -2.66,
+        "similarity": 97.7,
+        "future_5d_return": -3.04,
         "rsi": 34.7,
         "price_vs_sma50": -0.0761
-      },
-      {
-        "date": "2026-11-03",
-        "similarity": 97.8,
-        "future_5d_return": -3.35,
-        "rsi": 29.6,
-        "price_vs_sma50": -0.0557
       },
       {
         "date": "2026-11-05",
@@ -69,11 +62,11 @@
         "price_vs_sma50": -0.0733
       },
       {
-        "date": "2026-05-30",
+        "date": "2026-11-03",
         "similarity": 97.4,
-        "future_5d_return": -13.48,
-        "rsi": 28.9,
-        "price_vs_sma50": -0.0449
+        "future_5d_return": -3.35,
+        "rsi": 29.6,
+        "price_vs_sma50": -0.0557
       },
       {
         "date": "2026-06-27",
@@ -90,25 +83,25 @@
         "price_vs_sma50": -0.0639
       },
       {
-        "date": "2026-05-31",
+        "date": "2026-05-30",
         "similarity": 97.1,
-        "future_5d_return": -17.03,
-        "rsi": 30.4,
-        "price_vs_sma50": -0.0474
+        "future_5d_return": -13.48,
+        "rsi": 28.9,
+        "price_vs_sma50": -0.0449
       },
       {
         "date": "2026-06-28",
-        "similarity": 96.9,
+        "similarity": 97.1,
         "future_5d_return": 5.14,
         "rsi": 24.4,
         "price_vs_sma50": -0.1429
       },
       {
-        "date": "2026-03-30",
-        "similarity": 96.7,
-        "future_5d_return": 0.84,
-        "rsi": 28.0,
-        "price_vs_sma50": -0.029
+        "date": "2026-06-01",
+        "similarity": 96.9,
+        "future_5d_return": -14.67,
+        "rsi": 25.7,
+        "price_vs_sma50": -0.0767
       },
       {
         "date": "2026-05-27",
@@ -116,16 +109,23 @@
         "future_5d_return": -4.06,
         "rsi": 31.9,
         "price_vs_sma50": -0.0362
+      },
+      {
+        "date": "2026-05-29",
+        "similarity": 96.7,
+        "future_5d_return": -12.72,
+        "rsi": 23.9,
+        "price_vs_sma50": -0.0497
       }
     ],
     "risk_warning": "\u26a0\ufe0f Low confidence trade. Reduce position size by 50%.",
     "trader_comment": "No clear directional bias. Patience is key.",
-    "historical_win_rate": 30.0
+    "historical_win_rate": 20.0
   },
   "narrative": {
     "date": "November 11, 2026",
     "macro": "Macro Regime: UNKNOWN_UNCERTAINTY \u2014 Trade policy uncertainty unavailable \u2014 regime not determined",
-    "technicals": "Order book is balanced. No clear direction.",
+    "technicals": "Order book shows bullish imbalance. More buy orders than sell orders.",
     "sentiment": "Neutral sentiment. No extremes.",
     "upcoming_events": "Next event: CPI Report on 2026-11-12 (Impact: MEDIUM)",
     "trader_comment": "Market is in a consolidation phase. Watch for breakout."
@@ -133,14 +133,14 @@
   "macro_data": {
     "fed_trend": "NOT_CONFIGURED",
     "fed_label": "FRED_API_KEY not configured",
-    "dxy": 102.23,
+    "dxy": 102.33,
     "dxy_trend": "RISING",
-    "dxy_label": "RISING (102.23)",
+    "dxy_label": "RISING (102.33)",
     "vix": 19.46,
     "vix_level": "MEDIUM",
     "vix_label": "ELEVATED (19.46)",
     "liquidity": "TIGHTENING",
-    "liquidity_desc": "Short-end yield 4.12% (rising vs 5d ago)",
+    "liquidity_desc": "Short-end yield 4.11% (rising vs 5d ago)",
     "fed_impact": "\ud83d\udfe1 NEUTRAL",
     "dxy_impact": "\ud83d\udd34 BEARISH",
     "vix_impact": "\ud83d\udfe1 NEUTRAL",
@@ -195,8 +195,8 @@
   ],
   "event_risk": {
     "expected_move": "\u00b14.0%",
-    "expected_range_low": 70780.13,
-    "expected_range_high": 76678.47,
+    "expected_range_low": 70503.26,
+    "expected_range_high": 76378.54,
     "direction": "UNCERTAIN",
     "recommendation": "Reduce position size by 50% before event",
     "event": {
@@ -237,27 +237,27 @@
     "source": "yfinance spot BTC ETFs (proxy, not true creation/redemption flow)"
   },
   "onchain": {
-    "mvrv_zscore": 0.095,
-    "miner_reserves": 313748531.0,
-    "nvt_ratio": 46.6,
+    "mvrv_zscore": 0.067,
+    "miner_reserves": 313529578.0,
+    "nvt_ratio": 45.51,
     "hashrate_trend": "RISING",
     "mvrv_is_proxy": true,
-    "miner_reserves_trend": "RISING",
+    "miner_reserves_trend": "FALLING",
     "hashrate_source": "mempool.space (blockchain.info unavailable)"
   },
   "exit_strategy": {
-    "entry": 73599.3,
+    "entry": 73519.1,
     "signal": "NO TRADE",
-    "current_price": 74335.293,
+    "current_price": 74254.29100000001,
     "scenarios": []
   },
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.5,
-      "cnn_score": 0.5,
-      "ensemble_score": 0.5,
+      "cnn_score": 0.698,
+      "ensemble_score": 0.599,
       "action": "HOLD",
-      "confidence": 0.5,
+      "confidence": 0.599,
       "trade_qualified": false
     }
   },
