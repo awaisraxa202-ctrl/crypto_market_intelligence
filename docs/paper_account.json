@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 4710.272007929991,
+  "cash": 4252.909833121183,
   "positions": {
     "ADA": {
       "asset": "ADA",
@@ -24,18 +24,19 @@
       "asset": "XRP",
       "trade_type": "SWING_DAILY",
       "side": "SHORT",
-      "qty": 911.4205844713721,
+      "qty": 455.71029223568604,
       "avg_entry": 1.21,
       "opened": "2026-11-05T23:05:24.768698",
       "tranches": 1,
       "last_tranche_notional": 1102.8189072103603,
-      "stop_loss": 1.32115,
+      "stop_loss": 1.0555750000000002,
       "take_profit_1": 1.00021,
       "take_profit_2": 0.78625,
       "risk_distance": 0.11115000000000008,
       "entry_conviction": 0.41,
       "expected_hours": 120,
-      "tp1_hit": false
+      "tp1_hit": true,
+      "stop_moved_to_breakeven": true
     },
     "ETH": {
       "asset": "ETH",
@@ -68,6 +69,23 @@
       "take_profit_2": 51.7557,
       "risk_distance": 8.818600000000004,
       "entry_conviction": 0.36,
+      "expected_hours": 120,
+      "tp1_hit": false
+    },
+    "BTC": {
+      "asset": "BTC",
+      "trade_type": "SWING_DAILY",
+      "side": "SHORT",
+      "qty": 0.01610043628734818,
+      "avg_entry": 68376.8,
+      "opened": "2026-11-13T05:03:54.565752",
+      "tranches": 1,
+      "last_tranche_notional": 1100.896311932749,
+      "stop_loss": 73269.13,
+      "take_profit_1": 58592.14,
+      "take_profit_2": 48807.49,
+      "risk_distance": 4892.330000000002,
+      "entry_conviction": 0.32,
       "expected_hours": 120,
       "tp1_hit": false
     }
@@ -4560,13 +4578,26 @@
       "opened": "2026-11-11T08:32:50.898719",
       "closed": "2026-11-12T02:45:46.960565",
       "holding_days": 0
+    },
+    {
+      "asset": "XRP",
+      "trade_type": "SWING_DAILY",
+      "side": "SHORT",
+      "reason": "TAKE_PROFIT_1_PARTIAL",
+      "successful": true,
+      "profitable": true,
+      "entry_price": 1.21,
+      "exit_price": 1.00101,
+      "qty": 455.71029224,
+      "tranches": 1,
+      "pnl": 95.24,
+      "return_pct": 17.27,
+      "opened": "2026-11-05T23:05:24.768698",
+      "closed": "2026-11-13T05:03:54.546794",
+      "holding_days": 7
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-10-17T07:03:32.598184",
-      "equity": 8615.44
-    },
     {
       "ts": "2026-10-17T09:04:03.275145",
       "equity": 8613.72
@@ -6562,19 +6593,23 @@
     {
       "ts": "2026-11-13T03:03:20.640013",
       "equity": 8099.94
+    },
+    {
+      "ts": "2026-11-13T05:03:54.565768",
+      "equity": 8202.87
     }
   ],
   "stats": {
     "by_type": {
       "SWING_DAILY": {
-        "closed": 13,
-        "wins": 2,
+        "closed": 14,
+        "wins": 3,
         "losses": 11,
-        "win_rate": 15.4,
-        "profit_factor": 0.16,
-        "net_pnl": -836.92,
-        "open": 4,
-        "avg_holding_days": 7.2
+        "win_rate": 21.4,
+        "profit_factor": 0.26,
+        "net_pnl": -741.68,
+        "open": 5,
+        "avg_holding_days": 7.1
       },
       "INTRADAY_4H": {
         "closed": 251,
@@ -6587,25 +6622,25 @@
         "avg_holding_days": 0.1
       }
     },
-    "equity": 8099.94,
-    "cash": 4710.27,
-    "open_positions": 4,
-    "total_return_pct": -19.0,
-    "closed_trades": 264,
+    "equity": 8202.87,
+    "cash": 4252.91,
+    "open_positions": 5,
+    "total_return_pct": -17.97,
+    "closed_trades": 265,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
-    "wins": 118,
+    "wins": 119,
     "losses": 146,
-    "win_rate": 44.7,
-    "win_rate_basis": "118W/146L from 264 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 0.71,
-    "avg_win": 13.03,
+    "win_rate": 44.9,
+    "win_rate_basis": "119W/146L from 265 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 0.75,
+    "avg_win": 13.72,
     "avg_loss": -14.83,
     "dca_positions": 0,
     "last_events": [
-      "BTC skipped \u2014 correlated exposure cap",
-      "DOGE skipped \u2014 correlated exposure cap"
+      "XRP TP1 hit \u2014 SUCCESSFUL trade, took 50% off (+95.24), stop to breakeven",
+      "BTC OPENED SHORT 0.016100 @ 68376.8000"
     ]
   }
 }
