@@ -1,25 +1,8 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 4252.909833121183,
+  "cash": 5119.280949338416,
   "positions": {
-    "ADA": {
-      "asset": "ADA",
-      "trade_type": "SWING_DAILY",
-      "side": "SHORT",
-      "qty": 4205.598944493851,
-      "avg_entry": 0.1869,
-      "opened": "2026-10-30T01:03:47.203269",
-      "tranches": 1,
-      "last_tranche_notional": 786.0264427259009,
-      "stop_loss": 0.208677,
-      "take_profit_1": 0.143277,
-      "take_profit_2": 0.0996776,
-      "risk_distance": 0.02177699999999999,
-      "entry_conviction": 0.36,
-      "expected_hours": 120,
-      "tp1_hit": false
-    },
     "XRP": {
       "asset": "XRP",
       "trade_type": "SWING_DAILY",
@@ -4595,13 +4578,26 @@
       "opened": "2026-11-05T23:05:24.768698",
       "closed": "2026-11-13T05:03:54.546794",
       "holding_days": 7
+    },
+    {
+      "asset": "ADA",
+      "trade_type": "SWING_DAILY",
+      "side": "SHORT",
+      "reason": "TIME_EXIT",
+      "successful": false,
+      "profitable": true,
+      "entry_price": 0.1869,
+      "exit_price": 0.167461,
+      "qty": 4205.59894449,
+      "tranches": 1,
+      "pnl": 81.75,
+      "return_pct": 10.4,
+      "opened": "2026-10-30T01:03:47.203269",
+      "closed": "2026-11-14T01:06:25.833663",
+      "holding_days": 15
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-10-17T21:03:40.930463",
-      "equity": 8636.3
-    },
     {
       "ts": "2026-10-17T23:03:37.789119",
       "equity": 8620.25
@@ -6597,19 +6593,23 @@
     {
       "ts": "2026-11-14T01:03:22.505823",
       "equity": 8200.76
+    },
+    {
+      "ts": "2026-11-14T01:06:38.198862",
+      "equity": 8362.57
     }
   ],
   "stats": {
     "by_type": {
       "SWING_DAILY": {
-        "closed": 14,
-        "wins": 3,
+        "closed": 15,
+        "wins": 4,
         "losses": 11,
-        "win_rate": 21.4,
-        "profit_factor": 0.26,
-        "net_pnl": -741.68,
-        "open": 5,
-        "avg_holding_days": 7.1
+        "win_rate": 26.7,
+        "profit_factor": 0.34,
+        "net_pnl": -659.93,
+        "open": 4,
+        "avg_holding_days": 7.7
       },
       "INTRADAY_4H": {
         "closed": 251,
@@ -6622,22 +6622,24 @@
         "avg_holding_days": 0.1
       }
     },
-    "equity": 8200.76,
-    "cash": 4252.91,
-    "open_positions": 5,
-    "total_return_pct": -17.99,
-    "closed_trades": 265,
+    "equity": 8362.57,
+    "cash": 5119.28,
+    "open_positions": 4,
+    "total_return_pct": -16.37,
+    "closed_trades": 266,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 0,
     "corrupted_trades_pnl": 0,
-    "wins": 119,
+    "wins": 120,
     "losses": 146,
-    "win_rate": 44.9,
-    "win_rate_basis": "119W/146L from 265 closed trades (excl. 0 pre-fix + 0 corrupted)",
-    "profit_factor": 0.75,
-    "avg_win": 13.72,
+    "win_rate": 45.1,
+    "win_rate_basis": "120W/146L from 266 closed trades (excl. 0 pre-fix + 0 corrupted)",
+    "profit_factor": 0.79,
+    "avg_win": 14.28,
     "avg_loss": -14.83,
     "dca_positions": 0,
-    "last_events": []
+    "last_events": [
+      "ADA time-exited between full runs after 360h (+81.75)"
+    ]
   }
 }
