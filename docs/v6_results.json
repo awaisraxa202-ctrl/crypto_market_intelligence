@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-11-16T23:06:53.324926",
-  "imbalance": 0.596,
+  "timestamp": "2026-11-16T23:12:54.732072",
+  "imbalance": 0.338,
   "regime": {
     "regime": "UNKNOWN_UNCERTAINTY",
     "description": "Trade policy uncertainty unavailable \u2014 regime not determined",
@@ -15,10 +15,10 @@
   },
   "ml_signal": {
     "bilstm_score": 0.5,
-    "cnn_score": 0.5,
-    "ensemble_score": 0.5,
+    "cnn_score": 0.307,
+    "ensemble_score": 0.403,
     "action": "HOLD",
-    "confidence": 0.5,
+    "confidence": 0.403,
     "trade_qualified": false
   },
   "big_trade": {
@@ -38,10 +38,10 @@
   "explanation": {
     "asset": "BTC",
     "signal": "HOLD",
-    "confidence": 0.5,
+    "confidence": 0.403,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
-      "\u2705 order_book: Bullish order book imbalance",
+      "\u274c order_book: Order book data unavailable",
       "\u274c onchain: NVT ratio normal",
       "\u2705 sentiment: Fear & Greed in buy zone"
     ],
@@ -125,7 +125,7 @@
   "narrative": {
     "date": "November 16, 2026",
     "macro": "Macro Regime: UNKNOWN_UNCERTAINTY \u2014 Trade policy uncertainty unavailable \u2014 regime not determined",
-    "technicals": "Order book shows bullish imbalance. More buy orders than sell orders.",
+    "technicals": "Order book shows bearish imbalance. More sell orders than buy orders.",
     "sentiment": "Extreme Fear \u2014 Contrarian buying opportunity.",
     "upcoming_events": "Next event: Jobs Report on 2026-12-04 (Impact: MEDIUM)",
     "trader_comment": "Market is in a consolidation phase. Watch for breakout."
@@ -133,9 +133,9 @@
   "macro_data": {
     "fed_trend": "NOT_CONFIGURED",
     "fed_label": "FRED_API_KEY not configured",
-    "dxy": 103.59,
+    "dxy": 103.56,
     "dxy_trend": "RISING",
-    "dxy_label": "RISING (103.59)",
+    "dxy_label": "RISING (103.56)",
     "vix": 22.91,
     "vix_level": "MEDIUM",
     "vix_label": "ELEVATED (22.91)",
@@ -189,8 +189,8 @@
   ],
   "event_risk": {
     "expected_move": "\u00b14.0%",
-    "expected_range_low": 62630.02,
-    "expected_range_high": 67849.18,
+    "expected_range_low": 62630.59,
+    "expected_range_high": 67849.81,
     "direction": "UNCERTAIN",
     "recommendation": "Reduce position size by 50% before event",
     "event": {
@@ -231,27 +231,27 @@
     "source": "yfinance spot BTC ETFs (proxy, not true creation/redemption flow)"
   },
   "onchain": {
-    "mvrv_zscore": -0.721,
+    "mvrv_zscore": -0.722,
     "miner_reserves": 313013443.0,
-    "nvt_ratio": 39.33,
+    "nvt_ratio": 39.42,
     "hashrate_trend": "RISING",
     "mvrv_is_proxy": true,
     "miner_reserves_trend": "FALLING",
     "hashrate_source": "mempool.space (blockchain.info unavailable)"
   },
   "exit_strategy": {
-    "entry": 65263.4,
+    "entry": 65197.2,
     "signal": "NO TRADE",
-    "current_price": 65916.034,
+    "current_price": 65849.17199999999,
     "scenarios": []
   },
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.5,
-      "cnn_score": 0.5,
-      "ensemble_score": 0.5,
+      "cnn_score": 0.307,
+      "ensemble_score": 0.403,
       "action": "HOLD",
-      "confidence": 0.5,
+      "confidence": 0.403,
       "trade_qualified": false
     }
   },
