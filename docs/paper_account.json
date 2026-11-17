@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 2973.5183821962864,
+  "cash": 2820.11801756087,
   "positions": {
     "BTC": {
       "asset": "BTC",
@@ -71,24 +71,6 @@
       "expected_hours": 120,
       "tp1_hit": false
     },
-    "BTC@4h": {
-      "asset": "BTC",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 0.006247804128847092,
-      "avg_entry": 65015.0,
-      "opened": "2026-11-16T21:04:34.705762",
-      "tranches": 1,
-      "last_tranche_notional": 406.2009854369937,
-      "stop_loss": 65639.238248,
-      "take_profit_1": 63836.9,
-      "take_profit_2": 63836.9,
-      "risk_distance": 624.2382479999942,
-      "entry_conviction": 0.45,
-      "expected_hours": 6,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
     "BNB@4h": {
       "asset": "BNB",
       "trade_type": "INTRADAY_4H",
@@ -143,21 +125,39 @@
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     },
+    "XRP@4h": {
+      "asset": "XRP",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "qty": 605.2488916320144,
+      "avg_entry": 0.96804,
+      "opened": "2026-11-17T15:07:03.793227",
+      "tranches": 1,
+      "last_tranche_notional": 585.9051370554553,
+      "stop_loss": 0.979637,
+      "take_profit_1": 0.95,
+      "take_profit_2": 0.95,
+      "risk_distance": 0.011596999999999968,
+      "entry_conviction": 0.75,
+      "expected_hours": 6,
+      "tp1_hit": true,
+      "stop_moved_to_breakeven": false
+    },
     "ADA@4h": {
       "asset": "ADA",
       "trade_type": "INTRADAY_4H",
       "side": "SHORT",
-      "qty": 3389.9076213603225,
-      "avg_entry": 0.154849,
-      "opened": "2026-11-17T15:01:24.128665",
+      "qty": 3236.7019150392707,
+      "avg_entry": 0.153812,
+      "opened": "2026-11-17T15:07:03.793242",
       "tranches": 1,
-      "last_tranche_notional": 524.9238052600246,
-      "stop_loss": 0.156792,
+      "last_tranche_notional": 497.84359495602035,
+      "stop_loss": 0.155757,
       "take_profit_1": 0.1513,
       "take_profit_2": 0.1513,
-      "risk_distance": 0.0019430000000000003,
+      "risk_distance": 0.0019450000000000023,
       "entry_conviction": 0.45,
-      "expected_hours": 6,
+      "expected_hours": 4,
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     }
@@ -4854,6 +4854,23 @@
       "opened": "2026-11-16T17:04:23.406230",
       "closed": "2026-11-17T14:15:41.145333",
       "holding_days": 0
+    },
+    {
+      "asset": "BTC",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "TIME_EXIT",
+      "successful": false,
+      "profitable": "True",
+      "entry_price": 65015.0,
+      "exit_price": 64830.72312,
+      "qty": 0.0062478,
+      "tranches": 1,
+      "pnl": 1.15,
+      "return_pct": 0.28,
+      "opened": "2026-11-16T21:04:34.705762",
+      "closed": "2026-11-17T15:07:03.775664",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
@@ -6854,8 +6871,8 @@
       "equity": 8977.39
     },
     {
-      "ts": "2026-11-17T15:01:24.128687",
-      "equity": 8965.59
+      "ts": "2026-11-17T15:07:03.793254",
+      "equity": 8941.33
     }
   ],
   "stats": {
@@ -6871,34 +6888,36 @@
         "avg_holding_days": 7.4
       },
       "INTRADAY_4H": {
-        "closed": 256,
-        "wins": 119,
+        "closed": 257,
+        "wins": 120,
         "losses": 137,
-        "win_rate": 46.5,
+        "win_rate": 46.7,
         "profit_factor": 1.18,
-        "net_pnl": 214.72,
+        "net_pnl": 215.87,
         "open": 5,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 8965.59,
-    "cash": 2973.52,
+    "equity": 8941.33,
+    "cash": 2820.12,
     "open_positions": 9,
-    "total_return_pct": -10.34,
-    "closed_trades": 273,
+    "total_return_pct": -10.59,
+    "closed_trades": 274,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 3,
     "corrupted_trades_pnl": 262.84,
-    "wins": 125,
+    "wins": 126,
     "losses": 148,
-    "win_rate": 45.8,
-    "win_rate_basis": "125W/148L from 273 closed trades (excl. 0 pre-fix + 3 corrupted)",
+    "win_rate": 46.0,
+    "win_rate_basis": "126W/148L from 274 closed trades (excl. 0 pre-fix + 3 corrupted)",
     "profit_factor": 0.88,
-    "avg_win": 15.29,
+    "avg_win": 15.18,
     "avg_loss": -14.73,
     "dca_positions": 0,
     "last_events": [
-      "ADA \u26a14h OPENED SHORT 3389.907621 @ 0.1548 \u2192 0.1513 (~6h)"
+      "BTC@4h time-exited after 18h (expected ~6h) (+1.15)",
+      "XRP \u26a14h OPENED SHORT 605.248892 @ 0.9680 \u2192 0.95 (~6h)",
+      "ADA \u26a14h OPENED SHORT 3236.701915 @ 0.1538 \u2192 0.1513 (~4h)"
     ]
   }
 }
