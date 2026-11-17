@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 3149.9549160189254,
+  "cash": 3720.2466671977336,
   "positions": {
     "SOL": {
       "asset": "SOL",
@@ -104,24 +104,6 @@
       "risk_distance": 0.0022109999999999908,
       "entry_conviction": 0.45,
       "expected_hours": 7,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
-    "DOGE@4h": {
-      "asset": "DOGE",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 9430.005116808983,
-      "avg_entry": 0.059662,
-      "opened": "2026-11-16T17:04:23.406236",
-      "tranches": 1,
-      "last_tranche_notional": 562.6129652790576,
-      "stop_loss": 0.060495,
-      "take_profit_1": 0.0581,
-      "take_profit_2": 0.0581,
-      "risk_distance": 0.0008330000000000004,
-      "entry_conviction": 0.45,
-      "expected_hours": 6,
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     },
@@ -4786,13 +4768,26 @@
       "opened": "2026-11-16T17:04:23.406220",
       "closed": "2026-11-17T10:15:44.329116",
       "holding_days": 0
+    },
+    {
+      "asset": "DOGE",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "TIME_EXIT",
+      "successful": false,
+      "profitable": true,
+      "entry_price": 0.059662,
+      "exit_price": 0.05873,
+      "qty": 9430.00511681,
+      "tranches": 1,
+      "pnl": 8.79,
+      "return_pct": 1.56,
+      "opened": "2026-11-16T17:04:23.406236",
+      "closed": "2026-11-17T11:15:49.470639",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-10-21T00:30:49.678453",
-      "equity": 8651.82
-    },
     {
       "ts": "2026-10-21T01:04:14.099811",
       "equity": 8640.86
@@ -6788,6 +6783,10 @@
     {
       "ts": "2026-11-17T11:03:55.766726",
       "equity": 8767.55
+    },
+    {
+      "ts": "2026-11-17T11:15:49.494906",
+      "equity": 8809.21
     }
   ],
   "stats": {
@@ -6803,32 +6802,34 @@
         "avg_holding_days": 7.4
       },
       "INTRADAY_4H": {
-        "closed": 253,
-        "wins": 118,
+        "closed": 254,
+        "wins": 119,
         "losses": 135,
-        "win_rate": 46.6,
-        "profit_factor": 1.19,
-        "net_pnl": 220.51,
-        "open": 4,
+        "win_rate": 46.9,
+        "profit_factor": 1.2,
+        "net_pnl": 229.3,
+        "open": 3,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 8767.55,
-    "cash": 3149.95,
-    "open_positions": 9,
-    "total_return_pct": -12.32,
-    "closed_trades": 270,
+    "equity": 8809.21,
+    "cash": 3720.25,
+    "open_positions": 8,
+    "total_return_pct": -11.91,
+    "closed_trades": 271,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 2,
     "corrupted_trades_pnl": 192.51,
-    "wins": 124,
+    "wins": 125,
     "losses": 146,
-    "win_rate": 45.9,
-    "win_rate_basis": "124W/146L from 270 closed trades (excl. 0 pre-fix + 2 corrupted)",
+    "win_rate": 46.1,
+    "win_rate_basis": "125W/146L from 271 closed trades (excl. 0 pre-fix + 2 corrupted)",
     "profit_factor": 0.88,
-    "avg_win": 15.34,
+    "avg_win": 15.29,
     "avg_loss": -14.83,
     "dca_positions": 0,
-    "last_events": []
+    "last_events": [
+      "DOGE@4h time-exited between full runs after 18h (+8.79)"
+    ]
   }
 }
