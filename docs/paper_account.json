@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 2361.3198678618255,
+  "cash": 3149.9549160189254,
   "positions": {
     "SOL": {
       "asset": "SOL",
@@ -88,24 +88,6 @@
       "entry_conviction": 0.38,
       "expected_hours": 120,
       "tp1_hit": false
-    },
-    "ETH@4h": {
-      "asset": "ETH",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 0.42651120392710123,
-      "avg_entry": 1827.04,
-      "opened": "2026-11-16T17:04:23.406220",
-      "tranches": 1,
-      "last_tranche_notional": 779.2530300229711,
-      "stop_loss": 1850.520962,
-      "take_profit_1": 1800.0,
-      "take_profit_2": 1800.0,
-      "risk_distance": 23.48096200000009,
-      "entry_conviction": 0.45,
-      "expected_hours": 7,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
     },
     "ADA@4h": {
       "asset": "ADA",
@@ -4787,13 +4769,26 @@
       "opened": "2026-11-16T17:04:23.406244",
       "closed": "2026-11-17T08:15:46.619524",
       "holding_days": 0
+    },
+    {
+      "asset": "ETH",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "TAKE_PROFIT_2",
+      "successful": true,
+      "profitable": true,
+      "entry_price": 1827.04,
+      "exit_price": 1801.44,
+      "qty": 0.4265112,
+      "tranches": 1,
+      "pnl": 10.92,
+      "return_pct": 1.4,
+      "opened": "2026-11-16T17:04:23.406220",
+      "closed": "2026-11-17T10:15:44.329116",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-10-20T22:47:59.651717",
-      "equity": 8663.92
-    },
     {
       "ts": "2026-10-20T23:04:33.866555",
       "equity": 8655.63
@@ -6789,6 +6784,10 @@
     {
       "ts": "2026-11-17T09:03:54.194240",
       "equity": 8769.36
+    },
+    {
+      "ts": "2026-11-17T10:15:44.353746",
+      "equity": 8785.17
     }
   ],
   "stats": {
@@ -6804,34 +6803,34 @@
         "avg_holding_days": 7.4
       },
       "INTRADAY_4H": {
-        "closed": 252,
-        "wins": 117,
+        "closed": 253,
+        "wins": 118,
         "losses": 135,
-        "win_rate": 46.4,
-        "profit_factor": 1.18,
-        "net_pnl": 209.59,
-        "open": 5,
+        "win_rate": 46.6,
+        "profit_factor": 1.19,
+        "net_pnl": 220.51,
+        "open": 4,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 8769.36,
-    "cash": 2361.32,
-    "open_positions": 10,
-    "total_return_pct": -12.31,
-    "closed_trades": 269,
+    "equity": 8785.17,
+    "cash": 3149.95,
+    "open_positions": 9,
+    "total_return_pct": -12.15,
+    "closed_trades": 270,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 2,
     "corrupted_trades_pnl": 192.51,
-    "wins": 123,
+    "wins": 124,
     "losses": 146,
-    "win_rate": 45.7,
-    "win_rate_basis": "123W/146L from 269 closed trades (excl. 0 pre-fix + 2 corrupted)",
-    "profit_factor": 0.87,
-    "avg_win": 15.38,
+    "win_rate": 45.9,
+    "win_rate_basis": "124W/146L from 270 closed trades (excl. 0 pre-fix + 2 corrupted)",
+    "profit_factor": 0.88,
+    "avg_win": 15.34,
     "avg_loss": -14.83,
     "dca_positions": 0,
     "last_events": [
-      "SOL \u26a14h OPENED SHORT 5.774354 @ 72.1900 \u2192 70.4 (~6h)"
+      "ETH@4h TP2 hit between full runs \u2014 closed (+10.92)"
     ]
   }
 }
