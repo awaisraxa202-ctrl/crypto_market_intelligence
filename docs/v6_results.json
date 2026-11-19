@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-11-19T22:53:17.072203",
-  "imbalance": 0.23,
+  "timestamp": "2026-11-19T23:06:24.627705",
+  "imbalance": 0.174,
   "regime": {
     "regime": "UNKNOWN_UNCERTAINTY",
     "description": "Trade policy uncertainty unavailable \u2014 regime not determined",
@@ -15,30 +15,28 @@
   },
   "ml_signal": {
     "bilstm_score": 0.7,
-    "cnn_score": 0.145,
-    "ensemble_score": 0.422,
-    "action": "HOLD",
-    "confidence": 0.422,
-    "trade_qualified": false
+    "cnn_score": 0.061,
+    "ensemble_score": 0.38,
+    "action": "SELL",
+    "confidence": 0.62,
+    "trade_qualified": true
   },
   "big_trade": {
-    "position_size": 0,
-    "risk_pct": 0,
-    "target_movement": 0,
-    "trade_type": "BIG",
-    "gated_reason": "not trade_qualified (action=HOLD)"
+    "position_size": 0.1456,
+    "risk_pct": 3.62,
+    "target_movement": 2485.6,
+    "trade_type": "BIG"
   },
   "small_trade": {
-    "position_size": 0,
-    "risk_pct": 0,
-    "target_movement": 0,
-    "trade_type": "SMALL",
-    "gated_reason": "not trade_qualified (action=HOLD)"
+    "position_size": 0.1304,
+    "risk_pct": 0.81,
+    "target_movement": 621.4,
+    "trade_type": "SMALL"
   },
   "explanation": {
     "asset": "BTC",
-    "signal": "HOLD",
-    "confidence": 0.422,
+    "signal": "SELL",
+    "confidence": 0.62,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
       "\u274c order_book: Order book data unavailable",
@@ -56,7 +54,7 @@
       },
       {
         "date": "2026-06-09",
-        "similarity": 97.7,
+        "similarity": 97.6,
         "future_5d_return": 6.52,
         "rsi": 14.3,
         "price_vs_sma50": -0.1808
@@ -70,21 +68,21 @@
       },
       {
         "date": "2026-06-08",
-        "similarity": 97.3,
+        "similarity": 97.2,
         "future_5d_return": 2.1,
         "rsi": 14.3,
         "price_vs_sma50": -0.1656
       },
       {
         "date": "2026-06-07",
-        "similarity": 97.2,
+        "similarity": 97.1,
         "future_5d_return": 0.37,
         "rsi": 15.7,
         "price_vs_sma50": -0.1649
       },
       {
         "date": "2026-06-10",
-        "similarity": 97.1,
+        "similarity": 97.0,
         "future_5d_return": 7.84,
         "rsi": 15.3,
         "price_vs_sma50": -0.1806
@@ -118,7 +116,7 @@
         "price_vs_sma50": -0.1671
       }
     ],
-    "risk_warning": "\u26a0\ufe0f Low confidence trade. Reduce position size by 50%.",
+    "risk_warning": "\u2705 Moderate confidence. Standard position size recommended.",
     "trader_comment": "No clear directional bias. Patience is key.",
     "historical_win_rate": 60.0
   },
@@ -189,8 +187,8 @@
   ],
   "event_risk": {
     "expected_move": "\u00b14.0%",
-    "expected_range_low": 59674.18,
-    "expected_range_high": 64647.02,
+    "expected_range_low": 59571.74,
+    "expected_range_high": 64536.06,
     "direction": "UNCERTAIN",
     "recommendation": "Reduce position size by 50% before event",
     "event": {
@@ -231,28 +229,44 @@
     "source": "yfinance spot BTC ETFs (proxy, not true creation/redemption flow)"
   },
   "onchain": {
-    "mvrv_zscore": -1.027,
-    "miner_reserves": 313792813.0,
-    "nvt_ratio": 37.59,
+    "mvrv_zscore": -1.039,
+    "miner_reserves": 313746558.0,
+    "nvt_ratio": 37.79,
     "hashrate_trend": "RISING",
     "mvrv_is_proxy": true,
     "miner_reserves_trend": "FALLING",
     "hashrate_source": "mempool.space (blockchain.info unavailable)"
   },
   "exit_strategy": {
-    "entry": 62195.8,
-    "signal": "NO TRADE",
-    "current_price": 62817.758,
-    "scenarios": []
+    "entry": 62140.0,
+    "signal": "SHORT",
+    "current_price": 62761.4,
+    "scenarios": [
+      {
+        "condition": "Price hits TP1 ($60275.80)",
+        "action": "Take 50% profit",
+        "reason": "Lock in gains, reduce risk"
+      },
+      {
+        "condition": "Price hits TP2 ($58411.60)",
+        "action": "Take remaining 50% profit",
+        "reason": "Target hit, complete the trade"
+      },
+      {
+        "condition": "Price hits SL ($64004.20)",
+        "action": "Exit immediately",
+        "reason": "Stop-loss protects capital"
+      }
+    ]
   },
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.7,
-      "cnn_score": 0.145,
-      "ensemble_score": 0.422,
-      "action": "HOLD",
-      "confidence": 0.422,
-      "trade_qualified": false
+      "cnn_score": 0.061,
+      "ensemble_score": 0.38,
+      "action": "SELL",
+      "confidence": 0.62,
+      "trade_qualified": true
     }
   },
   "order_book_history_depth": 1,
