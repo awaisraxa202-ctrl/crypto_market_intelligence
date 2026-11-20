@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 3828.7428127019157,
+  "cash": 4396.913333986305,
   "positions": {
     "BTC": {
       "asset": "BTC",
@@ -87,24 +87,6 @@
       "entry_conviction": 0.32,
       "expected_hours": 120,
       "tp1_hit": false
-    },
-    "SOL@4h": {
-      "asset": "SOL",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 7.635008151078005,
-      "avg_entry": 73.63,
-      "opened": "2026-11-19T01:03:33.845116",
-      "tranches": 1,
-      "last_tranche_notional": 562.1656501638735,
-      "stop_loss": 75.35,
-      "take_profit_1": 70.93,
-      "take_profit_2": 70.93,
-      "risk_distance": 1.7199999999999989,
-      "entry_conviction": 0.45,
-      "expected_hours": 10,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
     },
     "XRP@4h": {
       "asset": "XRP",
@@ -5225,13 +5207,26 @@
       "opened": "2026-11-18T23:03:37.292029",
       "closed": "2026-11-20T05:03:55.119005",
       "holding_days": 1
+    },
+    {
+      "asset": "SOL",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "TIME_EXIT",
+      "successful": false,
+      "profitable": true,
+      "entry_price": 73.63,
+      "exit_price": 72.698112,
+      "qty": 7.63500815,
+      "tranches": 1,
+      "pnl": 7.11,
+      "return_pct": 1.27,
+      "opened": "2026-11-19T01:03:33.845116",
+      "closed": "2026-11-20T07:06:28.435769",
+      "holding_days": 1
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-10-23T19:03:27.403639",
-      "equity": 8598.22
-    },
     {
       "ts": "2026-10-23T19:38:17.515693",
       "equity": 8615.99
@@ -7227,6 +7222,10 @@
     {
       "ts": "2026-11-20T07:03:21.767200",
       "equity": 8872.03
+    },
+    {
+      "ts": "2026-11-20T07:06:31.817089",
+      "equity": 8875.28
     }
   ],
   "stats": {
@@ -7242,34 +7241,34 @@
         "avg_holding_days": 7.4
       },
       "INTRADAY_4H": {
-        "closed": 280,
-        "wins": 136,
+        "closed": 281,
+        "wins": 137,
         "losses": 144,
-        "win_rate": 48.6,
-        "profit_factor": 1.24,
-        "net_pnl": 300.36,
-        "open": 2,
+        "win_rate": 48.8,
+        "profit_factor": 1.25,
+        "net_pnl": 307.47,
+        "open": 1,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 8872.03,
-    "cash": 3828.74,
-    "open_positions": 7,
-    "total_return_pct": -11.28,
-    "closed_trades": 297,
+    "equity": 8875.28,
+    "cash": 4396.91,
+    "open_positions": 6,
+    "total_return_pct": -11.25,
+    "closed_trades": 298,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 3,
     "corrupted_trades_pnl": 262.84,
-    "wins": 142,
+    "wins": 143,
     "losses": 155,
-    "win_rate": 47.8,
-    "win_rate_basis": "142W/155L from 297 closed trades (excl. 0 pre-fix + 3 corrupted)",
+    "win_rate": 48.0,
+    "win_rate_basis": "143W/155L from 298 closed trades (excl. 0 pre-fix + 3 corrupted)",
     "profit_factor": 0.92,
-    "avg_win": 14.47,
+    "avg_win": 14.41,
     "avg_loss": -14.43,
     "dca_positions": 0,
     "last_events": [
-      "XRP \u26a14h OPENED SHORT 695.870533 @ 0.9713 \u2192 0.9548 (~5h)"
+      "SOL@4h time-exited between full runs after 30h (+7.11)"
     ]
   }
 }
