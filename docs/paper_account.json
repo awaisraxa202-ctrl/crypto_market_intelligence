@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 3359.14167255368,
+  "cash": 3797.2598670015086,
   "positions": {
     "ADA": {
       "asset": "ADA",
@@ -139,24 +139,6 @@
       "risk_distance": 0.011996000000000007,
       "entry_conviction": 0.45,
       "expected_hours": 10,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
-    "ADA@4h": {
-      "asset": "ADA",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 3101.265328225349,
-      "avg_entry": 0.143693,
-      "opened": "2026-11-22T08:59:28.555471",
-      "tranches": 1,
-      "last_tranche_notional": 445.63011880868504,
-      "stop_loss": 0.145707,
-      "take_profit_1": 0.138,
-      "take_profit_2": 0.138,
-      "risk_distance": 0.0020140000000000158,
-      "entry_conviction": 0.45,
-      "expected_hours": 9,
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     }
@@ -5346,13 +5328,26 @@
       "opened": "2026-11-22T08:59:28.555394",
       "closed": "2026-11-22T11:45:56.317305",
       "holding_days": 0
+    },
+    {
+      "asset": "ADA",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 0.143693,
+      "exit_price": 0.145824,
+      "qty": 3101.26532823,
+      "tranches": 1,
+      "pnl": -6.61,
+      "return_pct": -1.48,
+      "opened": "2026-11-22T08:59:28.555471",
+      "closed": "2026-11-22T12:15:46.151638",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-10-25T23:03:27.666921",
-      "equity": 8739.38
-    },
     {
       "ts": "2026-10-25T23:41:10.143537",
       "equity": 8737.12
@@ -7348,6 +7343,10 @@
     {
       "ts": "2026-11-22T11:45:56.335139",
       "equity": 9085.81
+    },
+    {
+      "ts": "2026-11-22T12:15:46.174804",
+      "equity": 9089.7
     }
   ],
   "stats": {
@@ -7363,34 +7362,34 @@
         "avg_holding_days": 7.3
       },
       "INTRADAY_4H": {
-        "closed": 283,
+        "closed": 284,
         "wins": 138,
-        "losses": 145,
-        "win_rate": 48.8,
-        "profit_factor": 1.24,
-        "net_pnl": 300.07,
-        "open": 4,
+        "losses": 146,
+        "win_rate": 48.6,
+        "profit_factor": 1.23,
+        "net_pnl": 293.46,
+        "open": 3,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 9085.81,
-    "cash": 3359.14,
-    "open_positions": 9,
-    "total_return_pct": -9.14,
-    "closed_trades": 301,
+    "equity": 9089.7,
+    "cash": 3797.26,
+    "open_positions": 8,
+    "total_return_pct": -9.1,
+    "closed_trades": 302,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 4,
     "corrupted_trades_pnl": 344.59,
     "wins": 145,
-    "losses": 156,
-    "win_rate": 48.2,
-    "win_rate_basis": "145W/156L from 301 closed trades (excl. 0 pre-fix + 4 corrupted)",
+    "losses": 157,
+    "win_rate": 48.0,
+    "win_rate_basis": "145W/157L from 302 closed trades (excl. 0 pre-fix + 4 corrupted)",
     "profit_factor": 0.95,
     "avg_win": 14.83,
-    "avg_loss": -14.46,
+    "avg_loss": -14.41,
     "dca_positions": 0,
     "last_events": [
-      "BTC@4h stopped out between full runs (-18.35)"
+      "ADA@4h stopped out between full runs (-6.61)"
     ]
   }
 }
