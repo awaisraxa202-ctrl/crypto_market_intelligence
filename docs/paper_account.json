@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 3797.2598670015086,
+  "cash": 4506.786884876629,
   "positions": {
     "ADA": {
       "asset": "ADA",
@@ -87,24 +87,6 @@
       "entry_conviction": 0.32,
       "expected_hours": 120,
       "tp1_hit": false
-    },
-    "ETH@4h": {
-      "asset": "ETH",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 0.4319765261677949,
-      "avg_entry": 1681.58,
-      "opened": "2026-11-22T08:59:28.555424",
-      "tranches": 1,
-      "last_tranche_notional": 726.4030868732406,
-      "stop_loss": 1715.84,
-      "take_profit_1": 1650.0,
-      "take_profit_2": 1650.0,
-      "risk_distance": 34.25999999999999,
-      "entry_conviction": 0.45,
-      "expected_hours": 10,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
     },
     "SOL@4h": {
       "asset": "SOL",
@@ -5345,13 +5327,26 @@
       "opened": "2026-11-22T08:59:28.555471",
       "closed": "2026-11-22T12:15:46.151638",
       "holding_days": 0
+    },
+    {
+      "asset": "ETH",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 1681.58,
+      "exit_price": 1717.212672,
+      "qty": 0.43197653,
+      "tranches": 1,
+      "pnl": -15.39,
+      "return_pct": -2.12,
+      "opened": "2026-11-22T08:59:28.555424",
+      "closed": "2026-11-22T15:30:52.114113",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-10-26T01:58:10.215106",
-      "equity": 8720.46
-    },
     {
       "ts": "2026-10-26T03:03:48.456607",
       "equity": 8718.95
@@ -7347,6 +7342,10 @@
     {
       "ts": "2026-11-22T15:04:04.076890",
       "equity": 9054.07
+    },
+    {
+      "ts": "2026-11-22T15:30:52.130557",
+      "equity": 9030.92
     }
   ],
   "stats": {
@@ -7362,32 +7361,34 @@
         "avg_holding_days": 7.3
       },
       "INTRADAY_4H": {
-        "closed": 284,
+        "closed": 285,
         "wins": 138,
-        "losses": 146,
-        "win_rate": 48.6,
-        "profit_factor": 1.23,
-        "net_pnl": 293.46,
-        "open": 3,
+        "losses": 147,
+        "win_rate": 48.4,
+        "profit_factor": 1.22,
+        "net_pnl": 278.07,
+        "open": 2,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 9054.07,
-    "cash": 3797.26,
-    "open_positions": 8,
-    "total_return_pct": -9.46,
-    "closed_trades": 302,
+    "equity": 9030.92,
+    "cash": 4506.79,
+    "open_positions": 7,
+    "total_return_pct": -9.69,
+    "closed_trades": 303,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 4,
     "corrupted_trades_pnl": 344.59,
     "wins": 145,
-    "losses": 157,
-    "win_rate": 48.0,
-    "win_rate_basis": "145W/157L from 302 closed trades (excl. 0 pre-fix + 4 corrupted)",
-    "profit_factor": 0.95,
+    "losses": 158,
+    "win_rate": 47.9,
+    "win_rate_basis": "145W/158L from 303 closed trades (excl. 0 pre-fix + 4 corrupted)",
+    "profit_factor": 0.94,
     "avg_win": 14.83,
     "avg_loss": -14.41,
     "dca_positions": 0,
-    "last_events": []
+    "last_events": [
+      "ETH@4h stopped out between full runs (-15.39)"
+    ]
   }
 }
