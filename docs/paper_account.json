@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 2524.3460796782647,
+  "cash": 3359.14167255368,
   "positions": {
     "ADA": {
       "asset": "ADA",
@@ -87,24 +87,6 @@
       "entry_conviction": 0.32,
       "expected_hours": 120,
       "tp1_hit": false
-    },
-    "BTC@4h": {
-      "asset": "BTC",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 0.014331444488673224,
-      "avg_entry": 59651.6,
-      "opened": "2026-11-22T08:59:28.555394",
-      "tranches": 1,
-      "last_tranche_notional": 854.8935940605396,
-      "stop_loss": 60883.4,
-      "take_profit_1": 58087.2,
-      "take_profit_2": 58087.2,
-      "risk_distance": 1231.800000000003,
-      "entry_conviction": 0.45,
-      "expected_hours": 7,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
     },
     "ETH@4h": {
       "asset": "ETH",
@@ -5347,13 +5329,26 @@
       "opened": "2026-11-13T05:03:54.565752",
       "closed": "2026-11-21T12:15:36.040936",
       "holding_days": 8
+    },
+    {
+      "asset": "BTC",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 59651.6,
+      "exit_price": 60932.10672,
+      "qty": 0.01433144,
+      "tranches": 1,
+      "pnl": -18.35,
+      "return_pct": -2.15,
+      "opened": "2026-11-22T08:59:28.555394",
+      "closed": "2026-11-22T11:45:56.317305",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-10-25T21:03:42.607935",
-      "equity": 8739.38
-    },
     {
       "ts": "2026-10-25T23:03:27.666921",
       "equity": 8739.38
@@ -7349,6 +7344,10 @@
     {
       "ts": "2026-11-22T11:04:05.260978",
       "equity": 9126.9
+    },
+    {
+      "ts": "2026-11-22T11:45:56.335139",
+      "equity": 9085.81
     }
   ],
   "stats": {
@@ -7364,32 +7363,34 @@
         "avg_holding_days": 7.3
       },
       "INTRADAY_4H": {
-        "closed": 282,
+        "closed": 283,
         "wins": 138,
-        "losses": 144,
-        "win_rate": 48.9,
-        "profit_factor": 1.26,
-        "net_pnl": 318.42,
-        "open": 5,
+        "losses": 145,
+        "win_rate": 48.8,
+        "profit_factor": 1.24,
+        "net_pnl": 300.07,
+        "open": 4,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 9126.9,
-    "cash": 2524.35,
-    "open_positions": 10,
-    "total_return_pct": -8.73,
-    "closed_trades": 300,
+    "equity": 9085.81,
+    "cash": 3359.14,
+    "open_positions": 9,
+    "total_return_pct": -9.14,
+    "closed_trades": 301,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 4,
     "corrupted_trades_pnl": 344.59,
     "wins": 145,
-    "losses": 155,
-    "win_rate": 48.3,
-    "win_rate_basis": "145W/155L from 300 closed trades (excl. 0 pre-fix + 4 corrupted)",
-    "profit_factor": 0.96,
+    "losses": 156,
+    "win_rate": 48.2,
+    "win_rate_basis": "145W/156L from 301 closed trades (excl. 0 pre-fix + 4 corrupted)",
+    "profit_factor": 0.95,
     "avg_win": 14.83,
-    "avg_loss": -14.43,
+    "avg_loss": -14.46,
     "dca_positions": 0,
-    "last_events": []
+    "last_events": [
+      "BTC@4h stopped out between full runs (-18.35)"
+    ]
   }
 }
