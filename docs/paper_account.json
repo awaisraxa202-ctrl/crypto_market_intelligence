@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 3888.180443707417,
+  "cash": 5572.462290904858,
   "positions": {
     "ADA": {
       "asset": "ADA",
@@ -87,60 +87,6 @@
       "entry_conviction": 0.32,
       "expected_hours": 120,
       "tp1_hit": false
-    },
-    "BNB@4h": {
-      "asset": "BNB",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 1.2228316710950822,
-      "avg_entry": 552.83,
-      "opened": "2026-11-23T03:04:10.898200",
-      "tranches": 1,
-      "last_tranche_notional": 676.0180327314944,
-      "stop_loss": 568.933071,
-      "take_profit_1": 530.89,
-      "take_profit_2": 530.89,
-      "risk_distance": 16.103071,
-      "entry_conviction": 0.45,
-      "expected_hours": 14,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
-    "DOGE@4h": {
-      "asset": "DOGE",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 10204.61855602872,
-      "avg_entry": 0.055359,
-      "opened": "2026-11-23T04:16:51.558722",
-      "tranches": 1,
-      "last_tranche_notional": 564.9174786431938,
-      "stop_loss": 0.055984,
-      "take_profit_1": 0.053484,
-      "take_profit_2": 0.053484,
-      "risk_distance": 0.0006250000000000006,
-      "entry_conviction": 0.45,
-      "expected_hours": 10,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
-    "AVAX@4h": {
-      "asset": "AVAX",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 71.93322068082148,
-      "avg_entry": 6.673,
-      "opened": "2026-11-23T04:16:51.558733",
-      "tranches": 1,
-      "last_tranche_notional": 480.01038160312174,
-      "stop_loss": 6.752024,
-      "take_profit_1": 6.399,
-      "take_profit_2": 6.399,
-      "risk_distance": 0.07902399999999954,
-      "entry_conviction": 0.45,
-      "expected_hours": 12,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
     }
   },
   "closed_trades": [
@@ -5413,13 +5359,60 @@
       "opened": "2026-11-23T04:16:51.558703",
       "closed": "2026-11-23T09:06:26.707912",
       "holding_days": 0
+    },
+    {
+      "asset": "BNB",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 552.83,
+      "exit_price": 569.388217,
+      "qty": 1.22283167,
+      "tranches": 1,
+      "pnl": -20.25,
+      "return_pct": -3.0,
+      "opened": "2026-11-23T03:04:10.898200",
+      "closed": "2026-11-23T14:01:11.224600",
+      "holding_days": 0
+    },
+    {
+      "asset": "DOGE",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 0.055359,
+      "exit_price": 0.056029,
+      "qty": 10204.61855603,
+      "tranches": 1,
+      "pnl": -6.83,
+      "return_pct": -1.21,
+      "opened": "2026-11-23T04:16:51.558722",
+      "closed": "2026-11-23T14:01:11.242274",
+      "holding_days": 0
+    },
+    {
+      "asset": "AVAX",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 6.673,
+      "exit_price": 6.757426,
+      "qty": 71.93322068,
+      "tranches": 1,
+      "pnl": -6.07,
+      "return_pct": -1.27,
+      "opened": "2026-11-23T04:16:51.558733",
+      "closed": "2026-11-23T14:01:14.533365",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-10-27T02:45:42.220810",
-      "equity": 8710.59
-    },
     {
       "ts": "2026-10-27T03:03:25.018747",
       "equity": 8708.6
@@ -7415,6 +7408,10 @@
     {
       "ts": "2026-11-23T13:03:23.089481",
       "equity": 9032.29
+    },
+    {
+      "ts": "2026-11-23T14:01:14.548896",
+      "equity": 9137.11
     }
   ],
   "stats": {
@@ -7430,32 +7427,36 @@
         "avg_holding_days": 7.3
       },
       "INTRADAY_4H": {
-        "closed": 288,
+        "closed": 291,
         "wins": 138,
-        "losses": 150,
-        "win_rate": 47.9,
-        "profit_factor": 1.19,
-        "net_pnl": 247.18,
-        "open": 3,
+        "losses": 153,
+        "win_rate": 47.4,
+        "profit_factor": 1.16,
+        "net_pnl": 214.03,
+        "open": 0,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 9032.29,
-    "cash": 3888.18,
-    "open_positions": 8,
-    "total_return_pct": -9.68,
-    "closed_trades": 306,
+    "equity": 9137.11,
+    "cash": 5572.46,
+    "open_positions": 5,
+    "total_return_pct": -8.63,
+    "closed_trades": 309,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 4,
     "corrupted_trades_pnl": 344.59,
     "wins": 145,
-    "losses": 161,
-    "win_rate": 47.4,
-    "win_rate_basis": "145W/161L from 306 closed trades (excl. 0 pre-fix + 4 corrupted)",
-    "profit_factor": 0.93,
+    "losses": 164,
+    "win_rate": 46.9,
+    "win_rate_basis": "145W/164L from 309 closed trades (excl. 0 pre-fix + 4 corrupted)",
+    "profit_factor": 0.92,
     "avg_win": 14.83,
-    "avg_loss": -14.34,
+    "avg_loss": -14.28,
     "dca_positions": 0,
-    "last_events": []
+    "last_events": [
+      "BNB@4h stopped out between full runs (-20.25)",
+      "DOGE@4h stopped out between full runs (-6.83)",
+      "AVAX@4h stopped out between full runs (-6.07)"
+    ]
   }
 }
