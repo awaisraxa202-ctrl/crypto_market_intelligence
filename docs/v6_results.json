@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-11-23T05:06:51.494621",
-  "imbalance": 0.694,
+  "timestamp": "2026-11-23T07:05:52.006311",
+  "imbalance": 0.255,
   "regime": {
     "regime": "UNKNOWN_UNCERTAINTY",
     "description": "Trade policy uncertainty unavailable \u2014 regime not determined",
@@ -15,115 +15,117 @@
   },
   "ml_signal": {
     "bilstm_score": 0.7,
-    "cnn_score": 0.741,
-    "ensemble_score": 0.72,
-    "action": "BUY",
-    "confidence": 0.72,
-    "trade_qualified": true
+    "cnn_score": 0.182,
+    "ensemble_score": 0.441,
+    "action": "HOLD",
+    "confidence": 0.441,
+    "trade_qualified": false
   },
   "big_trade": {
-    "position_size": 0.1519,
-    "risk_pct": 3.72,
-    "target_movement": 2449.7720000000004,
-    "trade_type": "BIG"
+    "position_size": 0,
+    "risk_pct": 0,
+    "target_movement": 0,
+    "trade_type": "BIG",
+    "gated_reason": "not trade_qualified (action=HOLD)"
   },
   "small_trade": {
-    "position_size": 0.1404,
-    "risk_pct": 0.86,
-    "target_movement": 612.4430000000001,
-    "trade_type": "SMALL"
+    "position_size": 0,
+    "risk_pct": 0,
+    "target_movement": 0,
+    "trade_type": "SMALL",
+    "gated_reason": "not trade_qualified (action=HOLD)"
   },
   "explanation": {
     "asset": "BTC",
-    "signal": "BUY",
-    "confidence": 0.72,
+    "signal": "HOLD",
+    "confidence": 0.441,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
-      "\u2705 order_book: Bullish order book imbalance",
+      "\u274c order_book: Order book data unavailable",
       "\u274c onchain: NVT ratio normal",
       "\u2705 sentiment: Fear & Greed in buy zone"
     ],
-    "historical_evidence": "Similar setups have shown a 50% win rate across 10 comparable past conditions.",
+    "historical_evidence": "Similar setups have shown a 60% win rate across 10 comparable past conditions.",
     "historical_trades": [
       {
         "date": "2026-06-10",
-        "similarity": 97.7,
+        "similarity": 97.4,
         "future_5d_return": 7.84,
         "rsi": 15.3,
         "price_vs_sma50": -0.1806
       },
       {
         "date": "2026-06-09",
-        "similarity": 97.1,
+        "similarity": 96.8,
         "future_5d_return": 6.52,
         "rsi": 14.3,
         "price_vs_sma50": -0.1808
       },
       {
-        "date": "2026-06-08",
-        "similarity": 96.7,
-        "future_5d_return": 2.1,
-        "rsi": 14.3,
-        "price_vs_sma50": -0.1656
-      },
-      {
         "date": "2026-02-04",
-        "similarity": 96.6,
+        "similarity": 96.4,
         "future_5d_return": -4.01,
         "rsi": 17.7,
         "price_vs_sma50": -0.1744
       },
       {
-        "date": "2026-06-07",
-        "similarity": 96.6,
-        "future_5d_return": 0.37,
-        "rsi": 15.7,
-        "price_vs_sma50": -0.1649
+        "date": "2026-06-08",
+        "similarity": 96.4,
+        "future_5d_return": 2.1,
+        "rsi": 14.3,
+        "price_vs_sma50": -0.1656
       },
       {
         "date": "2026-11-17",
-        "similarity": 96.1,
+        "similarity": 96.4,
         "future_5d_return": -5.71,
         "rsi": 22.6,
         "price_vs_sma50": -0.1787
       },
       {
+        "date": "2026-06-07",
+        "similarity": 96.3,
+        "future_5d_return": 0.37,
+        "rsi": 15.7,
+        "price_vs_sma50": -0.1649
+      },
+      {
         "date": "2026-06-11",
-        "similarity": 95.4,
+        "similarity": 95.9,
         "future_5d_return": 3.24,
         "rsi": 24.9,
         "price_vs_sma50": -0.1495
       },
       {
-        "date": "2026-11-18",
-        "similarity": 95.3,
-        "future_5d_return": -2.89,
-        "rsi": 9.4,
-        "price_vs_sma50": -0.1985
+        "date": "2026-06-12",
+        "similarity": 95.5,
+        "future_5d_return": 1.43,
+        "rsi": 25.0,
+        "price_vs_sma50": -0.1462
       },
       {
         "date": "2026-11-16",
-        "similarity": 95.1,
+        "similarity": 95.4,
         "future_5d_return": -7.29,
         "rsi": 24.5,
         "price_vs_sma50": -0.1834
       },
       {
-        "date": "2026-02-10",
-        "similarity": 95.0,
-        "future_5d_return": -0.01,
-        "rsi": 25.4,
-        "price_vs_sma50": -0.2018
+        "date": "2026-11-15",
+        "similarity": 95.2,
+        "future_5d_return": -9.96,
+        "rsi": 23.5,
+        "price_vs_sma50": -0.1811
       }
     ],
-    "risk_warning": "\u2705 Moderate confidence. Standard position size recommended.",
+    "risk_warning": "\u26a0\ufe0f Low confidence trade. Reduce position size by 50%.",
     "trader_comment": "No clear directional bias. Patience is key.",
-    "historical_win_rate": 50.0
+    "historical_win_rate": 60.0
   },
   "narrative": {
     "date": "November 23, 2026",
     "macro": "Macro Regime: UNKNOWN_UNCERTAINTY \u2014 Trade policy uncertainty unavailable \u2014 regime not determined",
-    "technicals": "Order book shows bullish imbalance. More buy orders than sell orders.",
+    "technicals": "Order book shows bearish imbalance. More sell orders than buy orders.",
     "sentiment": "Extreme Fear \u2014 Contrarian buying opportunity.",
     "upcoming_events": "Next event: Jobs Report on 2026-12-04 (Impact: MEDIUM)",
     "trader_comment": "Market is in a consolidation phase. Watch for breakout."
@@ -131,9 +133,9 @@
   "macro_data": {
     "fed_trend": "NOT_CONFIGURED",
     "fed_label": "FRED_API_KEY not configured",
-    "dxy": 103.81,
+    "dxy": 103.63,
     "dxy_trend": "FALLING",
-    "dxy_label": "FALLING (103.81)",
+    "dxy_label": "FALLING (103.63)",
     "vix": 35.89,
     "vix_level": "HIGH",
     "vix_label": "FEAR (35.89)",
@@ -187,8 +189,8 @@
   ],
   "event_risk": {
     "expected_move": "\u00b14.0%",
-    "expected_range_low": 58703.04,
-    "expected_range_high": 63594.96,
+    "expected_range_low": 58993.15,
+    "expected_range_high": 63909.25,
     "direction": "UNCERTAIN",
     "recommendation": "Reduce position size by 50% before event",
     "event": {
@@ -229,49 +231,28 @@
     "source": "yfinance spot BTC ETFs (proxy, not true creation/redemption flow)"
   },
   "onchain": {
-    "mvrv_zscore": -1.107,
-    "miner_reserves": 314382901.0,
-    "nvt_ratio": 42.95,
+    "mvrv_zscore": -1.076,
+    "miner_reserves": 314754740.0,
+    "nvt_ratio": 43.38,
     "hashrate_trend": "FALLING",
     "mvrv_is_proxy": true,
-    "miner_reserves_trend": "FALLING",
+    "miner_reserves_trend": "RISING",
     "hashrate_source": "mempool.space (blockchain.info unavailable)"
   },
   "exit_strategy": {
-    "entry": 61244.3,
-    "signal": "LONG",
-    "current_price": 61856.743,
-    "scenarios": [
-      {
-        "condition": "Price hits TP1 ($63081.63)",
-        "action": "Take 50% profit",
-        "reason": "Lock in gains, reduce risk"
-      },
-      {
-        "condition": "Price hits TP2 ($64918.96)",
-        "action": "Take remaining 50% profit",
-        "reason": "Target hit, complete the trade"
-      },
-      {
-        "condition": "Price hits SL ($59406.97)",
-        "action": "Exit immediately",
-        "reason": "Stop-loss protects capital"
-      },
-      {
-        "condition": "No target hit after 7 days",
-        "action": "Close position",
-        "reason": "Time-based exit, opportunity cost"
-      }
-    ]
+    "entry": 61393.9,
+    "signal": "NO TRADE",
+    "current_price": 62007.839,
+    "scenarios": []
   },
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.7,
-      "cnn_score": 0.741,
-      "ensemble_score": 0.72,
-      "action": "BUY",
-      "confidence": 0.72,
-      "trade_qualified": true
+      "cnn_score": 0.182,
+      "ensemble_score": 0.441,
+      "action": "HOLD",
+      "confidence": 0.441,
+      "trade_qualified": false
     }
   },
   "order_book_history_depth": 1,
