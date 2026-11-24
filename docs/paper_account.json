@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 3468.793675503197,
+  "cash": 4193.418525761635,
   "positions": {
     "ADA": {
       "asset": "ADA",
@@ -101,24 +101,6 @@
       "take_profit_1": 1650.0,
       "take_profit_2": 1650.0,
       "risk_distance": 47.9699999999998,
-      "entry_conviction": 0.75,
-      "expected_hours": 11,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
-    "BNB@4h": {
-      "asset": "BNB",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 1.311412086076251,
-      "avg_entry": 549.54,
-      "opened": "2026-11-24T03:03:43.989078",
-      "tranches": 1,
-      "last_tranche_notional": 720.6733977823429,
-      "stop_loss": 561.66,
-      "take_profit_1": 545.0,
-      "take_profit_2": 545.0,
-      "risk_distance": 12.120000000000005,
       "entry_conviction": 0.75,
       "expected_hours": 11,
       "tp1_hit": true,
@@ -5549,13 +5531,26 @@
       "opened": "2026-11-23T16:39:20.333336",
       "closed": "2026-11-23T21:45:43.572369",
       "holding_days": 0
+    },
+    {
+      "asset": "BNB",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "TAKE_PROFIT_2",
+      "successful": true,
+      "profitable": true,
+      "entry_price": 549.54,
+      "exit_price": 545.436,
+      "qty": 1.31141209,
+      "tranches": 1,
+      "pnl": 5.38,
+      "return_pct": 0.75,
+      "opened": "2026-11-24T03:03:43.989078",
+      "closed": "2026-11-24T03:07:06.880432",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-10-27T15:30:48.012192",
-      "equity": 8733.48
-    },
     {
       "ts": "2026-10-27T16:30:52.253644",
       "equity": 8723.69
@@ -7551,6 +7546,10 @@
     {
       "ts": "2026-11-24T03:03:43.989096",
       "equity": 9057.81
+    },
+    {
+      "ts": "2026-11-24T03:07:10.045945",
+      "equity": 9025.45
     }
   ],
   "stats": {
@@ -7566,36 +7565,34 @@
         "avg_holding_days": 7.3
       },
       "INTRADAY_4H": {
-        "closed": 296,
-        "wins": 143,
+        "closed": 297,
+        "wins": 144,
         "losses": 153,
-        "win_rate": 48.3,
+        "win_rate": 48.5,
         "profit_factor": 1.23,
-        "net_pnl": 308.42,
-        "open": 3,
+        "net_pnl": 313.8,
+        "open": 2,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 9057.81,
-    "cash": 3468.79,
-    "open_positions": 8,
-    "total_return_pct": -9.42,
-    "closed_trades": 314,
+    "equity": 9025.45,
+    "cash": 4193.42,
+    "open_positions": 7,
+    "total_return_pct": -9.75,
+    "closed_trades": 315,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 4,
     "corrupted_trades_pnl": 344.59,
-    "wins": 150,
+    "wins": 151,
     "losses": 164,
-    "win_rate": 47.8,
-    "win_rate_basis": "150W/164L from 314 closed trades (excl. 0 pre-fix + 4 corrupted)",
+    "win_rate": 47.9,
+    "win_rate_basis": "151W/164L from 315 closed trades (excl. 0 pre-fix + 4 corrupted)",
     "profit_factor": 0.96,
-    "avg_win": 14.97,
+    "avg_win": 14.9,
     "avg_loss": -14.28,
     "dca_positions": 0,
     "last_events": [
-      "ETH \u26a14h OPENED SHORT 0.502718 @ 1687.1300 \u2192 1650.0 (~11h)",
-      "BNB \u26a14h OPENED SHORT 1.311412 @ 549.5400 \u2192 545.0 (~11h)",
-      "BTC \u26a14h OPENED SHORT 0.010187 @ 60110.5000 \u2192 58087.2 (~9h)"
+      "BNB@4h TP2 hit between full runs \u2014 closed (+5.38)"
     ]
   }
 }
