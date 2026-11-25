@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-11-25T10:40:06.845480",
-  "imbalance": 0.832,
+  "timestamp": "2026-11-25T11:05:57.440792",
+  "imbalance": 0.049,
   "regime": {
     "regime": "UNKNOWN_UNCERTAINTY",
     "description": "Trade policy uncertainty unavailable \u2014 regime not determined",
@@ -15,31 +15,31 @@
   },
   "ml_signal": {
     "bilstm_score": 0.7,
-    "cnn_score": 0.948,
-    "ensemble_score": 0.824,
-    "action": "BUY",
-    "confidence": 0.824,
+    "cnn_score": 0.0,
+    "ensemble_score": 0.35,
+    "action": "SELL",
+    "confidence": 0.65,
     "trade_qualified": true
   },
   "big_trade": {
-    "position_size": 0.1622,
-    "risk_pct": 3.82,
-    "target_movement": 2357.628,
+    "position_size": 0.1552,
+    "risk_pct": 3.65,
+    "target_movement": 2351.808,
     "trade_type": "BIG"
   },
   "small_trade": {
-    "position_size": 0.1547,
-    "risk_pct": 0.91,
-    "target_movement": 589.407,
+    "position_size": 0.1403,
+    "risk_pct": 0.83,
+    "target_movement": 587.952,
     "trade_type": "SMALL"
   },
   "explanation": {
     "asset": "BTC",
-    "signal": "BUY",
-    "confidence": 0.824,
+    "signal": "SELL",
+    "confidence": 0.65,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
-      "\u2705 order_book: Bullish order book imbalance",
+      "\u274c order_book: Order book data unavailable",
       "\u274c onchain: NVT ratio normal",
       "\u2705 sentiment: Fear & Greed in buy zone"
     ],
@@ -54,7 +54,7 @@
       },
       {
         "date": "2026-06-09",
-        "similarity": 96.7,
+        "similarity": 96.8,
         "future_5d_return": 6.52,
         "rsi": 14.3,
         "price_vs_sma50": -0.1808
@@ -68,7 +68,7 @@
       },
       {
         "date": "2026-06-07",
-        "similarity": 96.1,
+        "similarity": 96.2,
         "future_5d_return": 0.37,
         "rsi": 15.7,
         "price_vs_sma50": -0.1649
@@ -89,7 +89,7 @@
       },
       {
         "date": "2026-02-11",
-        "similarity": 95.2,
+        "similarity": 95.3,
         "future_5d_return": 2.7,
         "rsi": 24.3,
         "price_vs_sma50": -0.2182
@@ -109,21 +109,21 @@
         "price_vs_sma50": -0.1985
       },
       {
-        "date": "2026-02-10",
+        "date": "2026-11-20",
         "similarity": 94.9,
-        "future_5d_return": -0.01,
-        "rsi": 25.4,
-        "price_vs_sma50": -0.2018
+        "future_5d_return": -0.11,
+        "rsi": 9.6,
+        "price_vs_sma50": -0.2425
       }
     ],
-    "risk_warning": "\ud83d\udfe2 High confidence trade. Can consider increased position size.",
+    "risk_warning": "\u2705 Moderate confidence. Standard position size recommended.",
     "trader_comment": "No clear directional bias. Patience is key.",
     "historical_win_rate": 50.0
   },
   "narrative": {
     "date": "November 25, 2026",
     "macro": "Macro Regime: UNKNOWN_UNCERTAINTY \u2014 Trade policy uncertainty unavailable \u2014 regime not determined",
-    "technicals": "Order book shows bullish imbalance. More buy orders than sell orders.",
+    "technicals": "Order book shows bearish imbalance. More sell orders than buy orders.",
     "sentiment": "Extreme Fear \u2014 Contrarian buying opportunity.",
     "upcoming_events": "Next event: Jobs Report on 2026-12-04 (Impact: MEDIUM)",
     "trader_comment": "Market is in a consolidation phase. Watch for breakout."
@@ -131,12 +131,12 @@
   "macro_data": {
     "fed_trend": "NOT_CONFIGURED",
     "fed_label": "FRED_API_KEY not configured",
-    "dxy": 103.96,
+    "dxy": 103.99,
     "dxy_trend": "RISING",
-    "dxy_label": "RISING (103.96)",
-    "vix": 29.29,
+    "dxy_label": "RISING (103.99)",
+    "vix": 29.28,
     "vix_level": "HIGH",
-    "vix_label": "FEAR (29.29)",
+    "vix_label": "FEAR (29.28)",
     "liquidity": "TIGHTENING",
     "liquidity_desc": "Short-end yield 4.17% (rising vs 5d ago)",
     "fed_impact": "\ud83d\udfe1 NEUTRAL",
@@ -187,8 +187,8 @@
   ],
   "event_risk": {
     "expected_move": "\u00b14.0%",
-    "expected_range_low": 56522.98,
-    "expected_range_high": 61233.22,
+    "expected_range_low": 56389.92,
+    "expected_range_high": 61089.08,
     "direction": "UNCERTAIN",
     "recommendation": "Reduce position size by 50% before event",
     "event": {
@@ -229,48 +229,43 @@
     "source": "yfinance spot BTC ETFs (proxy, not true creation/redemption flow)"
   },
   "onchain": {
-    "mvrv_zscore": -1.321,
-    "miner_reserves": 313236556.0,
-    "nvt_ratio": 39.9,
+    "mvrv_zscore": -1.336,
+    "miner_reserves": 314044625.0,
+    "nvt_ratio": 40.4,
     "hashrate_trend": "FALLING",
     "mvrv_is_proxy": true,
-    "miner_reserves_trend": "FALLING",
+    "miner_reserves_trend": "RISING",
     "hashrate_source": "mempool.space (blockchain.info unavailable)"
   },
   "exit_strategy": {
-    "entry": 58940.7,
-    "signal": "LONG",
-    "current_price": 59530.106999999996,
+    "entry": 58795.2,
+    "signal": "SHORT",
+    "current_price": 59383.151999999995,
     "scenarios": [
       {
-        "condition": "Price hits TP1 ($60708.92)",
+        "condition": "Price hits TP1 ($57031.34)",
         "action": "Take 50% profit",
         "reason": "Lock in gains, reduce risk"
       },
       {
-        "condition": "Price hits TP2 ($62477.14)",
+        "condition": "Price hits TP2 ($55267.49)",
         "action": "Take remaining 50% profit",
         "reason": "Target hit, complete the trade"
       },
       {
-        "condition": "Price hits SL ($57172.48)",
+        "condition": "Price hits SL ($60559.06)",
         "action": "Exit immediately",
         "reason": "Stop-loss protects capital"
-      },
-      {
-        "condition": "No target hit after 7 days",
-        "action": "Close position",
-        "reason": "Time-based exit, opportunity cost"
       }
     ]
   },
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.7,
-      "cnn_score": 0.948,
-      "ensemble_score": 0.824,
-      "action": "BUY",
-      "confidence": 0.824,
+      "cnn_score": 0.0,
+      "ensemble_score": 0.35,
+      "action": "SELL",
+      "confidence": 0.65,
       "trade_qualified": true
     }
   },
