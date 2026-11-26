@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 2531.6887269619397,
+  "cash": 2981.285217527571,
   "positions": {
     "ADA": {
       "asset": "ADA",
@@ -157,24 +157,6 @@
       "risk_distance": 0.11230500000000099,
       "entry_conviction": 0.48,
       "expected_hours": 5,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
-    "BNB@4h": {
-      "asset": "BNB",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 0.7982252859135892,
-      "avg_entry": 559.9,
-      "opened": "2026-11-26T05:04:19.404232",
-      "tranches": 1,
-      "last_tranche_notional": 446.9263375830186,
-      "stop_loss": 564.850184,
-      "take_profit_1": 555.0,
-      "take_profit_2": 555.0,
-      "risk_distance": 4.950184000000036,
-      "entry_conviction": 0.39,
-      "expected_hours": 10,
       "tp1_hit": true,
       "stop_moved_to_breakeven": false
     }
@@ -5721,13 +5703,26 @@
       "opened": "2026-11-24T19:03:30.718619",
       "closed": "2026-11-25T14:45:50.074817",
       "holding_days": 0
+    },
+    {
+      "asset": "BNB",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "TAKE_PROFIT_2",
+      "successful": true,
+      "profitable": true,
+      "entry_price": 559.9,
+      "exit_price": 555.444,
+      "qty": 0.79822529,
+      "tranches": 1,
+      "pnl": 3.56,
+      "return_pct": 0.8,
+      "opened": "2026-11-26T05:04:19.404232",
+      "closed": "2026-11-26T07:03:58.151246",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-10-29T11:03:24.084917",
-      "equity": 8624.08
-    },
     {
       "ts": "2026-10-29T12:00:52.695537",
       "equity": 8604.9
@@ -7723,6 +7718,10 @@
     {
       "ts": "2026-11-26T05:04:19.404250",
       "equity": 9167.93
+    },
+    {
+      "ts": "2026-11-26T07:03:58.168425",
+      "equity": 9122.42
     }
   ],
   "stats": {
@@ -7738,34 +7737,34 @@
         "avg_holding_days": 7.3
       },
       "INTRADAY_4H": {
-        "closed": 304,
-        "wins": 150,
+        "closed": 305,
+        "wins": 151,
         "losses": 154,
-        "win_rate": 49.3,
+        "win_rate": 49.5,
         "profit_factor": 1.29,
-        "net_pnl": 388.98,
-        "open": 5,
+        "net_pnl": 392.54,
+        "open": 4,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 9167.93,
-    "cash": 2531.69,
-    "open_positions": 10,
-    "total_return_pct": -8.32,
-    "closed_trades": 322,
+    "equity": 9122.42,
+    "cash": 2981.29,
+    "open_positions": 9,
+    "total_return_pct": -8.78,
+    "closed_trades": 323,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 4,
     "corrupted_trades_pnl": 344.59,
-    "wins": 157,
+    "wins": 158,
     "losses": 165,
-    "win_rate": 48.8,
-    "win_rate_basis": "157W/165L from 322 closed trades (excl. 0 pre-fix + 4 corrupted)",
+    "win_rate": 48.9,
+    "win_rate_basis": "158W/165L from 323 closed trades (excl. 0 pre-fix + 4 corrupted)",
     "profit_factor": 0.99,
-    "avg_win": 14.86,
+    "avg_win": 14.79,
     "avg_loss": -14.24,
     "dca_positions": 0,
     "last_events": [
-      "BNB \u26a14h OPENED SHORT 0.798225 @ 559.9000 \u2192 555.0 (~10h)"
+      "BNB@4h TP2 hit \u2014 closed (+3.56)"
     ]
   }
 }
