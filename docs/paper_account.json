@@ -1,7 +1,7 @@
 {
   "created": "2026-09-10T21:37:39.200648",
   "starting_capital": 10000.0,
-  "cash": 2943.576463706715,
+  "cash": 4490.655373768508,
   "positions": {
     "ADA": {
       "asset": "ADA",
@@ -87,42 +87,6 @@
       "entry_conviction": 0.32,
       "expected_hours": 120,
       "tp1_hit": false
-    },
-    "ETH@4h": {
-      "asset": "ETH",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 0.49148521667119044,
-      "avg_entry": 1723.43,
-      "opened": "2026-11-27T03:04:09.195301",
-      "tranches": 1,
-      "last_tranche_notional": 847.0403669676298,
-      "stop_loss": 1742.164309,
-      "take_profit_1": 1700.0,
-      "take_profit_2": 1700.0,
-      "risk_distance": 18.73430899999994,
-      "entry_conviction": 0.59,
-      "expected_hours": 14,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
-    },
-    "BNB@4h": {
-      "asset": "BNB",
-      "trade_type": "INTRADAY_4H",
-      "side": "SHORT",
-      "qty": 1.281251468317006,
-      "avg_entry": 561.74,
-      "opened": "2026-11-27T03:04:09.195312",
-      "tranches": 1,
-      "last_tranche_notional": 719.730199812395,
-      "stop_loss": 566.463355,
-      "take_profit_1": 544.46,
-      "take_profit_2": 544.46,
-      "risk_distance": 4.7233549999999696,
-      "entry_conviction": 0.43,
-      "expected_hours": 12,
-      "tp1_hit": true,
-      "stop_moved_to_breakeven": false
     },
     "BTC@4h": {
       "asset": "BTC",
@@ -5839,13 +5803,43 @@
       "opened": "2026-11-26T22:41:45.250510",
       "closed": "2026-11-27T02:30:52.760160",
       "holding_days": 0
+    },
+    {
+      "asset": "ETH",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 1723.43,
+      "exit_price": 1743.55804,
+      "qty": 0.49148522,
+      "tranches": 1,
+      "pnl": -9.89,
+      "return_pct": -1.17,
+      "opened": "2026-11-27T03:04:09.195301",
+      "closed": "2026-11-27T05:30:52.312921",
+      "holding_days": 0
+    },
+    {
+      "asset": "BNB",
+      "trade_type": "INTRADAY_4H",
+      "side": "SHORT",
+      "reason": "STOP_LOSS",
+      "successful": false,
+      "profitable": false,
+      "entry_price": 561.74,
+      "exit_price": 566.916526,
+      "qty": 1.28125147,
+      "tranches": 1,
+      "pnl": -6.63,
+      "return_pct": -0.92,
+      "opened": "2026-11-27T03:04:09.195312",
+      "closed": "2026-11-27T05:30:55.596599",
+      "holding_days": 0
     }
   ],
   "equity_curve": [
-    {
-      "ts": "2026-10-30T07:04:01.368303",
-      "equity": 8567.96
-    },
     {
       "ts": "2026-10-30T07:50:47.040082",
       "equity": 8532.7
@@ -7841,6 +7835,10 @@
     {
       "ts": "2026-11-27T05:03:30.416657",
       "equity": 9145.93
+    },
+    {
+      "ts": "2026-11-27T05:30:58.952949",
+      "equity": 9153.14
     }
   ],
   "stats": {
@@ -7856,34 +7854,35 @@
         "avg_holding_days": 7.3
       },
       "INTRADAY_4H": {
-        "closed": 312,
+        "closed": 314,
         "wins": 151,
-        "losses": 161,
-        "win_rate": 48.4,
-        "profit_factor": 1.24,
-        "net_pnl": 339.05,
-        "open": 4,
+        "losses": 163,
+        "win_rate": 48.1,
+        "profit_factor": 1.23,
+        "net_pnl": 322.53,
+        "open": 2,
         "avg_holding_days": 0.1
       }
     },
-    "equity": 9145.93,
-    "cash": 2943.58,
-    "open_positions": 9,
-    "total_return_pct": -8.54,
-    "closed_trades": 330,
+    "equity": 9153.14,
+    "cash": 4490.66,
+    "open_positions": 7,
+    "total_return_pct": -8.47,
+    "closed_trades": 332,
     "excluded_pre_fix": 0,
     "excluded_corrupted": 4,
     "corrupted_trades_pnl": 344.59,
     "wins": 158,
-    "losses": 172,
-    "win_rate": 47.9,
-    "win_rate_basis": "158W/172L from 330 closed trades (excl. 0 pre-fix + 4 corrupted)",
+    "losses": 174,
+    "win_rate": 47.6,
+    "win_rate_basis": "158W/174L from 332 closed trades (excl. 0 pre-fix + 4 corrupted)",
     "profit_factor": 0.97,
     "avg_win": 14.79,
-    "avg_loss": -13.97,
+    "avg_loss": -13.9,
     "dca_positions": 0,
     "last_events": [
-      "XRP \u26a14h OPENED SHORT 541.357328 @ 0.9599 \u2192 0.95 (~12h)"
+      "ETH@4h stopped out between full runs (-9.89)",
+      "BNB@4h stopped out between full runs (-6.63)"
     ]
   }
 }
