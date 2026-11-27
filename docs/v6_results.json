@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-11-27T05:36:54.395919",
-  "imbalance": 0.498,
+  "timestamp": "2026-11-27T07:30:21.202612",
+  "imbalance": 0.459,
   "regime": {
     "regime": "UNKNOWN_UNCERTAINTY",
     "description": "Trade policy uncertainty unavailable \u2014 regime not determined",
@@ -22,15 +22,15 @@
     "trade_qualified": true
   },
   "big_trade": {
-    "position_size": 0.1456,
+    "position_size": 0.1462,
     "risk_pct": 3.6,
-    "target_movement": 2471.752,
+    "target_movement": 2462.612,
     "trade_type": "BIG"
   },
   "small_trade": {
-    "position_size": 0.1295,
+    "position_size": 0.1299,
     "risk_pct": 0.8,
-    "target_movement": 617.938,
+    "target_movement": 615.653,
     "trade_type": "SMALL"
   },
   "explanation": {
@@ -47,7 +47,7 @@
     "historical_trades": [
       {
         "date": "2026-02-16",
-        "similarity": 97.1,
+        "similarity": 97.0,
         "future_5d_return": -1.3,
         "rsi": 35.8,
         "price_vs_sma50": -0.1788
@@ -61,7 +61,7 @@
       },
       {
         "date": "2026-06-14",
-        "similarity": 96.5,
+        "similarity": 96.4,
         "future_5d_return": -3.39,
         "rsi": 31.5,
         "price_vs_sma50": -0.1111
@@ -74,18 +74,25 @@
         "price_vs_sma50": -0.1756
       },
       {
-        "date": "2026-02-17",
+        "date": "2026-06-12",
         "similarity": 96.2,
+        "future_5d_return": 1.43,
+        "rsi": 25.0,
+        "price_vs_sma50": -0.1462
+      },
+      {
+        "date": "2026-02-17",
+        "similarity": 96.1,
         "future_5d_return": 0.2,
         "rsi": 37.5,
         "price_vs_sma50": -0.1916
       },
       {
-        "date": "2026-06-12",
-        "similarity": 96.1,
-        "future_5d_return": 1.43,
-        "rsi": 25.0,
-        "price_vs_sma50": -0.1462
+        "date": "2026-02-13",
+        "similarity": 95.9,
+        "future_5d_return": -3.5,
+        "rsi": 31.6,
+        "price_vs_sma50": -0.1899
       },
       {
         "date": "2026-02-15",
@@ -95,22 +102,15 @@
         "price_vs_sma50": -0.1835
       },
       {
-        "date": "2026-02-13",
-        "similarity": 95.8,
-        "future_5d_return": -3.5,
-        "rsi": 31.6,
-        "price_vs_sma50": -0.1899
-      },
-      {
         "date": "2026-06-11",
-        "similarity": 95.7,
+        "similarity": 95.8,
         "future_5d_return": 3.24,
         "rsi": 24.9,
         "price_vs_sma50": -0.1495
       },
       {
         "date": "2026-07-01",
-        "similarity": 95.7,
+        "similarity": 95.6,
         "future_5d_return": 6.75,
         "rsi": 33.3,
         "price_vs_sma50": -0.1194
@@ -131,9 +131,9 @@
   "macro_data": {
     "fed_trend": "NOT_CONFIGURED",
     "fed_label": "FRED_API_KEY not configured",
-    "dxy": 103.68,
+    "dxy": 103.69,
     "dxy_trend": "RISING",
-    "dxy_label": "RISING (103.68)",
+    "dxy_label": "RISING (103.69)",
     "vix": 26.8,
     "vix_level": "HIGH",
     "vix_label": "FEAR (26.80)",
@@ -187,8 +187,8 @@
   ],
   "event_risk": {
     "expected_move": "\u00b14.0%",
-    "expected_range_low": 59271.94,
-    "expected_range_high": 64211.26,
+    "expected_range_low": 59289.6,
+    "expected_range_high": 64230.4,
     "direction": "UNCERTAIN",
     "recommendation": "Reduce position size by 50% before event",
     "event": {
@@ -229,31 +229,30 @@
     "source": "yfinance spot BTC ETFs (proxy, not true creation/redemption flow)"
   },
   "onchain": {
-    "mvrv_zscore": -1.019,
-    "miner_reserves": 315879642.0,
-    "nvt_ratio": 55.09,
-    "hashrate_trend": "FALLING",
+    "mvrv_zscore": -1.026,
+    "miner_reserves": null,
+    "nvt_ratio": 56.0,
+    "hashrate_trend": null,
     "mvrv_is_proxy": true,
-    "miner_reserves_trend": "RISING",
-    "hashrate_source": "mempool.space (blockchain.info unavailable)"
+    "miner_reserves_trend": "UNKNOWN"
   },
   "exit_strategy": {
-    "entry": 61793.8,
+    "entry": 61565.3,
     "signal": "LONG",
-    "current_price": 62411.738000000005,
+    "current_price": 62180.953,
     "scenarios": [
       {
-        "condition": "Price hits TP1 ($63647.61)",
+        "condition": "Price hits TP1 ($63412.26)",
         "action": "Take 50% profit",
         "reason": "Lock in gains, reduce risk"
       },
       {
-        "condition": "Price hits TP2 ($65501.43)",
+        "condition": "Price hits TP2 ($65259.22)",
         "action": "Take remaining 50% profit",
         "reason": "Target hit, complete the trade"
       },
       {
-        "condition": "Price hits SL ($59939.99)",
+        "condition": "Price hits SL ($59718.34)",
         "action": "Exit immediately",
         "reason": "Stop-loss protects capital"
       },
