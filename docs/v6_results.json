@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-11-28T03:05:59.361752",
-  "imbalance": 0.262,
+  "timestamp": "2026-11-28T05:06:08.767982",
+  "imbalance": 0.356,
   "regime": {
     "regime": "UNKNOWN_UNCERTAINTY",
     "description": "Trade policy uncertainty unavailable \u2014 regime not determined",
@@ -15,10 +15,10 @@
   },
   "ml_signal": {
     "bilstm_score": 0.7,
-    "cnn_score": 0.193,
-    "ensemble_score": 0.447,
+    "cnn_score": 0.334,
+    "ensemble_score": 0.517,
     "action": "HOLD",
-    "confidence": 0.447,
+    "confidence": 0.517,
     "trade_qualified": false
   },
   "big_trade": {
@@ -38,7 +38,7 @@
   "explanation": {
     "asset": "BTC",
     "signal": "HOLD",
-    "confidence": 0.447,
+    "confidence": 0.517,
     "summary": "HOLD BTC \u2014 Mixed signals. Wait for clarity.",
     "factors": [
       "\u274c order_book: Order book data unavailable",
@@ -49,14 +49,14 @@
     "historical_trades": [
       {
         "date": "2026-02-17",
-        "similarity": 97.2,
+        "similarity": 97.1,
         "future_5d_return": 0.2,
         "rsi": 37.5,
         "price_vs_sma50": -0.1916
       },
       {
         "date": "2026-02-16",
-        "similarity": 96.9,
+        "similarity": 96.8,
         "future_5d_return": -1.3,
         "rsi": 35.8,
         "price_vs_sma50": -0.1788
@@ -70,35 +70,35 @@
       },
       {
         "date": "2026-02-15",
-        "similarity": 96.4,
+        "similarity": 96.3,
         "future_5d_return": -1.14,
         "rsi": 38.8,
         "price_vs_sma50": -0.1835
       },
       {
-        "date": "2026-02-14",
-        "similarity": 96.1,
-        "future_5d_return": -4.02,
-        "rsi": 38.0,
-        "price_vs_sma50": -0.1756
-      },
-      {
         "date": "2026-07-01",
-        "similarity": 96.1,
+        "similarity": 96.2,
         "future_5d_return": 6.75,
         "rsi": 33.3,
         "price_vs_sma50": -0.1194
       },
       {
         "date": "2026-02-13",
-        "similarity": 96.0,
+        "similarity": 96.1,
         "future_5d_return": -3.5,
         "rsi": 31.6,
         "price_vs_sma50": -0.1899
       },
       {
+        "date": "2026-02-14",
+        "similarity": 96.0,
+        "future_5d_return": -4.02,
+        "rsi": 38.0,
+        "price_vs_sma50": -0.1756
+      },
+      {
         "date": "2026-02-23",
-        "similarity": 95.9,
+        "similarity": 96.0,
         "future_5d_return": 3.65,
         "rsi": 32.8,
         "price_vs_sma50": -0.1998
@@ -112,7 +112,7 @@
       },
       {
         "date": "2026-03-01",
-        "similarity": 95.7,
+        "similarity": 95.6,
         "future_5d_return": 3.62,
         "rsi": 40.8,
         "price_vs_sma50": -0.1539
@@ -189,8 +189,8 @@
   ],
   "event_risk": {
     "expected_move": "\u00b14.0%",
-    "expected_range_low": 57523.78,
-    "expected_range_high": 62317.42,
+    "expected_range_low": 57456.67,
+    "expected_range_high": 62244.73,
     "direction": "UNCERTAIN",
     "recommendation": "Reduce position size by 50% before event",
     "event": {
@@ -231,27 +231,27 @@
     "source": "yfinance spot BTC ETFs (proxy, not true creation/redemption flow)"
   },
   "onchain": {
-    "mvrv_zscore": -1.19,
-    "miner_reserves": 315056579.0,
-    "nvt_ratio": 43.77,
+    "mvrv_zscore": -1.197,
+    "miner_reserves": 313534983.0,
+    "nvt_ratio": 45.14,
     "hashrate_trend": "RISING",
     "mvrv_is_proxy": true,
-    "miner_reserves_trend": "RISING",
+    "miner_reserves_trend": "FALLING",
     "hashrate_source": "mempool.space (blockchain.info unavailable)"
   },
   "exit_strategy": {
-    "entry": 59904.1,
+    "entry": 59883.7,
     "signal": "NO TRADE",
-    "current_price": 60503.140999999996,
+    "current_price": 60482.537,
     "scenarios": []
   },
   "ml_predictions": {
     "BTC": {
       "bilstm_score": 0.7,
-      "cnn_score": 0.193,
-      "ensemble_score": 0.447,
+      "cnn_score": 0.334,
+      "ensemble_score": 0.517,
       "action": "HOLD",
-      "confidence": 0.447,
+      "confidence": 0.517,
       "trade_qualified": false
     }
   },
@@ -260,45 +260,37 @@
     "BTC": {
       "symbol": "BTCUSDT",
       "bars_used": 721,
-      "total_trades": 51,
+      "total_trades": 50,
       "wins": 21,
-      "losses": 30,
+      "losses": 29,
       "time_exits": 5,
-      "win_rate": 41.2,
-      "profit_factor": 1.33,
-      "avg_r": 0.177,
-      "total_r": 9.04,
+      "win_rate": 42.0,
+      "profit_factor": 1.38,
+      "avg_r": 0.201,
+      "total_r": 10.04,
       "gross_r_win": 36.25,
-      "gross_r_loss": 27.21,
+      "gross_r_loss": 26.21,
       "trades": [
         {
           "side": "LONG",
-          "entry": 64917.4,
-          "exit": 64730.4,
-          "reason": "STOP",
-          "r_multiple": -1.0,
-          "held_bars": 2
-        },
-        {
-          "side": "LONG",
-          "entry": 64231.7,
-          "exit": 64023.5468,
+          "entry": 65071.8,
+          "exit": 64884.8,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
         },
         {
           "side": "LONG",
-          "entry": 63922.1,
-          "exit": 63715.1268,
+          "entry": 63975.7,
+          "exit": 63718.0431,
           "reason": "STOP",
           "r_multiple": -1.0,
-          "held_bars": 3
+          "held_bars": 4
         },
         {
           "side": "LONG",
           "entry": 63558.1,
-          "exit": 63339.9698,
+          "exit": 63341.8706,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 5
@@ -306,7 +298,7 @@
         {
           "side": "SHORT",
           "entry": 63059.1,
-          "exit": 63212.2646,
+          "exit": 63212.0076,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 3
@@ -314,7 +306,7 @@
         {
           "side": "SHORT",
           "entry": 63049.1,
-          "exit": 63184.2064,
+          "exit": 63184.0153,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
@@ -322,7 +314,7 @@
         {
           "side": "SHORT",
           "entry": 64138.7,
-          "exit": 64498.0442,
+          "exit": 64497.9783,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
@@ -330,7 +322,7 @@
         {
           "side": "SHORT",
           "entry": 64122.2,
-          "exit": 64504.2123,
+          "exit": 64504.1595,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 2
@@ -354,7 +346,7 @@
         {
           "side": "LONG",
           "entry": 78808.3,
-          "exit": 78443.4743,
+          "exit": 78443.4747,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
@@ -370,7 +362,7 @@
         {
           "side": "LONG",
           "entry": 77268.3,
-          "exit": 76831.1018,
+          "exit": 76831.102,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
@@ -378,7 +370,7 @@
         {
           "side": "LONG",
           "entry": 77525.7,
-          "exit": 77087.9256,
+          "exit": 77087.9257,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
@@ -590,6 +582,14 @@
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 1
+        },
+        {
+          "side": "SHORT",
+          "entry": 81683.4,
+          "exit": 81085.0,
+          "reason": "TARGET",
+          "r_multiple": 1.38,
+          "held_bars": 1
         }
       ],
       "error": null
@@ -602,9 +602,9 @@
       "losses": 17,
       "time_exits": 3,
       "win_rate": 51.4,
-      "profit_factor": 1.91,
+      "profit_factor": 1.92,
       "avg_r": 0.419,
-      "total_r": 14.67,
+      "total_r": 14.68,
       "gross_r_win": 30.71,
       "gross_r_loss": 16.04,
       "trades": [
@@ -627,7 +627,7 @@
         {
           "side": "SHORT",
           "entry": 1881.04,
-          "exit": 1886.9529,
+          "exit": 1886.9488,
           "reason": "STOP",
           "r_multiple": -1.0,
           "held_bars": 3
